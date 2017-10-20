@@ -1,0 +1,151 @@
+
+A - bright yellow,
+E - gold
+Fm - lighter blue, but also Bbm for the darker blues
+
+Maybe useful patches:
+
+B012 Vangelibells, as you'd expect, nice low down
+B046 Noise Toys
+
+FX-ee things:
+
+A099 RingThemBells, overwhelming decay, try it with sparse patterns
+G128 Bubble World, richly radiophonic (though I don't know how many FX will carry over to multi mode)
+H007 EffEmmEffIxx, nasty
+H020 Lila Bells, pretty but disturbing
+H033 Rise & Fall
+H031 RingDaBell, very 80's computer lab sound
+H043 The Assault, likewise but moreso
+
+
+-- Space Echo -------------------------------------------------------
+
+Multi Arp - Midi:02, Step Length:12.00
+Play -> 3, 'Shades of ...', Edit -> 5, 'Shades of ...'
+Patterns: 5, Transpose: 24, Velocity: 127, Gate:  50%
+
+Patch A033, Space Echo, is nice for this, transposed up a couple of octaves, pattern 3, no gaps.
+
+<< Pattern 1 >>
+Label: F Minor
+List 1: F4, G#4, B4
+
+<< Pattern 2 >>
+Label: F Minor
+List 1: Bb3, C#4, F4
+
+<< Pattern 3 >>
+Label: Shades of Blue
+List 1: F4, G#4, B4
+List 2: Bb3, C#4, F4
+
+<< Pattern 4 >>
+Label: Shades of Blue 2
+List 1: F4,,G#4, C5
+List 2: Bb3, C#4, F4
+
+
+<< Pattern 5 >>
+Label: Shades of Blue 3
+List 1: F4,,,G#4, B4,
+List 2: Bb3, C#4,, F4,,
+
+-- Bubbles -------------------------------------------------------
+
+Midi:01,
+Step Length: 4.00
+Transpose: 0, Velocity: 127, Gate:  50%
+
+G128 Bubble World
+
+Chain: 3, 4, 5, 6
+
+<< Pattern 01 >>
+Label: Empty
+List 1: ,,,,,,,,,,,,,,,,
+
+<< Pattern 02 >>
+Label: B&Y 2
+List 1: F4, G#4, B4
+List 2: Bb3, C#4, F4,
+List 3: E5, G#5, B5,,
+List 4: A4, C#5, E5,,,
+
+<< Pattern 03 >>
+Label: B&Y 3
+List 1: F3,,,,,, G#3,,,,,,, B3,,,,,,
+List 2: Bb2,,, C#4,,, F3,,,
+List 3: E4,,,, G#4,,,, B4,,,,
+List 4: A3,,,,, C#4,,,,, E4,,,,,
+
+<< Pattern 04 >>
+Label: B&Y 5, with high bits
+List 1: F3,,,,,, G#3,,,,,,, B3,,,,,,
+List 2: Bb2,,, C#4,,, F3,,,
+List 3: E4,,,, G#4,,,, B4,,,,
+List 4: A3,,,,, C#4,,,,, E4,,,,,
+List 5: F6 G#6,,, B6,,,,,,,,,,,, F7,
+
+<< Pattern 05 >>
+Label: Dolphins
+List 1: F6,,, G#6,,, B6,,, F7,,
+
+<< Pattern 06 >>
+Label: Long Dolphins
+List 1: F6 G#6,,, B6,,,,,,,,,,,, F7,
+
+-- Bells -------------------------------------------------------
+
+Multi Arp - Midi:03, Step Length: 4.00
+Play -> 3, 'Yellow/Gold', Edit -> 5, 'Yellow/Gold 3'
+Patterns: 5, Transpose: -24, Velocity: 127, Gate:  50%
+
+B012 Vangelis Bells, t = -24
+
+Chain: 1x2, 2x2, 1x2, 5
+
+<< Pattern 1 >>
+Label: A Major
+List 1: A4, C#5, E5, ,,,,
+
+<< Pattern 2 >>
+Label: E Major
+List 1: E5, G#5, B5, ,,,,
+
+<< Pattern 3 >>
+Label: Yellow/Gold
+List 1: E5, G#5, B5, ,,,,
+List 2: A4, C#5, E5, ,,,
+
+<< Pattern 4 >>
+Label: Yellow/Gold 2
+List 1: E5, G#5, B5, ,,,
+List 2: A4, C#5, E5, ,,
+
+<< Pattern 5 >>
+Label: Yellow/Gold 3
+List 1: E5, G#5, B5, ,
+List 2: A4, C#5, E5, ,,
+
+-- Alarm Clock -----------------------------------------------
+
+Pattern H031 RingDaBell
+Midi 4
+Step: 16 or higher
+Chain mode: N
+
+Chain: 1x5, 2x3, 1x14, 3x4
+
+<<Pattern 1 >>
+Label: Empty
+List 1: ,,,,,,,,,,,,,,,,
+
+<< Pattern 2 >>
+Label: Alarm
+List 1: F6,F6,F6,F6,,,,,,,,,,
+
+<< Pattern 3 >>
+Label: Alarm Tune
+List 1: A6,,B6,,C#7,,E7,,A6,,,,A6,,B6,,C#7,,E7,,G7,,,,,,,,
+

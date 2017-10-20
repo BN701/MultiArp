@@ -1,0 +1,263 @@
+<< Pattern >>
+
+List 1:   E5 / 60 700 E5/-7 ty/8000    B5  F#6 /100,   /1000000000E5,  E5/ 32,     E5, fred george   harry/was here
+Layer 3: aldskj asd
+List : asdadllkj
+List lkjadl Aome
+List 10:   /10000000000000000000E5,  E5/ 32,     E5, fred george   harry/was here
+
+// The comment symbol here is for my benefit. Any lines
+// thus marked can still be passed to Multi-Arp and will
+// be processed (generating errors) like everything else.
+
+// First token is an identifier: List, (Pattern) Label, Trigs
+//
+// Lists need a numeric ID next. I don't think I'll name them, though there is provision in the code.
+//
+// Multiple paste operations are allowed. Entries are replaced by whatever is being pasted,
+// entries not overwritten are left in place. (So note lists can be merged. Trig Lists replaced.)
+//
+
+<< Pattern >>
+Label: CMajor
+List 1: C5, D5, E5, F5, G5, A5, B5, C6
+List 1: C5 E5 G5, E5 G5 C6, G5 C6 E6, C6 E6 G6
+List 1: C4 E4 G4, E4 G4 C5, G4 C5 E5, C5 E5 G5
+List 1: C5, D5, E5, D5, E5, F5, E5, F5, G5, F5, G5, A5
+List 1: C5, D5, E5, D5, E5, F5, E5, F5, G5, F5, G5, D6, C6, , , , , , , ,
+List 1: C5, D5, E5, D5, E5, C6, E5, C6, D6, C6, D6, E6
+
+<< Pattern >>
+Label: CMajor, with accidentals
+List 1: C5, C#5, D5, D#5, E5, , ,
+List 1: F5, F#5, G5, G#5, A5, A#5, B5, C6
+
+<< Pattern >>
+Label: CMinor, natural
+List 1: C5, D5, Eb5, F5, G5, Ab5, Bb5, C6
+List 2: C5 D5 Eb5, D5 Eb5 C6, Eb5 C6 D6, C6 D6 E6
+List 3: C5, D5, Eb5, D5, Eb5, F5, Eb5, F5, G5, F5, G5, Ab5
+
+<< Pattern >>
+Label: CMinor, harmonic
+List 1: C5, D5, Eb5, F5, G5, Ab5, B5, C6
+List 2: C5 D5 Eb5, D5 Eb5 C6, Eb5 C6 D6, C6 D6 Eb6
+List 3: C5, D5, Eb5, D5, Eb5, F5, Eb5, F5, G5, F5, G5, Ab5
+
+<< Pattern >>
+Label: Cm7
+List 1: C5, Eb5, G5, Bb5
+
+
+
+<< Pattern >>
+Label: C Blues
+List 1: C5, Eb5, F5, Gb5, G5, Bb5, C6, Eb6
+
+<< Pattern >>
+Label: Metronome 4/4
+List 1: C4, C2, C2, C2
+List 2: C8, C7, C7, C7
+
+<< Pattern >>
+Label: Metronome 3/4
+List 1: C4, C2, C2
+
+<< Pattern >>
+Label: Metronome 5/4
+List 1: C4, C2, C2, C2, C2
+
+Step Value 16.000000
+List 1:  F2/127, F#2/127, G2/127, G#2/127, A2/127, A#2/127, B2/127, C3/127, C#3/127, D#3/127, D3/127, E3/127, F3/127, F#3/127, G3/127, G#3/127, A3/127, A#3/127, B3/127, C4/127, C#4/127, D4/127, D#4/127, E4/127, D#4/127, D4/127, C#4/127, C4/127, B3/127, A#3/127, A3/127, G3/127, G#3/127, G3/127, F3/127, F#3/127, F3/127, E3/127, D#3/127, D3/127, C#3/127, C3/127, B2/127, A#2/127, A2/127, G#2/127, G2/127, F#2/127, G2/127, G#2/127, A2/127, A#2/127, B2/127, C3/127, D3/127, G3/127, B2/127, G3/127, B2/127, G3/127, G3/127, C3/127, G3/127, F3/127, D3/127, C3/127, G3/127, F3/127, D3/127, A3/127, C3/127, G3/127, F3/127, E3/127, D3/127, C3/127, A3/127, G3/127, D#3/127, G3/127, F3/127, D3/127, C3/127, A3/127, F3/127, E3/127, D3/127, C3/127, F3/127, A3/127, E3/127, D3/127, C3/127
+
+<< Pattern >>
+Label: The first one
+List 1: E5 B5 F#6/100, E5, E5/32, E5
+List 1: E2, D4, E5, E6, A3, B3, C4, D4
+List 2: E2, D4, E5, E6, A3, B3, C4, D4
+
+<< Pattern >>
+Label: Metronome 3/4 plus
+List 1: C4, C2, C2
+List 2: C3,, C3, C3, C3,,
+
+List 4: C6,,,
+
+<< Pattern >>
+Label: Metronome 4/4
+List 2: C8, C7, C7, C7
+List 1: C4, C3, C2, C3, C4, C#3, C2 C3 C4, C3, C2 C3, C4 C3 C2, C3 C4 C3, C2 C3, C4 C3, C2 C3
+
+<< Pattern >>
+Label:Clave
+List 1: C4, , , C2, , , C2,
+
+Label: Test
+List 1: ,,C5,,C4
+Label:Test
+List 1: , , C5, , C4
+
+
+Chain to nothing
+Chain asdlkj: sds, 1lij, 1 lkj lkj, 1 x x 3, 2 x asd,
+
+
+<< Pattern >>
+Label: Jam Bass
+List 2: D4, D4, Db4, F4, F4, b4, ,,
+List 1: D2,D2,, D3,,D3
+
+<< Pattern >>
+Label: Jam Bass 2
+List 1: F#3,,,, F#3,,,F#3,F#4,,, F#3,,,
+List 2: D2,D2,, D3,,D3
+
+<< Pattern >>
+Label: Jam Bass 3
+List 1: Bb3,,Bb4,, Bb3,,,Bb3,,Bb2,, Bb3,,,Bb2
+List 2: D2,D2,, D3,,D3
+
+<< Pattern >>
+Label: Pulse
+List 1: F4 Bb4
+
+<< Pattern >>
+Label: Pulse 2
+List 1: Ab4 C5
+
+<< Pattern >>
+Label: New
+List 1: C4, D4, D#4, D4, F4, G4, F4, Bb5
+List 2: G3, F3, R, R
+
+<< Pattern >>
+Label:Ethel the frog and a longer name
+List 1: E2, D2, E2, E2, A2, B2, C3, D3
+List 2: E4, D4, E4, E4, A4, B4, C5, D5
+
+<< Pattern >>
+Label:Ethel the frog
+List 3: E2, D2, E2, E2, A2, B2, C3, D3
+List 5: E4, D4, E4, E4, A4, B4, C5, D5
+
+<< Pattern >>
+Label:Ethel the frog
+List 1: E2, D2, E2, E2, A2, B2, C3, D3
+List 2: E4, D4, E4, E4, A4, B4, C5, D5
+List 3: E2, D2, E2, E2, A2, B2, C3, D3
+List 4:
+List 5: E4, D4, E4, E4, A4, B4, C5, D5
+
+<< Pattern >>
+Label "Ethel the frog""
+List 1:
+List 2:
+List 3: E2/34, D2, E2/120, E2/0, A2, B2, C3, D3
+List 4:
+List 5: E4, D4, E4, E4, A4, B4, C5, D5
+
+<< Pattern >>
+
+Label:Ethel the frog
+List 1:
+List 2:
+List 3: E2, D2, E2, E2, A2, B2, C3, D3
+List 4:
+List 5: E4, D4, E4, E4, A4, B4, C5, D5
+List 6:
+List 7:
+List 8:
+List 9:
+List 10: , E5/0, E5,
+
+*** Here's a complete session ***
+
+<< Pattern Store >>
+
+Chain 1, 2, 3
+
+<< Pattern   1 >>
+Step Value 32.00
+Scale root 60 chrom 0 shift 0 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  E3, G4
+List 2  C4 Eb4, E4, F4
+
+<< Pattern   2 >>
+Step Value 8.00
+Scale root 60 chrom 0 shift 2 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  E3
+List 2  C4 Eb4, E4, F4
+
+<< Pattern   3 >>
+Step Value 6.00
+Scale root 60 chrom 0 shift -3 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  E3
+List 2  C4 Eb4, E4, F4
+
+<< Pattern Store >>
+
+Chain 1, 2, 3
+
+Pattern Chain Mode 0
+Reset on pattern change ON
+Edit focus follows play ON
+
+<< Pattern  1 >>
+Step Value 32.00
+Scale root 60 chrom 0 shift 0 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  E3, G4
+List 2  C4 Eb4, E4, F4
+
+<< Pattern  2 >>
+Step Value 8.00
+Scale root 60 chrom 0 shift 2 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  E3
+List 2  C4 Eb4, E4, F4
+
+<< Pattern  3 >>
+Step Value 6.00
+Scale root 60 chrom 0 shift -3 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  E3
+List 2  C4 Eb4, E4, F4
+
+
+
+<< Global >>
+
+Midi Channel 1
+Step Value 4.00
+Gate Length 1.00
+Gate Hold OFF
+Velocity 64
+Use pattern play data ON
+Link Quantum 4.00
+
+Scale root 60 chrom 0 shift 0 scale 'Major'
+Scale degrees 7 accidentals 'lo+mute' premap 'off'
+
+<< Pattern Store >>
+
+Chain 1x2, 2
+
+Store Pattern Chain Mode 2
+Store Reset on pattern change OFF
+Store Edit focus follows play OFF
+
+<< Pattern  1 >>
+Pattern Step Value 4.00
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  C5, D5, Eb5, F5, G5, Eb5, Bb5, C6
+
+<< Pattern  2 >>
+Pattern Step Value 10.00
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+List 1  C5, D5, Eb5, F5, G5, Eb5, Bb5, C6
+

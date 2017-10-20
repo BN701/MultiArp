@@ -1,8 +1,33 @@
-/* Starting from miniArp.c by Matthias Nagorni */
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+//
+//    ******************************************************************
+//    * Apologies for the alarming mix of coding styles. I'm an ad-hoc *
+//    * coder and I've been away from the game for several years.      *
+//    * BN, Oct 2017                                                   *
+//    ******************************************************************
+//
+//    Starting from miniArp.c by Matthias Nagorni, a great place to get
+//    going with the ALSA Sequencer.
+//
 
 
-
-// Make sure to define this before <cmath> is included for Windows (just in case I ever port it back)
 #define _USE_MATH_DEFINES
 
 #define LINK_PLATFORM_LINUX
@@ -163,25 +188,11 @@ void queue_next_step(int queueId)
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
         nextChord = g_PatternStore.Step();
-//        if ( g_PatternStore.PatternChanged() )
-//        {
-//            if ( g_PatternStore.CurrentPlayPattern().StepValueValid() )
-//                g_State.SetStepValueFromPattern(g_PatternStore.CurrentPlayPattern().StepValue());
-//            else
-//                g_State.ClearStepValueFromPattern();
-//        }
     }
 
     if ( nextChord != NULL )
     {
-//        Pattern & pattern = g_PatternStore.CurrentPlayPattern();
-
         double tempo = timeline.tempo();
-
-//        if ( g_State.UsePatternPlayData() && pattern.GateValid())
-//            duration = g_State.CalculateNoteDuration(tempo, nextChord->StepsTillNextNote(), pattern.Gate(), pattern.GateHold());
-//        else
-//            duration = g_State.CalculateNoteDuration(tempo, nextChord->StepsTillNextNote());
 
         /*
               V, m_StepValue, is 4 x 'steps per beat'. (This gives the familiar
@@ -217,11 +228,6 @@ void queue_next_step(int queueId)
                 noteVelocity = note.m_NoteVelocity;
             else
                 noteVelocity = g_PatternStore.NoteVelocity();
-
-//            else if ( g_State.UsePatternPlayData() && pattern.VelocityValid() )
-//                noteVelocity = pattern.Velocity();
-//            else
-//                noteVelocity = g_State.NoteVelocity();
 
             g_Sequencer.ScheduleNote(queueId, noteNumber, noteVelocity, duration);
         }
@@ -280,13 +286,6 @@ void midi_action(int queueId)
     }
     while ( g_Sequencer.EventInputPending() );
 }
-
-//enum paste_target_t
-//{
-//    paste_global,
-//    paste_pattern,
-//    num_paste_targets
-//};
 
 enum global_element_names_t {
      global_heading,
@@ -362,13 +361,6 @@ void load_from_string(string s, int & created, int & updated )
                 continue;
 
             // Handle global fields here (for the time being).
-
-//            if ( (*i).find("Scale ") == 0 )
-//            {
-//                globalTranslateTable.FromString(s);
-//                updated += 1;
-//                continue;
-//            }
 
             for ( global_element_names_t e = static_cast<global_element_names_t>(1);
                   e < number_global_element_names;
@@ -446,7 +438,6 @@ bool key_input_action()
 
     static string commandString;
 
-//    int scr_x, scr_y;
     int c = getch();
 
     switch (c)
@@ -514,80 +505,21 @@ bool key_input_action()
         break;
 
     case KEY_SPGUP:
-        break;
     case KEY_SPGDOWN:
-        break;
-
     case KEY_APGUP:
-        break;
     case KEY_APGDOWN:
-        break;
-
-    // Chromatic transpose
-
     case KEY_CDOWN:
-//        g_PatternStore.CurrentTranslateTable().SetTranspose(g_PatternStore.CurrentTranslateTable().Transpose() - 1);
-//        show_translation_status();
-        break;
-
     case KEY_CUP:
-//        g_PatternStore.CurrentTranslateTable().SetTranspose(g_PatternStore.CurrentTranslateTable().Transpose() + 1);
-//        show_translation_status();
-        break;
-
-    // Modal/tonal shift
-
     case KEY_CLEFT:
-//        g_PatternStore.CurrentTranslateTable().SetDegreeShift(g_PatternStore.CurrentTranslateTable().DegreeShift() - 1);
-//        show_translation_status();
-        break;
     case KEY_CRIGHT:
-//        g_PatternStore.CurrentTranslateTable().SetDegreeShift(g_PatternStore.CurrentTranslateTable().DegreeShift() + 1);
-//        show_translation_status();
-        break;
-
-    // Change root
-
     case KEY_SDOWN:
-//        g_PatternStore.CurrentTranslateTable().SetRoot(g_PatternStore.CurrentTranslateTable().Root() - 1);
-//        show_translation_status();
-        break;
     case KEY_SUP:
-//        g_PatternStore.CurrentTranslateTable().SetRoot(g_PatternStore.CurrentTranslateTable().Root() + 1);
-//        show_translation_status();
-        break;
-
-    // Cycle through scales
-
     case KEY_SLEFT:
-//        g_PatternStore.CurrentTranslateTable().NextScale(-1);
-//        show_translation_status();
-        break;
     case KEY_SRIGHT:
-//        g_PatternStore.CurrentTranslateTable().NextScale(1);
-//        show_translation_status();
-        break;
-
-    // Accidentals mode
-
     case KEY_CSLEFT:
-//        g_PatternStore.CurrentTranslateTable().NextAccidentalsMode(-1);
-//        show_translation_status();
-        break;
     case KEY_CSRIGHT:
-//        g_PatternStore.CurrentTranslateTable().NextAccidentalsMode(1);
-//        show_translation_status();
-        break;
-
-    // Premap mode
-
     case KEY_CSUP:
-//        g_PatternStore.CurrentTranslateTable().NextPremapMode(-1);
-//        show_translation_status();
-        break;
     case KEY_CSDOWN:
-//        g_PatternStore.CurrentTranslateTable().NextPremapMode(1);
-//        show_translation_status();
         break;
 
     case KEY_DOWN:
@@ -596,26 +528,8 @@ bool key_input_action()
     case KEY_RIGHT:
         g_PatternStore.RouteKey(g_CursorKeyMap.at(c));
         show_status_after_navigation();
-
-//        set_status(STAT_POS_2, g_PatternStore.Status().c_str());
-//        {
-//            int ofs, len;
-//            g_PatternStore.GetHighlight(ofs, len);
-//            highlight(STAT_POS_2, ofs, len, A_BOLD, 3);
-//        }
         break;
 
-
-//    // Pattern edit focus
-//
-//    case KEY_DOWN:
-//    case KEY_UP:
-//    case KEY_LEFT:
-//    case KEY_RIGHT:
-//        navigate_pattern_store(c);
-//        set_status_w(STAT_POS_PATTERN, g_PatternStore.Status().c_str());
-//        break;
-//
     case KEY_BACKSPACE: // 263
         if ( commandString.size() > 0 )
             commandString.pop_back();
@@ -665,7 +579,6 @@ int main(int argc, char *argv[])
     int queueIndex = g_Sequencer.CreateQueue();
     int queueId = g_Sequencer.Queue(queueIndex).GetQueueId();
 
-    // g_PatternStore.AddEmptyPattern();
     set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
 
     // Start the queue.

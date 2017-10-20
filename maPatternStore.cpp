@@ -1,3 +1,22 @@
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #include "maPatternStore.h"
 
 
@@ -430,13 +449,6 @@ string PatternStore::ToString()
     return result;
 }
 
-//enum paste_target_t
-//{
-//    paste_pattern_store,
-//    paste_pattern,
-//    num_paste_targets
-//};
-
 void PatternStore::SetFieldsFromString(string s)
 {
     for ( ps_element_names_t e = static_cast<ps_element_names_t>(1);
@@ -478,9 +490,6 @@ void PatternStore::SetFieldsFromString(string s)
 
 bool PatternStore::LoadFromString(string s, int & created, int & updates)
 {
-
-//    static paste_target_t target = paste_pattern;
-
     try
     {
         if ( s.find("<< Pattern Store >>") == 0 )
@@ -768,7 +777,6 @@ string PatternStore::LoadPatternPlayData( /*State & state, TranslateTable & tabl
 
     if ( (mask & PLAY_DATA_STEP) /* && p.StepValueValid() */ )
     {
-//        state.SetNewStepValuePending(p.StepValue());
         m_DefaultPattern.SetStepValue(p.StepValue());
         result += "Step Value";
     }

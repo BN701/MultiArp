@@ -1,3 +1,22 @@
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #include "maCommand.h"
 
 #include<algorithm>
@@ -410,7 +429,6 @@ bool do_command(std::string/*const char * */ commandString)
             {
                 g_PatternStore.SetFocus();
                 show_status_after_navigation();
-//                throw std::string("Hint: cue|edit n [now]");
             }
             else
             {
@@ -518,13 +536,6 @@ bool do_command(std::string/*const char * */ commandString)
             {
                 set_status(STAT_POS_2, "Setting %s Step Value: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
                 g_PatternStore.SetStepValue(fTemp);
-//                if ( g_State.UsePatternPlayData() )
-//                {
-//                    g_PatternStore.CurrentEditPattern().StoreStepValue(fTemp);
-//                    g_PatternStore.SetNewPatternPending(g_PatternStore.CurrentPlayPatternID() - 1);
-//                }
-//                else
-//                    g_State.SetNewStepValuePending(fTemp);
             }
             else
             {
@@ -540,10 +551,6 @@ bool do_command(std::string/*const char * */ commandString)
                 {
                     set_status(STAT_POS_2, "Setting %s Gate Length: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
                     g_PatternStore.SetGateLength(fTemp/100);
-//                    if ( g_State.UsePatternPlayData() )
-//                        g_PatternStore.CurrentEditPattern().StoreGate(fTemp/100);
-//                    else
-//                        g_State.SetGateLength(fTemp/100);
                 }
                 else
                 {
@@ -555,17 +562,9 @@ bool do_command(std::string/*const char * */ commandString)
             break;
         case C_GATE_HOLD:
             g_PatternStore.SetGateHold(true);
-//            if ( g_State.UsePatternPlayData() )
-//                g_PatternStore.CurrentEditPattern().StoreGateHold(true);
-//            else
-//                g_State.SetExtendGateOverRests(true);
             break;
         case C_GATE_NORMAL:
             g_PatternStore.SetGateHold(false);
-//            if ( g_State.UsePatternPlayData() )
-//                g_PatternStore.CurrentEditPattern().StoreGateHold(false);
-//            else
-//                g_State.SetExtendGateOverRests(false);
             break;
 
         case C_VELOCITY :
@@ -576,10 +575,6 @@ bool do_command(std::string/*const char * */ commandString)
             {
                 set_status(STAT_POS_2, "Setting %s velocity: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
                 g_PatternStore.SetNoteVelocity(iTemp);
-//                if ( g_State.UsePatternPlayData() )
-//                    g_PatternStore.CurrentEditPattern().StoreVelocity(fTemp);
-//                else
-//                    g_State.SetNoteVelocity(iTemp);
             }
             else
             {
@@ -613,13 +608,6 @@ bool do_command(std::string/*const char * */ commandString)
             g_PatternStore.CurrentTranslateTableForEdit();    // This automatically sets focus.
             show_status_after_navigation();
             break;
-//            if ( firstParameter == 0 )
-//                show_translation_status();
-//            else if ( firstParameter == 1 && g_PatternStore.CurrentTranslateTable().SetScale(tokens[1]) )
-//                set_status(STAT_POS_2, "Scale set to %s-%s", g_PatternStore.CurrentTranslateTable().RootName().c_str(), g_PatternStore.CurrentTranslateTable().ScaleName());
-//            else
-//                set_status(STAT_POS_2, "Hint: scale 1..%i|major|natural|harmonic|help", static_cast<int>(scroll_top));
-//            break;
         case C_SCALE_FROM_LIST:
             g_PatternStore.CurrentTranslateTableForEdit().SetScale(g_PatternStore.CurrentEditNoteList());
             show_translation_map_status();

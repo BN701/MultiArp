@@ -1,3 +1,22 @@
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef STATE_H
 #define STATE_H
 
@@ -16,22 +35,6 @@ class State
 
         void Step();
 
-//        /** Clear m_StepValueOverride
-//         * \return Clear current value of m_StepValueOverride
-//         */
-//        void ClearStepValueFromPattern();
-//        /** Set m_StepValueOverride
-//         * \param val New value to set
-//         */
-//        void SetStepValueFromPattern(double val);
-//        /** Access m_UseGlobalPlayData
-//         * \return The current value of m_UseGlobalPlayData
-//         */
-//        bool UsePatternPlayData() { return m_UsePatternPlayData; }
-//        /** Set m_StepValue
-//         * \param val New value to set
-//         */
-//        void SetUsePatternPlayData(bool val) { m_UsePatternPlayData = val; }
         /** Access m_StepValue
          * \return The current value of m_StepValue
          */
@@ -45,14 +48,6 @@ class State
                 return;
             m_CurrentStepValue = val;
         }
-//        /** Access m_Transpose
-//         * \return The current value of m_Transpose
-//         */
-//        int Transpose() { return m_Transpose; }
-//        /** Set m_Transpose
-//         * \param val New value to set
-//         */
-//        void SetTranspose(int val) { m_Transpose = val; }
         /** Access m_Quantum
          * \return The current value of m_Quantum
          */
@@ -61,22 +56,6 @@ class State
          * \param val New value to set
          */
         void SetQuantum(double val) { m_Quantum = val; }
-//        /** Access m_GateLength
-//         * \return The current value of m_GateLength
-//         */
-//        double GateLength() { return m_GateLength; }
-//        /** Set m_GateLength
-//         * \param val New value to set
-//         */
-//        void SetGateLength(double val) { m_GateLength = val; }
-//        /** Access m_NoteVelocity
-//         * \return The current value of m_NoteVelocity
-//         */
-//        unsigned int NoteVelocity() { return m_NoteVelocity; }
-//        /** Set m_NoteVelocity
-//         * \param val New value to set
-//         */
-//        void SetNoteVelocity(unsigned char val) { m_NoteVelocity = val; }
         /** Access m_RunState
          * \return The current value of m_RunState
          */
@@ -122,12 +101,9 @@ class State
          */
         void SetPatternReset(int val) { m_PatternReset = val; }
 
-//        void SetExtendGateOverRests(bool val) { m_ExtendGateOverRests = val; }
-//        bool ExtendGateOverRests() { return m_ExtendGateOverRests; }
-
         /*
             These accessors are used as once-only pairs. A new value is set and
-            a flag is set. WHen the flag is checked the new value is applied and
+            a flag is set. When the flag is checked the new value is applied and
             the flag is cleared.
          */
 
@@ -135,55 +111,22 @@ class State
         bool NewRunStatePending();
         int DeferStop() { return m_DeferStop; }
 
-//        void SetNewStepValuePending( double val );
-//        bool NewStepValuePending();
-
-//        void SetNewTransposePending( int val );
-//        bool NewTransposePending();
-
         void SetNewQuantumPending( double val );
         bool NewQuantumPending();
-
-        // Apply state variables to notes and other things.
-
-//        double StepLengthmSec(double tempo);
-//        double GateLengthmSec(double tempo, double gate = -1.0);
-//        double CalculateNoteDuration(double tempo, int extraSteps, double gate = -1.0, bool extendOverride = false);
-//        double StepValueInUse();
-
-        // int Transpose(int n) { return m_TransposeTables.Transpose(m_Root, m_Scale, m_Transpose, n); };
-        // int Transpose(int n) { return n + m_Transpose; };
 
     protected:
 
     private:
 
         double m_CurrentStepValue;
-        // double m_StepValue; //!< Member variable "m_StepValue"
-//        double m_StepValueFromPattern;
-//        bool m_validValueFromPattern;
         double m_Quantum; //!< Member variable "m_Quantum"
-//        double m_GateLength; //!< Member variable "m_GateLength"
-//        unsigned char m_NoteVelocity; //!< Member variable "m_NoteVelocity"
         bool m_RunState; //!< Member variable "m_RunState"
-        // int64_t m_Step; //!< Member variable "m_Step"
         double m_Beat; //!< Member variable "m_Beat"
         double m_Phase; //!< Member variable "m_Phase"
         int m_PatternReset; //!<Member variable "m_PatternReset"
-//        bool m_ExtendGateOverRests;
-
-//        bool m_UsePatternPlayData;
-
-        // int m_Root;
-        // int m_Scale;
-        // int m_Transpose; //!< Member variable "m_Transpose"
 
         bool m_NewRunStatePending;
         bool m_NewRunState;
-//        bool m_NewStepValuePending;
-//        double m_NewStepValue;
-//        bool m_NewTransposePending;
-//        int m_NewTranspose;
         bool m_NewQuantumPending;
         int m_NewQuantum;
 

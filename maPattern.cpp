@@ -1,3 +1,22 @@
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #include "maPatternStore.h"
 
 
@@ -89,29 +108,20 @@ string Pattern::ToString()
 
     char buffer[200];
 
-//    if ( m_validStepValue )
-//    {
-        sprintf(buffer, "%s %.2f", pat_element_names.at(pat_name_step_value), m_StepValue);
-        result += buffer;
-//    }
+    sprintf(buffer, "%s %.2f", pat_element_names.at(pat_name_step_value), m_StepValue);
+    result += buffer;
 
-//    if ( m_validGate )
-//    {
-        if ( !result.empty() )
-            result += ' ';
-        sprintf(buffer, "%s %.2f %s %s",
-                pat_element_names.at(pat_name_gate), m_Gate,
-                pat_element_names.at(pat_name_gate_hold), m_GateHold ? "ON" : "OFF");
-        result += buffer;
-//    }
+    if ( !result.empty() )
+        result += ' ';
+    sprintf(buffer, "%s %.2f %s %s",
+            pat_element_names.at(pat_name_gate), m_Gate,
+            pat_element_names.at(pat_name_gate_hold), m_GateHold ? "ON" : "OFF");
+    result += buffer;
 
-//    if ( m_validVelocity )
-//    {
-        if ( !result.empty() )
-            result += ' ';
-        sprintf(buffer, "%s %i", pat_element_names.at(pat_name_velocity), m_Velocity);
-        result += buffer;
-//    }
+    if ( !result.empty() )
+        result += ' ';
+    sprintf(buffer, "%s %i", pat_element_names.at(pat_name_velocity), m_Velocity);
+    result += buffer;
 
     result += "\n";
     result += m_TranslateTable.ToString("Pattern");
@@ -144,22 +154,16 @@ void Pattern::SetFieldsFromString(string s)
             switch (e)
             {
             case pat_name_step_value:
-                // m_validStepValue = false;
                 m_StepValue = stod(token);
-                // m_validStepValue = true;
                 break;
             case pat_name_gate:
-                // m_validGate = false;
                 m_Gate = stod(token);
-                // m_validGate = true;
                 break;
             case pat_name_gate_hold:
                 m_GateHold = token == "ON";
                 break;
             case pat_name_velocity:
-                // m_validVelocity = false;
                 m_Velocity = stoi(token);
-                // m_validVelocity = true;
                 break;
             case pat_name_label:
                 m_Label = token;
@@ -272,7 +276,6 @@ void Pattern::DeleteCurrentList()
     if ( m_ListSet.empty() )
         return;
 
-    // m_Deleted.push_back(m_Patterns.at(m_PosEdit));
     m_ListSet.erase(m_ListSet.begin() + m_PosEdit);
 
     if ( m_ListSet.empty() )
@@ -306,13 +309,11 @@ void Pattern::DeleteCurrentList()
 void Pattern::StoreStepValue( double val )
 {
     m_StepValue = val;
-//    m_validStepValue = true;
 }
 
 void Pattern::StoreGate( double gate )
 {
     m_Gate = gate;
-//    m_validGate = true;
 }
 
 void Pattern::StoreGateHold( bool val )
@@ -323,12 +324,10 @@ void Pattern::StoreGateHold( bool val )
 void Pattern::StoreVelocity( unsigned char vel )
 {
     m_Velocity = vel;
-//    m_validVelocity = true;
 }
 
 void Pattern::StoreTranslateTable( TranslateTable & table )
 {
     m_TranslateTable = table;
-    // m_validTranslateTable = true;
 }
 

@@ -1,3 +1,22 @@
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #ifndef PATTERN_STORE_H_INCLUDED
 #define PATTERN_STORE_H_INCLUDED
 
@@ -158,11 +177,6 @@ struct Pattern
     TranslateTable m_TranslateTable;
     FeelMap m_FeelMap;
 
-//    bool m_validStepValue;
-//    bool m_validGate;
-//    bool m_validVelocity;
-//    bool m_validTranslateTable;
-
     void StoreStepValue( double val );
     void StoreGate( double gate);
     void StoreGateHold( bool val );
@@ -176,17 +190,6 @@ struct Pattern
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
 
-//    bool StepValueValid() { return m_validStepValue; }
-//    bool GateValid() { return m_validGate; }
-//    bool VelocityValid() { return m_validVelocity; }
-//    bool TranslateTableValid() { return m_validTranslateTable; }
-
-//    void SetInvalidStepValue() { m_validStepValue = false; }
-//    void SetInvalidGate() { m_validGate = false; }
-//    void SetInvalidVelocity() { m_validVelocity = false; }
-//    void SetInvalidCurrentTranslateTable() { m_validTranslateTable = false; }
-
-
     Pattern():
         m_Pos(0),
         m_PosEdit(0),
@@ -195,10 +198,6 @@ struct Pattern
         m_Gate(0.5),
         m_GateHold(false),
         m_Velocity(64)
-        // m_validStepValue(false),
-        // m_validGate(false),
-        // m_validVelocity(false)
-        // m_validTranslateTable(false)
     {
         NewList();
     }
@@ -209,10 +208,6 @@ struct Pattern
         m_Trigs.clear();
         m_ListSet.clear();
         ResetPosition();
-        // m_validStepValue = false;
-        // m_validGate = false;
-        // m_validVelocity = false;
-        // m_validTranslateTable = false;
         m_TranslateTable.Reset();
         m_StepValue = 4.0;
         m_Gate = 0.5;

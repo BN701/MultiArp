@@ -1,30 +1,34 @@
+//
+//    MultiArp - Another step in the Great Midi Adventure!
+//    Copyright (C) 2017  Barry Neilsen
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #include "maState.h"
-// #include "maPatternStore.h"
 
 State::State():
     m_CurrentStepValue(4.0),
-//    m_StepValueFromPattern(0),
-//    m_validValueFromPattern(false),
-//    m_Transpose(0),
     m_Quantum(4.0),
-//    m_GateLength(1.0),
-//    m_NoteVelocity(64),
     m_RunState(false),
-//    m_Step(-1),
     m_Beat(-4/m_CurrentStepValue),
     m_Phase(0),
-//    m_ExtendGateOverRests(false),
-//    m_Root(60), // Middle C
-//    m_Scale(SCALE_CHROMATIC),
     m_NewRunStatePending(false),
     m_NewRunState(false),
-//    m_NewStepValuePending(false),
-//    m_NewStepValue(0),
-//    m_NewTransposePending(false),
-//    m_NewTranspose(0),
     m_NewQuantumPending(false),
     m_NewQuantum(0),
-//    m_UsePatternPlayData(true),
     m_DeferStop(0)
 {
     //ctor
@@ -37,69 +41,10 @@ State::~State()
 
 void State::Step()
 {
-//    m_Step++;
-//    if ( m_UsePatternPlayData && m_validValueFromPattern )
-//        m_Beat += 4 / m_StepValueFromPattern;
-//    else
-//        m_Beat += 4 / m_StepValue;
-
     m_Beat += 4 / m_CurrentStepValue;
 }
 
-//double State::StepValueInUse()
-//{
-//    if ( m_UsePatternPlayData && m_validValueFromPattern )
-//        return m_StepValueFromPattern;
-//    else
-//        return m_StepValue;
-//}
 
-//void State::SetStepValueFromPattern(double val)
-//{
-//    m_StepValueFromPattern = val;
-//    m_validValueFromPattern = true;
-//}
-//
-//
-//void State::ClearStepValueFromPattern()
-//{
-//    m_StepValueFromPattern = 0;
-//    m_validValueFromPattern = false;
-//}
-//
-
-
-//double State::StepLengthmSec(double tempo)
-//{
-//    /*
-//          V, m_StepValue, is 4 x 'steps per beat'. (This gives the familiar
-//          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
-//
-//          Steps per beat, v = V/4.
-//          Steps per minute = Tv = TV/4
-//          Steps per second = TV/240
-//          Step length in mSec = 1000*240/TV
-//     */
-//
-//    return 240000.0/(tempo * m_CurrentStepValue);
-//}
-//
-//double State::GateLengthmSec(double tempo, double gate)
-//{
-//    if ( gate > 0 )
-//        return gate * StepLengthmSec(tempo);
-//    else
-//        return m_GateLength * StepLengthmSec(tempo);
-//}
-//
-//double State::CalculateNoteDuration(double tempo, int extraSteps, double gate, bool extendOverride)
-//{
-//    if ( extendOverride || m_ExtendGateOverRests )
-//        return extraSteps * StepLengthmSec(tempo) + GateLengthmSec(tempo, gate);
-//    else
-//        return GateLengthmSec(tempo, gate);
-//}
-//
 void State::SetNewRunStatePending( bool val, int defer )
 {
     m_NewRunStatePending = true;
@@ -119,42 +64,6 @@ bool State::NewRunStatePending()
     else
         return false;
 }
-
-//void State::SetNewStepValuePending( double val )
-//{
-//    m_NewStepValuePending = true;
-//    m_NewStepValue = val;
-//}
-//
-//bool State::NewStepValuePending()
-//{
-//    if ( m_NewStepValuePending )
-//    {
-//        m_StepValue = m_NewStepValue;
-//        m_NewStepValuePending = false;
-//        return true;
-//    }
-//    else
-//        return false;
-//}
-//
-//void State::SetNewTransposePending( int val )
-//{
-//    m_NewTransposePending = true;
-//    m_NewTranspose = val;
-//}
-//
-//bool State::NewTransposePending()
-//{
-//    if ( m_NewTransposePending )
-//    {
-//        m_Transpose = m_NewTranspose;
-//        m_NewTransposePending = false;
-//        return true;
-//    }
-//    else
-//        return false;
-//}
 
 void State::SetNewQuantumPending( double val )
 {

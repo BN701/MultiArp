@@ -38,15 +38,24 @@ class FeelMap : public CursorKeys
             SetStatus();
         }
 
+        void New(std::vector<std::string> & tokens);
+        void Add();
+        void Remove();
+        void Respace();
+
+        std::string ToString(const char * prefix);
+        void FromString(std::string s);
+
+
     protected:
         void SetStatus();
 
         virtual bool HandleKey(key_type_t k);
-        int m_EditPoint;
 
     private:
 
-        int m_Points;
+        int m_Points;       // Number of stretchpoints - 1.
+        int m_EditPoint;
         std::vector<double> m_StretchPoints;
 };
 

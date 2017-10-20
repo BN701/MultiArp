@@ -9,7 +9,7 @@
 	<string>
 	<vector>
 
-1508498167 source:/home/barry/Code Blocks Projects/MultiArp/multi_arp.cpp
+1508522358 source:/home/barry/Code Blocks Projects/MultiArp/multi_arp.cpp
 	<ableton/Link.hpp>
 	<unordered_map>
 	"maAlsaSequencer.h"
@@ -4306,15 +4306,15 @@
 	<signal.h>
 	<alsa/asoundlib.h>
 
-1507987708 source:/home/barry/Code Blocks Projects/MultiArp/maAlsaSequencer.cpp
+1508498255 source:/home/barry/Code Blocks Projects/MultiArp/maAlsaSequencer.cpp
 	"maAlsaSequencer.h"
 
-1507987563 /home/barry/Code Blocks Projects/MultiArp/maAlsaSequencer.h
+1508499109 /home/barry/Code Blocks Projects/MultiArp/maAlsaSequencer.h
 	"maAlsaSequencerQueue.h"
 	<cstdint>
 	<vector>
 
-1508437061 source:/home/barry/Code Blocks Projects/MultiArp/maPatternStore.cpp
+1508524374 source:/home/barry/Code Blocks Projects/MultiArp/maPatternStore.cpp
 	"maPatternStore.h"
 	<cstring>
 	<stdexcept>
@@ -4329,13 +4329,13 @@
 	<signal.h>
 	<alsa/asoundlib.h>
 
-1505682579 source:/home/barry/Code Blocks Projects/MultiArp/maAlsaSequencerQueue.cpp
+1508498282 source:/home/barry/Code Blocks Projects/MultiArp/maAlsaSequencerQueue.cpp
 	"maAlsaSequencerQueue.h"
 
-1505682508 /home/barry/Code Blocks Projects/MultiArp/maAlsaSequencerQueue.h
+1508499118 /home/barry/Code Blocks Projects/MultiArp/maAlsaSequencerQueue.h
 	<alsa/asoundlib.h>
 
-1508437091 /home/barry/Code Blocks Projects/MultiArp/maPatternStore.h
+1508524679 /home/barry/Code Blocks Projects/MultiArp/maPatternStore.h
 	<vector>
 	<string>
 	"maCursorKeys.h"
@@ -4344,27 +4344,27 @@
 
 1505588809 /home/barry/Code Blocks Projects/MultiArp/notelist.hpp
 
-1508023420 source:/home/barry/Code Blocks Projects/MultiArp/maUtility.cpp
+1508499677 source:/home/barry/Code Blocks Projects/MultiArp/maUtility.cpp
 	"maUtility.h"
 	<cstring>
 
-1507904748 /home/barry/Code Blocks Projects/MultiArp/maUtility.h
+1508499677 /home/barry/Code Blocks Projects/MultiArp/maUtility.h
 	<vector>
 	<string>
 
-1508335993 source:/home/barry/Code Blocks Projects/MultiArp/maNotes.cpp
+1508498354 source:/home/barry/Code Blocks Projects/MultiArp/maNotes.cpp
 	"maPatternStore.h"
 	<cstring>
 	<unordered_map>
 	"maUtility.h"
 
-1508336369 source:/home/barry/Code Blocks Projects/MultiArp/maPattern.cpp
+1508524086 source:/home/barry/Code Blocks Projects/MultiArp/maPattern.cpp
 	"maPatternStore.h"
 	<cstring>
 	<unordered_map>
 	"maUtility.h"
 
-1508437215 source:/home/barry/Code Blocks Projects/MultiArp/maCommand.cpp
+1508510145 source:/home/barry/Code Blocks Projects/MultiArp/maCommand.cpp
 	"maCommand.h"
 	<algorithm>
 	<cstring>
@@ -4379,7 +4379,7 @@
 	"maTranslateTable.h"
 	"maUtility.h"
 
-1508433165 source:/home/barry/Code Blocks Projects/MultiArp/maScreen.cpp
+1508498496 source:/home/barry/Code Blocks Projects/MultiArp/maScreen.cpp
 	"maScreen.h"
 	"maState.h"
 	"maUtility.h"
@@ -4389,25 +4389,25 @@
 	"maPatternStore.h"
 	"maTranslateTable.h"
 
-1508432889 /home/barry/Code Blocks Projects/MultiArp/maScreen.h
+1508499677 /home/barry/Code Blocks Projects/MultiArp/maScreen.h
 	<ncurses.h>
 
-1507968280 /home/barry/Code Blocks Projects/MultiArp/maCommand.h
+1508499128 /home/barry/Code Blocks Projects/MultiArp/maCommand.h
 	<string>
 
-1508248655 source:/home/barry/Code Blocks Projects/MultiArp/maState.cpp
+1508498465 source:/home/barry/Code Blocks Projects/MultiArp/maState.cpp
 	"maState.h"
 
-1508249094 /home/barry/Code Blocks Projects/MultiArp/maState.h
+1508499618 /home/barry/Code Blocks Projects/MultiArp/maState.h
 	<inttypes.h>
 	<string>
 	"maTranslateTable.h"
 
-1508335756 source:/home/barry/Code Blocks Projects/MultiArp/maListBuilder.cpp
+1508498331 source:/home/barry/Code Blocks Projects/MultiArp/maListBuilder.cpp
 	"maListBuilder.h"
 	<alsa/asoundlib.h>
 
-1508334598 /home/barry/Code Blocks Projects/MultiArp/maListBuilder.h
+1508499194 /home/barry/Code Blocks Projects/MultiArp/maListBuilder.h
 	<alsa/asoundlib.h>
 	"maPatternStore.h"
 
@@ -4426,12 +4426,12 @@
 1506892932 /home/barry/Code Blocks Projects/MultiArp/maTransposeTable.h
 	<vector>
 
-1508339780 /home/barry/Code Blocks Projects/MultiArp/maTranslateTable.h
+1508499677 /home/barry/Code Blocks Projects/MultiArp/maTranslateTable.h
 	<string>
 	<vector>
 	"maCursorKeys.h"
 
-1508399529 source:/home/barry/Code Blocks Projects/MultiArp/maTranslateTable.cpp
+1508511955 source:/home/barry/Code Blocks Projects/MultiArp/maTranslateTable.cpp
 	"maTranslateTable.h"
 	<vector>
 	<string>
@@ -4441,20 +4441,22 @@
 	"maUtility.h"
 	"maPatternStore.h"
 
-1508451443 source:/home/barry/Code Blocks Projects/MultiArp/maFeelMap.cpp
+1508523980 source:/home/barry/Code Blocks Projects/MultiArp/maFeelMap.cpp
+	<algorithm>
 	<cmath>
-	<iostream>
 	<fstream>
+	<iostream>
 	"maFeelMap.h"
+	"maUtility.h"
 
-1508433806 /home/barry/Code Blocks Projects/MultiArp/maFeelMap.h
+1508523638 /home/barry/Code Blocks Projects/MultiArp/maFeelMap.h
 	<vector>
 	"maCursorKeys.h"
 
-1508308757 source:/home/barry/Code Blocks Projects/MultiArp/maCursorKeys.cpp
+1508498305 source:/home/barry/Code Blocks Projects/MultiArp/maCursorKeys.cpp
 	"maCursorKeys.h"
 
-1508400066 /home/barry/Code Blocks Projects/MultiArp/maCursorKeys.h
+1508499145 /home/barry/Code Blocks Projects/MultiArp/maCursorKeys.h
 	<string>
 	<vector>
 

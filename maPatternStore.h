@@ -199,7 +199,7 @@ struct Pattern
         m_GateHold(false),
         m_Velocity(64)
     {
-        NewList();
+        // NewList();
     }
 
     void Clear ()
@@ -247,7 +247,7 @@ struct Pattern
 
     std::string Label(size_t width);
     std::string ListToString(std::vector<int>::size_type n);
-    std::string ToString();
+    std::string ToString(const char * prefix = NULL);
     bool FromString(std::string s, int & updates);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
@@ -411,10 +411,13 @@ struct PatternStore : public CursorKeys
     int AddEmptyPattern()
     {
         m_Patterns.push_back(m_DefaultPattern);
+        m_Patterns.at(m_Patterns.size() - 1).NewList();
+
         if ( m_EditFocusFollowsPlay )
             return m_Patterns.size() - 1;
         else
             return m_PosEdit = m_Patterns.size() - 1;
+
     }
 
     int CopyCurrentPattern()

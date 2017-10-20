@@ -94,9 +94,15 @@ unordered_map<pat_element_names_t, const char *> pat_element_names = {
 
 
 
-string Pattern::ToString()
+string Pattern::ToString(const char * prefix)
 {
-    string result = "Pattern ";
+    string result;
+
+    if ( prefix != NULL )
+    {
+        result += prefix;
+        result += ' ';
+    }
 
     if ( !m_Label.empty() )
     {
@@ -124,7 +130,11 @@ string Pattern::ToString()
     result += buffer;
 
     result += "\n";
-    result += m_TranslateTable.ToString("Pattern");
+    result += m_TranslateTable.ToString(prefix);
+
+    result += "\n";
+    result += m_FeelMap.ToString(prefix);
+    result += "\n";
 
     int index = 1;
     for ( vector<NoteList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++, index++ )
@@ -187,6 +197,15 @@ bool Pattern::FromString(string s, int & updates)
 {
     try
     {
+        // This is now a kludgey hack to allow for both 'Default' and 'Pattern' tags,
+        // when initializing from a string.
+        //
+        // Forturnately, both tags are the same length so we can check for 'Scale',
+        // 'Trigs' and 'Feel' at position 7 and route accordingly. We don't do this
+        // for 'List' because the default pattern won't have any so all lists are
+        // routed to the current member of the pattern list. The final else
+        // clause catches everything else
+
         if ( s.find("List ") == 0 )
         {
             int index = stoi(s.substr(5)) - 1;
@@ -197,18 +216,24 @@ bool Pattern::FromString(string s, int & updates)
             updates += 1;
             return true;
         }
-        else if ( s.find("Trigs ") == 0 )
+        else if ( s.find(" Trigs ") == 7 )
         {
             updates += 1;
             return true;
         }
-        else if ( s.find("Pattern Scale ") == 0 )
+        else if ( s.find(" Scale ") == 7 )
         {
             m_TranslateTable.FromString(s);
             updates += 1;
             return true;
         }
-        else if ( s.find("Pattern ") == 0 )
+        else if ( s.find(" Feel ") == 7 )
+        {
+            m_FeelMap.FromString(s);
+            updates += 1;
+            return true;
+        }
+        else if ( s.find("Pattern ") == 0 || s.find("Default ") == 0 )
         {
             SetFieldsFromString(s);
             updates += 1;

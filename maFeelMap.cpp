@@ -17,12 +17,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 
 #include "maFeelMap.h"
+#include "maUtility.h"
 
 using namespace std;
 
@@ -78,6 +80,108 @@ FeelMap::~FeelMap()
 #endif
 }
 
+void FeelMap::New(vector<string> & tokens)
+{
+    m_StretchPoints.clear();
+    m_StretchPoints.push_back(0.0);
+    m_StretchPoints.push_back(1.0);
+
+    if ( tokens.size() > 2 )
+    {
+        for ( int i = 2; i < tokens.size(); i++ )
+        {
+            try
+            {
+                double t = stod(tokens.at(i));
+                if ( t > 0 && t < 1 )
+                    m_StretchPoints.push_back(t);
+            }
+            catch(...)
+            {
+            }
+        }
+        sort(m_StretchPoints.begin(), m_StretchPoints.end());
+    }
+
+    m_Points = m_StretchPoints.size() - 1;
+
+    if ( m_Points > 1 )
+        m_EditPoint = 1;
+    else
+        m_EditPoint = 0;
+
+    SetStatus();
+}
+
+void FeelMap::Add()
+{
+    double val = m_StretchPoints.at(m_EditPoint) + (m_StretchPoints.at(m_EditPoint + 1) - m_StretchPoints.at(m_EditPoint))/2;
+
+    vector<double>::iterator it = m_StretchPoints.begin();
+    m_StretchPoints.insert(it + m_EditPoint + 1, val);
+
+    m_Points = m_StretchPoints.size() - 1;
+    m_EditPoint += 1;
+    SetStatus();
+}
+
+void FeelMap::Remove()
+{
+    if ( m_Points <= 1 )
+        return;
+
+    vector<double>::iterator it = m_StretchPoints.begin();
+    m_StretchPoints.erase(it + m_EditPoint);
+
+    m_Points = m_StretchPoints.size() - 1;
+    if ( m_EditPoint == m_Points )
+        m_EditPoint -= 1;
+    SetStatus();
+}
+
+void FeelMap::Respace()
+{
+    if ( m_Points <= 1 )
+        return;
+
+    for ( int i = 1; i < m_Points; i++ )
+        m_StretchPoints.at(i) = double(i)/(m_Points);
+
+    SetStatus();
+}
+
+string FeelMap::ToString(const char * prefix)
+{
+    char buff[100];
+    string result;
+
+    if ( prefix != NULL )
+    {
+        result += prefix;
+        result += ' ';
+    }
+
+    result += "Feel Map";
+    if ( m_StretchPoints.size() > 2 )
+        for ( int i = 1; i < m_StretchPoints.size() - 1; i++ )
+        {
+            result += " ";
+            sprintf(buff, "%.3f", m_StretchPoints.at(i));
+            result += buff;
+        }
+
+    return result;
+}
+
+void FeelMap::FromString(string s)
+{
+    if ( s.find("Feel Map") == string::npos )
+        throw string("FeelMap::FromString() - Not a valid field list.");
+
+    vector<string> tokens = split(s.c_str(), ' ');
+
+    New(tokens);
+}
 
 void FeelMap::SetStatus()
 {
@@ -104,7 +208,8 @@ void FeelMap::SetStatus()
         m_FieldPositions.emplace_back(pos + 1, m_Status.size() - pos - 1);
     }
 
-    m_Highlights.push_back(m_FieldPositions.at(m_EditPoint));
+    if ( m_Points > 2 )
+        m_Highlights.push_back(m_FieldPositions.at(m_EditPoint));
 }
 
 bool FeelMap::HandleKey(key_type_t k)

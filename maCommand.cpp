@@ -33,6 +33,7 @@
 #include "maTranslateTable.h"
 #include "maUtility.h"
 
+using namespace std;
 
 // Global objects.
 
@@ -72,6 +73,12 @@ enum command_t
     C_SETROOT,
 
     C_FEEL,
+    C_FEEL_HELP,
+    C_FEEL_NEW,
+    C_FEEL_ADD,
+    C_FEEL_REMOVE,
+    C_FEEL_RESPACE,
+    C_FEEL_BYPASS,
 
     C_MIDI,
 
@@ -117,7 +124,7 @@ enum command_t
 };
 
 
-std::unordered_map<std::string, command_t> gCommandList =
+unordered_map<string, command_t> gCommandList =
 {
     {"exit", C_EXIT},
     {"quit", C_EXIT},
@@ -161,6 +168,21 @@ std::unordered_map<std::string, command_t> gCommandList =
 
     {"feel", C_FEEL},
     {"f", C_FEEL},
+    {"feel new", C_FEEL_NEW},
+    {"f new", C_FEEL_NEW},
+    {"feel add", C_FEEL_ADD},
+    {"f add", C_FEEL_ADD},
+    {"feel remove", C_FEEL_REMOVE},
+    {"f remove", C_FEEL_REMOVE},
+    {"feel new", C_FEEL_NEW},
+    {"f new", C_FEEL_NEW},
+    {"feel respace", C_FEEL_RESPACE},
+    {"f respace", C_FEEL_RESPACE},
+    {"feel bypass", C_FEEL_BYPASS},
+    {"f bypass", C_FEEL_BYPASS},
+    {"feel help", C_FEEL_HELP},
+    {"f help", C_FEEL_HELP},
+    {"help feel", C_FEEL_HELP},
 
     {"channel", C_MIDI},
     {"chan", C_MIDI},
@@ -218,17 +240,17 @@ std::unordered_map<std::string, command_t> gCommandList =
     {"control", C_HELP_2}
 };
 
-command_t command_from_string(std::string commandName)
+command_t command_from_string(string commandName)
 {
 
     command_t command;
 
     try
     {
-        std::transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
+        transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
         command = gCommandList.at(commandName);
     }
-    catch ( std::out_of_range const & e )
+    catch ( out_of_range const & e )
     {
         command = C_NONE;
     }
@@ -236,14 +258,14 @@ command_t command_from_string(std::string commandName)
     return command;
 }
 
-command_t command_from_string(std::vector<std::string> & tokens, int count = 1)
+command_t command_from_string(vector<string> & tokens, int count = 1)
 {
 
     command_t command;
 
     try
     {
-        std::string commandName = tokens[0];
+        string commandName = tokens[0];
 
         for ( int i = 1; i < count; i++ )
         {
@@ -253,7 +275,7 @@ command_t command_from_string(std::vector<std::string> & tokens, int count = 1)
 
         command = command_from_string(commandName);
     }
-    catch ( std::out_of_range const & e )
+    catch ( out_of_range const & e )
     {
         command = C_NONE;
     }
@@ -261,7 +283,7 @@ command_t command_from_string(std::vector<std::string> & tokens, int count = 1)
     return command;
 }
 
-void do_help(std::string topicName)
+void do_help(string topicName)
 {
     command_t topic = command_from_string(topicName);
 
@@ -319,7 +341,7 @@ void do_help(std::string topicName)
     }
 }
 
-void midi_setup(std::vector<std::string> & tokens)
+void midi_setup(vector<string> & tokens)
 {
     if ( tokens.size() < 2 )
     {
@@ -346,7 +368,7 @@ void midi_setup(std::vector<std::string> & tokens)
     {
         // Expect a number and use it to set midi channel.
 
-        int iTemp = std::stoi(tokens[1].c_str());
+        int iTemp = stoi(tokens[1].c_str());
         if ( iTemp >= 1 && iTemp <= 16)
         {
             set_status(STAT_POS_2, "Set midi channel: %s", tokens[1].c_str());
@@ -379,11 +401,11 @@ void navigate_pattern_store(int key)
     }
 }
 
-bool do_command(std::string/*const char * */ commandString)
+bool do_command(string/*const char * */ commandString)
 {
     bool bResult = true;
 
-    std::vector<std::string> tokens = split(commandString.c_str());
+    vector<string> tokens = split(commandString.c_str());
 
     if ( tokens.empty() )
         return bResult;
@@ -432,9 +454,9 @@ bool do_command(std::string/*const char * */ commandString)
             }
             else
             {
-                iTemp = std::stoi(tokens[1].c_str()) - 1;
+                iTemp = stoi(tokens[1].c_str()) - 1;
                 if ( ! g_PatternStore.ValidPosition(iTemp) )
-                    throw std::string("Requested pattern number out of range at the moment.");
+                    throw string("Requested pattern number out of range at the moment.");
                 switch ( command )
                 {
                 case C_CUE :
@@ -478,7 +500,7 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_DELETE :
             if ( g_PatternStore.PatternCount() == 0 )
-                throw std::string("Nothing to delete.");
+                throw string("Nothing to delete.");
             if ( tokens.size() >= 2 && tokens.at(1) == "all" )
             {
                 g_PatternStore.DeleteAllPatterns();
@@ -530,8 +552,8 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_STEPVAL :
             if ( tokens.size() < 2 )
-                throw std::string("Hint: step n");
-            fTemp = std::stod(tokens[1].c_str());
+                throw string("Hint: step n");
+            fTemp = stod(tokens[1].c_str());
             if ( fTemp != 0 )
             {
                 set_status(STAT_POS_2, "Setting %s Step Value: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
@@ -546,7 +568,7 @@ bool do_command(std::string/*const char * */ commandString)
         case C_GATELENGTH :
             if ( tokens.size() >= 2 )
             {
-                fTemp = std::stod(tokens[1].c_str());
+                fTemp = stod(tokens[1].c_str());
                 if ( fTemp >= 0 )
                 {
                     set_status(STAT_POS_2, "Setting %s Gate Length: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
@@ -558,7 +580,7 @@ bool do_command(std::string/*const char * */ commandString)
                 }
             }
             else
-                throw std::string("Hint: gate h[old]|n[ormal]|n.n%");
+                throw string("Hint: gate h[old]|n[ormal]|n.n%");
             break;
         case C_GATE_HOLD:
             g_PatternStore.SetGateHold(true);
@@ -569,8 +591,8 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_VELOCITY :
             if ( tokens.size() < 2 )
-                throw std::string("Hint: vel[ocity] n");
-            iTemp = std::stoi(tokens[1].c_str());
+                throw string("Hint: vel[ocity] n");
+            iTemp = stoi(tokens[1].c_str());
             if ( iTemp >= 0 && iTemp <= 127 )
             {
                 set_status(STAT_POS_2, "Setting %s velocity: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
@@ -584,8 +606,8 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_TRANSPOSE :
             if ( tokens.size() < 2 )
-                throw std::string("Hint: trans[pose] n [now]");
-            iTemp = std::stoi(tokens[1].c_str());
+                throw string("Hint: trans[pose] n [now]");
+            iTemp = stoi(tokens[1].c_str());
             if ( tokens.size() >= 3 && tokens[2] == "now")
             {
                 set_status(STAT_POS_2, "Transpose value set.");
@@ -603,6 +625,30 @@ bool do_command(std::string/*const char * */ commandString)
             g_PatternStore.CurrentFeelMapForEdit();
             show_status_after_navigation();
             break;
+        case C_FEEL_HELP:
+            throw string("feel new[list]|add|remove|respace|bypass");
+            break;
+        case C_FEEL_NEW:
+            g_PatternStore.CurrentFeelMapForEdit().New(tokens);
+            show_status_after_navigation();
+            break;
+        case C_FEEL_ADD:
+            g_PatternStore.CurrentFeelMapForEdit().Add();
+            show_status_after_navigation();
+            break;
+        case C_FEEL_REMOVE:
+            g_PatternStore.CurrentFeelMapForEdit().Remove();
+            show_status_after_navigation();
+            break;
+        case C_FEEL_RESPACE:
+            g_PatternStore.CurrentFeelMapForEdit().Respace();
+            show_status_after_navigation();
+            break;
+        case C_FEEL_BYPASS:
+            g_PatternStore.CurrentFeelMapForEdit();
+            show_status_after_navigation();
+            break;
+
 
         case C_SCALE:
             g_PatternStore.CurrentTranslateTableForEdit();    // This automatically sets focus.
@@ -624,7 +670,7 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_SETROOT :
             if ( tokens.size() < 2 || ! g_PatternStore.CurrentTranslateTableForEdit().SetRoot(tokens[1]) )
-                throw std::string("Hint: root C, C#, Eb, C5, F#6, etc.");
+                throw string("Hint: root C, C#, Eb, C5, F#6, etc.");
             else
                 show_translation_status();
             break;
@@ -635,8 +681,8 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_QUANTUM :
             if ( tokens.size() < 2 )
-                throw std::string("Hint: quan[tum] n.nn");
-            fTemp = std::stod(tokens[1].c_str());
+                throw string("Hint: quan[tum] n.nn");
+            fTemp = stod(tokens[1].c_str());
             if ( fTemp > 0 )
             {
                 set_status(STAT_POS_2, "Setting new Quantum: %s", tokens[1].c_str());
@@ -647,18 +693,18 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_SET_RESETONPATTERNCHANGE : // Auto-reset
             if ( tokens.size() < 2 )
-                throw std::string("Hint: autoreset on|off");
+                throw string("Hint: autoreset on|off");
             if ( tokens[1] == "on")
                 g_PatternStore.SetResetOnPatternChange(true);
             else if (tokens[1] == "off")
                 g_PatternStore.SetResetOnPatternChange(false);
             else
-                throw std::string("Autoreset not changed.");
+                throw string("Autoreset not changed.");
             break;
 
         case C_PATTERN_CHAIN :
             if ( tokens.size() < 2 )
-                throw std::string("Hint: chain off|natural|quantum|show");
+                throw string("Hint: chain off|natural|quantum|show");
             if ( tokens[1] == "off")
                 g_PatternStore.SetPatternChainMode(PC_MODE_NONE);
             else if ( tokens[1] == "n" || tokens[1] == "natural" )
@@ -742,7 +788,7 @@ bool do_command(std::string/*const char * */ commandString)
 
         case C_LIST :
             if ( tokens.size() < 2 )
-                throw std::string("Hint: list new|delete|n [clear|: n1, n2 ,...]");
+                throw string("Hint: list new|delete|n [clear|: n1, n2 ,...]");
             set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
             update_pattern_panel();
             break;
@@ -763,9 +809,9 @@ bool do_command(std::string/*const char * */ commandString)
             break;
 
         case C_NONE :
-            iTemp = std::stoi(tokens[0]) - 1;
+            iTemp = stoi(tokens[0]) - 1;
             if ( ! g_PatternStore.ValidPosition(iTemp) )
-                throw std::string("Requested pattern number out of range at the moment.");
+                throw string("Requested pattern number out of range at the moment.");
             set_status(STAT_POS_2, "Cueing pattern: %i", iTemp + 1);
             g_PatternStore.SetNewPatternPending(iTemp);
             // newPattern = iTemp;
@@ -774,15 +820,15 @@ bool do_command(std::string/*const char * */ commandString)
             break;
         }
     }
-    catch (std::invalid_argument e)
+    catch (invalid_argument e)
     {
         set_status(STAT_POS_2, "Phrase not recognised. (%s)", e.what());
     }
-    catch (std::out_of_range e)
+    catch (out_of_range e)
     {
         set_status(STAT_POS_2, "Something went out of range ...");
     }
-    catch ( std::string s )
+    catch ( string s )
     {
         set_status(STAT_POS_2, "%s", s.c_str());
     }
@@ -796,19 +842,19 @@ void do_command_line(int argc, char *argv[])
 
     // Set console window title. (This doesn't work after NCurses starts.)
 
-    std::string appTitle;
+    string appTitle;
     if ( argc > 1 )
         for ( int i = 1; i < argc; i++ )
         {
-            if ( std::strstr(argv[i], "-midi=") == argv[i] )
+            if ( strstr(argv[i], "-midi=") == argv[i] )
             {
-                int iTemp = std::strtol(argv[i] + 6, NULL, 10);
+                int iTemp = strtol(argv[i] + 6, NULL, 10);
                 if ( iTemp >= 1 && iTemp <= 16)
                     g_Sequencer.SetMidiChannel(iTemp - 1);
             }
-            else if ( std::strstr(argv[i], "-transpose=") == argv[i] )
+            else if ( strstr(argv[i], "-transpose=") == argv[i] )
             {
-                g_PatternStore.CurrentTranslateTableForEdit().SetTranspose(std::strtol(argv[i] + 11, NULL, 10));
+                g_PatternStore.CurrentTranslateTableForEdit().SetTranspose(strtol(argv[i] + 11, NULL, 10));
             }
             else if ( strstr(argv[i], "-tempo=") == argv[i] )
             {

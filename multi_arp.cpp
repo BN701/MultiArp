@@ -290,11 +290,6 @@ void midi_action(int queueId)
 enum global_element_names_t {
      global_heading,
      global_name_midi_channel,
-     global_name_step_value,
-     global_name_gate_length,
-     global_name_gate_hold,
-     global_name_velocity,
-     global_name_use_pattern_play_data,
      global_name_link_quantum,
      number_global_element_names
 };
@@ -303,43 +298,26 @@ enum global_element_names_t {
 unordered_map<global_element_names_t, const char *> global_element_names = {
     {global_heading, "Global"},
     {global_name_midi_channel, "Midi Channel"},
-    {global_name_step_value, "Step Value"},
-    {global_name_gate_length, "Gate Length"},
-    {global_name_gate_hold, "Gate Hold"},
-    {global_name_velocity, "Velocity"},
-    {global_name_use_pattern_play_data, "Use pattern play data"},
     {global_name_link_quantum, "Link Quantum"}
 };
 
-//string globals_to_string()
-//{
-//    string result = "<< ";
-//    result += global_element_names.at(global_heading);
-//    result += " >>\n\n";
-//
-//    char buff[200];
-//
-//    sprintf(buff, "%s %i\n", global_element_names.at(global_name_midi_channel), g_Sequencer.MidiChannel() + 1);
-//    result += buff;
-//    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_step_value), g_State.StepValue());
-//    result += buff;
-//    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_gate_length), g_State.GateLength());
-//    result += buff;
-//    sprintf(buff, "%s %s\n", global_element_names.at(global_name_gate_hold), g_State.ExtendGateOverRests() ? "ON" : "OFF");
-//    result += buff;
-//    sprintf(buff, "%s %i\n", global_element_names.at(global_name_velocity), g_State.NoteVelocity());
-//    result += buff;
-//    sprintf(buff, "%s %s\n", global_element_names.at(global_name_use_pattern_play_data), g_State.UsePatternPlayData() ? "ON" : "OFF");
-//    result += buff;
-//    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
-//    result += buff;
-//
-//    result += "\n";
-//    result += globalTranslateTable.ToString();
-//    result += "\n";
-//
-//    return result;
-//}
+string globals_to_string()
+{
+    string result = "<< ";
+    result += global_element_names.at(global_heading);
+    result += " >>\n\n";
+
+    char buff[200];
+
+    sprintf(buff, "%s %i\n", global_element_names.at(global_name_midi_channel), g_Sequencer.MidiChannel() + 1);
+    result += buff;
+    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
+    result += buff;
+
+    result += '\n';
+
+    return result;
+}
 
 
 void load_from_string(string s, int & created, int & updated )
@@ -377,21 +355,6 @@ void load_from_string(string s, int & created, int & updated )
                     {
                     case global_name_midi_channel:
                         g_Sequencer.SetMidiChannel(stoi(token) - 1);
-                        break;
-                    case global_name_step_value:
-//                        g_State.SetNewStepValuePending(stod(token));
-                        break;
-                    case global_name_gate_length:
-//                        g_State.SetGateLength(stod(token));
-                        break;
-                    case global_name_gate_hold:
-//                        g_State.SetExtendGateOverRests(token == "ON");
-                        break;
-                    case global_name_velocity:
-//                        g_State.SetNoteVelocity(stoi(token));
-                        break;
-                    case global_name_use_pattern_play_data:
-//                        g_State.SetUsePatternPlayData(token == "ON");
                         break;
                     case global_name_link_quantum:
                         g_State.SetNewQuantumPending(stod(token));
@@ -446,7 +409,7 @@ bool key_input_action()
         move(COMMAND_HOME);
         clrtoeol();
         refresh();
-        copy_clipboard(/*globals_to_string() + */g_PatternStore.ToString());
+        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
         break;
         break;

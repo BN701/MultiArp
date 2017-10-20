@@ -75,6 +75,7 @@
 		<Unit filename="maUtility.cpp" />
 		<Unit filename="maUtility.h" />
 		<Unit filename="multi_arp.cpp" />
+		<Unit filename="notelist.hpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

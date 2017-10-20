@@ -44,12 +44,15 @@ void PatternStore::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(16, m_Status.size() - 16);
 
-    size_t pos = m_Status.size();
-    sprintf(buff, ", List %i/%i",
-        m_Patterns.at(m_PosEdit).m_PosEdit + 1,
-        m_Patterns.at(m_PosEdit).m_ListSet.size());
-    m_Status += buff;
-    m_FieldPositions.emplace_back(pos + 7, m_Status.size() - pos - 7);
+    if ( !m_Patterns.at(m_PosEdit).m_ListSet.empty() )
+    {
+        size_t pos = m_Status.size();
+        sprintf(buff, ", List %i/%i",
+            m_Patterns.at(m_PosEdit).m_PosEdit + 1,
+            m_Patterns.at(m_PosEdit).m_ListSet.size());
+        m_Status += buff;
+        m_FieldPositions.emplace_back(pos + 7, m_Status.size() - pos - 7);
+    }
 
     m_Status += ".";
 
@@ -212,14 +215,17 @@ string PatternStore::PatternStatus()
         result += m_Patterns.at(m_PosEdit).Label(15);
     }
 
-    sprintf(buf, ", List %i", m_Patterns.at(m_PosEdit).m_PosEdit + 1);
-    result += buf;
-
-    int listCount = m_Patterns.at(m_PosEdit).m_ListSet.size();
-    if ( listCount > 1 )
+    if (  ! m_Patterns.at(m_PosEdit).m_ListSet.empty() )
     {
-        sprintf(buf, " of %i", listCount);
+        sprintf(buf, ", List %i", m_Patterns.at(m_PosEdit).m_PosEdit + 1);
         result += buf;
+
+        int listCount = m_Patterns.at(m_PosEdit).m_ListSet.size();
+        if ( listCount > 1 )
+        {
+            sprintf(buf, " of %i", listCount);
+            result += buf;
+        }
     }
 
     return result;
@@ -438,11 +444,15 @@ string PatternStore::ToString()
 
     result += buff;
 
+    result += "<< Pattern Default >>\n\n";
+    result += m_DefaultPattern.ToString("Default");
+    result += "\n\n";
+
     for ( int i = 0; i < m_Patterns.size(); i++ )
     {
-        sprintf(buff, "<< Pattern %2i >>\n", i + 1);
+        sprintf(buff, "<< Pattern %i >>\n\n", i + 1);
         result += buff;
-        result += m_Patterns.at(i).ToString();
+        result += m_Patterns.at(i).ToString("Pattern");
         result += "\n";
     }
 
@@ -494,12 +504,16 @@ bool PatternStore::LoadFromString(string s, int & created, int & updates)
     {
         if ( s.find("<< Pattern Store >>") == 0 )
         {
-            // m_PasteTarget = paste_pattern_store;
+            // Do nothing, it's just a section heading for readability.
+            return true;
+        }
+        else if ( s.find("<< Pattern Default >>") == 0 ) // Add pattern to end of list.
+        {
+            // Do nothing, it's just a section heading for readability.
             return true;
         }
         else if ( s.find("<< Pattern >>") == 0 ) // Add pattern to end of list.
         {
-            // m_PasteTarget = paste_pattern;
             m_Patterns.emplace_back();
             m_PosEdit = m_Patterns.size() - 1;
             created += 1;
@@ -507,7 +521,6 @@ bool PatternStore::LoadFromString(string s, int & created, int & updates)
         }
         else if ( s.find("<< Pattern ") == 0 ) // Create pattern with specific ID
         {
-            // m_PasteTarget = paste_pattern;
             size_t index = stoi(s.substr(11)) - 1;
             if ( m_Patterns.size() < index + 1)
                 m_Patterns.resize(index + 1);
@@ -524,6 +537,11 @@ bool PatternStore::LoadFromString(string s, int & created, int & updates)
         else if ( s.find("Store ") == 0 )
         {
             SetFieldsFromString(s);
+            return true;
+        }
+        else if ( s.find("Default ") == 0 )
+        {
+            m_DefaultPattern.FromString(s, updates);
             return true;
         }
         else

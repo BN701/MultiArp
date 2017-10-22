@@ -32,10 +32,19 @@ class FeelMap : public CursorKeys
 
         double Feel(double beat);
 
+        bool SetActive(bool val)
+        {
+            m_Active = val;
+            SetStatus();
+        }
+
+        bool Active() { return m_Active; }
+
+        void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();
-            SetStatus();
+            // SetStatus();
         }
 
         void New(std::vector<std::string> & tokens);
@@ -48,12 +57,12 @@ class FeelMap : public CursorKeys
 
 
     protected:
-        void SetStatus();
 
         virtual bool HandleKey(key_type_t k);
 
     private:
 
+        bool m_Active;
         int m_Points;       // Number of stretchpoints - 1.
         int m_EditPoint;
         std::vector<double> m_StretchPoints;

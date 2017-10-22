@@ -576,11 +576,13 @@ struct PatternStore : public CursorKeys
 
     std::string ListManager(std::string commandString, std::vector<std::string> & tokens);
 
+        void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();
-            SetStatus();
+            // SetStatus();
         }
+
     protected:
         enum pattern_store_focus_t {
             psf_pattern,
@@ -588,7 +590,6 @@ struct PatternStore : public CursorKeys
             number_psf_focus_modes
         };
 
-        void SetStatus();
 
         virtual bool HandleKey(key_type_t k);
         pattern_store_focus_t m_PatternStoreFocus;

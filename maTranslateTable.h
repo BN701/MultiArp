@@ -125,10 +125,11 @@ class TranslateTable : public CursorKeys
         std::string ShowScale();
         std::string ShowNoteMap();
 
+        void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();
-            SetStatus();
+            // SetStatus();
         }
 
     protected:
@@ -141,8 +142,6 @@ class TranslateTable : public CursorKeys
             accidentals,
             number_tt_focus_modes
         };
-
-        void SetStatus();
 
         virtual bool HandleKey(key_type_t k);
         translate_table_focus_t m_TranslateTableFocus;

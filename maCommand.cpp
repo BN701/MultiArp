@@ -78,7 +78,8 @@ enum command_t
     C_FEEL_ADD,
     C_FEEL_REMOVE,
     C_FEEL_RESPACE,
-    C_FEEL_BYPASS,
+    C_FEEL_ON,
+    C_FEEL_OFF,
 
     C_MIDI,
 
@@ -168,6 +169,13 @@ unordered_map<string, command_t> gCommandList =
 
     {"feel", C_FEEL},
     {"f", C_FEEL},
+    {"feel help", C_FEEL_HELP},
+    {"f help", C_FEEL_HELP},
+    {"help feel", C_FEEL_HELP},
+    {"feel on", C_FEEL_ON},
+    {"f on", C_FEEL_ON},
+    {"feel off", C_FEEL_OFF},
+    {"f off", C_FEEL_OFF},
     {"feel new", C_FEEL_NEW},
     {"f new", C_FEEL_NEW},
     {"feel add", C_FEEL_ADD},
@@ -178,11 +186,6 @@ unordered_map<string, command_t> gCommandList =
     {"f new", C_FEEL_NEW},
     {"feel respace", C_FEEL_RESPACE},
     {"f respace", C_FEEL_RESPACE},
-    {"feel bypass", C_FEEL_BYPASS},
-    {"f bypass", C_FEEL_BYPASS},
-    {"feel help", C_FEEL_HELP},
-    {"f help", C_FEEL_HELP},
-    {"help feel", C_FEEL_HELP},
 
     {"channel", C_MIDI},
     {"chan", C_MIDI},
@@ -450,6 +453,7 @@ bool do_command(string/*const char * */ commandString)
             if ( tokens.size() < 2 )
             {
                 g_PatternStore.SetFocus();
+                g_PatternStore.SetStatus();
                 show_status_after_navigation();
             }
             else
@@ -622,11 +626,19 @@ bool do_command(string/*const char * */ commandString)
             break;
 
         case C_FEEL:
-            g_PatternStore.CurrentFeelMapForEdit();
+            g_PatternStore.CurrentFeelMapForEdit().SetStatus();
             show_status_after_navigation();
             break;
         case C_FEEL_HELP:
             throw string("feel new[list]|add|remove|respace|bypass");
+            break;
+        case C_FEEL_ON:
+            g_PatternStore.CurrentFeelMapForEdit().SetActive(true);
+            show_status_after_navigation();
+            break;
+        case C_FEEL_OFF:
+            g_PatternStore.CurrentFeelMapForEdit().SetActive(false);
+            show_status_after_navigation();
             break;
         case C_FEEL_NEW:
             g_PatternStore.CurrentFeelMapForEdit().New(tokens);
@@ -644,14 +656,9 @@ bool do_command(string/*const char * */ commandString)
             g_PatternStore.CurrentFeelMapForEdit().Respace();
             show_status_after_navigation();
             break;
-        case C_FEEL_BYPASS:
-            g_PatternStore.CurrentFeelMapForEdit();
-            show_status_after_navigation();
-            break;
-
 
         case C_SCALE:
-            g_PatternStore.CurrentTranslateTableForEdit();    // This automatically sets focus.
+            g_PatternStore.CurrentTranslateTableForEdit().SetStatus();    // This automatically sets focus.
             show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:

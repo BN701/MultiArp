@@ -31,6 +31,7 @@ using namespace std;
 ofstream fLog;
 
 FeelMap::FeelMap():
+    m_Active(true),
     m_EditPoint(1)
 {
     //ctor
@@ -93,11 +94,26 @@ void FeelMap::New(vector<string> & tokens)
             try
             {
                 double t = stod(tokens.at(i));
-                if ( t > 0 && t < 1 )
-                    m_StretchPoints.push_back(t);
+
+                // Check if we're creating a default array of size 't',
+                // (Don't allow higher than 12, mostly because we
+                // can't fit any more on one line of the display.)
+
+                if ( i == 2 && t > 1 && t < 13 )
+                {
+                    m_Points = t;
+                    m_StretchPoints.resize(m_Points + 1);
+                    m_EditPoint = 1;
+                    Respace();
+                    return;
+                }
+
+                if ( t > 0 && t < 1.0 )
+                    m_StretchPoints.push_back(t); // We'll sort them after the loop.
             }
             catch(...)
             {
+                // Invalid parameter. Do nothing and try the next one.
             }
         }
         sort(m_StretchPoints.begin(), m_StretchPoints.end());
@@ -144,7 +160,7 @@ void FeelMap::Respace()
     if ( m_Points <= 1 )
         return;
 
-    for ( int i = 1; i < m_Points; i++ )
+    for ( int i = 0; i < m_Points + 1; i++ )
         m_StretchPoints.at(i) = double(i)/(m_Points);
 
     SetStatus();
@@ -187,17 +203,22 @@ void FeelMap::SetStatus()
 {
     char buff[200];
 
-    m_Status.clear();
+    m_Status = "Feel: ";
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    if ( m_StretchPoints.size() < 2 )
+    if ( ! m_Active )
     {
-        m_Status = "No stretch points set.";
+        m_Status += " Off";
         return;
     }
 
-    m_Status = "Stretchpoints: ";
+    if ( m_StretchPoints.size() < 2 )
+    {
+        m_Status += "No stretch points set.";
+        return;
+    }
+
     int pos = 0;
 
     for ( int i = 0; i < m_StretchPoints.size(); i++ )
@@ -208,13 +229,13 @@ void FeelMap::SetStatus()
         m_FieldPositions.emplace_back(pos + 1, m_Status.size() - pos - 1);
     }
 
-    if ( m_Points > 2 )
+    if ( m_Points > 1 )
         m_Highlights.push_back(m_FieldPositions.at(m_EditPoint));
 }
 
 bool FeelMap::HandleKey(key_type_t k)
 {
-    if ( m_EditPoint == 0 || m_EditPoint == m_StretchPoints.size() - 1 )
+    if ( ! m_Active || m_EditPoint == 0 || m_EditPoint == m_StretchPoints.size() - 1 )
         return true;
 
     int tEditPoint = m_EditPoint;
@@ -251,6 +272,9 @@ bool FeelMap::HandleKey(key_type_t k)
 
 double FeelMap::Feel( double beat )
 {
+    if ( ! m_Active )
+        return beat;
+
     if ( m_StretchPoints.empty() )
         return beat;
 

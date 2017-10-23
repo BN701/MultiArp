@@ -3,6 +3,7 @@
 bin/
 *.depend
 *.layout
+*.log
 
 # Prerequisites
 *.d

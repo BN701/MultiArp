@@ -52,6 +52,7 @@ extern TranslateTable * pTranslateTable;
 #define COLOUR_BRIGHT_RED   12
 #define COLOUR_REDDISH      13
 #define COLOUR_BRIGHT_GREEN 14
+#define COLOUR_YELLOW       16
 
 // Color Pair uses
 
@@ -59,6 +60,7 @@ extern TranslateTable * pTranslateTable;
 #define CP_MENU_HIGHLIGHT       2
 #define CP_RUNNING              3
 #define CP_RECORD               4
+#define CP_REALTIME             5
 
 
 Display::Display()
@@ -72,6 +74,7 @@ Display::Display()
     start_color();
     init_color(COLOUR_GREEN, 0, 750, 0);
     init_color(COLOUR_BRIGHT_GREEN, 0, 900, 0);
+    init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
     init_color(COLOUR_REDDISH, 750, 300, 200);
     init_color(COLOUR_BLUE, 0, 0, 750);
@@ -79,7 +82,8 @@ Display::Display()
     init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
 	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOR_BLACK);
 	init_pair(CP_RUNNING, COLOR_WHITE, COLOUR_GREEN);
-	init_pair(CP_RECORD, COLOR_WHITE, COLOUR_RED);
+	init_pair(CP_REALTIME, COLOR_WHITE, COLOUR_RED);
+	init_pair(CP_RECORD, COLOR_WHITE, COLOUR_YELLOW);
 //	init_pair(3, COLOUR_BLUE, COLOR_BLACK);
 	init_pair(CP_MENU_HIGHLIGHT, COLOR_WHITE, COLOUR_REDDISH);
 
@@ -114,13 +118,10 @@ void set_top_line()
                g_Sequencer.MidiChannel() + 1,
                g_State.CurrentStepValue(),
                g_State.Quantum(),
-               g_State.RunState() ? "<<   RUN   >>" : "<< STOPPED >>");
+               g_State.RunState() ? "<<   RUN   >>" : "<<   ---   >>");
 
-    if ( g_State.RunState() )
-        highlight(0, 0, 59, 7, A_BOLD, CP_RUNNING);
-    else
-        highlight(0, 0, 59, 7, A_BOLD, 0);
-
+    highlight(0, 0, 0, 80, A_BOLD, g_ListBuilder.MidiInputModeAsColour(vector<int> {0, CP_RECORD, CP_RECORD, CP_REALTIME})); // Hmm ...
+    highlight(0, 0, 59, 7, A_BOLD, g_State.RunState() ? CP_RUNNING : 0);
 }
 
 std::vector<int> gListDisplayRows;
@@ -239,12 +240,12 @@ void show_status_after_navigation()
 
 void show_translation_map_status()
 {
-    set_status(STAT_POS_2, "I: %s     Map: %s", g_PatternStore.CurrentTranslateTableForEdit(false).ShowScale().c_str(), g_PatternStore.CurrentTranslateTableForEdit(false).ShowNoteMap().c_str());
+    set_status(STAT_POS_2, "I: %s     Map: %s", g_PatternStore.TranslateTableForEdit(false).ShowScale().c_str(), g_PatternStore.TranslateTableForEdit(false).ShowNoteMap().c_str());
 }
 
 void show_translation_status()
 {
-    set_status(STAT_POS_2, g_PatternStore.CurrentTranslateTableForEdit().Status().c_str());
+    set_status(STAT_POS_2, g_PatternStore.TranslateTableForEdit().Status().c_str());
 }
 
 

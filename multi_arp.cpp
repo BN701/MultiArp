@@ -28,11 +28,11 @@
 //
 
 
-#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINES
 
 #define LINK_PLATFORM_LINUX
 #include <ableton/Link.hpp>
-#include <unordered_map>
+//#include <unordered_map>
 
 #include "maAlsaSequencer.h"
 #include "maAlsaSequencerQueue.h"
@@ -49,18 +49,15 @@ using namespace std;
 
 // Global Link instance.
 
-ableton::Link gLink(120.);
-chrono::microseconds gLinkStartTime(-1);
+ableton::Link g_Link(120.);
+chrono::microseconds g_LinkStartTime(-1);
 
 // Global instances.
 
 AlsaSequencer g_Sequencer;
-// CursorKeys gCursorKeys;
-// FeelMap globalFeelMap;
-ListBuilder g_ListBuilder;
-PatternStore g_PatternStore/*(globalTranslateTable)*/;
+ListBuilder g_ListBuilder(g_Link);
+PatternStore g_PatternStore;
 State g_State;
-// TranslateTable globalTranslateTable;
 
 
 extern Display gDisplay;
@@ -70,19 +67,13 @@ int gDeferStop = 0;
 void do_phase0_updates()
 {
     g_State.SetCurrentStepValue(g_PatternStore.StepValue());
-//    if ( g_State.NewStepValuePending() )
-//    {
-//        set_status(STAT_POS_2, "Step value set.");
-//        set_top_line();
-//    }
 
     if ( g_State.NewQuantumPending() )
     {
         set_status(STAT_POS_2, "New quantum value set.");
-        // set_top_line();
     }
 
-    if ( g_PatternStore.CurrentTranslateTableForPlay().NewTransposePending() )
+    if ( g_PatternStore.TranslateTableForPlay().NewTransposePending() )
     {
         set_status(STAT_POS_2, "Transpose set.");
     }
@@ -90,7 +81,6 @@ void do_phase0_updates()
     if ( g_PatternStore.NewPatternPending() )
     {
         set_status(STAT_POS_2, "Pattern changed.");
-        // set_top_line();
     }
 
     if ( g_State.NewRunStatePending() )
@@ -98,7 +88,6 @@ void do_phase0_updates()
         if ( g_State.RunState() )
             g_PatternStore.ResetAllPatterns();
         gDeferStop = g_State.DeferStop();
-        // set_top_line();
     }
 
     if ( g_State.PatternReset() != RESET_NONE )
@@ -151,11 +140,11 @@ void queue_next_step(int queueId)
 
     // Get time of next step from Link.
 
-    ableton::Link::Timeline timeline = gLink.captureAppTimeline();
+    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
 
     double nextBeat = g_State.Beat();
-    nextBeat = g_PatternStore.CurrentFeelMapForPlay().Feel(nextBeat);
 
+    nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
     chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
 
     g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
@@ -164,19 +153,20 @@ void queue_next_step(int queueId)
     {
         do_phase0_updates();
         g_PatternStore.SetPhaseIsZero();
+        g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
     }
 
     // Set next schedule time on the queue
 
     int64_t queue_time_usec;
-    if ( gLinkStartTime.count() < 0 )
+    if ( g_LinkStartTime.count() < 0 )
     {
-        gLinkStartTime = t_next_usec;
+        g_LinkStartTime = t_next_usec;
         queue_time_usec = 0;
     }
     else
     {
-        queue_time_usec = (t_next_usec.count() - gLinkStartTime.count());
+        queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
     }
 
     g_Sequencer.SetScheduleTime(queue_time_usec);
@@ -187,7 +177,8 @@ void queue_next_step(int queueId)
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        nextChord = g_PatternStore.Step();
+        // nextChord = g_PatternStore.Step();
+        nextChord = g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
     }
 
     if ( nextChord != NULL )
@@ -195,7 +186,7 @@ void queue_next_step(int queueId)
         double tempo = timeline.tempo();
 
         /*
-              V, m_StepValue, is 4 x 'steps per beat'. (This gives the familiar
+              V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
               eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
 
               Steps per beat, v = V/4.
@@ -206,7 +197,8 @@ void queue_next_step(int queueId)
 
         double stepLengthMilliSecs = 240000.0/(tempo * g_State.CurrentStepValue());
         double duration = stepLengthMilliSecs * (nextChord->StepsTillNextNote() + g_PatternStore.GateLength());
-        // duration = /* g_PatternStore.*/ CalculateNoteDuration(tempo, nextChord->StepsTillNextNote());
+
+        // TODO: Calculate duration for real time note capture, which is returned in beat values.
 
         for ( unsigned int i = 0; i < nextChord->m_Notes.size(); i++ )
         {
@@ -217,7 +209,7 @@ void queue_next_step(int queueId)
             if ( noteNumber < 0 )
                 continue;
 
-            noteNumber = g_PatternStore.CurrentTranslateTableForPlay().Translate(noteNumber);
+            noteNumber = g_PatternStore.TranslateTableForPlay().Translate(noteNumber);
 
             if ( noteNumber < 0 )
                 continue;
@@ -228,6 +220,14 @@ void queue_next_step(int queueId)
                 noteVelocity = note.m_NoteVelocity;
             else
                 noteVelocity = g_PatternStore.NoteVelocity();
+
+            double noteLength = note.Length();
+            if ( noteLength > 0 )
+            {
+                // Note duration here is in beats. Convert to milliseconds.
+                // mSec/beat = 60000/tempo
+                duration = 60000.0 * noteLength / tempo;
+            }
 
             g_Sequencer.ScheduleNote(queueId, noteNumber, noteVelocity, duration);
         }
@@ -273,7 +273,7 @@ void midi_action(int queueId)
                 set_status(STAT_POS_2, "");
                 update_pattern_panel();
             }
-            else if ( ev->type == SND_SEQ_EVENT_NOTEON )
+            else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
             {
                 show_listbuilder_status();
             }
@@ -537,7 +537,7 @@ int main(int argc, char *argv[])
 
     // Initialize ...
 
-    gLink.enable(true); // Start peer-to-peer interactions.
+    g_Link.enable(true); // Start peer-to-peer interactions.
 
     int queueIndex = g_Sequencer.CreateQueue();
     int queueId = g_Sequencer.Queue(queueIndex).GetQueueId();

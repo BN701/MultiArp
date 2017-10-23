@@ -30,12 +30,13 @@ class FeelMap : public CursorKeys
         FeelMap();
         virtual ~FeelMap();
 
-        double Feel(double beat);
+        double Adjust(double beat);
 
         bool SetActive(bool val)
         {
             m_Active = val;
             SetStatus();
+            return m_Active;
         }
 
         bool Active() { return m_Active; }

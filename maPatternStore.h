@@ -50,9 +50,14 @@ struct Note
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
     int m_NoteVelocity;      // -1 indicates not set (so use value from elsewhere)
 
+    double m_Beat;
+    double m_Length;         // Length in beats (or fraction of a beat).
+
     Note(int n = -1, int v = -1):
         m_NoteNumber(n),
-        m_NoteVelocity(v)
+        m_NoteVelocity(v),
+        m_Beat(0),
+        m_Length(0)
     {}
 
     std::string ToString();
@@ -61,6 +66,11 @@ struct Note
     static std::string NoteName(int n); // Expose the notes/numbers look up table.
     static int NoteNumberFromString(std::string note);
 
+    void SetBeat( double val ) { m_Beat = val; }
+    double Beat() { return m_Beat; }
+
+    void SetLength( double val ) { m_Length = val; }
+    double Length() { return m_Length; }
 
 };
 
@@ -75,6 +85,7 @@ struct Chord
     { }
 
     void Add(int n, int v = -1) { m_Notes.push_back(Note(n, v)); }
+    void Add(Note & note) { m_Notes.push_back(note); }
 
     void Clear() { m_Notes.clear(); }
     bool Empty() { return m_Notes.empty(); }
@@ -565,11 +576,11 @@ struct PatternStore : public CursorKeys
     bool GateHold();
     unsigned char NoteVelocity();
 
-    TranslateTable & CurrentTranslateTableForEdit(bool setFocus = true);
-    TranslateTable & CurrentTranslateTableForPlay();
+    TranslateTable & TranslateTableForEdit(bool setFocus = true);
+    TranslateTable & TranslateTableForPlay();
 
-    FeelMap & CurrentFeelMapForEdit(bool setFocus = true);
-    FeelMap & CurrentFeelMapForPlay();
+    FeelMap & FeelMapForEdit(bool setFocus = true);
+    FeelMap & FeelMapForPlay();
 
     void SetUsePatternPlayData( bool val );
     bool UsePatternPlayData() { return m_UsePatternPlayData; }

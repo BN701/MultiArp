@@ -82,6 +82,10 @@ enum command_t
     C_FEEL_OFF,
 
     C_MIDI,
+    C_MIDI_REAL_TIME,
+    C_MIDI_FULL,
+    C_MIDI_QUICK,
+    C_MIDI_OFF,
 
     C_CUE,              // Set the next pattern to play
     C_EDIT,             // Set focus for copy/paste
@@ -143,7 +147,7 @@ unordered_map<string, command_t> gCommandList =
     {"note", C_STEPVAL},
     {"step", C_STEPVAL},
     {"quantum", C_QUANTUM},
-    {"quan", C_QUANTUM},
+    {"q", C_QUANTUM},
     {"gate", C_GATELENGTH},
     {"gate hold", C_GATE_HOLD,},
     {"gate h", C_GATE_HOLD,},
@@ -190,7 +194,18 @@ unordered_map<string, command_t> gCommandList =
     {"channel", C_MIDI},
     {"chan", C_MIDI},
     {"midi", C_MIDI},
-    {"mi", C_MIDI},
+    {"m", C_MIDI},
+    {"midi real time", C_MIDI_REAL_TIME},
+    {"midi rt", C_MIDI_REAL_TIME},
+    {"m rt", C_MIDI_REAL_TIME},
+    {"midi full", C_MIDI_FULL},
+    {"midi f", C_MIDI_FULL},
+    {"m f", C_MIDI_FULL},
+    {"midi quick", C_MIDI_QUICK},
+    {"midi q", C_MIDI_QUICK},
+    {"m q", C_MIDI_QUICK},
+    {"midi off", C_MIDI_OFF},
+    {"m off", C_MIDI_OFF},
 
     {"edit", C_EDIT},
     {"e", C_EDIT},
@@ -344,65 +359,6 @@ void do_help(string topicName)
     }
 }
 
-void midi_setup(vector<string> & tokens)
-{
-    if ( tokens.size() < 2 )
-    {
-        set_status(STAT_POS_2, "Hint: chan[nel]|mi[di] q[uick]|f[ull]|n (1..16)");
-        return;
-    }
-
-    if ( tokens[1] == "f" || tokens[1] == "full" )
-    {
-        g_ListBuilder.SetMidiInputMode(MIDI_INPUT_FULL);
-        set_status(STAT_POS_2, "Midi Input set to FULL mode.");
-    }
-    else if ( tokens[1] == "q" || tokens[1] == "quick" )
-    {
-        g_ListBuilder.SetMidiInputMode(MIDI_INPUT_QUICK);
-        set_status(STAT_POS_2, "Midi Input set to QUICK mode.");
-    }
-    else if ( tokens[1] == "off" )
-    {
-        g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
-        set_status(STAT_POS_2, "Midi Input OFF.");
-    }
-    else
-    {
-        // Expect a number and use it to set midi channel.
-
-        int iTemp = stoi(tokens[1].c_str());
-        if ( iTemp >= 1 && iTemp <= 16)
-        {
-            set_status(STAT_POS_2, "Set midi channel: %s", tokens[1].c_str());
-            g_Sequencer.SetMidiChannel(iTemp - 1);
-            set_top_line();
-        }
-    }
-}
-
-void navigate_pattern_store(int key)
-{
-    switch ( key )
-    {
-    case KEY_UP:
-        g_PatternStore.DownListPos();
-        set_status(STAT_POS_2, "List edit DOWN.");
-        break;
-    case KEY_DOWN:
-        g_PatternStore.UpListPos();
-        set_status(STAT_POS_2, "List edit UP.");
-        break;
-    case KEY_LEFT:
-        g_PatternStore.DownEditPos();
-        set_status(STAT_POS_2, "Pattern edit DOWN.");
-        break;
-    case KEY_RIGHT:
-        g_PatternStore.UpEditPos();
-        set_status(STAT_POS_2, "Pattern edit UP.");
-        break;
-    }
-}
 
 bool do_command(string/*const char * */ commandString)
 {
@@ -615,54 +571,54 @@ bool do_command(string/*const char * */ commandString)
             if ( tokens.size() >= 3 && tokens[2] == "now")
             {
                 set_status(STAT_POS_2, "Transpose value set.");
-                g_PatternStore.CurrentTranslateTableForEdit().SetTranspose(iTemp);
+                g_PatternStore.TranslateTableForEdit().SetTranspose(iTemp);
                 set_top_line();
             }
             else
             {
                 set_status(STAT_POS_2, "Setting transpose value: %s", tokens[1].c_str());
-                g_PatternStore.CurrentTranslateTableForEdit().SetNewTransposePending(iTemp);
+                g_PatternStore.TranslateTableForEdit().SetNewTransposePending(iTemp);
             }
             break;
 
         case C_FEEL:
-            g_PatternStore.CurrentFeelMapForEdit().SetStatus();
+            g_PatternStore.FeelMapForEdit().SetStatus();
             show_status_after_navigation();
             break;
         case C_FEEL_HELP:
             throw string("feel new[list]|add|remove|respace|bypass");
             break;
         case C_FEEL_ON:
-            g_PatternStore.CurrentFeelMapForEdit().SetActive(true);
+            g_PatternStore.FeelMapForEdit().SetActive(true);
             show_status_after_navigation();
             break;
         case C_FEEL_OFF:
-            g_PatternStore.CurrentFeelMapForEdit().SetActive(false);
+            g_PatternStore.FeelMapForEdit().SetActive(false);
             show_status_after_navigation();
             break;
         case C_FEEL_NEW:
-            g_PatternStore.CurrentFeelMapForEdit().New(tokens);
+            g_PatternStore.FeelMapForEdit().New(tokens);
             show_status_after_navigation();
             break;
         case C_FEEL_ADD:
-            g_PatternStore.CurrentFeelMapForEdit().Add();
+            g_PatternStore.FeelMapForEdit().Add();
             show_status_after_navigation();
             break;
         case C_FEEL_REMOVE:
-            g_PatternStore.CurrentFeelMapForEdit().Remove();
+            g_PatternStore.FeelMapForEdit().Remove();
             show_status_after_navigation();
             break;
         case C_FEEL_RESPACE:
-            g_PatternStore.CurrentFeelMapForEdit().Respace();
+            g_PatternStore.FeelMapForEdit().Respace();
             show_status_after_navigation();
             break;
 
         case C_SCALE:
-            g_PatternStore.CurrentTranslateTableForEdit().SetStatus();    // This automatically sets focus.
+            g_PatternStore.TranslateTableForEdit().SetStatus();    // This automatically sets focus.
             show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:
-            g_PatternStore.CurrentTranslateTableForEdit().SetScale(g_PatternStore.CurrentEditNoteList());
+            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditNoteList());
             show_translation_map_status();
             break;
         case C_SCALE_SHOW:
@@ -676,14 +632,49 @@ bool do_command(string/*const char * */ commandString)
             break;
 
         case C_SETROOT :
-            if ( tokens.size() < 2 || ! g_PatternStore.CurrentTranslateTableForEdit().SetRoot(tokens[1]) )
+            if ( tokens.size() < 2 || ! g_PatternStore.TranslateTableForEdit().SetRoot(tokens[1]) )
                 throw string("Hint: root C, C#, Eb, C5, F#6, etc.");
             else
                 show_translation_status();
             break;
 
-        case C_MIDI :
-            midi_setup(tokens);
+        case C_MIDI:
+            if ( tokens.size() >= 2 )
+            {
+                // Expect a number and use it to set midi channel.
+
+                int iTemp = stoi(tokens[1].c_str());
+                if ( iTemp >= 1 && iTemp <= 16)
+                {
+                    set_status(STAT_POS_2, "Set midi channel: %s", tokens[1].c_str());
+                    g_Sequencer.SetMidiChannel(iTemp - 1);
+                    set_top_line();
+                }
+            }
+            else
+            {
+                set_status(STAT_POS_2, "Hint: chan[nel]|mi[di] q[uick]|f[ull]|n (1..16)");
+            }
+            break;
+        case C_MIDI_REAL_TIME:
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_REAL_TIME);
+            set_status(STAT_POS_2, "Midi Input set to REAL TIME.");
+            set_top_line();
+            break;
+        case C_MIDI_FULL:
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_FULL);
+            set_status(STAT_POS_2, "Midi Input set to FULL mode.");
+            set_top_line();
+            break;
+        case C_MIDI_QUICK:
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_QUICK);
+            set_status(STAT_POS_2, "Midi Input set to QUICK mode.");
+            set_top_line();
+            break;
+        case C_MIDI_OFF:
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
+            set_status(STAT_POS_2, "Midi Input OFF.");
+            set_top_line();
             break;
 
         case C_QUANTUM :
@@ -861,7 +852,7 @@ void do_command_line(int argc, char *argv[])
             }
             else if ( strstr(argv[i], "-transpose=") == argv[i] )
             {
-                g_PatternStore.CurrentTranslateTableForEdit().SetTranspose(strtol(argv[i] + 11, NULL, 10));
+                g_PatternStore.TranslateTableForEdit().SetTranspose(strtol(argv[i] + 11, NULL, 10));
             }
             else if ( strstr(argv[i], "-tempo=") == argv[i] )
             {

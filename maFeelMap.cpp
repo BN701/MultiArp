@@ -28,14 +28,18 @@
 
 using namespace std;
 
+#define LOG_ON 0
+
+#if LOG_ON
 ofstream fLog;
+#endif
 
 FeelMap::FeelMap():
     m_Active(true),
     m_EditPoint(1)
 {
     //ctor
-#if 0
+#if LOG_ON
     fLog.open("FeelMap.log");
 #endif
 
@@ -76,7 +80,7 @@ FeelMap::FeelMap():
 FeelMap::~FeelMap()
 {
     //dtor
-#if 0
+#if LOG_ON
     fLog.close();
 #endif
 }
@@ -270,7 +274,7 @@ bool FeelMap::HandleKey(key_type_t k)
 }
 
 
-double FeelMap::Feel( double beat )
+double FeelMap::Adjust( double beat )
 {
     if ( ! m_Active )
         return beat;
@@ -297,7 +301,9 @@ double FeelMap::Feel( double beat )
     if ( n == 0 )
     {
         T = P * m_StretchPoints.at(1) * t;
+#if LOG_ON
         sprintf(buff, "Beat %6.2f -> %6.2f (n = %i)\n", beat, T, n);
+#endif
     }
     else
     {
@@ -305,14 +311,18 @@ double FeelMap::Feel( double beat )
         double windowOut = m_StretchPoints.at(n) - m_StretchPoints.at(n-1);
         double tFrac = t - static_cast<double>(n-1)/P;
         T = m_StretchPoints.at(n-1) + tFrac * windowOut / windowIn;
+#if LOG_ON
         sprintf(buff, "t %6.2f -> %6.2f (n = %i, wIn = %.3f wOut = %.3f tFrac %.3f)\n", t, T, n, windowIn, windowOut, tFrac);
+#endif
     }
 
     // T = m_StretchPoints.at(n-1) + (1.0 * m_Points * t - 1) * (m_StretchPoints.at(n) - m_StretchPoints.at(n-1));
 
     T += wholeBeats;
 
+#if LOG_ON
     fLog << buff;
+#endif
 
     return T;
 }

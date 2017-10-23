@@ -22,8 +22,6 @@
 
 #include <string>
 
-void navigate_pattern_store(int key);
-
 void do_command_line(int argc, char *argv[]);
 bool do_command(std::string commandList);
 

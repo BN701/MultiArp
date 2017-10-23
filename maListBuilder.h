@@ -20,19 +20,25 @@
 #ifndef LISTBUILDER_H
 #define LISTBUILDER_H
 
+#define LINK_PLATFORM_LINUX
+#include <ableton/Link.hpp>
+
 #include <alsa/asoundlib.h>
 
 #include "maPatternStore.h"
 
-#define MIDI_INPUT_OFF      0
-#define MIDI_INPUT_QUICK    1
-#define MIDI_INPUT_FULL     2
-
+enum midi_input_modes_t
+{
+    MIDI_INPUT_OFF,
+    MIDI_INPUT_QUICK,
+    MIDI_INPUT_FULL,
+    MIDI_INPUT_REAL_TIME
+};
 
 class ListBuilder
 {
     public:
-        ListBuilder();
+        ListBuilder(ableton::Link & linkInstance);
         virtual ~ListBuilder();
 
         bool HandleMidi(snd_seq_event_t *ev);
@@ -47,14 +53,28 @@ class ListBuilder
 
         void SetMidiInputMode( int val );
         int MidiInputMode();
+        bool RealTimeRecord() { return m_MidiInputMode == MIDI_INPUT_REAL_TIME; }
+        int MidiInputModeAsColour(std::vector<int> choices) { return choices.at(m_MidiInputMode); }
         bool MidiInputModeChanged();    // Call once and clear flag.
 
+        void SetPhaseIsZero(double beat, double quantum);
+
+        Chord * Step(double phase, double stepValue);
+
     protected:
+        ableton::Link & m_Link;
         int m_MidiInputMode;
         int m_openNotes;
+        Note m_Activity;   // Something to show what's coming in.
         Chord m_Chord;
         NoteList m_NoteList;
         bool m_MidiInputModeChanged;
+        double m_LinkQuantum;
+        double m_BeatAtLastPhaseZero;
+
+        std::map<unsigned char, Note> m_OpenNotes;
+        std::map<double, Note> m_RealTimeList;
+        std::vector<std::map<double, Note>::iterator> m_RealTimeUndoIndex;
 
     private:
 };

@@ -636,7 +636,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
 }
 
 
-TranslateTable & PatternStore::CurrentTranslateTableForPlay()
+TranslateTable & PatternStore::TranslateTableForPlay()
 {
     if ( m_UsePatternPlayData && !m_Patterns.empty() /* && m_Patterns.at(m_PosEdit).TranslateTableValid() */ )
         return m_Patterns.at(m_PosPlay).PatternTranslateTable();
@@ -645,7 +645,7 @@ TranslateTable & PatternStore::CurrentTranslateTableForPlay()
 }
 
 
-TranslateTable & PatternStore::CurrentTranslateTableForEdit(bool setFocus)
+TranslateTable & PatternStore::TranslateTableForEdit(bool setFocus)
 {
     TranslateTable * pTable = NULL;
 
@@ -660,7 +660,7 @@ TranslateTable & PatternStore::CurrentTranslateTableForEdit(bool setFocus)
     return *pTable;
 }
 
-FeelMap & PatternStore::CurrentFeelMapForPlay()
+FeelMap & PatternStore::FeelMapForPlay()
 {
     if ( m_UsePatternPlayData && !m_Patterns.empty() /* && m_Patterns.at(m_PosEdit).TranslateTableValid() */ )
         return m_Patterns.at(m_PosPlay).PatternFeelMap();
@@ -669,7 +669,7 @@ FeelMap & PatternStore::CurrentFeelMapForPlay()
 }
 
 
-FeelMap & PatternStore::CurrentFeelMapForEdit(bool setFocus)
+FeelMap & PatternStore::FeelMapForEdit(bool setFocus)
 {
     FeelMap * pMap = NULL;
 

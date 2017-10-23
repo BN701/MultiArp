@@ -17,24 +17,45 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+
 #include "maListBuilder.h"
 
+
 #include <alsa/asoundlib.h>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
 
 // From curses.h
 
 #define KEY_BACKSPACE	0407		/* backspace key */
 
-ListBuilder::ListBuilder():
+#define LOG_ON 1
+
+#if LOG_ON
+ofstream fLog;
+#endif
+
+ListBuilder::ListBuilder(ableton::Link & linkInstance):
+    m_Link(linkInstance),
     m_MidiInputMode(MIDI_INPUT_OFF),
     m_openNotes(0)
 {
     //ctor
+#if LOG_ON
+    fLog.open("ListBuilder.log");
+#endif
+
 }
 
 ListBuilder::~ListBuilder()
 {
     //dtor
+#if LOG_ON
+    fLog.close();
+#endif
+
 }
 
 void ListBuilder::SetMidiInputMode( int val )
@@ -59,6 +80,8 @@ int ListBuilder::MidiInputMode()
 
 bool ListBuilder::MidiInputModeChanged()
 {
+    // Call once and clear flag.
+
     if ( m_MidiInputModeChanged )
     {
         m_MidiInputModeChanged = false;
@@ -66,12 +89,17 @@ bool ListBuilder::MidiInputModeChanged()
     }
     else
         return false;
-}    // Call once and clear flag.
+}
+
+
 
 char ListBuilder::MidiInputModeAsChar()
 {
     switch ( m_MidiInputMode )
     {
+        case MIDI_INPUT_REAL_TIME:
+            return 'R';
+
         case MIDI_INPUT_FULL:
             return 'F';
 
@@ -79,7 +107,7 @@ char ListBuilder::MidiInputModeAsChar()
             return 'Q';
 
         default:
-            return ' ';
+            return 'X';
 
     }
 }
@@ -88,6 +116,14 @@ std::string ListBuilder::ToString()
 {
     switch ( m_MidiInputMode )
     {
+        case MIDI_INPUT_REAL_TIME:
+            {
+                char buff[100];
+                sprintf(buff, " Open: %i, captured: %i", m_OpenNotes.size(), m_RealTimeList.size());
+                return buff;
+            }
+            break;
+
         case MIDI_INPUT_FULL:
             if ( m_NoteList.Empty() )
                 return m_Chord.ToString();
@@ -100,8 +136,46 @@ std::string ListBuilder::ToString()
             return m_NoteList.ToString();
 
         default:
-            return "";
+            return m_Activity.ToString();
     }
+}
+
+
+bool ListBuilder::HandleKeybInput(int c)
+{
+    switch (c)
+    {
+        case 10:
+            return m_MidiInputMode == MIDI_INPUT_FULL && !m_NoteList.Empty();
+
+        case 32:
+            m_NoteList.Add();
+            return true;
+
+        case KEY_BACKSPACE:
+            switch ( m_MidiInputMode )
+            {
+            case MIDI_INPUT_REAL_TIME:
+                if ( !m_RealTimeUndoIndex.empty() )
+                {
+                    m_RealTimeList.erase(m_RealTimeUndoIndex.back());
+                    m_RealTimeUndoIndex.pop_back();
+                }
+                break;
+            default:
+                m_NoteList.DeleteLast();
+            }
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+void ListBuilder::SetPhaseIsZero(double beat, double quantum)
+{
+    m_BeatAtLastPhaseZero = beat;
+    m_LinkQuantum = quantum;
 }
 
 bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
@@ -109,6 +183,81 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
 
     switch ( m_MidiInputMode )
     {
+        case MIDI_INPUT_REAL_TIME:
+            {
+                std::chrono::microseconds t_now = m_Link.clock().micros();
+                ableton::Link::Timeline timeline = m_Link.captureAppTimeline();
+                double beat = timeline.beatAtTime(t_now, m_LinkQuantum);
+
+                // Create notes for note-on, complete notes and calculate
+                // duration for note off.
+#if LOG_ON
+                char buff[100];
+                sprintf(buff, "Beat %6.2f", beat);
+                fLog << buff;
+#endif
+
+                if ( ev->type == SND_SEQ_EVENT_NOTEON )
+                {
+                    Note note(ev->data.note.note, ev->data.note.velocity);
+                    note.SetBeat(beat);
+
+                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
+                    if ( it != m_OpenNotes.end() )
+                        m_OpenNotes.at(ev->data.note.note) = note;
+                    else
+                        m_OpenNotes.insert(make_pair(ev->data.note.note, note));
+#if LOG_ON
+                    sprintf(buff, " opening %3i\n", ev->data.note.note);
+                    fLog << buff;
+#endif
+                }
+                else
+                {
+                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
+                    if ( it != m_OpenNotes.end() )
+                    {
+                        Note note = m_OpenNotes.at(ev->data.note.note);
+                        m_OpenNotes.erase(it);
+
+                        double beatStart = note.Beat();
+                        note.SetLength(beat - beatStart);
+
+                        // Normalize beat Start
+
+                        while ( beatStart < m_BeatAtLastPhaseZero )
+                            beatStart += m_LinkQuantum;
+
+                        note.SetBeat(beatStart - m_BeatAtLastPhaseZero);
+
+                        // Syntax here is getting ridiculous! Here's what's going on:
+                        //
+                        // m_RealTimeList is a map of Note objects, keyed on their beat value.
+                        // You have to make a std::pair to add items to the map.
+                        // The insert() operation returns another pair, the first element of
+                        // which is an iterator pointing to the new item in the map.
+                        // We put the iterator on the undo stack, m_RealTimeUndoIndex.
+                        //
+                        // (TODO: We might need to handle clashes, as I guess it's not
+                        // impossible for two events to have the same beat value.)
+
+                        m_RealTimeUndoIndex.push_back(m_RealTimeList.insert(make_pair(note.Beat(), note)).first);
+
+#if LOG_ON
+                        sprintf(buff, " closing %3i, beat %6.2f length %6.2f\n",
+                                ev->data.note.note,
+                                note.Beat(),
+                                note.Length());
+
+                        fLog << buff;
+#endif
+                    }
+
+                }
+
+            }
+            return false;
+
         case MIDI_INPUT_FULL:
 
             // Build the current chord and addto the note list when all keys
@@ -142,32 +291,38 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
             {
                 m_openNotes -= 1;
             }
-            return m_openNotes == 0;
+            return m_openNotes == 0; // Tell calling function we have a complete notelist.
 
         default:
-
+            m_Activity.m_NoteNumber = ev->data.note.note;
             return false;
     }
 
 }
 
 
-bool ListBuilder::HandleKeybInput(int c)
+Chord * ListBuilder::Step(double phase, double stepValue)
 {
-    switch (c)
+    m_Chord.Clear();
+
+    double windowStart = phase - 2 / stepValue;
+    double windowEnd = phase + 2 / stepValue;
+
+    for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+                    it != m_RealTimeList.upper_bound(windowEnd); it++ )
+        m_Chord.Add(it->second);
+
+    // When phase is zero, window start will be negative, so we also need to
+    // look for notes at the top of the loop that would normally be quantized
+    // up to next beat zero.
+
+    if ( windowStart < 0 )
     {
-        case 10:
-            return m_MidiInputMode == MIDI_INPUT_FULL && !m_NoteList.Empty();
-
-        case 32:
-            m_NoteList.Add();
-            return true;
-
-        case KEY_BACKSPACE:
-            m_NoteList.DeleteLast();
-            return true;
-
-        default:
-            return false;
+        windowStart += m_LinkQuantum;
+        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+                    it != m_RealTimeList.upper_bound(m_LinkQuantum); it++ )
+            m_Chord.Add(it->second);
     }
+
+    return & m_Chord;
 }

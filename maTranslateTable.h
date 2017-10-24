@@ -64,7 +64,7 @@ enum scale_t {
 };
 
 // #include "maPatternStore.h"
-class NoteList; // Passed as parameter to one of the SetScale() methods.
+class PlayList; // Passed as parameter to one of the SetScale() methods.
 
 // This isn't used at the moment, but will come in
 // handy if we do pre-calculations when setting up
@@ -101,7 +101,7 @@ class TranslateTable : public CursorKeys
 
         void SetScale(scale_t scale);
         bool SetScale(std::string & name);
-        bool SetScale(NoteList & list);
+        bool SetScale(PlayList & list);
         void NextScale( int dir );
         int Scale() { return m_Scale; }
 

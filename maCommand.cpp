@@ -618,7 +618,7 @@ bool do_command(string/*const char * */ commandString)
             show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:
-            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditNoteList());
+            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditPlayList());
             show_translation_map_status();
             break;
         case C_SCALE_SHOW:

@@ -261,7 +261,7 @@ void Note::FromString(string s)
     }
 }
 
-bool Chord::IsRest()
+bool Cluster::IsRest()
 {
     if ( Empty() )
         return true;
@@ -273,7 +273,7 @@ bool Chord::IsRest()
     return true;
 }
 
-string Chord::ToString()
+string Cluster::ToString()
 {
     string result;
     for ( vector<Note>::iterator i = m_Notes.begin(); i != m_Notes.end(); i++ )
@@ -285,7 +285,7 @@ string Chord::ToString()
     return result;
 }
 
-void Chord::FromString(string s)
+void Cluster::FromString(string s)
 {
     vector<string> noteStrings = split(s.c_str());
 
@@ -316,39 +316,39 @@ void Chord::FromString(string s)
     }
 }
 
-Chord * NoteList::Step()
+Cluster * PlayList::Step()
 {
-    if ( m_Chords.empty() )
+    if ( m_Clusters.empty() )
         return NULL;
 
     m_LastRequestedPos = m_Pos;
-    Chord *pChord = & m_Chords[m_Pos++];
+    Cluster *pCluster = & m_Clusters[m_Pos++];
 
     // Look ahead for rests.
 
-    if ( !pChord->IsRest() )
+    if ( !pCluster->IsRest() )
     {
         vector<int>::size_type p = m_Pos;
-        pChord->m_StepLength = 0;
+        pCluster->m_StepLength = 0;
 
         do
         {
-            if ( p == m_Chords.size() )
+            if ( p == m_Clusters.size() )
                 p = 0;
 
-            if ( m_Chords[p++].IsRest() )
-                pChord->m_StepLength += 1;
+            if ( m_Clusters[p++].IsRest() )
+                pCluster->m_StepLength += 1;
             else
                 break;
 
         } while ( true );
     }
     else
-        pChord = NULL;
+        pCluster = NULL;
 
     // Set completion flag.
 
-    if ( m_Pos >= m_Chords.size() )
+    if ( m_Pos >= m_Clusters.size() )
     {
         m_Complete = true;
         m_Pos = 0;
@@ -358,11 +358,11 @@ Chord * NoteList::Step()
         m_Complete = false;
     }
 
-    return pChord;
+    return pCluster;
 }
 
 
-bool NoteList::PlayPositionInfo(int & offset,  int & length)
+bool PlayList::PlayPositionInfo(int & offset,  int & length)
 {
     if ( m_LastRequestedPos >= m_PosInfo.size() )
         return false;
@@ -383,22 +383,22 @@ bool NoteList::PlayPositionInfo(int & offset,  int & length)
     return true;
 }
 
-string NoteList::ToString()
+string PlayList::ToString()
 {
     string result;
     m_PosInfo.clear();
-    for ( vector<Chord>::iterator i = m_Chords.begin(); i != m_Chords.end(); )
+    for ( vector<Cluster>::iterator i = m_Clusters.begin(); i != m_Clusters.end(); )
     {
         int iStart = result.size();
-        result += Chord(*i).ToString();
-        if ( ++i < m_Chords.end() )
+        result += Cluster(*i).ToString();
+        if ( ++i < m_Clusters.end() )
             result += ",";
         m_PosInfo.push_back(PosInfo(iStart, result.size() - iStart));
     }
     return result;
 }
 
-void NoteList::FromString(string s)
+void PlayList::FromString(string s)
 {
     vector<string> chordStrings = split(s.c_str(), ',', true);
 
@@ -410,8 +410,8 @@ void NoteList::FromString(string s)
     {
 //        const char * chordString = chordStrings[i].c_str();
 
-        Chord chord;
+        Cluster chord;
         chord.FromString(*it);
-        m_Chords.push_back(chord);
+        m_Clusters.push_back(chord);
     }
 }

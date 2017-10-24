@@ -27,7 +27,7 @@
 
 using namespace std;
 
-Chord * Pattern::Step()
+Cluster * Pattern::Step()
 {
     if ( m_ListSet.empty() )
         return NULL;
@@ -46,7 +46,7 @@ bool Pattern::AllListsComplete()
 {
     bool bResult = true;
 
-    for ( std::vector<NoteList>::iterator it = m_ListSet.begin(); it < m_ListSet.end(); it++ )
+    for ( std::vector<PlayList>::iterator it = m_ListSet.begin(); it < m_ListSet.end(); it++ )
     {
         bResult &= (*it).Complete();
     }
@@ -137,12 +137,12 @@ string Pattern::ToString(const char * prefix)
     result += "\n";
 
     int index = 1;
-    for ( vector<NoteList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++, index++ )
+    for ( vector<PlayList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++, index++ )
     {
         char buffer[12];
         sprintf(buffer, "List %i ", index);
         result += buffer;
-        result += NoteList(*i).ToString();
+        result += PlayList(*i).ToString();
         result += "\n";
     }
     return result;
@@ -268,7 +268,7 @@ int Pattern::NewList()
     return m_PosEdit;
 }
 
-void Pattern::ReplaceList(NoteList & noteList)
+void Pattern::ReplaceList(PlayList & noteList)
 {
     if ( m_PosEdit >= m_ListSet.size() )
         m_ListSet.resize(m_PosEdit + 1);

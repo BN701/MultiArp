@@ -44,8 +44,8 @@ class ListBuilder
         bool HandleMidi(snd_seq_event_t *ev);
         bool HandleKeybInput(int c);
 
-        NoteList & CurrentList() { return m_NoteList; }
-        void Clear() { m_NoteList.Clear(); }
+        PlayList & CurrentList() { return m_PlayList; }
+        void Clear() { m_PlayList.Clear(); }
 
         std::string ToString();
 
@@ -59,15 +59,15 @@ class ListBuilder
 
         void SetPhaseIsZero(double beat, double quantum);
 
-        Chord * Step(double phase, double stepValue);
+        Cluster * Step(double phase, double stepValue);
 
     protected:
         ableton::Link & m_Link;
         int m_MidiInputMode;
         int m_openNotes;
         Note m_Activity;   // Something to show what's coming in.
-        Chord m_Chord;
-        NoteList m_NoteList;
+        Cluster m_Cluster;
+        PlayList m_PlayList;
         bool m_MidiInputModeChanged;
         double m_LinkQuantum;
         double m_BeatAtLastPhaseZero;

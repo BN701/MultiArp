@@ -518,14 +518,14 @@ void TranslateTable::NextPremapMode( int dir )
 }
 
 
-bool TranslateTable::SetScale(NoteList & list)
+bool TranslateTable::SetScale(PlayList & list)
 {
     bool foundSomething = false;
     int foundNotes[12];
     for ( int i = 0; i < 12; i++ )
         foundNotes[i] = 0;
 
-    for ( vector<Chord>::iterator ch = list.m_Chords.begin(); ch < list.m_Chords.end(); ch++ )
+    for ( vector<Cluster>::iterator ch = list.m_Clusters.begin(); ch < list.m_Clusters.end(); ch++ )
         for ( vector<Note>::iterator note = (*ch).m_Notes.begin(); note < (*ch).m_Notes.end(); note++ )
         {
             foundNotes[(*note).m_NoteNumber % 12] = 1;

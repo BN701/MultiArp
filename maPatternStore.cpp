@@ -107,7 +107,7 @@ bool PatternStore::HandleKey(key_type_t k)
     return true;
 }
 
-NoteList & PatternStore::CurrentEditNoteList()
+PlayList & PatternStore::CurrentEditPlayList()
 {
     if ( m_Patterns.empty() )
         throw string("Pattern Store is Empty.");
@@ -246,7 +246,7 @@ string PatternStore::PatternOverview()
     return buff;
 }
 
-Chord * PatternStore::Step()
+Cluster * PatternStore::Step()
 {
     /*
         As long as PatternChanged() is called for every step, we
@@ -402,7 +402,7 @@ string PatternStore::PlayPatternToString()
     return m_Patterns.at(m_PosPlay).ToString();
 }
 
-void PatternStore::UpdatePattern(NoteList & noteList)
+void PatternStore::UpdatePattern(PlayList & noteList)
 {
     if ( m_Patterns.empty() )
         m_Patterns.emplace_back();

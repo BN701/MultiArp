@@ -74,13 +74,13 @@ struct Note
 
 };
 
-struct Chord
+struct Cluster
 {
 
     std::vector<Note> m_Notes;
     int m_StepLength;           // This will be filled in at some point to indicate how many rests follow.
 
-    Chord():
+    Cluster():
         m_StepLength(1)
     { }
 
@@ -97,12 +97,12 @@ struct Chord
     void FromString(std::string s);
 };
 
-struct NoteList
+struct PlayList
 {
 
-    std::vector<Chord>::size_type m_Pos;                 // Points to the next position to be retrieved.
-    std::vector<Chord>::size_type m_LastRequestedPos;    // Last position for which note info was requested.
-    std::vector<Chord> m_Chords;
+    std::vector<Cluster>::size_type m_Pos;                 // Points to the next position to be retrieved.
+    std::vector<Cluster>::size_type m_LastRequestedPos;    // Last position for which note info was requested.
+    std::vector<Cluster> m_Clusters;
 
     std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
 
@@ -110,7 +110,7 @@ struct NoteList
 
     bool m_Complete;
 
-    NoteList():
+    PlayList():
         m_Pos(0),
         m_LastRequestedPos(0),
         m_Complete(false)
@@ -119,31 +119,31 @@ struct NoteList
 
     void Clear ()
     {
-        m_Chords.clear();
+        m_Clusters.clear();
         ResetPosition();
     }
 
     bool Empty()
     {
-        return m_Chords.empty();
+        return m_Clusters.empty();
     }
 
     void Add(int n = -1, int v = -1)
     {
-        Chord chord;
+        Cluster chord;
         chord.Add(n, v);
         Add(chord);
     }
 
-    void Add(Chord & chord)
+    void Add(Cluster & chord)
     {
-        m_Chords.push_back(chord);
+        m_Clusters.push_back(chord);
     }
 
     void DeleteLast()
     {
-        if ( !m_Chords.empty() )
-            m_Chords.pop_back();
+        if ( !m_Clusters.empty() )
+            m_Clusters.pop_back();
     }
 
     // True if mpos is zero after completing a cycle.
@@ -154,7 +154,7 @@ struct NoteList
         return m_Complete;
     }
 
-    Chord * Step();
+    Cluster * Step();
 
     void ResetPosition()
     {
@@ -177,7 +177,7 @@ struct Pattern
 
     std::vector<int> m_Trigs;
 
-    std::vector<NoteList> m_ListSet;
+    std::vector<PlayList> m_ListSet;
 
     std::string m_Label;
 
@@ -245,11 +245,11 @@ struct Pattern
     void ResetPosition()
     {
         m_Pos = 0;
-        for ( std::vector<NoteList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++ )
+        for ( std::vector<PlayList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++ )
             (*i).ResetPosition();
     }
 
-    Chord * Step();
+    Cluster * Step();
 
     bool LabelEmpty()
     {
@@ -264,7 +264,7 @@ struct Pattern
     void SetFieldsFromString(std::string s);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
-    void ReplaceList(NoteList & noteList);
+    void ReplaceList(PlayList & noteList);
     int NewList();
     void DeleteCurrentList();
 
@@ -397,7 +397,7 @@ struct PatternStore : public CursorKeys
         m_PhaseIsZero = true;
     }
 
-    Chord * Step();
+    Cluster * Step();
 
     std::string EditPatternToString();
     std::string PlayPatternToString();
@@ -407,12 +407,12 @@ struct PatternStore : public CursorKeys
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
-    void UpdatePattern(NoteList & noteList);
+    void UpdatePattern(PlayList & noteList);
     void SetFieldsFromString(std::string s);
     bool LoadFromString(std::string s, int & created, int & updates);
     void UpdatePatternChainFromString(std::string s);
 
-    NoteList & CurrentEditNoteList();
+    PlayList & CurrentEditPlayList();
     Pattern & CurrentPlayPattern();
     Pattern & CurrentEditPattern();
 

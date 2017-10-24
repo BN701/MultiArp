@@ -67,8 +67,8 @@ void ListBuilder::SetMidiInputMode( int val )
 
         if ( m_MidiInputMode == MIDI_INPUT_OFF )
         {
-            m_NoteList.Clear();
-            m_Chord.Clear();
+            m_PlayList.Clear();
+            m_Cluster.Clear();
         }
     }
 }
@@ -125,15 +125,15 @@ std::string ListBuilder::ToString()
             break;
 
         case MIDI_INPUT_FULL:
-            if ( m_NoteList.Empty() )
-                return m_Chord.ToString();
-            else if ( m_Chord.Empty() )
-                return m_NoteList.ToString();
+            if ( m_PlayList.Empty() )
+                return m_Cluster.ToString();
+            else if ( m_Cluster.Empty() )
+                return m_PlayList.ToString();
             else
-                return m_NoteList.ToString() + "," + m_Chord.ToString();
+                return m_PlayList.ToString() + "," + m_Cluster.ToString();
 
         case MIDI_INPUT_QUICK:
-            return m_NoteList.ToString();
+            return m_PlayList.ToString();
 
         default:
             return m_Activity.ToString();
@@ -146,10 +146,10 @@ bool ListBuilder::HandleKeybInput(int c)
     switch (c)
     {
         case 10:
-            return m_MidiInputMode == MIDI_INPUT_FULL && !m_NoteList.Empty();
+            return m_MidiInputMode == MIDI_INPUT_FULL && !m_PlayList.Empty();
 
         case 32:
-            m_NoteList.Add();
+            m_PlayList.Add();
             return true;
 
         case KEY_BACKSPACE:
@@ -163,7 +163,7 @@ bool ListBuilder::HandleKeybInput(int c)
                 }
                 break;
             default:
-                m_NoteList.DeleteLast();
+                m_PlayList.DeleteLast();
             }
             return true;
 
@@ -267,7 +267,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
 
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
             {
-                m_Chord.Add(ev->data.note.note, ev->data.note.velocity);
+                m_Cluster.Add(ev->data.note.note, ev->data.note.velocity);
                 m_openNotes += 1;
             }
             else if ( m_openNotes > 0 )
@@ -276,15 +276,15 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
             }
             if ( m_openNotes == 0 )
             {
-                m_NoteList.Add(m_Chord);
-                m_Chord.Clear();
+                m_PlayList.Add(m_Cluster);
+                m_Cluster.Clear();
             }
             return false;
 
         case MIDI_INPUT_QUICK:
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
             {
-                m_NoteList.Add(ev->data.note.note, ev->data.note.velocity);
+                m_PlayList.Add(ev->data.note.note, ev->data.note.velocity);
                 m_openNotes += 1;
             }
             else if ( m_openNotes > 0 )
@@ -301,16 +301,16 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
 }
 
 
-Chord * ListBuilder::Step(double phase, double stepValue)
+Cluster * ListBuilder::Step(double phase, double stepValue)
 {
-    m_Chord.Clear();
+    m_Cluster.Clear();
 
     double windowStart = phase - 2 / stepValue;
     double windowEnd = phase + 2 / stepValue;
 
     for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(windowEnd); it++ )
-        m_Chord.Add(it->second);
+        m_Cluster.Add(it->second);
 
     // When phase is zero, window start will be negative, so we also need to
     // look for notes at the top of the loop that would normally be quantized
@@ -321,8 +321,8 @@ Chord * ListBuilder::Step(double phase, double stepValue)
         windowStart += m_LinkQuantum;
         for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(m_LinkQuantum); it++ )
-            m_Chord.Add(it->second);
+            m_Cluster.Add(it->second);
     }
 
-    return & m_Chord;
+    return & m_Cluster;
 }

@@ -173,15 +173,15 @@ void queue_next_step(int queueId)
 
     // Step the Pattern Store
 
-    Chord * nextChord = NULL;
+    Cluster * nextCluster = NULL;
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        // nextChord = g_PatternStore.Step();
-        nextChord = g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
+        // nextCluster = g_PatternStore.Step();
+        nextCluster = g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
     }
 
-    if ( nextChord != NULL )
+    if ( nextCluster != NULL )
     {
         double tempo = timeline.tempo();
 
@@ -196,13 +196,13 @@ void queue_next_step(int queueId)
          */
 
         double stepLengthMilliSecs = 240000.0/(tempo * g_State.CurrentStepValue());
-        double duration = stepLengthMilliSecs * (nextChord->StepsTillNextNote() + g_PatternStore.GateLength());
+        double duration = stepLengthMilliSecs * (nextCluster->StepsTillNextNote() + g_PatternStore.GateLength());
 
         // TODO: Calculate duration for real time note capture, which is returned in beat values.
 
-        for ( unsigned int i = 0; i < nextChord->m_Notes.size(); i++ )
+        for ( unsigned int i = 0; i < nextCluster->m_Notes.size(); i++ )
         {
-            Note & note = nextChord->m_Notes[i];
+            Note & note = nextCluster->m_Notes[i];
 
             int noteNumber = note.m_NoteNumber;
 

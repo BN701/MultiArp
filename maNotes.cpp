@@ -229,13 +229,13 @@ int Note::NoteNumberFromString(string note)
 }
 
 
-string Note::ToString()
+string Note::ToString(bool showVelocity)
 {
     if ( m_NoteNumber == -1 )
         return " -";
 
     char buffer[25];
-    if ( m_NoteVelocity >= 0 )
+    if ( showVelocity && m_NoteVelocity >= 0 )
         sprintf(buffer, " %s%i/%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12, m_NoteVelocity);
     else
         sprintf(buffer, " %s%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12);
@@ -406,12 +406,53 @@ void PlayList::FromString(string s)
         throw string("Note List parse error: nothing found.");
 
     for ( vector<string>::iterator it = chordStrings.begin(); it != chordStrings.end(); it++ )
-//    for ( int i = 0; i < chordStrings.size(); i++ )
     {
-//        const char * chordString = chordStrings[i].c_str();
-
         Cluster chord;
         chord.FromString(*it);
         m_Clusters.push_back(chord);
     }
+}
+
+
+string PlayListRT::ToString()
+{
+    string result;
+
+    for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++)
+    {
+        char buff[50];
+        if ( !result.empty() )
+            result += ",";
+        sprintf(buff, "%s", it->second.ToString(false).c_str());
+        result += buff;
+    }
+
+    return result;
+}
+
+void PlayListRT::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
+{
+//    shared_ptr<Cluster> result = make_shared<Cluster>();
+
+    double windowStart = phase - 2 / stepValue;
+    double windowEnd = phase + 2 / stepValue;
+
+    for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+                    it != m_RealTimeList.upper_bound(windowEnd); it++ )
+        cluster.Add(it->second);
+
+    // When phase is zero, window start will be negative, so we also need to
+    // look for notes at the top of the loop that would normally be quantized
+    // up to next beat zero.
+
+//    if ( windowStart < 0 )
+//    {
+//        windowStart += m_LinkQuantum;
+//        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+//                    it != m_RealTimeList.upper_bound(m_LinkQuantum); it++ )
+//            m_Captured.Add(it->second);
+//    }
+
+//    return result;
+
 }

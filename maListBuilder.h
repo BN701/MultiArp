@@ -45,7 +45,16 @@ class ListBuilder
         bool HandleKeybInput(int c);
 
         PlayList & CurrentList() { return m_PlayList; }
-        void Clear() { m_PlayList.Clear(); }
+        std::map<double,Note> & RealTimeList() { return m_RealTimeList; }
+
+        void Clear()
+        {
+            m_PlayList.Clear();
+            m_Captured.Clear();
+            m_OpenNotes.clear();
+            m_RealTimeList.clear();
+            m_RealTimeUndoIndex.clear();
+        }
 
         std::string ToString();
 
@@ -66,7 +75,7 @@ class ListBuilder
         int m_MidiInputMode;
         int m_openNotes;
         Note m_Activity;   // Something to show what's coming in.
-        Cluster m_Cluster;
+        Cluster m_Captured;
         PlayList m_PlayList;
         bool m_MidiInputModeChanged;
         double m_LinkQuantum;

@@ -22,6 +22,8 @@
 
 #include <vector>
 #include <string>
+#include <map>
+#include <memory>
 
 #include "maCursorKeys.h"
 #include "maFeelMap.h"
@@ -60,7 +62,7 @@ struct Note
         m_Length(0)
     {}
 
-    std::string ToString();
+    std::string ToString(bool showVelocity = true);
     void FromString(std::string);
 
     static std::string NoteName(int n); // Expose the notes/numbers look up table.
@@ -76,13 +78,18 @@ struct Note
 
 struct Cluster
 {
-
     std::vector<Note> m_Notes;
     int m_StepLength;           // This will be filled in at some point to indicate how many rests follow.
 
     Cluster():
         m_StepLength(1)
     { }
+
+    Cluster & operator+=(const Cluster & rhs)
+    {
+        m_Notes.insert(m_Notes.end(), rhs.m_Notes.begin(), rhs.m_Notes.end());
+        return *this; // return the result by reference
+    }
 
     void Add(int n, int v = -1) { m_Notes.push_back(Note(n, v)); }
     void Add(Note & note) { m_Notes.push_back(note); }
@@ -91,6 +98,7 @@ struct Cluster
     bool Empty() { return m_Notes.empty(); }
     bool IsRest();
 
+    int SetStepsTillNextNote( int val ) { m_StepLength = val; }
     int StepsTillNextNote() { return m_StepLength; }
 
     std::string ToString();
@@ -100,8 +108,8 @@ struct Cluster
 struct PlayList
 {
 
-    std::vector<Cluster>::size_type m_Pos;                 // Points to the next position to be retrieved.
-    std::vector<Cluster>::size_type m_LastRequestedPos;    // Last position for which note info was requested.
+    std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
+    std::vector<Cluster>::size_type m_LastRequestedPos;     // Last position for which note info was requested.
     std::vector<Cluster> m_Clusters;
 
     std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
@@ -168,6 +176,17 @@ struct PlayList
     bool PlayPositionInfo(int & offset,  int & length);
 };
 
+struct PlayListRT
+{
+    std::map<double,Note> m_RealTimeList;
+    void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
+
+    PlayListRT(std::map<double,Note> realTimeList):
+        m_RealTimeList(realTimeList)
+    {};
+
+    std::string ToString();
+};
 
 struct Pattern
 {
@@ -178,6 +197,7 @@ struct Pattern
     std::vector<int> m_Trigs;
 
     std::vector<PlayList> m_ListSet;
+    std::vector<PlayListRT> m_RealTimeSet;
 
     std::string m_Label;
 
@@ -242,14 +262,20 @@ struct Pattern
         return m_ListSet.size();
     }
 
+    int RealTimeListCount()
+    {
+        return m_RealTimeSet.size();
+    }
+
     void ResetPosition()
     {
         m_Pos = 0;
+//        for ( std::vector<std::unique_ptr<PlayList_>>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++ )
         for ( std::vector<PlayList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++ )
             (*i).ResetPosition();
     }
 
-    Cluster * Step();
+    void Step(Cluster & cluster, double phase, double stepValue);
 
     bool LabelEmpty()
     {
@@ -257,9 +283,11 @@ struct Pattern
     }
 
     std::string Label(size_t width);
+    std::string RealTimeListToString(std::vector<int>::size_type n);
     std::string ListToString(std::vector<int>::size_type n);
     std::string ToString(const char * prefix = NULL);
     bool FromString(std::string s, int & updates);
+    void AddRealTimeList(std::map<double,Note> realTimeList);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
@@ -397,17 +425,20 @@ struct PatternStore : public CursorKeys
         m_PhaseIsZero = true;
     }
 
-    Cluster * Step();
+    void Step(Cluster & cluster, double phase, double stepValue);
 
     std::string EditPatternToString();
     std::string PlayPatternToString();
 
     int PlayPatternListCount();
+    int RealTimeListCount();
+    std::string RealTimeListToString(int n);
     std::string PlayPatternListToString(int n);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
     void UpdatePattern(PlayList & noteList);
+    void UpdatePattern(std::map<double,Note> & realTimeList);
     void SetFieldsFromString(std::string s);
     bool LoadFromString(std::string s, int & created, int & updates);
     void UpdatePatternChainFromString(std::string s);

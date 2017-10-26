@@ -154,12 +154,28 @@ int PatternStore::PlayPatternListCount()
     return m_Patterns.at(m_PosPlay).ListCount();
 }
 
+int PatternStore::RealTimeListCount()
+{
+    if ( m_Patterns.empty() )
+        return 0;
+
+    return m_Patterns.at(m_PosPlay).RealTimeListCount();
+}
+
 string PatternStore::PlayPatternListToString(int n)
 {
     if ( m_Patterns.empty() )
         return "";
 
     return m_Patterns.at(m_PosPlay).ListToString(n);
+}
+
+string PatternStore::RealTimeListToString(int n)
+{
+    if ( m_Patterns.empty() )
+        return "";
+
+    return m_Patterns.at(m_PosPlay).RealTimeListToString(n);
 }
 
 bool PatternStore::PlayPositionInfo(int & listIndex, int & offset, int & length)
@@ -246,7 +262,7 @@ string PatternStore::PatternOverview()
     return buff;
 }
 
-Cluster * PatternStore::Step()
+void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
 {
     /*
         As long as PatternChanged() is called for every step, we
@@ -254,7 +270,7 @@ Cluster * PatternStore::Step()
      */
 
     if ( m_Patterns.empty() )
-        return NULL;
+        return;
 
     if ( m_PatternChainMode != PC_MODE_NONE && ! m_PatternChain.empty() )
     {
@@ -297,7 +313,7 @@ Cluster * PatternStore::Step()
 
     m_PhaseIsZero = false;
 
-    return m_Patterns.at(m_PosPlay).Step();
+    m_Patterns.at(m_PosPlay).Step(cluster, phase, stepValue);
 }
 
 void PatternStore::UpdatePatternChainFromString(string s)
@@ -408,6 +424,14 @@ void PatternStore::UpdatePattern(PlayList & noteList)
         m_Patterns.emplace_back();
 
     m_Patterns.at(m_PosEdit).ReplaceList(noteList);
+}
+
+void PatternStore::UpdatePattern(std::map<double,Note> & realTimeList)
+{
+    if ( m_Patterns.empty() )
+        m_Patterns.emplace_back();
+
+    m_Patterns.at(m_PosEdit).AddRealTimeList(realTimeList);
 }
 
 enum ps_element_names_t {

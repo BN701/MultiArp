@@ -770,7 +770,6 @@ bool do_command(string/*const char * */ commandString)
 
         case C_USE:
             set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
-
             break;
         case C_USE_GLOBAL_PLAYDATA:
             g_PatternStore.SetUsePatternPlayData(false);

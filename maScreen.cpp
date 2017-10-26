@@ -124,7 +124,7 @@ void set_top_line()
     highlight(0, 0, 59, 7, A_BOLD, g_State.RunState() ? CP_RUNNING : 0);
 }
 
-std::vector<int> gListDisplayRows;
+std::vector<int> g_ListDisplayRows;
 
 void update_pattern_panel()
 {
@@ -132,13 +132,20 @@ void update_pattern_panel()
 
 	wattron(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
 
-    gListDisplayRows.clear();
+    g_ListDisplayRows.clear();
     wmove(gDisplay.BigPanel(), 0, 0);
+
+    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
+    {
+        getyx(gDisplay.BigPanel(), scr_y, scr_x);
+        g_ListDisplayRows.push_back(scr_y);
+        wprintw(gDisplay.BigPanel(), "%s\n", g_PatternStore.RealTimeListToString(i).c_str());
+    }
 
     for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
     {
         getyx(gDisplay.BigPanel(), scr_y, scr_x);
-        gListDisplayRows.push_back(scr_y);
+        g_ListDisplayRows.push_back(scr_y);
         wprintw(gDisplay.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
     }
 
@@ -181,7 +188,7 @@ void highlight_pattern_panel()
 
     if ( g_PatternStore.PlayPositionInfo(listIndex, offset, length) )
     {
-        int row = gListDisplayRows.at(listIndex);
+        int row = g_ListDisplayRows.at(listIndex);
 
         while ( offset >= 76 )
         {

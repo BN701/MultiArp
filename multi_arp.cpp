@@ -173,15 +173,18 @@ void queue_next_step(int queueId)
 
     // Step the Pattern Store
 
-    Cluster * nextCluster = NULL;
+    Cluster nextCluster;
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        // nextCluster = g_PatternStore.Step();
-        nextCluster = g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
+        g_PatternStore.Step(nextCluster, g_State.Phase(), g_State.CurrentStepValue());
+//        if ( pNext != NULL )
+//            nextCluster = *pNext;
+        if ( g_ListBuilder.RealTimeRecord() )
+            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
     }
 
-    if ( nextCluster != NULL )
+    if ( !nextCluster.Empty() )
     {
         double tempo = timeline.tempo();
 
@@ -196,13 +199,11 @@ void queue_next_step(int queueId)
          */
 
         double stepLengthMilliSecs = 240000.0/(tempo * g_State.CurrentStepValue());
-        double duration = stepLengthMilliSecs * (nextCluster->StepsTillNextNote() + g_PatternStore.GateLength());
+        double duration = stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength());
 
-        // TODO: Calculate duration for real time note capture, which is returned in beat values.
-
-        for ( unsigned int i = 0; i < nextCluster->m_Notes.size(); i++ )
+        for ( unsigned int i = 0; i < nextCluster.m_Notes.size(); i++ )
         {
-            Note & note = nextCluster->m_Notes[i];
+            Note & note = nextCluster.m_Notes[i];
 
             int noteNumber = note.m_NoteNumber;
 
@@ -447,7 +448,10 @@ bool key_input_action()
         }
         else if ( g_ListBuilder.HandleKeybInput(c) )
         {
-            g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+            if ( g_ListBuilder.RealTimeRecord() )
+                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList());
+            else
+                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
             g_ListBuilder.Clear();
             update_pattern_panel();
             set_status(STAT_POS_2, "");

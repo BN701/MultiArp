@@ -27,19 +27,30 @@
 
 using namespace std;
 
-Cluster * Pattern::Step()
+void Pattern::Step(Cluster & cluster, double phase, double stepValue)
 {
-    if ( m_ListSet.empty() )
-        return NULL;
+    // Add in step based events, if any, and step position.
 
-    if ( m_Pos >= m_ListSet.size() )
+    if ( ! m_ListSet.empty() )
     {
-        m_Pos = 0;
+        if ( m_Pos >= m_ListSet.size() )
+            m_Pos = 0;
+
+        m_LastRequestedPos = m_Pos;
+
+        Cluster * result = m_ListSet[m_Pos++].Step();
+        if ( result != NULL )
+        {
+            cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+            cluster += *result;
+        }
     }
 
-    m_LastRequestedPos = m_Pos;
+    // Collect any real time events.
 
-    return m_ListSet[m_Pos++].Step();
+    for ( vector<PlayListRT>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
+        it->Step(cluster, phase, stepValue);
+
 }
 
 bool Pattern::AllListsComplete()
@@ -70,6 +81,14 @@ string Pattern::ListToString(vector<int>::size_type n)
         return "";
 
     return m_ListSet.at(n).ToString();
+}
+
+string Pattern::RealTimeListToString(vector<int>::size_type n)
+{
+    if ( n >= m_RealTimeSet.size() )
+        return "";
+
+    return m_RealTimeSet.at(n).ToString();
 }
 
 enum pat_element_names_t {
@@ -258,6 +277,11 @@ void Pattern::AddListFromString(vector<int>::size_type index, string s)
 
     m_ListSet.at(index).Clear();
     m_ListSet.at(index).FromString(s);
+}
+
+void Pattern::AddRealTimeList(std::map<double,Note> realTimeList)
+{
+    m_RealTimeSet.emplace_back(realTimeList);
 }
 
 

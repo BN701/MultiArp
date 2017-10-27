@@ -19,6 +19,7 @@
 
 #include "maPatternStore.h"
 
+#include <cmath>
 #include <cstring>
 #include <unordered_map>
 
@@ -232,20 +233,20 @@ int Note::NoteNumberFromString(string note)
 string Note::ToString(bool showVelocity)
 {
     if ( m_NoteNumber == -1 )
-        return " -";
+        return "-";
 
     char buffer[25];
     if ( showVelocity && m_NoteVelocity >= 0 )
-        sprintf(buffer, " %s%i/%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12, m_NoteVelocity);
+        sprintf(buffer, "%s%i:%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12, m_NoteVelocity);
     else
-        sprintf(buffer, " %s%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12);
+        sprintf(buffer, "%s%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12);
 
     return buffer;
 }
 
 void Note::FromString(string s)
 {
-    size_t pos = s.find('/');
+    size_t pos = s.find(':');
 
     if ( pos != string::npos )
     {
@@ -273,14 +274,14 @@ bool Cluster::IsRest()
     return true;
 }
 
-string Cluster::ToString()
+string Cluster::ToString(bool showVelocity)
 {
     string result;
     for ( vector<Note>::iterator i = m_Notes.begin(); i != m_Notes.end(); i++ )
     {
-        // if ( result.size() > 0 )
-        //  result += ' ';
-        result += Note(*i).ToString();
+         if ( result.size() > 0 )
+          result += '/';
+        result += Note(*i).ToString(showVelocity);
     }
     return result;
 }
@@ -430,12 +431,128 @@ string PlayListRT::ToString()
     return result;
 }
 
+
+//string PlayListRT::ToString(int step, double phase)
+//{
+//    char buff[50];
+//    sprintf(buff, "%6.2f (%.2f): ", m_LastRequestedPhase, m_LastRequestedStepValue);
+//
+//    string result = buff;
+//
+//    double space = m_LastRequestedPhase + 2.0/m_LastRequestedStepValue;
+//
+//    for (map<double,Note>::iterator it = m_RealTimeList.lower_bound(m_LastRequestedPhase - 2.0/m_LastRequestedStepValue); it != m_RealTimeList.end(); it++)
+//    {
+//        while ( space < it->second.Phase() )
+//        {
+//            result += 'a';
+//            space += 4.0/m_LastRequestedStepValue;
+//        }
+////        sprintf(buff, "%s", it->second.ToString(false).c_str());
+////        result += buff;
+//        result += it->second.ToString(false);
+//        space += 4.0/m_LastRequestedStepValue;
+//    }
+//
+//    for ( ; space < m_QuantumAtCapture; space += 4.0/m_LastRequestedStepValue )
+//        result += 'b';
+//
+//
+//    space = 2.0/m_LastRequestedPhase;
+//
+//    for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.upper_bound(m_LastRequestedPhase); it++)
+//    {
+////        for ( ; space < it->second.Phase(); space += 4.0/m_LastRequestedStepValue )
+////            result += 'c';
+//        while ( space < it->second.Phase() )
+//        {
+//            result += 'c';
+//            space += 4.0/m_LastRequestedStepValue;
+//        }
+////        sprintf(buff, "%s", it->second.ToString(false).c_str());
+////        result += buff;
+//        it->second.ToString(false);
+//        space += 4.0/m_LastRequestedStepValue;
+//    }
+//
+//    for ( ; space < m_LastRequestedPhase; space += 4.0/m_LastRequestedStepValue )
+//        result += 'd';
+//
+//    return result;
+//}
+//
+
+string PlayListRT::ToStringForDisplay()
+{
+    char buff[50];
+    sprintf(buff, "%6.2f (%.2f): ", m_LastRequestedPhase, m_LastRequestedStepValue);
+
+    string result = buff;
+
+    long topLimit = lround(1000 * m_QuantumAtCapture);
+    long midLimit = lround(1000 * m_LastRequestedPhase);
+
+    double windowPos = m_LastRequestedPhase;
+    double windowStep = 4.0/m_LastRequestedStepValue;
+
+    Cluster notes;
+
+    while ( lround(1000 * windowPos) < topLimit )
+    {
+        double windowStart = windowPos - windowStep/2;
+        double windowEnd = windowPos + windowStep/2;
+
+        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+                        it != m_RealTimeList.upper_bound(windowEnd); it++ )
+            notes.Add(it->second);
+
+        if ( !notes.Empty() )
+        {
+            result += notes.ToString(false);
+            notes.Clear();
+        }
+        else
+            result += '-';
+
+        windowPos += windowStep;
+    }
+
+    windowPos = 0;
+
+    while ( lround(1000 * windowPos) < midLimit )
+    {
+        double windowStart = windowPos - windowStep/2;
+        double windowEnd = windowPos + windowStep/2;
+
+        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+                        it != m_RealTimeList.upper_bound(windowEnd); it++ )
+            notes.Add(it->second);
+
+        if ( !notes.Empty() )
+        {
+            result += notes.ToString(false);
+            notes.Clear();
+        }
+        else
+            result += '-';
+
+        windowPos += windowStep;
+    }
+
+
+    return result;
+}
+
+
 void PlayListRT::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
 {
 //    shared_ptr<Cluster> result = make_shared<Cluster>();
 
-    double windowStart = phase - 2 / stepValue;
-    double windowEnd = phase + 2 / stepValue;
+    m_LastRequestedStepValue = stepValue;
+    m_LastRequestedPhase = phase;
+
+    double windowStart = phase - 2.0 / stepValue;
+    double windowEnd = phase + 2.0 / stepValue;
 
     for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(windowEnd); it++ )

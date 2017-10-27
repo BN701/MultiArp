@@ -83,12 +83,12 @@ string Pattern::ListToString(vector<int>::size_type n)
     return m_ListSet.at(n).ToString();
 }
 
-string Pattern::RealTimeListToString(vector<int>::size_type n)
+string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
 {
     if ( n >= m_RealTimeSet.size() )
         return "";
 
-    return m_RealTimeSet.at(n).ToString();
+    return m_RealTimeSet.at(n).ToStringForDisplay();
 }
 
 enum pat_element_names_t {
@@ -279,9 +279,9 @@ void Pattern::AddListFromString(vector<int>::size_type index, string s)
     m_ListSet.at(index).FromString(s);
 }
 
-void Pattern::AddRealTimeList(std::map<double,Note> realTimeList)
+void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum)
 {
-    m_RealTimeSet.emplace_back(realTimeList);
+    m_RealTimeSet.emplace_back(realTimeList, quantum);
 }
 
 

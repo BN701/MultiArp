@@ -52,13 +52,13 @@ struct Note
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
     int m_NoteVelocity;      // -1 indicates not set (so use value from elsewhere)
 
-    double m_Beat;
+    double m_Phase;
     double m_Length;         // Length in beats (or fraction of a beat).
 
     Note(int n = -1, int v = -1):
         m_NoteNumber(n),
         m_NoteVelocity(v),
-        m_Beat(0),
+        m_Phase(0),
         m_Length(0)
     {}
 
@@ -68,8 +68,8 @@ struct Note
     static std::string NoteName(int n); // Expose the notes/numbers look up table.
     static int NoteNumberFromString(std::string note);
 
-    void SetBeat( double val ) { m_Beat = val; }
-    double Beat() { return m_Beat; }
+    void SetPhase( double val ) { m_Phase = val; }
+    double Phase() { return m_Phase; }
 
     void SetLength( double val ) { m_Length = val; }
     double Length() { return m_Length; }
@@ -98,10 +98,10 @@ struct Cluster
     bool Empty() { return m_Notes.empty(); }
     bool IsRest();
 
-    int SetStepsTillNextNote( int val ) { m_StepLength = val; }
+    void SetStepsTillNextNote( int val ) { m_StepLength = val; }
     int StepsTillNextNote() { return m_StepLength; }
 
-    std::string ToString();
+    std::string ToString(bool showVelocity = true);
     void FromString(std::string s);
 };
 
@@ -178,14 +178,23 @@ struct PlayList
 
 struct PlayListRT
 {
+    double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
+
+    double m_LastRequestedStepValue;
+    double m_LastRequestedPhase;
+
     void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
-    PlayListRT(std::map<double,Note> realTimeList):
-        m_RealTimeList(realTimeList)
+    PlayListRT(std::map<double,Note> realTimeList, double quantum):
+        m_QuantumAtCapture(quantum),
+        m_RealTimeList(realTimeList),
+        m_LastRequestedStepValue(4.0),
+        m_LastRequestedPhase(0.0)
     {};
 
     std::string ToString();
+    std::string ToStringForDisplay();
 };
 
 struct Pattern
@@ -283,11 +292,11 @@ struct Pattern
     }
 
     std::string Label(size_t width);
-    std::string RealTimeListToString(std::vector<int>::size_type n);
+    std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
     std::string ListToString(std::vector<int>::size_type n);
     std::string ToString(const char * prefix = NULL);
     bool FromString(std::string s, int & updates);
-    void AddRealTimeList(std::map<double,Note> realTimeList);
+    void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
@@ -432,13 +441,13 @@ struct PatternStore : public CursorKeys
 
     int PlayPatternListCount();
     int RealTimeListCount();
-    std::string RealTimeListToString(int n);
+    std::string RealTimeListToStringForDisplay(int n);
     std::string PlayPatternListToString(int n);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
     void UpdatePattern(PlayList & noteList);
-    void UpdatePattern(std::map<double,Note> & realTimeList);
+    void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
     void SetFieldsFromString(std::string s);
     bool LoadFromString(std::string s, int & created, int & updates);
     void UpdatePatternChainFromString(std::string s);

@@ -118,10 +118,11 @@ void queue_next_step(int queueId)
 
     if ( g_PatternStore.PatternChanged(true) )
     {
-        update_pattern_panel();
+//        update_pattern_panel();
         set_top_line();
     }
 
+    update_pattern_panel();
     highlight_pattern_panel();  // Moves note highlight.
 
     set_status_w(STAT_POS_STEP, "Beat: %6.2f, phase: %4.2f, queue: %4i:%02i seconds",
@@ -449,7 +450,7 @@ bool key_input_action()
         else if ( g_ListBuilder.HandleKeybInput(c) )
         {
             if ( g_ListBuilder.RealTimeRecord() )
-                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList());
+                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
             else
                 g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
             g_ListBuilder.Clear();

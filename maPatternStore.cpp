@@ -170,12 +170,12 @@ string PatternStore::PlayPatternListToString(int n)
     return m_Patterns.at(m_PosPlay).ListToString(n);
 }
 
-string PatternStore::RealTimeListToString(int n)
+string PatternStore::RealTimeListToStringForDisplay(int n)
 {
     if ( m_Patterns.empty() )
         return "";
 
-    return m_Patterns.at(m_PosPlay).RealTimeListToString(n);
+    return m_Patterns.at(m_PosPlay).RealTimeListToStringForDisplay(n);
 }
 
 bool PatternStore::PlayPositionInfo(int & listIndex, int & offset, int & length)
@@ -426,12 +426,12 @@ void PatternStore::UpdatePattern(PlayList & noteList)
     m_Patterns.at(m_PosEdit).ReplaceList(noteList);
 }
 
-void PatternStore::UpdatePattern(std::map<double,Note> & realTimeList)
+void PatternStore::UpdatePattern(std::map<double,Note> & realTimeList, double quantum)
 {
     if ( m_Patterns.empty() )
         m_Patterns.emplace_back();
 
-    m_Patterns.at(m_PosEdit).AddRealTimeList(realTimeList);
+    m_Patterns.at(m_PosEdit).AddRealTimeList(realTimeList, quantum);
 }
 
 enum ps_element_names_t {

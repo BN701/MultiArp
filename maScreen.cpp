@@ -56,11 +56,15 @@ extern TranslateTable * pTranslateTable;
 
 // Color Pair uses
 
-#define CP_PATTERN_LIST_PANEL   1
-#define CP_MENU_HIGHLIGHT       2
-#define CP_RUNNING              3
-#define CP_RECORD               4
-#define CP_REALTIME             5
+enum colour_pairs
+{
+    CP_PATTERN_LIST_PANEL = 1,
+    CP_PATTERN_LIST_PANEL_2,
+    CP_MENU_HIGHLIGHT,
+    CP_RUNNING,
+    CP_RECORD,
+    CP_REALTIME
+};
 
 
 Display::Display()
@@ -77,10 +81,11 @@ Display::Display()
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
     init_color(COLOUR_REDDISH, 750, 300, 200);
-    init_color(COLOUR_BLUE, 0, 0, 750);
+    init_color(COLOUR_BLUE, 500, 500, 900);
     init_color(COLOUR_GREY, 350, 350, 350);
     init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
 	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOR_BLACK);
 	init_pair(CP_RUNNING, COLOR_WHITE, COLOUR_GREEN);
 	init_pair(CP_REALTIME, COLOR_WHITE, COLOUR_RED);
 	init_pair(CP_RECORD, COLOR_WHITE, COLOUR_YELLOW);
@@ -130,23 +135,28 @@ void update_pattern_panel()
 {
     int scr_x, scr_y;
 
-	wattron(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+	wattron(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
 
     g_ListDisplayRows.clear();
     wmove(gDisplay.BigPanel(), 0, 0);
 
     for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
     {
-        getyx(gDisplay.BigPanel(), scr_y, scr_x);
-        g_ListDisplayRows.push_back(scr_y);
-        wprintw(gDisplay.BigPanel(), "%s\n", g_PatternStore.RealTimeListToString(i).c_str());
+//        getyx(gDisplay.BigPanel(), scr_y, scr_x);
+//        g_ListDisplayRows.push_back(scr_y);
+        wprintw(gDisplay.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
+//        highlight(i, 0, 0, 80, 0, CP_PATTERN_LIST_PANEL_2);
     }
+
+    wprintw(gDisplay.BigPanel(), "\n");
+	wattron(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
 
     for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
     {
         getyx(gDisplay.BigPanel(), scr_y, scr_x);
         g_ListDisplayRows.push_back(scr_y);
         wprintw(gDisplay.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
+//        highlight(scr_y, 0, 0, 80, 0, CP_PATTERN_LIST_PANEL);
     }
 
     wattroff(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
@@ -199,7 +209,7 @@ void highlight_pattern_panel()
         if ( (offset + length) >= 76 )
         {
             int length0 = 76 - offset;
-            mvwchgat(gDisplay.BigPanel(), row, offset, length0, A_REVERSE, 1, NULL);
+            mvwchgat(gDisplay.BigPanel(), row, offset, length0, A_BOLD, 1, NULL);
 
             clearPositions.push_back(row);
             clearPositions.push_back(offset);

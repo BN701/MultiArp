@@ -66,7 +66,7 @@ FeelMap::FeelMap():
     m_Points = 3;
 #endif
 
-#if 1
+#if 0
     m_StretchPoints.push_back(0.0);
     m_StretchPoints.push_back(0.30);
     m_StretchPoints.push_back(0.5);

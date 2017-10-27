@@ -210,7 +210,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
                 if ( ev->type == SND_SEQ_EVENT_NOTEON )
                 {
                     Note note(ev->data.note.note, ev->data.note.velocity);
-                    note.SetBeat(beat);
+                    note.SetPhase(beat);    // Temporarily store beat in the notes Phase member.
 
                     map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
                     if ( it != m_OpenNotes.end() )
@@ -230,15 +230,15 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
                         Note note = m_OpenNotes.at(ev->data.note.note);
                         m_OpenNotes.erase(it);
 
-                        double beatStart = note.Beat();
+                        double beatStart = note.Phase();
                         note.SetLength(beat - beatStart);
 
                         // Normalize beat Start
 
-                        while ( beatStart < m_BeatAtLastPhaseZero )
-                            beatStart += m_LinkQuantum;
+//                        while ( beatStart < m_BeatAtLastPhaseZero )
+//                            beatStart += m_LinkQuantum;
 
-                        note.SetBeat(beatStart - m_BeatAtLastPhaseZero);
+                        note.SetPhase(beatStart - m_BeatAtLastPhaseZero);
 
                         // Syntax here is getting ridiculous! Here's what's going on:
                         //
@@ -251,12 +251,12 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
                         // (TODO: We might need to handle clashes, as I guess it's not
                         // impossible for two events to have the same beat value.)
 
-                        m_RealTimeUndoIndex.push_back(m_RealTimeList.insert(make_pair(note.Beat(), note)).first);
+                        m_RealTimeUndoIndex.push_back(m_RealTimeList.insert(make_pair(note.Phase(), note)).first);
 
 #if LOG_ON
-                        sprintf(buff, " closing %3i, beat %6.2f length %6.2f\n",
+                        sprintf(buff, " closing %3i, phase %6.2f length %6.2f\n",
                                 ev->data.note.note,
-                                note.Beat(),
+                                note.Phase(),
                                 note.Length());
 
                         fLog << buff;

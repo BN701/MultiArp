@@ -105,7 +105,7 @@ struct Cluster
     void FromString(std::string s);
 };
 
-struct PlayList
+struct StepList
 {
 
     std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
@@ -118,7 +118,7 @@ struct PlayList
 
     bool m_Complete;
 
-    PlayList():
+    StepList():
         m_Pos(0),
         m_LastRequestedPos(0),
         m_Complete(false)
@@ -170,13 +170,13 @@ struct PlayList
         m_Complete = false;
     }
 
-    std::string ToString();
+    std::string ToString(bool showVelocity = true);
     void FromString(std::string s);
 
     bool PlayPositionInfo(int & offset,  int & length);
 };
 
-struct PlayListRT
+struct RealTimeList : public CursorKeys
 {
     double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
@@ -184,29 +184,54 @@ struct PlayListRT
     double m_LastRequestedStepValue;
     double m_LastRequestedPhase;
 
+    double m_LoopStart;
+    double m_LocalQuantum;  // Loop length.
+    double m_Multiplier;
+    bool m_AdjustWindowToStep;  // Probably just if multiplier less than 1.
+
     void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
-    PlayListRT(std::map<double,Note> realTimeList, double quantum):
+    RealTimeList(std::map<double,Note> realTimeList, double quantum):
         m_QuantumAtCapture(quantum),
         m_RealTimeList(realTimeList),
         m_LastRequestedStepValue(4.0),
-        m_LastRequestedPhase(0.0)
+        m_LastRequestedPhase(0.0),
+        m_LoopStart(0.0),
+        m_LocalQuantum(0.0),   // Negative means don't use.
+        m_Multiplier(1.0),
+        m_AdjustWindowToStep(true),
+        m_RTListFocus(rtf_loop_start)
     {};
 
     std::string ToString();
-    std::string ToStringForDisplay();
+    std::string ToStringForDisplay(int width = 75);
+
+    void SetStatus();
+    protected:
+        enum rt_list_focus_t {
+            rtf_loop_start,
+            rtf_local_quantum,
+            rtf_multiplier,
+            rtf_window_adjust,
+            number_rt_list_focus_modes
+        };
+
+        virtual bool HandleKey(key_type_t k);
+        rt_list_focus_t m_RTListFocus;
+
 };
 
 struct Pattern
 {
-    std::vector<int>::size_type m_Pos;
-    std::vector<int>::size_type m_PosEdit;
-    std::vector<int>::size_type m_LastRequestedPos;
+    std::vector<StepList>::size_type m_Pos;
+    std::vector<StepList>::size_type m_PosEdit;
+    std::vector<RealTimeList>::size_type m_PosRealTimeEdit;
+    std::vector<StepList>::size_type m_LastRequestedPos;
 
     std::vector<int> m_Trigs;
 
-    std::vector<PlayList> m_ListSet;
-    std::vector<PlayListRT> m_RealTimeSet;
+    std::vector<StepList> m_StepListSet;
+    std::vector<RealTimeList> m_RealTimeSet;
 
     std::string m_Label;
 
@@ -233,6 +258,7 @@ struct Pattern
     Pattern():
         m_Pos(0),
         m_PosEdit(0),
+        m_PosRealTimeEdit(0),
         m_LastRequestedPos(0),
         m_StepValue(4),
         m_Gate(0.5),
@@ -246,7 +272,7 @@ struct Pattern
     {
         m_Label.clear();
         m_Trigs.clear();
-        m_ListSet.clear();
+        m_StepListSet.clear();
         ResetPosition();
         m_TranslateTable.Reset();
         m_StepValue = 4.0;
@@ -257,8 +283,14 @@ struct Pattern
 
     void SetEditPos( std::vector<int>::size_type p )
     {
-        if ( p >= 0 && p < m_ListSet.size() )
+        if ( p >= 0 && p < m_StepListSet.size() )
             m_PosEdit = p;
+    }
+
+    void SetRealTimeEditPos( std::vector<int>::size_type p )
+    {
+        if ( p >= 0 && p < m_RealTimeSet.size() )
+            m_PosRealTimeEdit = p;
     }
 
     void SetStepValue( double val )
@@ -268,7 +300,7 @@ struct Pattern
 
     int ListCount()
     {
-        return m_ListSet.size();
+        return m_StepListSet.size();
     }
 
     int RealTimeListCount()
@@ -279,8 +311,7 @@ struct Pattern
     void ResetPosition()
     {
         m_Pos = 0;
-//        for ( std::vector<std::unique_ptr<PlayList_>>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++ )
-        for ( std::vector<PlayList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++ )
+        for ( std::vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++ )
             (*i).ResetPosition();
     }
 
@@ -301,14 +332,17 @@ struct Pattern
     void SetFieldsFromString(std::string s);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
-    void ReplaceList(PlayList & noteList);
+    void ReplaceList(StepList & noteList);
     int NewList();
     void DeleteCurrentList();
+    void DeleteCurrentRealTimeList();
 
     bool AllListsComplete();
 
     void UpEditPos() { SetEditPos( m_PosEdit + 1); }
     void DownEditPos() { SetEditPos( m_PosEdit - 1); }
+    void UpRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit + 1); }
+    void DownRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit - 1); }
 
 };
 
@@ -446,13 +480,14 @@ struct PatternStore : public CursorKeys
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
-    void UpdatePattern(PlayList & noteList);
+    void UpdatePattern(StepList & noteList);
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
     void SetFieldsFromString(std::string s);
     bool LoadFromString(std::string s, int & created, int & updates);
     void UpdatePatternChainFromString(std::string s);
 
-    PlayList & CurrentEditPlayList();
+    StepList & CurrentEditStepList();
+    RealTimeList & CurrentEditRealTimeList();
     Pattern & CurrentPlayPattern();
     Pattern & CurrentEditPattern();
 
@@ -579,10 +614,12 @@ struct PatternStore : public CursorKeys
         }
     }
 
-    void UpEditPos() { SetEditPos( m_PosEdit + 1); }
-    void DownEditPos() { SetEditPos( m_PosEdit - 1); }
+    void UpEditPos() { SetEditPos(m_PosEdit + 1); }
+    void DownEditPos() { SetEditPos(m_PosEdit - 1); }
     void UpListPos();
     void DownListPos();
+    void UpRTListPos();
+    void DownRTListPos();
 
     bool ValidPosition( std::vector<int>::size_type p )
     {
@@ -626,18 +663,20 @@ struct PatternStore : public CursorKeys
     bool UsePatternPlayData() { return m_UsePatternPlayData; }
 
     std::string ListManager(std::string commandString, std::vector<std::string> & tokens);
+    void DeleteCurrentRealTimeList();
 
-        void SetStatus();
-        virtual void SetFocus()
-        {
-            CursorKeys::SetFocus();
-            // SetStatus();
-        }
+    void SetStatus();
+    virtual void SetFocus()
+    {
+        CursorKeys::SetFocus();
+        // SetStatus();
+    }
 
     protected:
         enum pattern_store_focus_t {
             psf_pattern,
             psf_list,
+            psf_rt_list,
             number_psf_focus_modes
         };
 

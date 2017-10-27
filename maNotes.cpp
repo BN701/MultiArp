@@ -317,7 +317,7 @@ void Cluster::FromString(string s)
     }
 }
 
-Cluster * PlayList::Step()
+Cluster * StepList::Step()
 {
     if ( m_Clusters.empty() )
         return NULL;
@@ -363,7 +363,7 @@ Cluster * PlayList::Step()
 }
 
 
-bool PlayList::PlayPositionInfo(int & offset,  int & length)
+bool StepList::PlayPositionInfo(int & offset,  int & length)
 {
     if ( m_LastRequestedPos >= m_PosInfo.size() )
         return false;
@@ -384,14 +384,14 @@ bool PlayList::PlayPositionInfo(int & offset,  int & length)
     return true;
 }
 
-string PlayList::ToString()
+string StepList::ToString(bool showVelocity)
 {
     string result;
     m_PosInfo.clear();
     for ( vector<Cluster>::iterator i = m_Clusters.begin(); i != m_Clusters.end(); )
     {
         int iStart = result.size();
-        result += Cluster(*i).ToString();
+        result += Cluster(*i).ToString(showVelocity);
         if ( ++i < m_Clusters.end() )
             result += ",";
         m_PosInfo.push_back(PosInfo(iStart, result.size() - iStart));
@@ -399,7 +399,7 @@ string PlayList::ToString()
     return result;
 }
 
-void PlayList::FromString(string s)
+void StepList::FromString(string s)
 {
     vector<string> chordStrings = split(s.c_str(), ',', true);
 
@@ -414,8 +414,112 @@ void PlayList::FromString(string s)
     }
 }
 
+void RealTimeList::SetStatus()
+{
+    char buff[200];
 
-string PlayListRT::ToString()
+    m_Status = "RT Loop - ";
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    m_Status += "Sta: ";
+    int pos = m_Status.size();
+    sprintf(buff, "%.2f", m_LoopStart);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += " Qua: ";
+    pos = m_Status.size();
+    sprintf(buff, "%.2f", m_LocalQuantum);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += " Mul: ";
+    pos = m_Status.size();
+    sprintf(buff, "%.2f", m_Multiplier);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += " Small Window: ";
+    pos = m_Status.size();
+    sprintf(buff, "%s", m_AdjustWindowToStep ? "on" : "off");
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Highlights.push_back(m_FieldPositions.at(m_RTListFocus));
+
+}
+
+bool RealTimeList::HandleKey(key_type_t k)
+{
+    int temp;
+    double inc = 0.1;
+    switch ( k )
+    {
+    case left:
+        temp = static_cast<int>(m_RTListFocus) - 1;
+        if ( temp >= 0 && temp < number_rt_list_focus_modes )
+            m_RTListFocus = static_cast<rt_list_focus_t>(temp);
+        break;
+    case right:
+        temp = static_cast<int>(m_RTListFocus) + 1;
+        if ( temp >= 0 && temp < number_rt_list_focus_modes )
+            m_RTListFocus = static_cast<rt_list_focus_t>(temp);
+        break;
+    case shift_up:
+        inc = 0.01;
+    case up:
+        switch ( m_RTListFocus )
+        {
+        case rtf_loop_start:
+            m_LoopStart += inc;
+            break;
+        case rtf_local_quantum:
+            m_LocalQuantum += inc;
+            if ( m_LocalQuantum == 0 )
+                m_LocalQuantum += inc;
+            break;
+        case rtf_multiplier:
+            m_Multiplier += inc;
+            break;
+        case rtf_window_adjust:
+            m_AdjustWindowToStep = true;
+            break;
+        default:
+            break;
+        }
+        break;
+    case shift_down:
+        inc = 0.01;
+    case down:
+        switch ( m_RTListFocus )
+        {
+        case rtf_loop_start:
+            m_LoopStart -= inc;
+            break;
+        case rtf_local_quantum:
+            m_LocalQuantum -= inc;
+            if ( m_LocalQuantum == 0 )
+                m_LocalQuantum -= inc;
+            break;
+        case rtf_multiplier:
+            m_Multiplier -= inc;
+            break;
+        case rtf_window_adjust:
+            break;
+        default:
+            m_AdjustWindowToStep = false;
+            break;
+        }
+        break;
+    }
+
+    SetStatus();
+
+    return true;
+}
+
+string RealTimeList::ToString()
 {
     string result;
 
@@ -432,7 +536,7 @@ string PlayListRT::ToString()
 }
 
 
-//string PlayListRT::ToString(int step, double phase)
+//string RealTimeList::ToString(int step, double phase)
 //{
 //    char buff[50];
 //    sprintf(buff, "%6.2f (%.2f): ", m_LastRequestedPhase, m_LastRequestedStepValue);
@@ -482,10 +586,12 @@ string PlayListRT::ToString()
 //}
 //
 
-string PlayListRT::ToStringForDisplay()
+// Less efficient (probably) but easier to read (possibly) ...
+
+string RealTimeList::ToStringForDisplay(int width)
 {
     char buff[50];
-    sprintf(buff, "%6.2f (%.2f): ", m_LastRequestedPhase, m_LastRequestedStepValue);
+    sprintf(buff, "%04.2f: ", m_LastRequestedPhase);
 
     string result = buff;
 
@@ -539,20 +645,39 @@ string PlayListRT::ToStringForDisplay()
         windowPos += windowStep;
     }
 
+    if ( result.size() > width )
+        result.resize(width);
+
+    sprintf(buff, "\n   (Multiplier %.2f, Loop Start %.2f Loop Quantum %.2f]", m_Multiplier, m_LoopStart, m_LocalQuantum);
+    result += buff;
 
     return result;
 }
 
 
-void PlayListRT::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
+void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
 {
-//    shared_ptr<Cluster> result = make_shared<Cluster>();
+    phase *= m_Multiplier;
+
+    if ( lround(m_LocalQuantum) != 0 )
+        while ( phase > m_LocalQuantum )
+            phase -= m_LocalQuantum;
+
+    phase += m_LoopStart;
+
+    while ( phase > m_QuantumAtCapture )
+        phase -= m_QuantumAtCapture;
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;
 
-    double windowStart = phase - 2.0 / stepValue;
-    double windowEnd = phase + 2.0 / stepValue;
+    double window = 4.0 / stepValue;
+
+    if ( m_AdjustWindowToStep && abs(m_Multiplier) < 1.0 )
+        window *= m_Multiplier;
+
+    double windowStart = phase - window/2;
+    double windowEnd = phase + window/2;
 
     for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(windowEnd); it++ )

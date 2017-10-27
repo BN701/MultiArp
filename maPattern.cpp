@@ -31,14 +31,14 @@ void Pattern::Step(Cluster & cluster, double phase, double stepValue)
 {
     // Add in step based events, if any, and step position.
 
-    if ( ! m_ListSet.empty() )
+    if ( ! m_StepListSet.empty() )
     {
-        if ( m_Pos >= m_ListSet.size() )
+        if ( m_Pos >= m_StepListSet.size() )
             m_Pos = 0;
 
         m_LastRequestedPos = m_Pos;
 
-        Cluster * result = m_ListSet[m_Pos++].Step();
+        Cluster * result = m_StepListSet[m_Pos++].Step();
         if ( result != NULL )
         {
             cluster.SetStepsTillNextNote(result->StepsTillNextNote());
@@ -48,7 +48,7 @@ void Pattern::Step(Cluster & cluster, double phase, double stepValue)
 
     // Collect any real time events.
 
-    for ( vector<PlayListRT>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
+    for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
         it->Step(cluster, phase, stepValue);
 
 }
@@ -57,7 +57,7 @@ bool Pattern::AllListsComplete()
 {
     bool bResult = true;
 
-    for ( std::vector<PlayList>::iterator it = m_ListSet.begin(); it < m_ListSet.end(); it++ )
+    for ( std::vector<StepList>::iterator it = m_StepListSet.begin(); it < m_StepListSet.end(); it++ )
     {
         bResult &= (*it).Complete();
     }
@@ -67,20 +67,29 @@ bool Pattern::AllListsComplete()
 
 bool Pattern::PlayPositionInfo(int & listIndex, int & offset, int & length)
 {
-    if ( m_ListSet.empty() )
+    if ( m_StepListSet.empty() )
         return false;
 
     listIndex = m_LastRequestedPos;
 
-    return m_ListSet.at(m_LastRequestedPos).PlayPositionInfo(offset, length);
+    return m_StepListSet.at(m_LastRequestedPos).PlayPositionInfo(offset, length);
 }
 
 string Pattern::ListToString(vector<int>::size_type n)
 {
-    if ( n >= m_ListSet.size() )
+    if ( n >= m_StepListSet.size() )
         return "";
 
-    return m_ListSet.at(n).ToString();
+    string result;
+
+    if ( n == m_PosEdit )
+        result = " -> ";
+    else
+        result = "    ";
+
+    result += m_StepListSet.at(n).ToString(false);
+
+    return result;
 }
 
 string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
@@ -88,7 +97,15 @@ string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
     if ( n >= m_RealTimeSet.size() )
         return "";
 
-    return m_RealTimeSet.at(n).ToStringForDisplay();
+    string result;
+
+    if ( n == m_PosRealTimeEdit )
+        result = " -> ";
+    else
+        result = "    ";
+
+    result += m_RealTimeSet.at(n).ToStringForDisplay();
+    return result;
 }
 
 enum pat_element_names_t {
@@ -156,12 +173,12 @@ string Pattern::ToString(const char * prefix)
     result += "\n";
 
     int index = 1;
-    for ( vector<PlayList>::iterator i = m_ListSet.begin(); i != m_ListSet.end(); i++, index++ )
+    for ( vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++, index++ )
     {
         char buffer[12];
         sprintf(buffer, "List %i ", index);
         result += buffer;
-        result += PlayList(*i).ToString();
+        result += StepList(*i).ToString();
         result += "\n";
     }
     return result;
@@ -272,11 +289,11 @@ void Pattern::AddListFromString(vector<int>::size_type index, string s)
     if ( index < 0 )
         throw string("Pattern::AddListFromString(), invalid list index.");
 
-    if ( index >= m_ListSet.size() )
-        m_ListSet.resize(index + 1);
+    if ( index >= m_StepListSet.size() )
+        m_StepListSet.resize(index + 1);
 
-    m_ListSet.at(index).Clear();
-    m_ListSet.at(index).FromString(s);
+    m_StepListSet.at(index).Clear();
+    m_StepListSet.at(index).FromString(s);
 }
 
 void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum)
@@ -287,17 +304,17 @@ void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum
 
 int Pattern::NewList()
 {
-    m_ListSet.emplace_back();
-    m_PosEdit = m_ListSet.size() - 1;
+    m_StepListSet.emplace_back();
+    m_PosEdit = m_StepListSet.size() - 1;
     return m_PosEdit;
 }
 
-void Pattern::ReplaceList(PlayList & noteList)
+void Pattern::ReplaceList(StepList & noteList)
 {
-    if ( m_PosEdit >= m_ListSet.size() )
-        m_ListSet.resize(m_PosEdit + 1);
+    if ( m_PosEdit >= m_StepListSet.size() )
+        m_StepListSet.resize(m_PosEdit + 1);
 
-    m_ListSet.at(m_PosEdit) = noteList;
+    m_StepListSet.at(m_PosEdit) = noteList;
 }
 
 
@@ -322,12 +339,12 @@ string Pattern::Label(size_t width)
 
 void Pattern::DeleteCurrentList()
 {
-    if ( m_ListSet.empty() )
+    if ( m_StepListSet.empty() )
         return;
 
-    m_ListSet.erase(m_ListSet.begin() + m_PosEdit);
+    m_StepListSet.erase(m_StepListSet.begin() + m_PosEdit);
 
-    if ( m_ListSet.empty() )
+    if ( m_StepListSet.empty() )
     {
         m_PosEdit = 0;
         m_Pos = 0;
@@ -344,14 +361,35 @@ void Pattern::DeleteCurrentList()
     // (If it was pointing at the pattern that was deleted, it now
     // points to the one that took its place.)
 
-    if ( m_Pos > m_PosEdit || m_Pos == m_ListSet.size() )
+    if ( m_Pos > m_PosEdit || m_Pos == m_StepListSet.size() )
         m_Pos -= 1;
 
     // The edit pointer stays in place and now points to next in
     // list (unless it was already at the end of the list).
 
-    if ( m_PosEdit == m_ListSet.size() )
+    if ( m_PosEdit == m_StepListSet.size() )
         m_PosEdit -= 1;
+
+}
+
+void Pattern::DeleteCurrentRealTimeList()
+{
+    if ( m_RealTimeSet.empty() )
+        return;
+
+    m_RealTimeSet.erase(m_RealTimeSet.begin() + m_PosRealTimeEdit);
+
+    if ( m_RealTimeSet.empty() )
+    {
+        m_PosRealTimeEdit = 0;
+        return;
+    }
+
+    // The edit pointer stays in place and now points to next in
+    // list (unless it was already at the end of the list).
+
+    if ( m_PosRealTimeEdit == m_RealTimeSet.size() )
+        m_PosRealTimeEdit -= 1;
 
 }
 

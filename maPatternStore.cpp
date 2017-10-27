@@ -44,15 +44,35 @@ void PatternStore::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(16, m_Status.size() - 16);
 
-    if ( !m_Patterns.at(m_PosEdit).m_ListSet.empty() )
+    m_Status += ", Step List ";
+    size_t pos = m_Status.size();
+    if ( !m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
-        size_t pos = m_Status.size();
-        sprintf(buff, ", List %i/%i",
+        sprintf(buff, "%i/%i",
             m_Patterns.at(m_PosEdit).m_PosEdit + 1,
-            m_Patterns.at(m_PosEdit).m_ListSet.size());
+            m_Patterns.at(m_PosEdit).m_StepListSet.size());
         m_Status += buff;
-        m_FieldPositions.emplace_back(pos + 7, m_Status.size() - pos - 7);
     }
+    else
+    {
+        m_Status += "-/-";
+    }
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+
+    m_Status += ", Real Time List ";
+    pos = m_Status.size();
+    if ( !m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
+    {
+        sprintf(buff, "%i/%i",
+            m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1,
+            m_Patterns.at(m_PosEdit).m_RealTimeSet.size());
+        m_Status += buff;
+    }
+    else
+    {
+        m_Status += "-/-";
+    }
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
     m_Status += ".";
 
@@ -81,7 +101,10 @@ bool PatternStore::HandleKey(key_type_t k)
             UpEditPos();
             break;
         case psf_list:
-            UpListPos();
+            DownListPos();
+            break;
+        case psf_rt_list:
+            DownRTListPos();
             break;
         default:
             break;
@@ -94,7 +117,10 @@ bool PatternStore::HandleKey(key_type_t k)
             DownEditPos();
             break;
         case psf_list:
-            DownListPos();
+            UpListPos();
+            break;
+        case psf_rt_list:
+            UpRTListPos();
             break;
         default:
             break;
@@ -107,15 +133,28 @@ bool PatternStore::HandleKey(key_type_t k)
     return true;
 }
 
-PlayList & PatternStore::CurrentEditPlayList()
+StepList & PatternStore::CurrentEditStepList()
 {
     if ( m_Patterns.empty() )
         throw string("Pattern Store is Empty.");
 
-    if ( m_Patterns.at(m_PosEdit).m_ListSet.empty() )
+    if ( m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
         throw string("Current pattern has no lists.");
 
-    return m_Patterns.at(m_PosEdit).m_ListSet.at(m_PosEdit);
+    size_t pos = m_Patterns.at(m_PosEdit).m_PosEdit;
+    return m_Patterns.at(m_PosEdit).m_StepListSet.at(pos);
+}
+
+RealTimeList & PatternStore::CurrentEditRealTimeList()
+{
+    if ( m_Patterns.empty() )
+        throw string("Pattern Store is Empty.");
+
+    if ( m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
+        throw string("Current pattern has no real time lists.");
+
+    size_t pos = m_Patterns.at(m_PosEdit).m_PosRealTimeEdit;
+    return m_Patterns.at(m_PosEdit).m_RealTimeSet.at(pos);
 }
 
 Pattern & PatternStore::CurrentPlayPattern()
@@ -144,6 +183,18 @@ void PatternStore::DownListPos()
 {
     if ( !m_Patterns.empty() )
         m_Patterns[m_PosEdit].DownEditPos();
+}
+
+void PatternStore::UpRTListPos()
+{
+    if ( !m_Patterns.empty() )
+        m_Patterns[m_PosEdit].UpRTEditPos();
+}
+
+void PatternStore::DownRTListPos()
+{
+    if ( !m_Patterns.empty() )
+        m_Patterns[m_PosEdit].DownRTEditPos();
 }
 
 int PatternStore::PlayPatternListCount()
@@ -231,12 +282,12 @@ string PatternStore::PatternStatus()
         result += m_Patterns.at(m_PosEdit).Label(15);
     }
 
-    if (  ! m_Patterns.at(m_PosEdit).m_ListSet.empty() )
+    if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
         sprintf(buf, ", List %i", m_Patterns.at(m_PosEdit).m_PosEdit + 1);
         result += buf;
 
-        int listCount = m_Patterns.at(m_PosEdit).m_ListSet.size();
+        int listCount = m_Patterns.at(m_PosEdit).m_StepListSet.size();
         if ( listCount > 1 )
         {
             sprintf(buf, " of %i", listCount);
@@ -418,7 +469,7 @@ string PatternStore::PlayPatternToString()
     return m_Patterns.at(m_PosPlay).ToString();
 }
 
-void PatternStore::UpdatePattern(PlayList & noteList)
+void PatternStore::UpdatePattern(StepList & noteList)
 {
     if ( m_Patterns.empty() )
         m_Patterns.emplace_back();
@@ -582,6 +633,19 @@ bool PatternStore::LoadFromString(string s, int & created, int & updates)
     }
 }
 
+void PatternStore::DeleteCurrentRealTimeList()
+{
+    if ( m_Patterns.empty() )
+        throw string("Pattern Store is Empty.");
+
+    if ( m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
+        throw string("Current pattern has no real time lists.");
+
+    m_Patterns.at(m_PosEdit).DeleteCurrentRealTimeList();
+
+    SetStatus();
+}
+
 string PatternStore::ListManager(string commandString, vector<string> & tokens)
 {
     int index;
@@ -601,7 +665,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
     }
     else if ( tokens[1] == "delete")
     {
-        if ( m_Patterns.empty() || m_Patterns.at(m_PosEdit).m_ListSet.empty() )
+        if ( m_Patterns.empty() || m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
             return "Nothing to delete.";
         m_Patterns.at(m_PosEdit).DeleteCurrentList();
         return "Current list deleted.";
@@ -630,7 +694,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
     if ( tokens.size() == 2 )
     {
         m_Patterns.at(m_PosEdit).SetEditPos(index);
-        string temp = "L " + tokens.at(1) + " -" + m_Patterns.at(m_PosEdit).m_ListSet.at(index).ToString();
+        string temp = "L " + tokens.at(1) + " -" + m_Patterns.at(m_PosEdit).m_StepListSet.at(index).ToString();
         if ( temp.size() > 60 )
         {
             temp.resize(57);
@@ -644,7 +708,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
 
     if ( tokens.at(2) == "clear" )
     {
-        m_Patterns.at(m_PosEdit).m_ListSet.at(index).Clear();
+        m_Patterns.at(m_PosEdit).m_StepListSet.at(index).Clear();
         return "List cleared.";
     }
 

@@ -44,12 +44,12 @@ class ListBuilder
         bool HandleMidi(snd_seq_event_t *ev);
         bool HandleKeybInput(int c);
 
-        PlayList & CurrentList() { return m_PlayList; }
+        StepList & CurrentList() { return m_StepList; }
         std::map<double,Note> & RealTimeList() { return m_RealTimeList; }
 
         void Clear()
         {
-            m_PlayList.Clear();
+            m_StepList.Clear();
             m_Captured.Clear();
             m_OpenNotes.clear();
             m_RealTimeList.clear();
@@ -76,7 +76,7 @@ class ListBuilder
         int m_openNotes;
         Note m_Activity;   // Something to show what's coming in.
         Cluster m_Captured;
-        PlayList m_PlayList;
+        StepList m_StepList;
         bool m_MidiInputModeChanged;
         double m_LinkQuantum;
         double m_BeatAtLastPhaseZero;

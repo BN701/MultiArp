@@ -518,7 +518,7 @@ void TranslateTable::NextPremapMode( int dir )
 }
 
 
-bool TranslateTable::SetScale(PlayList & list)
+bool TranslateTable::SetScale(StepList & list)
 {
     bool foundSomething = false;
     int foundNotes[12];

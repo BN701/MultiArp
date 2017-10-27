@@ -79,16 +79,16 @@ public:
 
     WINDOW *BigPanel()
     {
-        return mBigPanel;
+        return m_BigPanel;
     }
 
     WINDOW *SmallPanel()
     {
-        return mSmallPanel;
+        return m_SmallPanel;
     }
 private:
-    WINDOW * mBigPanel = NULL;
-    WINDOW * mSmallPanel = NULL;
+    WINDOW * m_BigPanel = NULL;
+    WINDOW * m_SmallPanel = NULL;
 
 };
 

@@ -67,7 +67,7 @@ void ListBuilder::SetMidiInputMode( int val )
 
         if ( m_MidiInputMode == MIDI_INPUT_OFF )
         {
-            m_PlayList.Clear();
+            m_StepList.Clear();
             m_Captured.Clear();
         }
     }
@@ -125,18 +125,18 @@ std::string ListBuilder::ToString()
             break;
 
         case MIDI_INPUT_FULL:
-            if ( m_PlayList.Empty() )
+            if ( m_StepList.Empty() )
                 return m_Captured.ToString();
             else if ( m_Captured.Empty() )
-                return m_PlayList.ToString();
+                return m_StepList.ToString(false);
             else
-                return m_PlayList.ToString() + "," + m_Captured.ToString();
+                return m_StepList.ToString(false) + "," + m_Captured.ToString();
 
         case MIDI_INPUT_QUICK:
-            return m_PlayList.ToString();
+            return m_StepList.ToString(false);
 
         default:
-            return m_Activity.ToString();
+            return m_Activity.ToString(false);
     }
 }
 
@@ -152,14 +152,14 @@ bool ListBuilder::HandleKeybInput(int c)
                 return !m_RealTimeList.empty();
 
             case MIDI_INPUT_FULL:
-                return !m_PlayList.Empty();
+                return !m_StepList.Empty();
 
             default:
                 return false;
             }
 
         case 32:
-            m_PlayList.Add();
+            m_StepList.Add();
             return true;
 
         case KEY_BACKSPACE:
@@ -173,7 +173,7 @@ bool ListBuilder::HandleKeybInput(int c)
                 }
                 break;
             default:
-                m_PlayList.DeleteLast();
+                m_StepList.DeleteLast();
             }
             return true;
 
@@ -286,7 +286,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
             }
             if ( m_openNotes == 0 )
             {
-                m_PlayList.Add(m_Captured);
+                m_StepList.Add(m_Captured);
                 m_Captured.Clear();
             }
             return false;
@@ -294,7 +294,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
         case MIDI_INPUT_QUICK:
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
             {
-                m_PlayList.Add(ev->data.note.note, ev->data.note.velocity);
+                m_StepList.Add(ev->data.note.note, ev->data.note.velocity);
                 m_openNotes += 1;
             }
             else if ( m_openNotes > 0 )

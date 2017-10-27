@@ -77,7 +77,7 @@ Display::Display()
 
     start_color();
     init_color(COLOUR_GREEN, 0, 750, 0);
-    init_color(COLOUR_BRIGHT_GREEN, 0, 900, 0);
+    init_color(COLOUR_BRIGHT_GREEN, 0, 750, 0);
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
     init_color(COLOUR_REDDISH, 750, 300, 200);
@@ -94,15 +94,15 @@ Display::Display()
 
     mvprintw(6, 1, "=> ");
 
-    mSmallPanel = newwin(4, 76, 2, 4);
-    mBigPanel = newwin(17, 76, 8, 4);
+    m_SmallPanel = newwin(4, 76, 2, 4);
+    m_BigPanel = newwin(17, 80, 8, 0);
 }
 
 
 Display::~Display()
 {
-    delwin(mSmallPanel);
-    delwin(mBigPanel);
+    delwin(m_SmallPanel);
+    delwin(m_BigPanel);
     endwin();			/* End curses mode		  */
 }
 
@@ -126,7 +126,7 @@ void set_top_line()
                g_State.RunState() ? "<<   RUN   >>" : "<<   ---   >>");
 
     highlight(0, 0, 0, 80, A_BOLD, g_ListBuilder.MidiInputModeAsColour(vector<int> {0, CP_RECORD, CP_RECORD, CP_REALTIME})); // Hmm ...
-    highlight(0, 0, 59, 7, A_BOLD, g_State.RunState() ? CP_RUNNING : 0);
+    highlight(0, 0, 60, 5, A_BOLD, g_State.RunState() ? CP_RUNNING : 0);
 }
 
 std::vector<int> g_ListDisplayRows;
@@ -199,6 +199,14 @@ void highlight_pattern_panel()
     if ( g_PatternStore.PlayPositionInfo(listIndex, offset, length) )
     {
         int row = g_ListDisplayRows.at(listIndex);
+
+        // TODO: (Sort of.) This is a hack to cope with the fact that the pattern now inserts a simple
+        //       arrow at the start of each row to show selection. The 'big panel' now uses the full width
+        //       of the screen, but the play list ToString() routine still store's highlight positions
+        //       relative to the beginning of the string it creates, which doesn't include the selection
+        //       arrow. If we keep this flickering highlight mechanism, we need to make this better.
+
+        offset += 4;
 
         while ( offset >= 76 )
         {

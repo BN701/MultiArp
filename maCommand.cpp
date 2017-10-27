@@ -120,6 +120,9 @@ enum command_t
 
     C_LIST,             // Note list commands.
 
+    C_LIST_RT,          // Real time list commands.
+    C_LIST_RT_DELETE,
+
     C_HELP_1,
     C_HELP_2,
     C_HELP_3,
@@ -224,6 +227,10 @@ unordered_map<string, command_t> gCommandList =
 
     {"list", C_LIST},
     {"l", C_LIST},
+    {"real time", C_LIST_RT},
+    {"rt", C_LIST_RT},
+    {"real time delete", C_LIST_RT_DELETE},
+    {"rt delete", C_LIST_RT_DELETE},
     {"status", C_STATUS},
     {"stat", C_STATUS},
     {"undo", C_UNDO},
@@ -618,7 +625,7 @@ bool do_command(string/*const char * */ commandString)
             show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:
-            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditPlayList());
+            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditStepList());
             show_translation_map_status();
             break;
         case C_SCALE_SHOW:
@@ -788,6 +795,19 @@ bool do_command(string/*const char * */ commandString)
                 throw string("Hint: list new|delete|n [clear|: n1, n2 ,...]");
             set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
             update_pattern_panel();
+            break;
+
+        case C_LIST_RT :
+            g_PatternStore.CurrentEditRealTimeList().SetStatus();
+            g_PatternStore.CurrentEditRealTimeList().SetFocus();
+            show_status_after_navigation();
+            break;
+
+        case C_LIST_RT_DELETE :
+            g_PatternStore.DeleteCurrentRealTimeList();
+            g_PatternStore.SetFocus();
+            g_PatternStore.SetStatus();
+            show_status_after_navigation();
             break;
 
         case C_HELP :

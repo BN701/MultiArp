@@ -50,7 +50,28 @@ class CursorKeys
         CursorKeys();
         virtual ~CursorKeys();
 
-        enum key_type_t {up, down, left, right};
+        enum key_type_t {
+            up,
+            down,
+            left,
+            right,
+            shift_page_up,
+            shift_page_down,
+            alt_page_up,
+            alt_page_down,
+            ctrl_down,
+            ctrl_up,
+            ctrl_left,
+            ctrl_right,
+            shift_down,
+            shift_up,
+            shift_left,
+            shift_right,
+            ctrl_shift_left,
+            ctrl_shift_right,
+            ctrl_shift_up,
+            ctrl_shift_down
+        };
 
         virtual void SetMode(entry_modes_t m) { m_EntryMode = m; }
         entry_modes_t Mode() { return m_EntryMode; }

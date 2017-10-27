@@ -393,7 +393,23 @@ unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
     {KEY_DOWN, CursorKeys::down},
     {KEY_UP, CursorKeys::up},
     {KEY_LEFT, CursorKeys::left},
-    {KEY_RIGHT, CursorKeys::right}
+    {KEY_RIGHT, CursorKeys::right},
+    {KEY_SPGUP, CursorKeys::shift_page_up},
+    {KEY_SPGDOWN, CursorKeys::shift_page_down},
+    {KEY_APGUP, CursorKeys::alt_page_up},
+    {KEY_APGDOWN, CursorKeys::alt_page_down},
+    {KEY_CDOWN, CursorKeys::ctrl_down},
+    {KEY_CUP, CursorKeys::ctrl_up},
+    {KEY_CLEFT, CursorKeys::ctrl_left},
+    {KEY_CRIGHT, CursorKeys::ctrl_right},
+    {KEY_SDOWN, CursorKeys::shift_down},
+    {KEY_SUP, CursorKeys::shift_up},
+    {KEY_SLEFT, CursorKeys::shift_left},
+    {KEY_SRIGHT, CursorKeys::shift_right},
+    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
+    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
+    {KEY_CSUP, CursorKeys::ctrl_shift_up},
+    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
 };
 
 
@@ -488,8 +504,6 @@ bool key_input_action()
     case KEY_CSRIGHT:
     case KEY_CSUP:
     case KEY_CSDOWN:
-        break;
-
     case KEY_DOWN:
     case KEY_UP:
     case KEY_LEFT:

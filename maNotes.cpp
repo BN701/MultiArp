@@ -237,7 +237,12 @@ string Note::ToString(bool showVelocity)
 
     char buffer[25];
     if ( showVelocity && m_NoteVelocity >= 0 )
-        sprintf(buffer, "%s%i:%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12, m_NoteVelocity);
+        sprintf(buffer, "%s%i:%i:%.3f:%.3f",
+            mapNumbersToNotes.at(m_NoteNumber % 12).c_str(),
+            m_NoteNumber / 12,
+            m_NoteVelocity,
+            m_Phase,
+            m_Length);
     else
         sprintf(buffer, "%s%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12);
 
@@ -296,15 +301,11 @@ void Cluster::FromString(string s)
         return;
     }
 
-//    for ( int i = 0; i < noteStrings.size(); i++ )
     for ( vector<string>::iterator it = noteStrings.begin(); it != noteStrings.end(); it++ )
     {
-//        const char * noteString = noteStrings[i].c_str();
-
         Note n;
         try
         {
-//            n.FromString(noteStrings.at(i));
             n.FromString(*it);
             m_Notes.push_back(n);
         }
@@ -414,6 +415,24 @@ void StepList::FromString(string s)
     }
 }
 
+enum rtl_element_names_t {
+    rtl_name_loop,
+    rtl_name_quantum,
+    rtl_name_multiplier,
+    rtl_name_window_adjust,
+    num_rtl_element_names
+};
+
+
+unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
+    {rtl_name_loop, "Loop"},
+    {rtl_name_quantum, "Quantum"},
+    {rtl_name_multiplier, "Multiplier"},
+    {rtl_name_window_adjust, "Window"},
+    {num_rtl_element_names, ""}
+};
+
+
 void RealTimeList::SetStatus()
 {
     char buff[200];
@@ -471,18 +490,18 @@ bool RealTimeList::HandleKey(key_type_t k)
     case up:
         switch ( m_RTListFocus )
         {
-        case rtf_loop_start:
+        case rtl_loop_start:
             m_LoopStart += inc;
             break;
-        case rtf_local_quantum:
+        case rtl_local_quantum:
             m_LocalQuantum += inc;
             if ( m_LocalQuantum == 0 )
                 m_LocalQuantum += inc;
             break;
-        case rtf_multiplier:
+        case rtl_multiplier:
             m_Multiplier += inc;
             break;
-        case rtf_window_adjust:
+        case rtl_window_adjust:
             m_AdjustWindowToStep = true;
             break;
         default:
@@ -494,18 +513,18 @@ bool RealTimeList::HandleKey(key_type_t k)
     case down:
         switch ( m_RTListFocus )
         {
-        case rtf_loop_start:
+        case rtl_loop_start:
             m_LoopStart -= inc;
             break;
-        case rtf_local_quantum:
+        case rtl_local_quantum:
             m_LocalQuantum -= inc;
             if ( m_LocalQuantum == 0 )
                 m_LocalQuantum -= inc;
             break;
-        case rtf_multiplier:
+        case rtl_multiplier:
             m_Multiplier -= inc;
             break;
-        case rtf_window_adjust:
+        case rtl_window_adjust:
             break;
         default:
             m_AdjustWindowToStep = false;
@@ -525,12 +544,21 @@ string RealTimeList::ToString()
 
     for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++)
     {
-        char buff[50];
         if ( !result.empty() )
-            result += ",";
-        sprintf(buff, "%s", it->second.ToString(false).c_str());
-        result += buff;
+            result += ", ";
+        result += it->second.ToString();
     }
+
+    char buff[200];
+
+    sprintf(buff, " %s %.3f %s %.3f %s %.3f %s '%s'",
+            rtl_element_names.at(rtl_name_loop), m_LoopStart,
+            rtl_element_names.at(rtl_name_quantum), m_LocalQuantum,
+            rtl_element_names.at(rtl_name_multiplier), m_Multiplier,
+            rtl_element_names.at(rtl_name_window_adjust), m_AdjustWindowToStep ? "on" : "off"
+            );
+
+    result += buff;
 
     return result;
 }

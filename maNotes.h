@@ -198,7 +198,7 @@ struct RealTimeList : public CursorKeys
         m_LocalQuantum(0.0),   // Negative means don't use.
         m_Multiplier(1.0),
         m_AdjustWindowToStep(true),
-        m_RTListFocus(rtf_loop_start)
+        m_RTListFocus(rtl_loop_start)
     {};
 
     std::string ToString();
@@ -207,10 +207,10 @@ struct RealTimeList : public CursorKeys
     void SetStatus();
     protected:
         enum rt_list_focus_t {
-            rtf_loop_start,
-            rtf_local_quantum,
-            rtf_multiplier,
-            rtf_window_adjust,
+            rtl_loop_start,
+            rtl_local_quantum,
+            rtl_multiplier,
+            rtl_window_adjust,
             number_rt_list_focus_modes
         };
 

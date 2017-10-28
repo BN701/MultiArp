@@ -175,12 +175,23 @@ string Pattern::ToString(const char * prefix)
     int index = 1;
     for ( vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++, index++ )
     {
-        char buffer[12];
-        sprintf(buffer, "List %i ", index);
+        char buffer[20];
+        sprintf(buffer, "Step %i ", index);
         result += buffer;
-        result += StepList(*i).ToString();
+        result += (*i).ToString();
         result += "\n";
     }
+
+    index = 1;
+    for ( vector<RealTimeList>::iterator i = m_RealTimeSet.begin(); i != m_RealTimeSet.end(); i++, index++ )
+    {
+        char buffer[20];
+        sprintf(buffer, "RealTime %i ", index);
+        result += buffer;
+        result += (*i).ToString();
+        result += "\n";
+    }
+
     return result;
 }
 

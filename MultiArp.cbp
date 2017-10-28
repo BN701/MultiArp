@@ -62,7 +62,9 @@
 		<Unit filename="maListBuilder.cpp" />
 		<Unit filename="maListBuilder.h" />
 		<Unit filename="maNotes.cpp" />
+		<Unit filename="maNotes.h" />
 		<Unit filename="maPattern.cpp" />
+		<Unit filename="maPattern.h" />
 		<Unit filename="maPatternStore.cpp" />
 		<Unit filename="maPatternStore.h" />
 		<Unit filename="maScreen.cpp" />

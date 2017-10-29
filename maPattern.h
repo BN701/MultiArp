@@ -134,9 +134,10 @@ struct Pattern
     std::string Label(size_t width);
     std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
     std::string ListToString(std::vector<int>::size_type n);
-    std::string ToString(const char * prefix = NULL);
+    std::string ToString(const char * prefix);
     bool FromString(std::string s, int & updates);
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
+    void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);

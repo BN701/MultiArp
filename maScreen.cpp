@@ -81,7 +81,7 @@ Display::Display()
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
     init_color(COLOUR_REDDISH, 750, 300, 200);
-    init_color(COLOUR_BLUE, 500, 500, 900);
+    init_color(COLOUR_BLUE, 250, 750, 900);
     init_color(COLOUR_GREY, 350, 350, 350);
     init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
 	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOR_BLACK);

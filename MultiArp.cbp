@@ -44,6 +44,7 @@
 			<Add library="../rtmidi-2.1.1/.libs/librtmidi.so" />
 			<Add library="libasound.a" />
 		</Linker>
+		<Unit filename="Test Files/More Test Data.txt" />
 		<Unit filename="Test Files/Note List Test Data.txt" />
 		<Unit filename="Test Files/Shades of Blue and Yellow, extended.txt" />
 		<Unit filename="Test Files/Shades of Blue and Yellow, extendedtxt" />

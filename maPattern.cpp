@@ -176,7 +176,7 @@ string Pattern::ToString(const char * prefix)
     for ( vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++, index++ )
     {
         char buffer[20];
-        sprintf(buffer, "Step %i ", index);
+        sprintf(buffer, "Step List %i ", index);
         result += buffer;
         result += (*i).ToString();
         result += "\n";
@@ -186,7 +186,7 @@ string Pattern::ToString(const char * prefix)
     for ( vector<RealTimeList>::iterator i = m_RealTimeSet.begin(); i != m_RealTimeSet.end(); i++, index++ )
     {
         char buffer[20];
-        sprintf(buffer, "RealTime %i ", index);
+        sprintf(buffer, "Real Time List %i ", index);
         result += buffer;
         result += (*i).ToString();
         result += "\n";
@@ -244,22 +244,43 @@ bool Pattern::FromString(string s, int & updates)
 {
     try
     {
-        // This is now a kludgey hack to allow for both 'Default' and 'Pattern' tags,
+        // This is now a klunky hack to allow for both 'Default' and 'Pattern' tags,
         // when initializing from a string.
         //
-        // Forturnately, both tags are the same length so we can check for 'Scale',
+        // Fortunately, both tags are the same length so we can check for 'Scale',
         // 'Trigs' and 'Feel' at position 7 and route accordingly. We don't do this
         // for 'List' because the default pattern won't have any so all lists are
         // routed to the current member of the pattern list. The final else
-        // clause catches everything else
+        // clause catches everything else.
 
         if ( s.find("List ") == 0 )
         {
+            // Old tag, should remove this after a while.
             int index = stoi(s.substr(5)) - 1;
             size_t pos = s.find(' ', 5);
             if ( pos == string::npos )
-                throw string("Pattern::FromString(), parameter list is empty.");
+                throw string("Pattern::FromString(), Step parameter list is empty.");
             AddListFromString(index, s.substr(pos));
+            updates += 1;
+            return true;
+        }
+        else if ( s.find("Step List ") == 0 )
+        {
+            int index = stoi(s.substr(10)) - 1;
+            size_t pos = s.find(' ', 10);
+            if ( pos == string::npos )
+                throw string("Pattern::FromString(), Step parameter list is empty.");
+            AddListFromString(index, s.substr(pos));
+            updates += 1;
+            return true;
+        }
+        else if ( s.find("Real Time List ") == 0 )
+        {
+            int index = stoi(s.substr(15)) - 1;
+            size_t pos = s.find(' ', 15);
+            if ( pos == string::npos )
+                throw string("Pattern::FromString(), Real Time parameter list is empty.");
+            AddRealTimeListFromString(index, s.substr(pos));
             updates += 1;
             return true;
         }
@@ -295,7 +316,7 @@ bool Pattern::FromString(string s, int & updates)
     }
 }
 
-void Pattern::AddListFromString(vector<int>::size_type index, string s)
+void Pattern::AddListFromString(vector<StepList>::size_type index, string s)
 {
     if ( index < 0 )
         throw string("Pattern::AddListFromString(), invalid list index.");
@@ -303,7 +324,7 @@ void Pattern::AddListFromString(vector<int>::size_type index, string s)
     if ( index >= m_StepListSet.size() )
         m_StepListSet.resize(index + 1);
 
-    m_StepListSet.at(index).Clear();
+//    m_StepListSet.at(index).Clear();
     m_StepListSet.at(index).FromString(s);
 }
 
@@ -312,6 +333,18 @@ void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum
     m_RealTimeSet.emplace_back(realTimeList, quantum);
 }
 
+void Pattern::AddRealTimeListFromString(vector<RealTimeList>::size_type index, string s)
+{
+    if ( index < 0 )
+        throw string("Pattern::AddListFromString(), invalid list index.");
+
+    if ( index >= m_RealTimeSet.size() )
+        m_RealTimeSet.resize(index + 1);
+
+//    m_RealTimeSet.at(index).Clear();
+    m_RealTimeSet.at(index).FromString(s);
+
+}
 
 int Pattern::NewList()
 {

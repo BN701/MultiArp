@@ -189,7 +189,7 @@ struct RealTimeList : public CursorKeys
 
     void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
-    RealTimeList(std::map<double,Note> realTimeList, double quantum):
+    RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
         m_QuantumAtCapture(quantum),
         m_RealTimeList(realTimeList),
         m_LastRequestedStepValue(4.0),
@@ -201,6 +201,7 @@ struct RealTimeList : public CursorKeys
         m_RTListFocus(rtl_loop_start)
     {};
 
+    void FromString(std::string s);
     std::string ToString();
     std::string ToStringForDisplay(int width = 75);
 

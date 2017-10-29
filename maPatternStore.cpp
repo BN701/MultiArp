@@ -459,14 +459,14 @@ string PatternStore::EditPatternToString()
 {
     if ( m_Patterns.empty() )
         return "";
-    return m_Patterns.at(m_PosEdit).ToString();
+    return m_Patterns.at(m_PosEdit).ToString("Pattern");
 }
 
 string PatternStore::PlayPatternToString()
 {
     if ( m_Patterns.empty() )
         return "";
-    return m_Patterns.at(m_PosPlay).ToString();
+    return m_Patterns.at(m_PosPlay).ToString("Pattern");
 }
 
 void PatternStore::UpdatePattern(StepList & noteList)
@@ -622,8 +622,10 @@ bool PatternStore::LoadFromString(string s, int & created, int & updates)
         else
         {
             if ( m_Patterns.empty() )
+            {
                 m_Patterns.emplace_back();
-            created += 1;
+                created += 1;
+            }
             return m_Patterns.at(m_PosEdit).FromString(s, updates);
         }
     }

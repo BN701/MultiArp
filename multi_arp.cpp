@@ -543,7 +543,6 @@ bool key_input_action()
 void sigterm_exit(int sig)
 {
 
-    // TODO: Do a proper cleanup of the Sequencer resources, i.e. queues?
     endwin();
     exit(0);
 }

@@ -36,7 +36,13 @@ vector<string> split(const char *str, char c, bool wantEmptyTokens)
         while (*str != c && *str)
             str++;
 
-        result.push_back(string(begin, str));
+        if ( !result.empty() && result.back().back() == '\\')
+        {
+            result.back().resize(result.back().size() - 1);
+            result.back() += string(begin, str);
+        }
+        else
+            result.push_back(string(begin, str));
 
         if ( !wantEmptyTokens && result.back().size() == 0 )
             result.pop_back();

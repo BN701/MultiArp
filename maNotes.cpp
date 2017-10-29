@@ -19,6 +19,7 @@
 
 #include "maNotes.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <unordered_map>
@@ -251,20 +252,51 @@ string Note::ToString(bool showVelocity)
 
 void Note::FromString(string s)
 {
-    size_t pos = s.find(':');
 
-    if ( pos != string::npos )
+    // We may have leading white space, which will throw the map look-up,
+    // so convert separators to white space and then parse on that.
+
+    replace( s.begin(), s.end(), ':', ' ');
+    vector<string> tokens = split(s.c_str(), ' ');
+
+    if ( tokens.size() >= 1 )
+        m_NoteNumber = mapNotesToNumbers.at(tokens.at(0));
+    else
+        m_NoteNumber = -1;
+
+    if ( tokens.size() >= 2 )
     {
-        m_NoteNumber = mapNotesToNumbers.at(s.substr(0, pos));
-        m_NoteVelocity = stoi(s.substr(pos + 1));
+        m_NoteVelocity = stoi(tokens.at(1));
         if ( m_NoteVelocity < 0 || m_NoteVelocity > 127 )
             m_NoteVelocity = -1;
     }
     else
-    {
-        m_NoteNumber = mapNotesToNumbers.at(s);
         m_NoteVelocity = -1;
-    }
+
+    if ( tokens.size() >= 3 )
+        m_Phase = stod(tokens.at(2));
+    else
+        m_Phase = 0.0;
+
+    if ( tokens.size() >= 4 )
+        m_Length = stod(tokens.at(3));
+    else
+        m_Length = 0.0;
+
+//    size_t pos = s.find(':');
+//
+//    if ( pos != string::npos )
+//    {
+//        m_NoteNumber = mapNotesToNumbers.at(s.substr(0, pos));
+//        m_NoteVelocity = stoi(s.substr(pos + 1));
+//        if ( m_NoteVelocity < 0 || m_NoteVelocity > 127 )
+//            m_NoteVelocity = -1;
+//    }
+//    else
+//    {
+//        m_NoteNumber = mapNotesToNumbers.at(s);
+//        m_NoteVelocity = -1;
+//    }
 }
 
 bool Cluster::IsRest()
@@ -293,6 +325,7 @@ string Cluster::ToString(bool showVelocity)
 
 void Cluster::FromString(string s)
 {
+    replace( s.begin(), s.end(), '/', ' ');         // Support both spacers.
     vector<string> noteStrings = split(s.c_str());
 
     if ( noteStrings.size() == 0 )
@@ -406,6 +439,8 @@ void StepList::FromString(string s)
 
     if ( chordStrings.size() == 0 )
         throw string("Note List parse error: nothing found.");
+
+    Clear();
 
     for ( vector<string>::iterator it = chordStrings.begin(); it != chordStrings.end(); it++ )
     {
@@ -538,19 +573,84 @@ bool RealTimeList::HandleKey(key_type_t k)
     return true;
 }
 
+void RealTimeList::FromString(string s)
+{
+    vector<string> tokens = split(s.c_str(), ',', true);
+
+    if ( tokens.size() == 0 )
+        throw string("Note List parse error: nothing found.");
+
+    // Expect field list in first token ...
+
+    for ( rtl_element_names_t e = static_cast<rtl_element_names_t>(0);
+          e < num_rtl_element_names;
+          e = static_cast<rtl_element_names_t>(static_cast<int>(e) + 1) )
+    {
+        string token = find_token(tokens.at(0), rtl_element_names.at(e));
+
+        if ( token.empty() )
+            continue;
+
+        try
+        {
+            switch (e)
+            {
+            case rtl_name_loop:
+                m_LoopStart = stod(token);
+                break;
+            case rtl_name_quantum:
+                m_LocalQuantum = stod(token);
+                break;
+            case rtl_name_multiplier:
+                m_Multiplier = stod(token);
+                break;
+            case rtl_name_window_adjust:
+                m_AdjustWindowToStep = token.find("on") == 0;
+                break;
+            default:
+                break;
+            }
+        }
+        catch(invalid_argument ex)
+        {
+
+        }
+        catch(out_of_range ex)
+        {
+        }
+    }
+
+    // Anything after that is a note.
+
+    if ( tokens.size() == 1 )
+        return;  // Leave note list intact.
+
+    m_RealTimeList.clear();
+
+    for ( vector<string>::iterator it = tokens.begin() + 1; it != tokens.end(); it++ )
+    {
+        Note note;
+        note.FromString(*it);
+
+        // Check for existing entries and adjust start time if found.
+
+        while ( true )
+        {
+            map<double,Note>::iterator it2 = m_RealTimeList.find(note.Phase());
+            if ( it2 == m_RealTimeList.end() )
+                break;
+            note.SetPhase(note.Phase() + 0.0001);
+        }
+
+        m_RealTimeList.insert(make_pair(note.Phase(), note));
+    }
+}
+
 string RealTimeList::ToString()
 {
     string result;
 
-    for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++)
-    {
-        if ( !result.empty() )
-            result += ", ";
-        result += it->second.ToString();
-    }
-
     char buff[200];
-
     sprintf(buff, " %s %.3f %s %.3f %s %.3f %s '%s'",
             rtl_element_names.at(rtl_name_loop), m_LoopStart,
             rtl_element_names.at(rtl_name_quantum), m_LocalQuantum,
@@ -559,6 +659,15 @@ string RealTimeList::ToString()
             );
 
     result += buff;
+
+    int i = 0;
+    for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++)
+    {
+        result += ", ";
+        if ( i++ % 4 == 0 )
+            result += "\\\n     ";
+        result += it->second.ToString();
+    }
 
     return result;
 }
@@ -618,7 +727,7 @@ string RealTimeList::ToString()
 
 string RealTimeList::ToStringForDisplay(int width)
 {
-    char buff[50];
+    char buff[100];
     sprintf(buff, "%04.2f: ", m_LastRequestedPhase);
 
     string result = buff;
@@ -676,7 +785,8 @@ string RealTimeList::ToStringForDisplay(int width)
     if ( result.size() > width )
         result.resize(width);
 
-    sprintf(buff, "\n   (Multiplier %.2f, Loop Start %.2f Loop Quantum %.2f]", m_Multiplier, m_LoopStart, m_LocalQuantum);
+    sprintf(buff, "\n    Multiplier %.2f, Loop Start %.2f, Loop Quantum %.2f, Window Adjust %s",
+        m_Multiplier, m_LoopStart, m_LocalQuantum, m_AdjustWindowToStep ? "ON" : "OFF");
     result += buff;
 
     return result;

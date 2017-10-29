@@ -845,13 +845,6 @@ int TranslateTable::TranslateUsingTable(int root, int scale, int translation, in
         noteIndex += 12;
     }
 
-    // TODO: Can optimize a bit by moving this
-    // code to only run if global root and transpose
-    // are changed. Those variables are currently
-    // held in State, but since State holds the only
-    // instance of TranslateTable, those values may as
-    // well come here.
-
     int octaveShift = 0;
 
     while ( transIndex >= 12 )

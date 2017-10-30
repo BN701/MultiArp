@@ -20,8 +20,8 @@
 #include "maState.h"
 
 State::State():
-    m_CurrentStepValue(4.0),
-    m_Quantum(4.0),
+    m_CurrentStepValue(16.0),
+    m_Quantum(16.0),
     m_RunState(false),
     m_Beat(-4/m_CurrentStepValue),
     m_Phase(0),

@@ -125,7 +125,7 @@ void queue_next_step(int queueId)
     update_pattern_panel();
     highlight_pattern_panel();  // Moves note highlight.
 
-    set_status_w(STAT_POS_STEP, "Beat: %6.2f, phase: %4.2f, queue: %4i:%02i seconds",
+    set_status_w(STAT_POS_STEP, "Beat: %6.2f, phase: %05.2f, queue: %4i:%02i seconds",
                g_State.Beat(),
                g_State.Phase(),
                g_Sequencer.ScheduleTimeSeconds(),

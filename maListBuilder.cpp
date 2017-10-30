@@ -235,8 +235,8 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
 
                         // Normalize beat Start
 
-//                        while ( beatStart < m_BeatAtLastPhaseZero )
-//                            beatStart += m_LinkQuantum;
+                        while ( beatStart < m_BeatAtLastPhaseZero )
+                            beatStart += m_LinkQuantum;
 
                         note.SetPhase(beatStart - m_BeatAtLastPhaseZero);
 

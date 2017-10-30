@@ -728,7 +728,7 @@ string RealTimeList::ToString()
 string RealTimeList::ToStringForDisplay(int width)
 {
     char buff[100];
-    sprintf(buff, "%04.2f: ", m_LastRequestedPhase);
+    sprintf(buff, "%05.2f ", m_LastRequestedPhase);
 
     string result = buff;
 

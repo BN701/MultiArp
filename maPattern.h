@@ -69,7 +69,7 @@ struct Pattern
         m_PosEdit(0),
         m_PosRealTimeEdit(0),
         m_LastRequestedPos(0),
-        m_StepValue(4),
+        m_StepValue(16),
         m_Gate(0.5),
         m_GateHold(false),
         m_Velocity(64)

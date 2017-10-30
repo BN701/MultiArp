@@ -45,6 +45,7 @@
 			<Add library="libasound.a" />
 		</Linker>
 		<Unit filename="Test Files/More Test Data.txt" />
+		<Unit filename="Test Files/Nice Clips, Autumn 2017.txt" />
 		<Unit filename="Test Files/Note List Test Data.txt" />
 		<Unit filename="Test Files/Shades of Blue and Yellow, extended.txt" />
 		<Unit filename="Test Files/Shades of Blue and Yellow, extendedtxt" />

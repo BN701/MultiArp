@@ -552,8 +552,11 @@ bool RealTimeList::HandleKey(key_type_t k)
             m_LoopStart -= inc;
             break;
         case rtl_local_quantum:
-            m_LocalQuantum -= inc;
-            if ( m_LocalQuantum == 0 )
+//            if ( lround(100 * m_LocalQuantum) > 0 )
+//                m_LocalQuantum -= inc;
+            if ( m_LocalQuantum - inc < 0 )
+                m_LocalQuantum = 0;
+            else
                 m_LocalQuantum -= inc;
             break;
         case rtl_multiplier:
@@ -795,16 +798,23 @@ string RealTimeList::ToStringForDisplay(int width)
 
 void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
 {
+    bool localLoop = lround(m_LocalQuantum) > 0;
+
     phase *= m_Multiplier;
 
-    if ( lround(m_LocalQuantum) != 0 )
+    // Wrap to start of local loop.
+
+    if ( localLoop )
         while ( phase > m_LocalQuantum )
             phase -= m_LocalQuantum;
 
     phase += m_LoopStart;
 
-    while ( phase > m_QuantumAtCapture )
-        phase -= m_QuantumAtCapture;
+    // Wrap to start of capture loop loop.
+
+    if ( localLoop )
+        while ( phase > m_QuantumAtCapture )
+            phase -= m_QuantumAtCapture;
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;

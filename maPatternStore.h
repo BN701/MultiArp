@@ -78,6 +78,7 @@ struct PatternStore : public CursorKeys
         // m_PatternChain = {0, 0, 0, 1};
     };
 
+    bool Empty() { return m_Patterns.empty(); }
     std::string ToString();
     void FromString(const char * s);
 

@@ -60,6 +60,7 @@ enum colour_pairs
 {
     CP_PATTERN_LIST_PANEL = 1,
     CP_PATTERN_LIST_PANEL_2,
+    CP_PATTERN_LIST_PANEL_3,
     CP_MENU_HIGHLIGHT,
     CP_RUNNING,
     CP_RECORD,
@@ -80,12 +81,13 @@ Display::Display()
     init_color(COLOUR_BRIGHT_GREEN, 0, 750, 0);
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
-    init_color(COLOUR_REDDISH, 750, 300, 200);
+    init_color(COLOUR_REDDISH, 900, 300, 200);
     init_color(COLOUR_BLUE, 250, 750, 900);
     init_color(COLOUR_GREY, 350, 350, 350);
     init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
 	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOR_BLACK);
 	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOR_BLACK);
 	init_pair(CP_RUNNING, COLOR_WHITE, COLOUR_GREEN);
 	init_pair(CP_REALTIME, COLOR_WHITE, COLOUR_RED);
 	init_pair(CP_RECORD, COLOR_WHITE, COLOUR_YELLOW);
@@ -135,10 +137,36 @@ void update_pattern_panel()
 {
     int scr_x, scr_y;
 
+    wmove(gDisplay.BigPanel(), 0, 0);
+    wclrtobot(gDisplay.BigPanel());
+
+    if ( !g_PatternStore.Empty() )
+    {
+        wattron(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_3));
+
+        Pattern & p = g_PatternStore.CurrentPlayPattern();
+        wmove(gDisplay.BigPanel(), 0, 4);
+        wprintw(gDisplay.BigPanel(), "Play %i, %s", g_PatternStore.CurrentPlayPatternID(), p.Label(50).c_str());
+
+        wmove(gDisplay.BigPanel(), 1, 4);
+        wprintw(gDisplay.BigPanel(), "Step %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
+            p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
+
+        TranslateTable table = p.PatternTranslateTable();
+        wmove(gDisplay.BigPanel(), 2, 4);
+        wprintw(gDisplay.BigPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
+                table.Transpose(),
+                table.DegreeShift(),
+                table.ShiftName(),
+                table.RootName().c_str(),
+                table.ScaleName());
+
+        wmove(gDisplay.BigPanel(), 4, 0);
+    }
+
 	wattron(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
 
     g_ListDisplayRows.clear();
-    wmove(gDisplay.BigPanel(), 0, 0);
 
     for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
     {
@@ -161,7 +189,6 @@ void update_pattern_panel()
 
     wattroff(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
 
-    wclrtobot(gDisplay.BigPanel());
     wrefresh(gDisplay.BigPanel());
 }
 

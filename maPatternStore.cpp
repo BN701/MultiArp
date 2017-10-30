@@ -249,12 +249,12 @@ string PatternStore::PatternStatus()
     sprintf(buf, "Play: %i", m_PosPlay + 1);
     result += buf;
 
-    if ( !m_Patterns.at(m_PosPlay).LabelEmpty() )
-    {
-        result += ", ";
-        result += m_Patterns.at(m_PosPlay).Label(15);
-    }
-
+//    if ( !m_Patterns.at(m_PosPlay).LabelEmpty() )
+//    {
+//        result += ", ";
+//        result += m_Patterns.at(m_PosPlay).Label(15);
+//    }
+//
     switch ( m_PatternChainMode )
     {
         case PC_MODE_NONE :
@@ -276,12 +276,12 @@ string PatternStore::PatternStatus()
     sprintf(buf, "\nEdit: %i", m_PosEdit + 1);
     result += buf;
 
-    if ( !m_Patterns.at(m_PosEdit).LabelEmpty() )
-    {
-        result += ", ";
-        result += m_Patterns.at(m_PosEdit).Label(15);
-    }
-
+//    if ( !m_Patterns.at(m_PosEdit).LabelEmpty() )
+//    {
+//        result += ", ";
+//        result += m_Patterns.at(m_PosEdit).Label(15);
+//    }
+//
     if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
         sprintf(buf, ", List %i", m_Patterns.at(m_PosEdit).m_PosEdit + 1);

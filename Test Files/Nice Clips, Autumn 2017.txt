@@ -31,3 +31,302 @@ Step List 2 Bb4,C5,D5
 Step List 3 C4,,,,
 
 
+<< Global >>
+
+Midi Channel 5
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Chain 1, 2
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change ON
+Store Edit focus follows play OFF
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale root 60 chrom 0 shift 0 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     F4:127:11.040:0.104, Bb4:127:11.297:0.106, G4:127:11.547:0.105, G4:127:12.060:0.097
+Real Time List 2  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     D6:127:0.003:0.063, D6:127:0.014:0.089, C6:127:1.016:0.085, D6:127:1.957:0.080, \
+     C6:127:2.998:0.086, D6:127:3.942:0.079, C6:127:4.989:0.083, D6:127:5.552:0.075, \
+     D6:127:6.546:0.075, C6:127:7.016:0.077, C6:127:8.036:0.096, D6:127:8.556:0.073, \
+     D6:127:9.495:0.066, C6:127:9.955:0.081, C6:127:10.989:0.081, D6:127:11.494:0.059, \
+     F6:127:12.535:0.087, F6:127:13.547:0.076, C6:127:14.552:0.082, C6:127:15.036:0.073, \
+     D6:127:15.555:0.071
+
+<< Pattern 2 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 58 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     F4:127:11.040:0.104, Bb4:127:11.297:0.106, G4:127:11.547:0.105, G4:127:12.060:0.097
+Real Time List 2  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     D6:127:0.003:0.063, D6:127:0.014:0.089, C6:127:1.016:0.085, D6:127:1.957:0.080, \
+     C6:127:2.998:0.086, D6:127:3.942:0.079, C6:127:4.989:0.083, D6:127:5.552:0.075, \
+     D6:127:6.546:0.075, C6:127:7.016:0.077, C6:127:8.036:0.096, D6:127:8.556:0.073, \
+     D6:127:9.495:0.066, C6:127:9.955:0.081, C6:127:10.989:0.081, D6:127:11.494:0.059, \
+     F6:127:12.535:0.087, F6:127:13.547:0.076, C6:127:14.552:0.082, C6:127:15.036:0.073, \
+     D6:127:15.555:0.071
+
+<< Pattern 3 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 58 chrom 12 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 8.000 Quantum 4.000 Multiplier 1.000 Window 'on', \
+     F4:127:11.040:0.104, Bb4:127:11.297:0.106, G4:127:11.547:0.105, G4:127:12.060:0.097
+
+<< Global >>
+
+Midi Channel 3
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Chain 1x2, 2x2
+
+Store Pattern Chain Mode 2
+Store Reset on pattern change ON
+Store Edit focus follows play ON
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale root 60 chrom 0 shift 0 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     G5:127:0.018:0.729, C6:127:0.021:0.613, Bb5:127:1.479:0.082, F5:127:1.755:0.756, \
+     Bb5:127:1.770:0.756, C6:127:2.491:0.162, G5:127:2.495:0.113, C6:127:11.514:0.465, \
+     F6:127:11.516:0.451, Bb5:127:12.526:1.073, D6:127:12.528:1.091, C6:127:13.522:0.174, \
+     G5:127:13.544:0.157, Bb5:127:14.543:0.137, F5:127:14.554:0.191, F5:127:14.970:0.561, \
+     Bb5:127:14.980:0.633, G5:127:15.531:0.115, C6:127:15.565:0.075
+
+<< Pattern 2 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Step List 1
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     F5:127:6.470:2.341, C5:127:6.470:2.370, G5:127:8.929:0.623, D5:127:8.951:0.569, \
+     Bb5:127:10.466:2.310, F5:127:10.468:2.306, G5:127:12.913:0.302, C6:127:12.918:0.297
+
+<< Global >>
+
+Midi Channel 6
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Chain 1x2, 2
+
+Store Pattern Chain Mode 2
+Store Reset on pattern change ON
+Store Edit focus follows play ON
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale root 60 chrom 0 shift 0 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     G5:127:0.962:1.788, Bb5:127:2.513:1.072, C6:127:3.524:0.273, C6:127:4.061:0.934, \
+     Bb5:127:4.908:0.617, G5:127:5.426:0.209, Bb5:127:5.936:0.580, G5:127:6.474:0.245, \
+     Bb5:127:7.591:0.429, G5:127:7.993:0.577, Bb5:127:8.493:0.532, C6:127:8.979:0.813, \
+     C6:127:10.012:0.830, F5:127:15.989:0.784
+
+<< Pattern 2 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Step List 1
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     Bb4:127:0.996:2.087, C5:127:3.015:1.969, F5:127:8.987:1.010, D5:127:9.978:0.450, \
+     C5:127:10.417:0.571, F4:127:11.055:1.883, C5:127:12.903:2.063, G4:127:14.949:2.055
+
+<< Global >>
+
+Midi Channel 5
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Chain 1, 2
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change ON
+Store Edit focus follows play OFF
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale root 60 chrom 0 shift 0 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     F4:127:11.040:0.104, Bb4:127:11.297:0.106, G4:127:11.547:0.105, G4:127:12.060:0.097
+Real Time List 2  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     D6:127:0.003:0.063, D6:127:0.014:0.089, C6:127:1.016:0.085, D6:127:1.957:0.080, \
+     C6:127:2.998:0.086, D6:127:3.942:0.079, C6:127:4.989:0.083, D6:127:5.552:0.075, \
+     D6:127:6.546:0.075, C6:127:7.016:0.077, C6:127:8.036:0.096, D6:127:8.556:0.073, \
+     D6:127:9.495:0.066, C6:127:9.955:0.081, C6:127:10.989:0.081, D6:127:11.494:0.059, \
+     F6:127:12.535:0.087, F6:127:13.547:0.076, C6:127:14.552:0.082, C6:127:15.036:0.073, \
+     D6:127:15.555:0.071
+
+<< Pattern 2 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 58 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     F4:127:11.040:0.104, Bb4:127:11.297:0.106, G4:127:11.547:0.105, G4:127:12.060:0.097
+Real Time List 2  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     D6:127:0.003:0.063, D6:127:0.014:0.089, C6:127:1.016:0.085, D6:127:1.957:0.080, \
+     C6:127:2.998:0.086, D6:127:3.942:0.079, C6:127:4.989:0.083, D6:127:5.552:0.075, \
+     D6:127:6.546:0.075, C6:127:7.016:0.077, C6:127:8.036:0.096, D6:127:8.556:0.073, \
+     D6:127:9.495:0.066, C6:127:9.955:0.081, C6:127:10.989:0.081, D6:127:11.494:0.059, \
+     F6:127:12.535:0.087, F6:127:13.547:0.076, C6:127:14.552:0.082, C6:127:15.036:0.073, \
+     D6:127:15.555:0.071
+
+<< Pattern 3 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 58 chrom 12 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 8.000 Quantum 4.000 Multiplier 1.000 Window 'on', \
+     F4:127:11.040:0.104, Bb4:127:11.297:0.106, G4:127:11.547:0.105, G4:127:12.060:0.097
+
+Second jam ...
+
+
+<< Global >>
+
+Midi Channel 3
+Link Quantum 4.00
+
+<< Pattern Store >>
+
+Chain 1x2, 3x2
+
+Store Pattern Chain Mode 2
+Store Reset on pattern change ON
+Store Edit focus follows play OFF
+
+<< Pattern Default >>
+
+Default Step Value 8.00 Gate 1.00 Hold OFF Vel 64
+Default Scale root 72 chrom 0 shift -2 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'leave'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Step List 1 C6:127:0.000:0.000,D6:127:0.000:0.000,E6:127:0.000:0.000,G6:127:0.000:0.000,C6:127:0.000:0.000,E6:127:0.000:0.000,G6:127:0.000:0.000,A6:127:0.000:0.000
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     C5:127:0.007:0.106, G4:127:1.479:0.090, G4:127:1.480:0.065, G4:127:1.941:0.098, \
+     G4:127:2.000:0.091, C5:127:3.436:0.076, C5:127:3.468:0.021, C5:127:3.505:0.061, \
+     C5:127:3.982:0.072
+
+<< Pattern 2 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift -2 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Step List 1 C6:127:0.000:0.000,D6:127:0.000:0.000,E6:127:0.000:0.000,G6:127:0.000:0.000,C6:127:0.000:0.000,E6:127:0.000:0.000,G6:127:0.000:0.000,A6:127:0.000:0.000
+
+<< Pattern 3 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 56 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'upper'
+Pattern Feel Map
+Step List 1 C6:127:0.000:0.000,D6:127:0.000:0.000,E6:127:0.000:0.000,G6:127:0.000:0.000,C6:127:0.000:0.000,E6:127:0.000:0.000,G6:127:0.000:0.000,A6:127:0.000:0.000
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     C5:127:0.012:0.117, G5:127:1.485:0.078, G5:127:1.495:0.106, G5:127:1.990:0.120, \
+     G5:127:1.999:0.093, C5:127:3.457:0.086, C5:127:3.469:0.100, C5:127:3.984:0.116
+
+<< Global >>
+
+Midi Channel 4
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Chain 1x2, 2x2
+
+Store Pattern Chain Mode 2
+Store Reset on pattern change ON
+Store Edit focus follows play ON
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale root 60 chrom 0 shift 0 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Real Time List 1  Loop 0.000 Quantum 0.000 Multiplier 1.000 Window 'on', \
+     Bb5:127:3.896:1.642, F5:127:3.911:1.643, C6:127:7.851:2.531, G5:127:7.870:2.497, \
+     C5:127:15.927:2.106
+

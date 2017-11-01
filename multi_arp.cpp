@@ -32,6 +32,7 @@
 
 #define LINK_PLATFORM_LINUX
 #include <ableton/Link.hpp>
+#include <csignal>
 //#include <unordered_map>
 
 #include "maAlsaSequencer.h"
@@ -131,6 +132,8 @@ void queue_next_step(int queueId)
                g_Sequencer.ScheduleTimeSeconds(),
                g_Sequencer.ScheduleTimeNanoSeconds() / 10000000);
 
+    update_progress_bar();
+
     // There may have been a pattern change (especially if chaining is active).
 
     set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
@@ -168,6 +171,15 @@ void queue_next_step(int queueId)
     else
     {
         queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
+    }
+
+    if ( queue_time_usec < 0 )
+    {
+        // Sometimes at start up link appears to go backwards, especially if
+        // there's another instance of the app running. For now, just keep
+        // reschedule and hope things settle down.
+//        raise(SIGINT);
+        queue_time_usec = 0;
     }
 
     g_Sequencer.SetScheduleTime(queue_time_usec);

@@ -142,7 +142,7 @@ void show_translation_status();
 void show_translation_map_status();
 void show_listbuilder_status();
 void show_status_after_navigation();
-
+void update_progress_bar();
 
 void update_pattern_panel();
 void highlight_pattern_panel();

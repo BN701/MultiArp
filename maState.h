@@ -35,6 +35,7 @@ class State
 
         void Step();
 
+        void Progress(double & progress, double & stepWidth);
         /** Access m_StepValue
          * \return The current value of m_StepValue
          */

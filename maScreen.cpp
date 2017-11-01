@@ -53,14 +53,23 @@ extern TranslateTable * pTranslateTable;
 #define COLOUR_REDDISH      13
 #define COLOUR_BRIGHT_GREEN 14
 #define COLOUR_YELLOW       16
+#define COLOUR_DARK_GREY    17
+#define COLOUR_DARKER_GREY  18
+#define COLOUR_WHITE        19
+#define COLOUR_BLACK        20
 
 // Color Pair uses
 
 enum colour_pairs
 {
-    CP_PATTERN_LIST_PANEL = 1,
+    CP_MAIN = 1,
+    CP_PATTERN_LIST_PANEL,
     CP_PATTERN_LIST_PANEL_2,
     CP_PATTERN_LIST_PANEL_3,
+    CP_PATTERN_LIST_PANEL_BKGND,
+    CP_PROGRESS_BAR_HIGHLIGHT,
+    CP_PROGRESS_BAR_BKGND,
+    CP_SMALL_PANEL_BKGND,
     CP_MENU_HIGHLIGHT,
     CP_RUNNING,
     CP_RECORD,
@@ -77,27 +86,43 @@ Display::Display()
     keypad(stdscr, true);
 
     start_color();
+
     init_color(COLOUR_GREEN, 0, 750, 0);
     init_color(COLOUR_BRIGHT_GREEN, 0, 750, 0);
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
     init_color(COLOUR_REDDISH, 900, 300, 200);
     init_color(COLOUR_BLUE, 250, 750, 900);
-    init_color(COLOUR_GREY, 350, 350, 350);
     init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
-	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOR_BLACK);
-	init_pair(CP_RUNNING, COLOR_WHITE, COLOUR_GREEN);
-	init_pair(CP_REALTIME, COLOR_WHITE, COLOUR_RED);
-	init_pair(CP_RECORD, COLOR_WHITE, COLOUR_YELLOW);
-//	init_pair(3, COLOUR_BLUE, COLOR_BLACK);
-	init_pair(CP_MENU_HIGHLIGHT, COLOR_WHITE, COLOUR_REDDISH);
+    init_color(COLOUR_GREY, 750, 750, 750);
+    init_color(COLOUR_DARK_GREY, 500, 500, 500);
+    init_color(COLOUR_DARKER_GREY, 250, 250, 250);
+
+    init_color(COLOUR_WHITE, 1000, 1000, 1000);
+    init_color(COLOUR_BLACK, 0, 0, 0);
+
+	init_pair(CP_MAIN, COLOUR_WHITE, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOUR_BLACK);
+	init_pair(CP_RUNNING, COLOUR_WHITE, COLOUR_GREEN);
+	init_pair(CP_REALTIME, COLOUR_WHITE, COLOUR_RED);
+	init_pair(CP_RECORD, COLOUR_WHITE, COLOUR_YELLOW);
+	init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
+	init_pair(CP_PATTERN_LIST_PANEL_BKGND, COLOR_YELLOW, COLOUR_GREY);
+    init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
+    init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_DARK_GREY, COLOUR_BLACK);
+    init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_GREY, COLOUR_BLACK);
+
 
     mvprintw(6, 1, "=> ");
 
-    m_SmallPanel = newwin(4, 76, 2, 4);
-    m_BigPanel = newwin(17, 80, 8, 0);
+    m_SmallPanel = newwin(4, 64, 2, 4);
+    m_BigPanel = newwin(16, 80, 9, 0);
+
+    bkgd(COLOR_PAIR(CP_MAIN));
+    wbkgd(m_SmallPanel, COLOR_PAIR(CP_SMALL_PANEL_BKGND));
+    wbkgd(m_BigPanel, COLOR_PAIR(CP_MAIN));
 }
 
 
@@ -127,9 +152,62 @@ void set_top_line()
                g_State.Quantum(),
                g_State.RunState() ? "<<   RUN   >>" : "<<   ---   >>");
 
-    highlight(0, 0, 0, 80, A_BOLD, g_ListBuilder.MidiInputModeAsColour(vector<int> {0, CP_RECORD, CP_RECORD, CP_REALTIME})); // Hmm ...
-    highlight(0, 0, 60, 5, A_BOLD, g_State.RunState() ? CP_RUNNING : 0);
+    highlight(0, 0, 0, 80, A_BOLD, g_ListBuilder.MidiInputModeAsColour(vector<int> {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME})); // Hmm ...
+    highlight(0, 0, 60, 5, A_BOLD, g_State.RunState() ? CP_RUNNING : CP_MAIN);
 }
+
+void update_progress_bar()
+{
+    double progress, stepWidth;
+    g_State.Progress(progress, stepWidth);
+
+    int n = lround(64.0 * progress);
+    int len = lround(64.0 * stepWidth);
+
+    int mode = 0;
+    if ( len == 1 )
+        mode = 1;
+    else if ( len < 9 )
+        mode == 2;
+
+    if ( n + len > 64 )
+        len = 64 - n;
+
+    string barline(64, '.');
+    string marker(len, '-');
+
+    int scr_x, scr_y;
+    getyx(stdscr, scr_y, scr_x);
+
+    switch ( mode )
+    {
+    case 1:
+        attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
+        mvprintw(1, 4, barline.c_str());
+        attron(COLOR_PAIR(CP_MAIN));
+        mvaddch(1, 4 + n, ACS_RARROW);
+        break;
+    case 2:
+        attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
+        mvprintw(1, 4, barline.c_str());
+        attron(COLOR_PAIR(CP_MAIN));
+        mvprintw(1, 4 + n, marker.c_str());
+        break;
+    default:
+        move(1, 4);
+        clrtoeol();
+        attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
+        mvprintw(1, 4 + n, marker.c_str());
+        break;
+    }
+
+    attroff(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
+
+    move(scr_y, scr_x);
+    refresh();
+
+}
+
 
 std::vector<int> g_ListDisplayRows;
 
@@ -190,6 +268,7 @@ void update_pattern_panel()
     wattroff(gDisplay.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
 
     wrefresh(gDisplay.BigPanel());
+
 }
 
 void highlight_pattern_panel()

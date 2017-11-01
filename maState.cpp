@@ -44,6 +44,11 @@ void State::Step()
     m_Beat += 4 / m_CurrentStepValue;
 }
 
+void State::Progress(double & progress, double & stepWidth)
+{
+    progress = m_Phase/m_Quantum;
+    stepWidth =  4.0/(m_CurrentStepValue * m_Quantum);
+}
 
 void State::SetNewRunStatePending( bool val, int defer )
 {

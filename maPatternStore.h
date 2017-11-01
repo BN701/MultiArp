@@ -141,6 +141,12 @@ struct PatternStore : public CursorKeys
             m_Patterns.at(m_PosEdit).SetStepValue(i);
     }
 
+    void SetLabelCurrentEditPattern(const char * label)
+    {
+        if ( !m_Patterns.empty() )
+            m_Patterns.at(m_PosEdit).SetLabel(label);
+    }
+
     double StepValueCurrentPlayPattern()
     {
         if ( m_Patterns.empty() )

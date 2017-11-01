@@ -65,8 +65,8 @@
 
 #define COMMAND_HOME 6,4
 #define STAT_POS_TOPLINE 0,0
-#define STAT_POS_STEP gDisplay.SmallPanel(), 0,0
-#define STAT_POS_PATTERN gDisplay.SmallPanel(), 1,0
+#define STAT_POS_STEP g_Display.ProgressPanel(), 0,0
+#define STAT_POS_PATTERN g_Display.SmallPanel(), 1,0
 #define STAT_POS_2 5,4
 
 
@@ -77,18 +77,18 @@ public:
     Display();
     ~Display();
 
-    WINDOW *BigPanel()
-    {
-        return m_BigPanel;
-    }
+    WINDOW *BigPanel() { return m_BigPanel; }
+    WINDOW *SmallPanel() { return m_SmallPanel; }
+    WINDOW *ProgressPanel() { return m_ProgressPanel; }
+    WINDOW *EditListPanel() { return m_EditListPanel; }
+    WINDOW *EditSummaryPanel() { return m_EditSummaryPanel; }
 
-    WINDOW *SmallPanel()
-    {
-        return m_SmallPanel;
-    }
 private:
     WINDOW * m_BigPanel = NULL;
     WINDOW * m_SmallPanel = NULL;
+    WINDOW * m_ProgressPanel = NULL;
+    WINDOW * m_EditListPanel = NULL;
+    WINDOW * m_EditSummaryPanel = NULL;
 
 };
 

@@ -61,7 +61,7 @@ PatternStore g_PatternStore;
 State g_State;
 
 
-extern Display gDisplay;
+extern Display g_Display;
 
 int gDeferStop = 0;
 
@@ -126,11 +126,11 @@ void queue_next_step(int queueId)
     update_pattern_panel();
     highlight_pattern_panel();  // Moves note highlight.
 
-    set_status_w(STAT_POS_STEP, "Beat: %6.2f, phase: %05.2f, queue: %4i:%02i seconds",
-               g_State.Beat(),
+    set_status_w(STAT_POS_STEP, " Phase%8.2f\n Beat%9.2f\n (Sec%6i:%i)",
                g_State.Phase(),
+               g_State.Beat(),
                g_Sequencer.ScheduleTimeSeconds(),
-               g_Sequencer.ScheduleTimeNanoSeconds() / 10000000);
+               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 
     update_progress_bar();
 

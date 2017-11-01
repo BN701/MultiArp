@@ -90,6 +90,8 @@ struct Pattern
         m_Velocity = 64;
     }
 
+    void SetLabel(const char * label) { m_Label = label; }
+
     void SetEditPos( std::vector<int>::size_type p )
     {
         if ( p >= 0 && p < m_StepListSet.size() )

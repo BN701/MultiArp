@@ -40,7 +40,7 @@ using namespace std;
 extern AlsaSequencer g_Sequencer;
 extern State g_State;
 extern PatternStore g_PatternStore;
-extern Display gDisplay;
+extern Display g_Display;
 extern ListBuilder g_ListBuilder;
 extern TranslateTable * pTranslateTable;
 
@@ -56,6 +56,8 @@ enum command_t
     C_RESET,
     C_SET_RESETONPATTERNCHANGE,
     C_RESET_BEAT,
+
+    C_SET_LABEL,
 
     C_STEPVAL,
     C_QUANTUM,
@@ -137,6 +139,8 @@ unordered_map<string, command_t> gCommandList =
     {"exit", C_EXIT},
     {"quit", C_EXIT},
     {"help", C_HELP},
+
+    {"label", C_SET_LABEL},
 
     {"run", C_RUN},
     {"stop", C_STOP},
@@ -409,6 +413,18 @@ bool do_command(string/*const char * */ commandString)
 
         case C_HALT:
             g_State.SetRunState(false);
+            break;
+
+
+        case C_SET_LABEL:
+            if ( tokens.size() > 1 )
+            {
+                size_t pos = commandString.find(' ') + 1;
+                g_PatternStore.CurrentEditPattern().SetLabel(commandString.substr(pos).c_str());
+            }
+            set_status(STAT_POS_2, "Pattern %i: %s",
+                g_PatternStore.CurrentEditPatternID(),
+                g_PatternStore.CurrentEditPattern().Label(50).c_str());
             break;
 
         case C_CUE  :

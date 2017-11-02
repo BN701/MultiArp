@@ -126,13 +126,13 @@ void queue_next_step(int queueId)
     update_pattern_panel();
     highlight_pattern_panel();  // Moves note highlight.
 
-    set_status_w(STAT_POS_STEP, " Phase%8.2f\n Beat%9.2f\n (Sec%6i:%i)",
-               g_State.Phase(),
+    update_progress_bar();
+    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
+               /*g_State.Phase(),*/
                g_State.Beat(),
                g_Sequencer.ScheduleTimeSeconds(),
                g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 
-    update_progress_bar();
 
     // There may have been a pattern change (especially if chaining is active).
 
@@ -466,6 +466,7 @@ bool key_input_action()
             set_status(STAT_POS_2, "%s", errorMessage.c_str());
         }
         set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+        update_edit_panels();
         update_pattern_panel();
         break;
 
@@ -522,6 +523,7 @@ bool key_input_action()
     case KEY_RIGHT:
         g_PatternStore.RouteKey(g_CursorKeyMap.at(c));
         show_status_after_navigation();
+        update_edit_panels();
         break;
 
     case KEY_BACKSPACE: // 263

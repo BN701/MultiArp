@@ -866,6 +866,11 @@ bool do_command(string/*const char * */ commandString)
         set_status(STAT_POS_2, "%s", s.c_str());
     }
 
+    // Keeping track of all the places I might need to do this
+    // is nearly impossible, so might as well just do it every
+    // time.
+
+    update_edit_panels(true);
     commandString = "";
     return bResult;
 }

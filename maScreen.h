@@ -145,6 +145,7 @@ void show_status_after_navigation();
 void update_progress_bar();
 
 void update_pattern_panel();
+void update_edit_panels(bool refreshList = false);
 void highlight_pattern_panel();
 
 void highlight(int base_row, int base_col, int ofs, int len, int attr, int colour = 0);

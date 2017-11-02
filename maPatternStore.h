@@ -165,6 +165,8 @@ struct PatternStore : public CursorKeys
     std::string EditPatternToString();
     std::string PlayPatternToString();
 
+    std::string PatternSelectionList(int start, int rows);
+
     int PlayPatternListCount();
     int RealTimeListCount();
     std::string RealTimeListToStringForDisplay(int n);
@@ -183,6 +185,8 @@ struct PatternStore : public CursorKeys
     Pattern & CurrentPlayPattern();
     Pattern & CurrentEditPattern();
 
+    int CurrentPosEdit() { return m_PosEdit; }
+    int CurrentPosPlay() { return m_PosPlay; }
     int CurrentEditPatternID() { return m_PosEdit + 1; }
     int CurrentPlayPatternID() { return m_PosPlay + 1; }
 
@@ -331,8 +335,8 @@ struct PatternStore : public CursorKeys
         m_PosPatternChain = -1; // This seems odd, but it's incremented immediately on phase
     }
 
-    void StorePatternPlayData( /*State & state, TranslateTable & table,*/ unsigned char mask = PLAY_DATA_ALL);
-    std::string LoadPatternPlayData( /*State & state, TranslateTable & table,*/ unsigned char mask = PLAY_DATA_ALL );
+    void StorePatternPlayData( unsigned char mask = PLAY_DATA_ALL);
+    std::string LoadPatternPlayData( unsigned char mask = PLAY_DATA_ALL );
     std::string ShowPatternPlayData();
 
     void SetStepValue(double step);

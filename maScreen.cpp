@@ -71,6 +71,8 @@ enum colour_pairs
     CP_PROGRESS_BAR_BKGND,
     CP_SMALL_PANEL_BKGND,
     CP_SMALL_PANEL_2_BKGND,
+    CP_LIST_PANEL_BKGND,
+    CP_SUMMARY_PANEL_BKGND,
     CP_MENU_HIGHLIGHT,
     CP_RUNNING,
     CP_RECORD,
@@ -92,7 +94,7 @@ Display::Display()
     init_color(COLOUR_BRIGHT_GREEN, 0, 750, 0);
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
-    init_color(COLOUR_REDDISH, 900, 300, 200);
+    init_color(COLOUR_REDDISH, 750, 300, 200);
     init_color(COLOUR_BLUE, 250, 750, 900);
     init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
     init_color(COLOUR_GREY, 750, 750, 750);
@@ -103,32 +105,37 @@ Display::Display()
     init_color(COLOUR_BLACK, 0, 0, 0);
 
 	init_pair(CP_MAIN, COLOUR_WHITE, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOUR_BLACK);
 	init_pair(CP_RUNNING, COLOUR_WHITE, COLOUR_GREEN);
 	init_pair(CP_REALTIME, COLOUR_WHITE, COLOUR_RED);
 	init_pair(CP_RECORD, COLOUR_WHITE, COLOUR_YELLOW);
 	init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
+
+	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOUR_BLACK);
 	init_pair(CP_PATTERN_LIST_PANEL_BKGND, COLOR_YELLOW, COLOUR_GREY);
+
+    init_pair(CP_LIST_PANEL_BKGND, COLOUR_GREY, COLOUR_BLACK);
+    init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
     init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOR_BLACK);
-    init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_DARK_GREY, COLOUR_BLACK);
-    init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_GREY, COLOUR_BLACK);
+
+    init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOR_BLACK);
+    init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOR_BLACK);
 
     mvprintw(6, 1, "=> ");
 
     m_SmallPanel = newwin(4, 50, 2, 4);
-    m_ProgressPanel = newwin(3, 15, 2, 61);
+    m_ProgressPanel = newwin(2, 15, 3, 61);
     m_EditListPanel = newwin(4, 20, 8, 4);
-    m_EditSummaryPanel = newwin(4, 51, 8, 25);
+    m_EditSummaryPanel = newwin(4, 52, 8, 24);
     m_BigPanel = newwin(10, 80, 15, 0);
 
     bkgd(COLOR_PAIR(CP_MAIN));
     wbkgd(m_SmallPanel, COLOR_PAIR(CP_SMALL_PANEL_BKGND));
     wbkgd(m_ProgressPanel, COLOR_PAIR(CP_SMALL_PANEL_2_BKGND));
-    wbkgd(m_EditListPanel, COLOR_PAIR(CP_SMALL_PANEL_2_BKGND));
-    wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SMALL_PANEL_2_BKGND));
+    wbkgd(m_EditListPanel, COLOR_PAIR(CP_LIST_PANEL_BKGND));
+    wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
     wbkgd(m_BigPanel, COLOR_PAIR(CP_MAIN));
 }
 
@@ -165,9 +172,10 @@ void set_top_line()
 
 void update_progress_bar()
 {
-    int row = 1;
-    int col = 5;
+    int row = 2;
+    int col = 4;
     double width = 64;
+
 
     double progress, stepWidth;
     g_State.Progress(progress, stepWidth);
@@ -179,7 +187,7 @@ void update_progress_bar()
         len == 1;
 
     int mode = 0;
-    if ( len == 1 )
+    if ( len < 3 )
         mode = 1;
     else if ( len < 9 )
         mode == 2;
@@ -187,8 +195,30 @@ void update_progress_bar()
     if ( n + len > 64 )
         len = width - n;
 
-    string barline(width, '.');
-    string marker(len, '-');
+    char lineFill, markerFill;
+
+    switch ( mode )
+    {
+    case 1:
+        lineFill = '-';
+        markerFill = '>';
+        break;
+    case 2:
+        lineFill = '-';
+        markerFill = '=';
+        break;
+    default:
+        lineFill = ' ';
+        markerFill = '-';
+        break;
+
+    }
+
+    string marker(len, markerFill);
+    string barline(width, lineFill);
+    char buff[10];
+    sprintf(buff, "%7.2f ", g_State.Phase() + 1);
+    barline += buff;
 
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
@@ -198,18 +228,22 @@ void update_progress_bar()
     case 1:
         attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
         mvprintw(row, col, barline.c_str());
-        attron(COLOR_PAIR(CP_MAIN));
-        mvaddch(row, col + n, ACS_RARROW);
+        attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
+//        mvaddch(row, col + n, ACS_RARROW);
+//        mvaddch(row, col + n, '>');
+        mvprintw(row, col + n, marker.c_str());
         break;
     case 2:
         attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
         mvprintw(row, col, barline.c_str());
-        attron(COLOR_PAIR(CP_MAIN));
+        attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
         mvprintw(row, col + n, marker.c_str());
         break;
     default:
-        move(row, col);
-        clrtoeol();
+//        move(row, col);
+//        clrtoeol();
+        attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
+        mvprintw(row, col, barline.c_str());
         attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
         mvprintw(row, col + n, marker.c_str());
         break;
@@ -222,46 +256,56 @@ void update_progress_bar()
 
 }
 
-void update_edit_panels()
+void update_edit_panels(bool refreshList)
 {
-    int scr_x, scr_y;
+    if ( g_PatternStore.Empty() )
+        return;
+
+    // Selection List
+
+    static int listStart = 0;
+    const int rows = 4;
+
+    int selection = g_PatternStore.CurrentPosEdit();
+
+    while ( selection >= listStart + rows )
+        listStart += 1;
+
+    while ( selection < listStart )
+        listStart -= 1;
 
     wmove(g_Display.EditListPanel(), 0, 0);
     wclrtobot(g_Display.EditListPanel());
 
+    wprintw(g_Display.EditListPanel(), g_PatternStore.PatternSelectionList(listStart, rows).c_str());
+    mvwchgat(g_Display.EditListPanel(), selection - listStart, 0, 20, A_BOLD, CP_SUMMARY_PANEL_BKGND, NULL);
+
     wrefresh(g_Display.EditListPanel());
+
+    // Summary Panel
 
     wmove(g_Display.EditSummaryPanel(), 0, 0);
     wclrtobot(g_Display.EditSummaryPanel());
 
-    if ( !g_PatternStore.Empty() )
-    {
-//        wattron(g_Display.EditSummaryPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_3));
+    Pattern & p = g_PatternStore.CurrentEditPattern();
+    wmove(g_Display.EditSummaryPanel(), 0, 1);
+    wprintw(g_Display.EditSummaryPanel(), "Edit %02i, %s", g_PatternStore.CurrentEditPatternID(), p.Label(50).c_str());
 
-        Pattern & p = g_PatternStore.CurrentEditPattern();
-        wmove(g_Display.EditSummaryPanel(), 0, 1);
-        wprintw(g_Display.EditSummaryPanel(), "%02i, %s", g_PatternStore.CurrentEditPatternID(), p.Label(50).c_str());
+    wmove(g_Display.EditSummaryPanel(), 1, 1);
+    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.ListCount(), p.RealTimeListCount());
 
-        wmove(g_Display.EditSummaryPanel(), 1, 1);
-        wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.ListCount(), p.RealTimeListCount());
+    wmove(g_Display.EditSummaryPanel(), 2, 1);
+    wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
+        p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
 
-        wmove(g_Display.EditSummaryPanel(), 2, 1);
-        wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
-            p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
-
-        TranslateTable table = p.PatternTranslateTable();
-        wmove(g_Display.EditSummaryPanel(), 3, 1);
-        wprintw(g_Display.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
-                table.Transpose(),
-                table.DegreeShift(),
-                table.ShiftName(),
-                table.RootName().c_str(),
-                table.ScaleName());
-
-//        wmove(g_Display.EditSummaryPanel(), 4, 0);
-    }
-
-//    wattroff(g_Display.EditSummaryPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+    TranslateTable table = p.PatternTranslateTable();
+    wmove(g_Display.EditSummaryPanel(), 3, 1);
+    wprintw(g_Display.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
+            table.Transpose(),
+            table.DegreeShift(),
+            table.ShiftName(),
+            table.RootName().c_str(),
+            table.ScaleName());
 
     wrefresh(g_Display.EditSummaryPanel());
 }
@@ -272,45 +316,16 @@ void update_pattern_panel()
 {
     int scr_x, scr_y;
 
-    update_edit_panels();
-
     wmove(g_Display.BigPanel(), 0, 0);
     wclrtobot(g_Display.BigPanel());
 
-//    if ( !g_PatternStore.Empty() )
-//    {
-//        wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_3));
-//
-//        Pattern & p = g_PatternStore.CurrentPlayPattern();
-//        wmove(g_Display.BigPanel(), 0, 4);
-//        wprintw(g_Display.BigPanel(), "Play %i, %s", g_PatternStore.CurrentPlayPatternID(), p.Label(50).c_str());
-//
-//        wmove(g_Display.BigPanel(), 1, 4);
-//        wprintw(g_Display.BigPanel(), "Step %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
-//            p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
-//
-//        TranslateTable table = p.PatternTranslateTable();
-//        wmove(g_Display.BigPanel(), 2, 4);
-//        wprintw(g_Display.BigPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
-//                table.Transpose(),
-//                table.DegreeShift(),
-//                table.ShiftName(),
-//                table.RootName().c_str(),
-//                table.ScaleName());
-//
-//        wmove(g_Display.BigPanel(), 4, 0);
-//    }
-//
 	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
 
     g_ListDisplayRows.clear();
 
     for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
     {
-//        getyx(g_Display.BigPanel(), scr_y, scr_x);
-//        g_ListDisplayRows.push_back(scr_y);
         wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
-//        highlight(i, 0, 0, 80, 0, CP_PATTERN_LIST_PANEL_2);
     }
 
     wprintw(g_Display.BigPanel(), "\n");
@@ -321,7 +336,6 @@ void update_pattern_panel()
         getyx(g_Display.BigPanel(), scr_y, scr_x);
         g_ListDisplayRows.push_back(scr_y);
         wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
-//        highlight(scr_y, 0, 0, 80, 0, CP_PATTERN_LIST_PANEL);
     }
 
     wattroff(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
@@ -426,6 +440,7 @@ void show_status_after_navigation()
 
     for ( int i = 0; i < highlights.size(); i++ )
         highlight(STAT_POS_2, highlights.at(i).offset, highlights.at(i).length, A_BOLD, CP_MENU_HIGHLIGHT);
+
 }
 
 void show_translation_map_status()

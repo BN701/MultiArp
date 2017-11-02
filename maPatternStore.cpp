@@ -33,19 +33,21 @@ void PatternStore::SetStatus()
 {
     m_Status.clear();
     m_Highlights.clear();
+    m_FieldPositions.clear();
 
     if ( m_Patterns.empty() )
         return;
 
     char buff[100];
 
-    sprintf(buff, "Editing Pattern %i/%i",
-        m_PosEdit + 1, m_Patterns.size());
+    m_Status = "Editing Pattern ";
+    size_t pos = m_Status.size();
+    sprintf(buff, "%i/%i", m_PosEdit + 1, m_Patterns.size());
     m_Status += buff;
-    m_FieldPositions.emplace_back(16, m_Status.size() - 16);
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
     m_Status += ", Step List ";
-    size_t pos = m_Status.size();
+    pos = m_Status.size();
     if ( !m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
         sprintf(buff, "%i/%i",
@@ -98,7 +100,7 @@ bool PatternStore::HandleKey(key_type_t k)
         switch ( m_PatternStoreFocus )
         {
         case psf_pattern:
-            UpEditPos();
+            DownEditPos();
             break;
         case psf_list:
             DownListPos();
@@ -114,7 +116,7 @@ bool PatternStore::HandleKey(key_type_t k)
         switch ( m_PatternStoreFocus )
         {
         case psf_pattern:
-            DownEditPos();
+            UpEditPos();
             break;
         case psf_list:
             UpListPos();
@@ -467,6 +469,25 @@ string PatternStore::PlayPatternToString()
     if ( m_Patterns.empty() )
         return "";
     return m_Patterns.at(m_PosPlay).ToString("Pattern");
+}
+
+string PatternStore::PatternSelectionList(int start, int rows)
+{
+    string result;
+
+    if ( m_Patterns.empty() )
+        return result;
+
+    for ( size_t pos = start; pos < start + rows && pos < m_Patterns.size(); pos++ )
+    {
+        char buff[50];
+        sprintf(buff, " %02i ", pos + 1);
+        result += buff;
+        result += m_Patterns.at(pos).Label(15);
+        result += '\n';
+    }
+
+    return result;
 }
 
 void PatternStore::UpdatePattern(StepList & noteList)

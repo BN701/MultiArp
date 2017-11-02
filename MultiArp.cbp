@@ -55,6 +55,8 @@
 		<Unit filename="maAlsaSequencer.h" />
 		<Unit filename="maAlsaSequencerQueue.cpp" />
 		<Unit filename="maAlsaSequencerQueue.h" />
+		<Unit filename="maChainLink.cpp" />
+		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
 		<Unit filename="maCommand.h" />
 		<Unit filename="maCursorKeys.cpp" />

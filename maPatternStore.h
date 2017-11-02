@@ -25,6 +25,7 @@
 #include <map>
 #include <memory>
 
+#include "maChainLink.h"
 #include "maCursorKeys.h"
 #include "maFeelMap.h"
 #include "maNotes.h"
@@ -48,13 +49,13 @@ struct PatternStore : public CursorKeys
     int m_PatternChainMode;
     bool m_ResetOnPatternChange;
     bool m_PhaseIsZero;
-    bool m_EditFocusFollowsPlay;
+    bool m_EditPosFollowsPlay;
     bool m_NewPatternPending;
     int m_NewPattern;
     bool m_PatternChanged;
     bool m_UsePatternPlayData;
 
-    std::vector<int> m_PatternChain;
+    std::vector<ChainLink> m_PatternChain;
 
     std::vector<Pattern> m_Patterns;
     std::vector<Pattern> m_Deleted;
@@ -68,7 +69,7 @@ struct PatternStore : public CursorKeys
         m_PatternChainMode(PC_MODE_NONE),
         m_ResetOnPatternChange(true),
         m_PhaseIsZero(false),
-        m_EditFocusFollowsPlay(true),
+        m_EditPosFollowsPlay(true),
         m_NewPatternPending(false),
         m_NewPattern(-1),
         m_PatternChanged(false),
@@ -110,14 +111,14 @@ struct PatternStore : public CursorKeys
 
     void SetEditFocusFollowsPlay(bool bVal)
     {
-        m_EditFocusFollowsPlay = bVal;
-        if ( m_EditFocusFollowsPlay )
+        m_EditPosFollowsPlay = bVal;
+        if ( m_EditPosFollowsPlay )
             m_PosEdit = m_PosPlay;
     }
 
     bool EditFocusFollowsPlay()
     {
-        return m_EditFocusFollowsPlay;
+        return m_EditPosFollowsPlay;
     }
 
     void SetResetOnPatternChange(bool bVal)
@@ -178,6 +179,7 @@ struct PatternStore : public CursorKeys
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
     void SetFieldsFromString(std::string s);
     bool LoadFromString(std::string s, int & created, int & updates);
+    void UpdatePatternChainFromSimpleString(std::string s); // Old style, from chain command, no support for jumps.
     void UpdatePatternChainFromString(std::string s);
 
     StepList & CurrentEditStepList();
@@ -193,9 +195,11 @@ struct PatternStore : public CursorKeys
     int AddEmptyPattern()
     {
         m_Patterns.push_back(m_DefaultPattern);
-        m_Patterns.at(m_Patterns.size() - 1).NewList();
+        m_Patterns.back().NewList();
+        m_Patterns.back().SetLabel("New");
 
-        if ( m_EditFocusFollowsPlay )
+
+        if ( m_EditPosFollowsPlay )
             return m_Patterns.size() - 1;
         else
             return m_PosEdit = m_Patterns.size() - 1;
@@ -206,7 +210,9 @@ struct PatternStore : public CursorKeys
     {
         m_Patterns.push_back(m_Patterns.at(m_PosEdit));
         m_Patterns.back().ResetPosition();
-        if ( m_EditFocusFollowsPlay )
+        m_Patterns.back().SetLabel((m_Patterns.back().Label() + ", copy").c_str());
+
+        if ( m_EditPosFollowsPlay )
             return m_Patterns.size() - 1;
         else
             return m_PosEdit = m_Patterns.size() - 1;
@@ -274,7 +280,7 @@ struct PatternStore : public CursorKeys
         m_Patterns.push_back(m_Deleted.back());
         m_Deleted.pop_back();
 
-        if ( !m_EditFocusFollowsPlay )
+        if ( !m_EditPosFollowsPlay )
             m_PosEdit = m_Patterns.size() - 1;
     }
 
@@ -291,7 +297,7 @@ struct PatternStore : public CursorKeys
         if ( p >= 0 && p < m_Patterns.size() )
         {
             m_PosPlay = p;
-            if ( m_EditFocusFollowsPlay && m_PatternChainMode == PC_MODE_NONE )
+            if ( m_EditPosFollowsPlay /*&& m_PatternChainMode == PC_MODE_NONE*/ )
                 m_PosEdit = m_PosPlay;
             m_PatternChanged = true; // Cleared again at the start of Step() ..
         }
@@ -306,7 +312,7 @@ struct PatternStore : public CursorKeys
         if ( p >= 0 && p < m_Patterns.size() )
         {
             m_PosEdit = p;
-            m_EditFocusFollowsPlay = false;
+            m_EditPosFollowsPlay = false;
         }
     }
 
@@ -332,7 +338,7 @@ struct PatternStore : public CursorKeys
     {
         for ( std::vector<Pattern>::iterator i = m_Patterns.begin(); i != m_Patterns.end(); i++ )
             (*i).ResetPosition();
-        m_PosPatternChain = -1; // This seems odd, but it's incremented immediately on phase
+        m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
     }
 
     void StorePatternPlayData( unsigned char mask = PLAY_DATA_ALL);

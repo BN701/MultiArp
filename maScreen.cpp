@@ -288,24 +288,30 @@ void update_edit_panels(bool refreshList)
     wclrtobot(g_Display.EditSummaryPanel());
 
     Pattern & p = g_PatternStore.CurrentEditPattern();
-    wmove(g_Display.EditSummaryPanel(), 0, 1);
-    wprintw(g_Display.EditSummaryPanel(), "Edit %02i, %s", g_PatternStore.CurrentEditPatternID(), p.Label(50).c_str());
+//    wmove(g_Display.EditSummaryPanel(), 0, 1);
+//    wprintw(g_Display.EditSummaryPanel(), "Edit %02i, %s", g_PatternStore.CurrentEditPatternID(), p.Label(50).c_str());
 
-    wmove(g_Display.EditSummaryPanel(), 1, 1);
+    wmove(g_Display.EditSummaryPanel(), 0, 1);
     wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.ListCount(), p.RealTimeListCount());
 
-    wmove(g_Display.EditSummaryPanel(), 2, 1);
+    wmove(g_Display.EditSummaryPanel(), 1, 1);
     wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
         p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
 
     TranslateTable table = p.PatternTranslateTable();
-    wmove(g_Display.EditSummaryPanel(), 3, 1);
+
+    wmove(g_Display.EditSummaryPanel(), 2, 1);
     wprintw(g_Display.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
             table.Transpose(),
             table.DegreeShift(),
             table.ShiftName(),
             table.RootName().c_str(),
             table.ScaleName());
+
+    wmove(g_Display.EditSummaryPanel(), 3, 1);
+    wprintw(g_Display.EditSummaryPanel(), "Premap %s, Accidentals %s",
+            table.PremapModeName(),
+            table.AccidentalsModeName());
 
     wrefresh(g_Display.EditSummaryPanel());
 }

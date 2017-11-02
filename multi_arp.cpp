@@ -121,6 +121,7 @@ void queue_next_step(int queueId)
     {
 //        update_pattern_panel();
         set_top_line();
+        update_edit_panels();
     }
 
     update_pattern_panel();

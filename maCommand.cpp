@@ -725,17 +725,17 @@ bool do_command(string/*const char * */ commandString)
 
         case C_PATTERN_CHAIN :
             if ( tokens.size() < 2 )
-                throw string("Hint: chain off|natural|quantum|show");
-            if ( tokens[1] == "off")
+                set_status(STAT_POS_2, "%s", g_PatternStore.PatternChainToString().c_str());
+            else if ( tokens[1] == "off")
                 g_PatternStore.SetPatternChainMode(PC_MODE_NONE);
             else if ( tokens[1] == "n" || tokens[1] == "natural" )
                 g_PatternStore.SetPatternChainMode(PC_MODE_NATURAL);
             else if ( tokens[1] == "q" || tokens[1] == "quantum" )
                 g_PatternStore.SetPatternChainMode(PC_MODE_FORCED);
-            else if (tokens[1] == "show")
-                set_status(STAT_POS_2, "%s", g_PatternStore.PatternChainToString().c_str());
+            else if (tokens[1] == "help")
+                set_status(STAT_POS_2, "chain off|natural|quantum|show");
             else
-                g_PatternStore.UpdatePatternChainFromString(commandString);
+                g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
             break;
 
         case C_LOAD:

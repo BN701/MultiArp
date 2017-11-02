@@ -133,6 +133,7 @@ struct Pattern
         return m_Label.empty();
     }
 
+    std::string Label() { return m_Label; }
     std::string Label(size_t width);
     std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
     std::string ListToString(std::vector<int>::size_type n);

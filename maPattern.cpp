@@ -371,9 +371,9 @@ string Pattern::Label(size_t width)
         width = 80;
 
     if ( m_Label.size() > width - 2 )                    // Allow for quotes.
-        sprintf(format, "\'%%.%is...\'", width - 5);    // Allow for quotes and ellipsis.
+        sprintf(format, "%%.%is...", width - 5);    // Allow for quotes and ellipsis.
     else
-        strcpy(format, "\'%s\'");
+        strcpy(format, "%s");
 
     sprintf(buf, format, m_Label.c_str());
 

@@ -76,9 +76,7 @@ void AlsaSequencer::SetScheduleTime(uint64_t t)
 
 bool AlsaSequencer::ScheduleNote(int queueId, int note, int vel, int len)
 {
-
     snd_seq_event_t ev;
-
 
     // Macro: fills event record with NULLS
     snd_seq_ev_clear(&ev);

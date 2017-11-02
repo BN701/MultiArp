@@ -327,37 +327,56 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
 
     if ( m_PatternChainMode != PC_MODE_NONE && ! m_PatternChain.empty() )
     {
-
+        bool changePattern = false;
         switch ( m_PatternChainMode )
         {
             case PC_MODE_NATURAL :
                 if ( m_Patterns.at(m_PosPlay).AllListsComplete() )
                 {
-                    m_PosPatternChain++;
-                    m_PatternChanged = true;
+//                    m_PosPatternChain++;
+                    changePattern = true;
                 }
                 break;
 
             case PC_MODE_FORCED :
                 if ( m_PhaseIsZero )
                 {
-                    m_PosPatternChain++;
-                    m_PatternChanged = true;
+//                    m_PosPatternChain++;
+                    changePattern = true;
                 }
                 break;
         }
 
-        if ( m_PatternChanged )
+        if ( changePattern && m_PatternChain.at(m_PosPatternChain).RepeatsRemaining() == 0 )
         {
-            // Check the chain index for wraps.
+            int next = m_PatternChain.at(m_PosPatternChain).Next();
 
-            if ( m_PosPatternChain >= m_PatternChain.size() )
-                m_PosPatternChain = 0;
+            if ( next >= 0 )
+            {
+                m_PosPatternChain = next;
+            }
+            else
+            {
+                // Increment chain index and check for wraps.
+
+                m_PosPatternChain += 1;
+
+                if ( m_PosPatternChain >= m_PatternChain.size() )
+                    m_PosPatternChain = 0;
+            }
 
             // Don't change play pointer if new pattern out of range.
 
-            if ( m_PatternChain.at(m_PosPatternChain) < m_Patterns.size() )
-                m_PosPlay = m_PatternChain.at(m_PosPatternChain);
+            int pos = m_PatternChain.at(m_PosPatternChain).Pattern();
+
+            if ( pos < m_Patterns.size() )
+            {
+                m_PosPlay = pos;
+                if ( m_EditPosFollowsPlay )
+                    m_PosEdit = m_PosPlay;
+            }
+
+            m_PatternChanged = true;
 
             if ( m_ResetOnPatternChange )
                 m_Patterns.at(m_PosPlay).ResetPosition();
@@ -367,6 +386,47 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
     m_PhaseIsZero = false;
 
     m_Patterns.at(m_PosPlay).Step(cluster, phase, stepValue);
+}
+
+void PatternStore::UpdatePatternChainFromSimpleString(string s)
+{
+    // Scan past first token, which should be 'chain', though we don't check.
+
+    vector<string> tokens = split(s.c_str(), ' ');
+
+    if ( tokens.size() == 1 )
+        throw string("Pattern Chain parse error: nothing entered.");
+
+    m_PatternChain.clear();
+
+    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
+    {
+        try
+        {
+            size_t pos;
+            int pattern = stoi(*it, &pos) - 1;
+
+            if ( pattern < 0 )
+                continue;
+
+            int repeats = 1;
+            if ( pos < (*it).size() )
+            {
+                pos = (*it).find('x');
+                if ( pos != string::npos )
+                    repeats = stoi((*it).substr(pos + 1));
+            }
+
+            m_PatternChain.emplace_back();
+            m_PatternChain.back().SetPattern(pattern);
+            m_PatternChain.back().SetRepeats(repeats - 1);
+        }
+        catch ( invalid_argument )
+        {
+            // Do nothing and carry on with next token.
+        }
+
+    }
 }
 
 void PatternStore::UpdatePatternChainFromString(string s)
@@ -384,22 +444,8 @@ void PatternStore::UpdatePatternChainFromString(string s)
     {
         try
         {
-            size_t pos;
-            int patternNo = stoi(*it, &pos) - 1;
-
-            if ( patternNo < 0 )
-                continue;
-
-            int repeats = 1;
-            if ( pos < (*it).size() )
-            {
-                pos = (*it).find('x');
-                if ( pos != string::npos )
-                    repeats = stoi((*it).substr(pos + 1));
-            }
-
-            for ( int i = 0; i < repeats; i++ )
-                m_PatternChain.push_back(patternNo);
+            m_PatternChain.emplace_back();
+            m_PatternChain.back().FromString(*it);
         }
         catch ( invalid_argument )
         {
@@ -414,47 +460,55 @@ string PatternStore::PatternChainToString()
     if ( m_PatternChain.empty() )
         return "Chain empty.";
 
-    string result = "Chain ";
+    string result = "Chain";
 
-    vector<int>::iterator it = m_PatternChain.begin();
-
-    int lastValue = *it;
-    int repeats = 0;
-
-    char buf[20];
-    int value = 0;
-
-    do
+    for ( vector<ChainLink>::iterator it = m_PatternChain.begin(); it != m_PatternChain.end(); it++ )
     {
-        value = (*it);
-
-        if ( value != lastValue )
-        {
-            char buf[20];
-            if ( repeats > 1 )
-                sprintf(buf, "%ix%i", lastValue + 1, repeats);
-            else
-                sprintf(buf, "%i", lastValue + 1);
-
-            result += buf;
-            result += ", ";
-
-            repeats = 1;
-            lastValue = value;
-        }
-        else
-            repeats += 1;
-
-    } while ( ++it < m_PatternChain.end() );
-
-    if ( repeats > 1 )
-        sprintf(buf, "%ix%i", value + 1, repeats);
-    else
-        sprintf(buf, "%i", value + 1);
-
-    result += buf;
+        result += ' ';
+        result += (*it).ToString();
+    }
 
     return result;
+
+//    vector<ChainLink>::iterator it = m_PatternChain.begin();
+//
+//    int lastValue = *it;
+//    int repeats = 0;
+//
+//    char buf[20];
+//    int value = 0;
+//
+//    do
+//    {
+//        value = (*it);
+//
+//        if ( value != lastValue )
+//        {
+//            char buf[20];
+//            if ( repeats > 1 )
+//                sprintf(buf, "%ix%i", lastValue + 1, repeats);
+//            else
+//                sprintf(buf, "%i", lastValue + 1);
+//
+//            result += buf;
+//            result += ", ";
+//
+//            repeats = 1;
+//            lastValue = value;
+//        }
+//        else
+//            repeats += 1;
+//
+//    } while ( ++it < m_PatternChain.end() );
+//
+//    if ( repeats > 1 )
+//        sprintf(buf, "%ix%i", value + 1, repeats);
+//    else
+//        sprintf(buf, "%i", value + 1);
+//
+//    result += buf;
+//
+//    return result;
 }
 
 string PatternStore::EditPatternToString()
@@ -535,7 +589,7 @@ string PatternStore::ToString()
     sprintf(buff, "Store %s %i\nStore %s %s\nStore %s %s\n\n",
                 ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChainMode),
                 ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "ON" : "OFF",
-                ps_element_names.at(ps_name_edit_focus_follows_play), m_EditFocusFollowsPlay ? "ON" : "OFF"
+                ps_element_names.at(ps_name_edit_focus_follows_play), m_EditPosFollowsPlay ? "ON" : "OFF"
             );
 
     result += buff;
@@ -577,7 +631,7 @@ void PatternStore::SetFieldsFromString(string s)
                 m_ResetOnPatternChange = token == "ON";
                 break;
             case ps_name_edit_focus_follows_play:
-                m_EditFocusFollowsPlay = token == "ON";
+                m_EditPosFollowsPlay = token == "ON";
                 break;
             default:
                 break;

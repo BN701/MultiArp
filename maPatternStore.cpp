@@ -239,6 +239,34 @@ bool PatternStore::PlayPositionInfo(int & listIndex, int & offset, int & length)
     return m_Patterns.at(m_PosPlay).PlayPositionInfo(listIndex, offset, length);
 }
 
+string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
+{
+    if ( m_Patterns.empty() )
+        return "No patterns loaded.\n";
+
+    string result;
+
+    for ( int row = firstRow; row < firstRow + rows; row++ )
+    {
+        if ( ! result.empty() )
+            result +=  '\n';
+
+        char buff[20];
+        sprintf(buff, "%02i - ", 4 * row + 1);
+        result += buff;
+
+        for ( int i = 0; i < 4; i++ )
+        {
+            int pos = 4 * row + i;
+            if ( pos >= m_PatternChain.size() )
+                break;
+            result += m_PatternChain.at(pos).ToStringForDisplay();
+        }
+    }
+
+    return result;
+}
+
 string PatternStore::PatternStatus()
 {
     string result;
@@ -347,9 +375,9 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
                 break;
         }
 
-        if ( changePattern && m_PatternChain.at(m_PosPatternChain).RepeatsRemaining() == 0 )
+        if ( changePattern && m_PatternChain.at(m_PosPatternChain).Remaining() == 0 )
         {
-            int next = m_PatternChain.at(m_PosPatternChain).Next();
+            int next = m_PatternChain.at(m_PosPatternChain).Jump();
 
             if ( next >= 0 )
             {

@@ -137,7 +137,7 @@ void queue_next_step(int queueId)
 
     // There may have been a pattern change (especially if chaining is active).
 
-    set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+    update_pattern_status_panel();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 

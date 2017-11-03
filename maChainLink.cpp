@@ -32,7 +32,7 @@ ChainLink::~ChainLink()
     //dtor
 }
 
-int ChainLink::RepeatsRemaining()
+int ChainLink::Remaining()
 {
     // This bit makes us loop indefinitely.
 
@@ -41,17 +41,57 @@ int ChainLink::RepeatsRemaining()
 
     // Initialize remaining loop count.
 
-    if ( m_RepeatsRemaining == -1 )
-        m_RepeatsRemaining = m_Repeats;
+    if ( m_Remaining == -1 )
+        m_Remaining = m_Repeats;
 
-    return m_RepeatsRemaining--;
+    return m_Remaining--;
 }
+
+string ChainLink::ToStringForDisplay(int width)
+{
+    string result;
+
+    char buff[50];
+
+    sprintf(buff, "%02i", m_Pattern + 1);
+    result += buff;
+
+    if ( m_Remaining >= 0 )
+    {
+        sprintf(buff, " x%02i", m_Remaining + 1);
+        result += buff;
+    }
+    else if ( m_Repeats > 0 )
+    {
+        sprintf(buff, " x%02i", m_Repeats + 1);
+        result += buff;
+    }
+
+    if ( m_Jump >= 0 )
+    {
+        sprintf(buff, " >%02i", m_Jump + 1);
+        result += buff;
+    }
+
+    bool odd = true;
+    while ( result.size() < width )
+    {
+        if ( odd )
+            result.insert(0, 1, ' ');
+        else
+            result += ' ';
+        odd = !odd;
+    }
+
+    return result;
+}
+
 
 string ChainLink::ToString()
 {
     char buff[50];
 
-    sprintf(buff, "%i/%i/%i", m_Pattern, m_Repeats, m_Next);
+    sprintf(buff, "%i/%i/%i", m_Pattern, m_Repeats, m_Jump);
 
     return buff;
 }
@@ -65,5 +105,5 @@ void ChainLink::FromString(string & s)
 
     m_Pattern = stoi(tokens.at(0));
     m_Repeats = stoi(tokens.at(1));
-    m_Next = stoi(tokens.at(2));
+    m_Jump = stoi(tokens.at(2));
 }

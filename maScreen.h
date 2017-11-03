@@ -135,6 +135,7 @@ void set_status_w(WINDOW * w, int y, int x, const char *format, Args ... args)
     refresh();
 }
 
+void highlight_pattern_panel();
 
 void set_top_line();
 void show_status();
@@ -142,11 +143,11 @@ void show_translation_status();
 void show_translation_map_status();
 void show_listbuilder_status();
 void show_status_after_navigation();
-void update_progress_bar();
 
-void update_pattern_panel();
 void update_edit_panels(bool refreshList = false);
-void highlight_pattern_panel();
+void update_pattern_panel();
+void update_pattern_status_panel();
+void update_progress_bar();
 
 void highlight(int base_row, int base_col, int ofs, int len, int attr, int colour = 0);
 

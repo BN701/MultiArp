@@ -131,6 +131,9 @@ struct PatternStore : public CursorKeys
         m_PatternChainMode = bVal;
     }
 
+    int PatternChainMode() { return m_PatternChainMode; }
+    int CurrentPosPatternChain() { return m_PosPatternChain; }
+
     bool EditPatternIsPlayPattern()
     {
         return m_PosEdit == m_PosPlay;
@@ -175,6 +178,8 @@ struct PatternStore : public CursorKeys
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
+    std::string PatternChainToStringForDisplay(int firstRow, int rows);
+
     void UpdatePattern(StepList & noteList);
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
     void SetFieldsFromString(std::string s);

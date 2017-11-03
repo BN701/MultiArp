@@ -141,6 +141,8 @@ unordered_map<string, command_t> gCommandList =
     {"help", C_HELP},
 
     {"label", C_SET_LABEL},
+    {"name", C_SET_LABEL},
+    {"n", C_SET_LABEL},
 
     {"run", C_RUN},
     {"stop", C_STOP},

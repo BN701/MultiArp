@@ -14,13 +14,13 @@ Real Time List 1  Loop 0.001 Quantum 0.000 Multiplier 1.000 Window 'on', \
 << Global >>
 
 Midi Channel 1
-Link Quantum 16.00
+Link Quantum 4.00
 
 << Pattern Store >>
 
-Chain 0/1/-1 1/3/-1 2/3/-1 1/0/-1
+Chain 0/1/2 1/0/3 2/3/1 4/6/-1
 
-Store Pattern Chain Mode 0
+Store Pattern Chain Mode 2
 Store Reset on pattern change ON
 Store Edit focus follows play OFF
 
@@ -34,16 +34,15 @@ Default Feel Map
 
 << Pattern 1 >>
 
-Pattern Label "New"
+Pattern Label "Eric"
 Step Value 16.00 Gate 0.50 Hold OFF Vel 64
 Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
 Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
 Pattern Feel Map
-Step List 1
 
 << Pattern 2 >>
 
-Pattern Label "New, copy"
+Pattern Label "New"
 Step Value 16.00 Gate 0.50 Hold OFF Vel 64
 Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
 Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
@@ -52,13 +51,9 @@ Step List 1
 
 << Pattern 3 >>
 
-Pattern Label "New, copy, copy"
+Pattern Label "George"
 Step Value 16.00 Gate 0.50 Hold OFF Vel 64
 Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
 Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
 Pattern Feel Map
-Step List 1
-
-
-
 

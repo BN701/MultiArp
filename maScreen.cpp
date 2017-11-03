@@ -71,6 +71,7 @@ enum colour_pairs
     CP_PROGRESS_BAR_BKGND,
     CP_SMALL_PANEL_BKGND,
     CP_SMALL_PANEL_2_BKGND,
+    CP_PATTERN_CHAIN_HIGHLIGHT,
     CP_LIST_PANEL_BKGND,
     CP_SUMMARY_PANEL_BKGND,
     CP_MENU_HIGHLIGHT,
@@ -119,13 +120,14 @@ Display::Display()
     init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
     init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOR_BLACK);
+    init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOUR_WHITE, COLOUR_GREEN);
 
     init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOR_BLACK);
 
     mvprintw(6, 1, "=> ");
 
-    m_SmallPanel = newwin(4, 50, 2, 4);
+    m_SmallPanel = newwin(4, 56, 2, 4);
     m_ProgressPanel = newwin(2, 15, 3, 61);
     m_EditListPanel = newwin(4, 20, 8, 4);
     m_EditSummaryPanel = newwin(4, 52, 8, 24);
@@ -256,10 +258,48 @@ void update_progress_bar()
 
 }
 
+void update_pattern_status_panel()
+{
+    if ( g_PatternStore.PatternChainMode() == PC_MODE_NONE )
+    {
+        set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+        return;
+    }
+
+    static int firstRow = 0;
+    const int rows = 2;
+
+    int selection = g_PatternStore.CurrentPosPatternChain();
+
+    while ( selection >= 4 * firstRow )
+        firstRow += 4;
+
+    while ( selection < 4 * firstRow )
+        firstRow -= 4;
+
+    int scr_x, scr_y;
+    getyx(stdscr, scr_y, scr_x);
+
+    mvwprintw(g_Display.SmallPanel(), 1, 0, g_PatternStore.PatternChainToStringForDisplay(firstRow, rows).c_str());
+    mvwchgat(g_Display.SmallPanel(), 1, 5 + 12 * (selection % 4), 12, 0, CP_PATTERN_CHAIN_HIGHLIGHT, NULL);
+
+    wrefresh(g_Display.SmallPanel());
+    move(scr_y, scr_x);
+    refresh();
+}
+
 void update_edit_panels(bool refreshList)
 {
     if ( g_PatternStore.Empty() )
+    {
+        wmove(g_Display.EditListPanel(), 0, 0);
+        wclrtobot(g_Display.EditListPanel());
+        wrefresh(g_Display.EditListPanel());
+        wmove(g_Display.EditSummaryPanel(), 0, 0);
+        wclrtobot(g_Display.EditSummaryPanel());
+        wrefresh(g_Display.EditSummaryPanel());
         return;
+    }
 
     // Selection List
 
@@ -278,7 +318,7 @@ void update_edit_panels(bool refreshList)
     wclrtobot(g_Display.EditListPanel());
 
     wprintw(g_Display.EditListPanel(), g_PatternStore.PatternSelectionList(listStart, rows).c_str());
-    mvwchgat(g_Display.EditListPanel(), selection - listStart, 0, 20, A_BOLD, CP_SUMMARY_PANEL_BKGND, NULL);
+    mvwchgat(g_Display.EditListPanel(), selection - listStart, 0, 20, 0, CP_SUMMARY_PANEL_BKGND, NULL);
 
     wrefresh(g_Display.EditListPanel());
 

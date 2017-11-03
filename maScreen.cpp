@@ -91,7 +91,7 @@ Display::Display()
 
     start_color();
 
-    init_color(COLOUR_GREEN, 0, 750, 0);
+    init_color(COLOUR_GREEN, 0, 400, 0);
     init_color(COLOUR_BRIGHT_GREEN, 0, 750, 0);
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
@@ -106,7 +106,7 @@ Display::Display()
     init_color(COLOUR_BLACK, 0, 0, 0);
 
 	init_pair(CP_MAIN, COLOUR_WHITE, COLOUR_BLACK);
-	init_pair(CP_RUNNING, COLOUR_WHITE, COLOUR_GREEN);
+	init_pair(CP_RUNNING, COLOUR_WHITE, COLOUR_BRIGHT_GREEN);
 	init_pair(CP_REALTIME, COLOUR_WHITE, COLOUR_RED);
 	init_pair(CP_RECORD, COLOUR_WHITE, COLOUR_YELLOW);
 	init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
@@ -120,7 +120,7 @@ Display::Display()
     init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
     init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOR_BLACK);
-    init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOUR_WHITE, COLOUR_GREEN);
+    init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOR_YELLOW, COLOUR_GREEN);
 
     init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOR_BLACK);
@@ -260,7 +260,14 @@ void update_progress_bar()
 
 void update_pattern_status_panel()
 {
-    if ( g_PatternStore.PatternChainMode() == PC_MODE_NONE )
+    wmove(g_Display.SmallPanel(), 1, 0);
+    wclrtoeol(g_Display.SmallPanel());
+    wmove(g_Display.SmallPanel(), 2, 0);
+    wclrtoeol(g_Display.SmallPanel());
+
+    if ( g_PatternStore.PatternChainMode() == PC_MODE_NONE ||
+         g_PatternStore.Empty() ||
+         g_PatternStore.PatternChainEmpty() )
     {
         set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
         return;
@@ -271,17 +278,19 @@ void update_pattern_status_panel()
 
     int selection = g_PatternStore.CurrentPosPatternChain();
 
-    while ( selection >= 4 * firstRow )
-        firstRow += 4;
+    while ( selection >= 4 * (firstRow + rows) )
+        firstRow += 1;
 
     while ( selection < 4 * firstRow )
-        firstRow -= 4;
+        firstRow -= 1;
+
+    int rowSelect = selection/4 - firstRow;
 
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
 
     mvwprintw(g_Display.SmallPanel(), 1, 0, g_PatternStore.PatternChainToStringForDisplay(firstRow, rows).c_str());
-    mvwchgat(g_Display.SmallPanel(), 1, 5 + 12 * (selection % 4), 12, 0, CP_PATTERN_CHAIN_HIGHLIGHT, NULL);
+    mvwchgat(g_Display.SmallPanel(), 1 + rowSelect, 5 + 12 * (selection % 4), 12, 0, CP_PATTERN_CHAIN_HIGHLIGHT, NULL);
 
     wrefresh(g_Display.SmallPanel());
     move(scr_y, scr_x);

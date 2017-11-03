@@ -248,6 +248,9 @@ string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
 
     for ( int row = firstRow; row < firstRow + rows; row++ )
     {
+        if ( 4 * row >= m_PatternChain.size() )
+            break;
+
         if ( ! result.empty() )
             result +=  '\n';
 
@@ -467,6 +470,7 @@ void PatternStore::UpdatePatternChainFromString(string s)
         throw string("Pattern Chain parse error: nothing entered.");
 
     m_PatternChain.clear();
+    m_PosPatternChain = 0;
 
     for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
     {

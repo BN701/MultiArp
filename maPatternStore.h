@@ -80,6 +80,7 @@ struct PatternStore : public CursorKeys
     };
 
     bool Empty() { return m_Patterns.empty(); }
+    bool PatternChainEmpty() { return m_PatternChain.empty(); }
     std::string ToString();
     void FromString(const char * s);
 

@@ -121,6 +121,7 @@ void queue_next_step(int queueId)
     {
 //        update_pattern_panel();
         set_top_line();
+        update_pattern_status_panel();
         update_edit_panels();
     }
 
@@ -135,9 +136,9 @@ void queue_next_step(int queueId)
                g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 
 
-    // There may have been a pattern change (especially if chaining is active).
-
-    update_pattern_status_panel();
+//    // There may have been a pattern change (especially if chaining is active).
+//
+//    update_pattern_status_panel();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 

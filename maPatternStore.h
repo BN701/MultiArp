@@ -368,6 +368,8 @@ struct PatternStore : public CursorKeys
     FeelMap & FeelMapForEdit(bool setFocus = true);
     FeelMap & FeelMapForPlay();
 
+    PatternChain & PatternChainForEdit() { return m_PatternChain; }
+
     void SetUsePatternPlayData( bool val );
     bool UsePatternPlayData() { return m_UsePatternPlayData; }
 

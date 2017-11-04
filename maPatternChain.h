@@ -43,7 +43,17 @@ class PatternChain : public CursorKeys
         void FromString(std::string s);
         void FromSimpleString(std::string s);
 
+        void SetStatus();
+        virtual void SetFocus()
+        {
+            CursorKeys::SetFocus();
+            // SetStatus();
+        }
+
     protected:
+        virtual bool HandleKey(key_type_t k);
+
+        std::vector<ChainLink>::size_type m_PosEdit = 0;
 
     private:
 

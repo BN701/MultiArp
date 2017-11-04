@@ -107,3 +107,64 @@ void ChainLink::FromString(string & s)
     m_Repeats = stoi(tokens.at(1));
     m_Jump = stoi(tokens.at(2));
 }
+
+void ChainLink::SetStatus()
+{
+    int pos = 0;
+    char buff[50];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    sprintf(buff, "Chain Slot %02i - ", m_ID);
+    m_Status = buff;
+
+    m_Status += "Pattern ";
+    pos = m_Status.size();
+    sprintf(buff, "%i", m_Pattern + 1);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+
+    m_Status += ", Play x ";
+    pos = m_Status.size();
+    sprintf(buff, "%i", m_Repeats + 1);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+
+    m_Status += ", Jump ";
+    pos = m_Status.size();
+    sprintf(buff, "%i", m_Jump + 1);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+
+    m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+}
+
+bool ChainLink::HandleKey(key_type_t k)
+{
+
+    switch ( k )
+    {
+    case back_space:
+        m_ReturnFocus->SetFocus();
+        break;
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+    case right:
+        if ( m_PosEdit < 2 )
+            m_PosEdit += 1;
+        break;
+    case up:
+    case down:
+        break;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+

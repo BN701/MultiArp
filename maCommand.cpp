@@ -42,7 +42,7 @@ extern State g_State;
 extern PatternStore g_PatternStore;
 extern Display g_Display;
 extern ListBuilder g_ListBuilder;
-extern TranslateTable * pTranslateTable;
+//extern TranslateTable * pTranslateTable;
 
 enum command_t
 {
@@ -727,7 +727,12 @@ bool do_command(string/*const char * */ commandString)
 
         case C_PATTERN_CHAIN :
             if ( tokens.size() < 2 )
-                set_status(STAT_POS_2, "%s", g_PatternStore.PatternChainToString().c_str());
+            {
+                g_PatternStore.PatternChainForEdit().SetStatus();
+                g_PatternStore.PatternChainForEdit().SetFocus();
+                show_status_after_navigation();
+            }
+//                set_status(STAT_POS_2, "%s", g_PatternStore.PatternChainToString().c_str());
             else if ( tokens[1] == "off")
                 g_PatternStore.SetPatternChainMode(PC_MODE_NONE);
             else if ( tokens[1] == "n" || tokens[1] == "natural" )

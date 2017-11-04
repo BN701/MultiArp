@@ -146,10 +146,15 @@ struct StepList
         m_Clusters.push_back(chord);
     }
 
-    void DeleteLast()
+    bool DeleteLast()
     {
         if ( !m_Clusters.empty() )
+        {
             m_Clusters.pop_back();
+            return true;
+        }
+        else
+            return false;
     }
 
     // True if mpos is zero after completing a cycle.

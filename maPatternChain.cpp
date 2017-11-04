@@ -151,4 +151,62 @@ string PatternChain::ToString()
 
 }
 
+void PatternChain::SetStatus()
+{
+    char buff[20];
+
+    m_Status = "Chain -";
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    int pos = 0;
+
+    for ( int i = 0; i < m_Chain.size(); i++ )
+    {
+        pos = m_Status.size();
+        sprintf(buff, " %i:", i + 1);
+        m_Status += buff;
+        m_Status += m_Chain.at(i).ToStringForDisplay(1);
+        m_FieldPositions.emplace_back(pos + 1, m_Status.size() - pos - 1);
+    }
+
+    if ( ! m_Chain.empty() )
+        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+}
+
+bool PatternChain::HandleKey(key_type_t k)
+{
+
+    switch ( k )
+    {
+    case enter:
+        if ( m_PosEdit < m_Chain.size() - 1 )
+        {
+            ChainLink & link = m_Chain.at(m_PosEdit);
+            link.SetID(m_PosEdit + 1);
+            link.SetFocus();
+            link.SetStatus();
+            link.SetReturnFocus(this);
+        }
+        break;
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+    case right:
+        if ( m_PosEdit < m_Chain.size() - 1 )
+            m_PosEdit += 1;
+        break;
+    case up:
+    case down:
+        break;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+
 

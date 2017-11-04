@@ -55,9 +55,10 @@ chrono::microseconds g_LinkStartTime(-1);
 
 // Global instances.
 
-AlsaSequencer g_Sequencer;
+CursorKeys g_CursorKeys;
 ListBuilder g_ListBuilder(g_Link);
 PatternStore g_PatternStore;
+AlsaSequencer g_Sequencer;
 State g_State;
 
 
@@ -472,7 +473,7 @@ bool key_input_action()
         update_pattern_panel();
         break;
 
-    case 10: // Enter (Ctl-J *and* Ctl-M will fire this one.)
+    case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
         if ( !commandString.empty() )
         {
             result = do_command(commandString/*.c_str()*/);
@@ -487,6 +488,10 @@ bool key_input_action()
             g_ListBuilder.Clear();
             update_pattern_panel();
             set_status(STAT_POS_2, "");
+        }
+        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+        {
+            show_status_after_navigation();
         }
         move(COMMAND_HOME);
         clrtoeol();
@@ -523,7 +528,8 @@ bool key_input_action()
     case KEY_UP:
     case KEY_LEFT:
     case KEY_RIGHT:
-        g_PatternStore.RouteKey(g_CursorKeyMap.at(c));
+//        g_PatternStore.RouteKey(g_CursorKeyMap.at(c));
+        g_CursorKeys.RouteKey(g_CursorKeyMap.at(c));
         show_status_after_navigation();
         update_edit_panels();
         break;
@@ -533,6 +539,8 @@ bool key_input_action()
             commandString.pop_back();
         else if ( g_ListBuilder.HandleKeybInput(c) )
             show_listbuilder_status();
+        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+            show_status_after_navigation();
         move(COMMAND_HOME + commandString.size());
         clrtoeol(); // Assuming the cursor has been put back to correct location.
         break;

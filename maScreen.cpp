@@ -32,10 +32,11 @@ using namespace std;
 // Global ALSA Sequencer instance.
 
 extern AlsaSequencer g_Sequencer;
+extern CursorKeys g_CursorKeys;
 extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
 extern State g_State;
-extern TranslateTable * pTranslateTable;
+//extern TranslateTable * pTranslateTable;
 
 // Additional colours beyond the basic eight that are defined
 // in ncurses.h. (Note the UK spelling to distinguish them from
@@ -186,13 +187,13 @@ void update_progress_bar()
     int len = lround(width * stepWidth);
 
     if ( len < 1 )
-        len == 1;
+        len = 1;
 
     int mode = 0;
     if ( len < 3 )
         mode = 1;
     else if ( len < 9 )
-        mode == 2;
+        mode = 2;
 
     if ( n + len > 64 )
         len = width - n;
@@ -481,20 +482,52 @@ void show_status()
 
 void show_status_after_navigation()
 {
+    const int width = 60;
+
     // Call this after any change to focus or navigation involving
     // objects derived from CursorKeys. All objects share the same
     // static pointer to the object in focus, and calling Status()
     // on any of them will retrieve the status string for the object
     // that currently has focus. (For now we use g_PatternStore itself,
     // because it's global and always present, but there's no other
-    // special status awarded to it than that.)
+    // special status afforded to it than that.)
 
-    set_status(STAT_POS_2, g_PatternStore.Status().c_str());
-    int ofs, len;
-    vector<screen_pos_t> & highlights = g_PatternStore.GetHighlights();
+    string status = g_CursorKeys.Status();
 
-    for ( int i = 0; i < highlights.size(); i++ )
-        highlight(STAT_POS_2, highlights.at(i).offset, highlights.at(i).length, A_BOLD, CP_MENU_HIGHLIGHT);
+    // Although I started off with a mechanism which allows for multiple
+    // highlights, so far I've only ever set one at a time. Now that I
+    // need to handle long strings and need to make sure the highlight
+    // is visible I'm relying on there only being one highlight and using
+    // that to position the whole string within the available width. Any
+    // highlights set after the first may end up off screen.
+
+    static int adjustOffset = 0;
+
+    vector<screen_pos_t> & highlights = g_CursorKeys.GetHighlights();
+
+    if ( !highlights.empty() )
+    {
+        screen_pos_t cursor = highlights.front();
+
+        if ( g_CursorKeys.FirstField() )
+        {
+            // Make sure whole string scrolls into view on the left.
+            cursor.length += cursor.offset;
+            cursor.offset = 0;
+        }
+
+        if ( status.size() < width )
+            adjustOffset = 0;
+        else if ( cursor.offset < adjustOffset )
+            adjustOffset = cursor.offset;
+        else if ( cursor.offset + cursor.length - adjustOffset >= width )
+            adjustOffset = cursor.offset + cursor.length - width;
+    }
+
+    set_status(STAT_POS_2, status.substr(adjustOffset, width).c_str());
+
+    for ( size_t i = 0; i < highlights.size(); i++ )
+        highlight(STAT_POS_2, highlights.at(i).offset - adjustOffset, highlights.at(i).length, A_BOLD, CP_MENU_HIGHLIGHT);
 
 }
 

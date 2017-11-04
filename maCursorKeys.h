@@ -51,6 +51,8 @@ class CursorKeys
         virtual ~CursorKeys();
 
         enum key_type_t {
+            enter,
+            back_space,
             up,
             down,
             left,
@@ -76,11 +78,13 @@ class CursorKeys
         virtual void SetMode(entry_modes_t m) { m_EntryMode = m; }
         entry_modes_t Mode() { return m_EntryMode; }
 
+        virtual void SetReturnFocus( CursorKeys * val ) { m_ReturnFocus = val; }
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
-        void RouteKey(key_type_t k) { m_Focus->HandleKey(k); }
+        bool RouteKey(key_type_t k) { return m_Focus->HandleKey(k); }
         std::string & Status() { return m_Focus->m_Status; }
 
+        bool FirstField() { return m_Focus->m_FirstField; }
         std::vector<screen_pos_t> & GetHighlights() { return m_Focus->m_Highlights; }
 
     protected:
@@ -91,7 +95,10 @@ class CursorKeys
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.
 
+        bool m_FirstField = true;
         static CursorKeys * m_Focus;
+
+        CursorKeys * m_ReturnFocus = NULL;
 
     private:
 };

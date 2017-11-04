@@ -170,12 +170,15 @@ bool ListBuilder::HandleKeybInput(int c)
                 {
                     m_RealTimeList.erase(m_RealTimeUndoIndex.back());
                     m_RealTimeUndoIndex.pop_back();
+                    return true;
                 }
-                break;
+                else
+                    return false;
+            case MIDI_INPUT_FULL:
+                return m_StepList.DeleteLast();
             default:
-                m_StepList.DeleteLast();
+                return false;
             }
-            return true;
 
         default:
             return false;

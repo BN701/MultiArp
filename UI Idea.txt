@@ -1,0 +1,16 @@
+Multi Arp - Midi:01, Step:16.00, Link Quantum:16.00     <<   ---   >>
+
+    ------------------------------------------------->--------------  13.25
+    1.........2.........3.........4.........5........6.....   Beat    12.25
+    nn - 01:nn->35 01:nn->35 01:nn->35 01:nn->35 01:nn->35    (Sec     6:1)
+    Key: 121
+ => copy
+
+     01 New              List(s) 1, Real Time 0
+                         Step value 16.00, Vel 64, Gate 50% (Hold off)
+                         Chromatic 0, Tonal 0 (I), C5-Major
+                         Premap off, Accidentals lo+mute
+
+    01 xnn >35
+      01 xnn
+        01

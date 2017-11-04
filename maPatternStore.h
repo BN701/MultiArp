@@ -30,6 +30,7 @@
 #include "maFeelMap.h"
 #include "maNotes.h"
 #include "maPattern.h"
+#include "maPatternChain.h"
 
 
 // Patternchain modes
@@ -55,7 +56,7 @@ struct PatternStore : public CursorKeys
     bool m_PatternChanged;
     bool m_UsePatternPlayData;
 
-    std::vector<ChainLink> m_PatternChain;
+    PatternChain m_PatternChain;
 
     std::vector<Pattern> m_Patterns;
     std::vector<Pattern> m_Deleted;

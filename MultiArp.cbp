@@ -69,6 +69,8 @@
 		<Unit filename="maNotes.h" />
 		<Unit filename="maPattern.cpp" />
 		<Unit filename="maPattern.h" />
+		<Unit filename="maPatternChain.cpp" />
+		<Unit filename="maPatternChain.h" />
 		<Unit filename="maPatternStore.cpp" />
 		<Unit filename="maPatternStore.h" />
 		<Unit filename="maScreen.cpp" />

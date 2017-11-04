@@ -244,30 +244,30 @@ string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
     if ( m_Patterns.empty() )
         return "No patterns loaded.\n";
 
-    string result;
+    return m_PatternChain.ToStringForDisplay(firstRow, rows);
 
-    for ( int row = firstRow; row < firstRow + rows; row++ )
-    {
-        if ( 4 * row >= m_PatternChain.size() )
-            break;
-
-        if ( ! result.empty() )
-            result +=  '\n';
-
-        char buff[20];
-        sprintf(buff, "%02i - ", 4 * row + 1);
-        result += buff;
-
-        for ( int i = 0; i < 4; i++ )
-        {
-            int pos = 4 * row + i;
-            if ( pos >= m_PatternChain.size() )
-                break;
-            result += m_PatternChain.at(pos).ToStringForDisplay();
-        }
-    }
-
-    return result;
+//    for ( int row = firstRow; row < firstRow + rows; row++ )
+//    {
+//        if ( 4 * row >= m_PatternChain.size() )
+//            break;
+//
+//        if ( ! result.empty() )
+//            result +=  '\n';
+//
+//        char buff[20];
+//        sprintf(buff, "%02i - ", 4 * row + 1);
+//        result += buff;
+//
+//        for ( int i = 0; i < 4; i++ )
+//        {
+//            int pos = 4 * row + i;
+//            if ( pos >= m_PatternChain.size() )
+//                break;
+//            result += m_PatternChain.at(pos).ToStringForDisplay();
+//        }
+//    }
+//
+//    return result;
 }
 
 string PatternStore::PatternStatus()
@@ -421,126 +421,95 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
 
 void PatternStore::UpdatePatternChainFromSimpleString(string s)
 {
-    // Scan past first token, which should be 'chain', though we don't check.
+    m_PatternChain.FromSimpleString(s);
+    m_PosPatternChain = 0;
 
-    vector<string> tokens = split(s.c_str(), ' ');
-
-    if ( tokens.size() == 1 )
-        throw string("Pattern Chain parse error: nothing entered.");
-
-    m_PatternChain.clear();
-
-    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
-    {
-        try
-        {
-            size_t pos;
-            int pattern = stoi(*it, &pos) - 1;
-
-            if ( pattern < 0 )
-                continue;
-
-            int repeats = 1;
-            if ( pos < (*it).size() )
-            {
-                pos = (*it).find('x');
-                if ( pos != string::npos )
-                    repeats = stoi((*it).substr(pos + 1));
-            }
-
-            m_PatternChain.emplace_back();
-            m_PatternChain.back().SetPattern(pattern);
-            m_PatternChain.back().SetRepeats(repeats - 1);
-        }
-        catch ( invalid_argument )
-        {
-            // Do nothing and carry on with next token.
-        }
-
-    }
+//    // Scan past first token, which should be 'chain', though we don't check.
+//
+//    vector<string> tokens = split(s.c_str(), ' ');
+//
+//    if ( tokens.size() == 1 )
+//        throw string("Pattern Chain parse error: nothing entered.");
+//
+//    m_PatternChain.clear();
+//
+//    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
+//    {
+//        try
+//        {
+//            size_t pos;
+//            int pattern = stoi(*it, &pos) - 1;
+//
+//            if ( pattern < 0 )
+//                continue;
+//
+//            int repeats = 1;
+//            if ( pos < (*it).size() )
+//            {
+//                pos = (*it).find('x');
+//                if ( pos != string::npos )
+//                    repeats = stoi((*it).substr(pos + 1));
+//            }
+//
+//            m_PatternChain.emplace_back();
+//            m_PatternChain.back().SetPattern(pattern);
+//            m_PatternChain.back().SetRepeats(repeats - 1);
+//        }
+//        catch ( invalid_argument )
+//        {
+//            // Do nothing and carry on with next token.
+//        }
+//
+//    }
 }
 
 void PatternStore::UpdatePatternChainFromString(string s)
 {
-    // Scan past first token, which should be 'chain', though we don't check.
-
-    vector<string> tokens = split(s.c_str(), ' ');
-
-    if ( tokens.size() == 1 )
-        throw string("Pattern Chain parse error: nothing entered.");
-
-    m_PatternChain.clear();
+    m_PatternChain.FromString(s);
     m_PosPatternChain = 0;
 
-    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
-    {
-        try
-        {
-            m_PatternChain.emplace_back();
-            m_PatternChain.back().FromString(*it);
-        }
-        catch ( invalid_argument )
-        {
-            // Do nothing and carry on with next token.
-        }
-
-    }
+//    // Scan past first token, which should be 'chain', though we don't check.
+//
+//    vector<string> tokens = split(s.c_str(), ' ');
+//
+//    if ( tokens.size() == 1 )
+//        throw string("Pattern Chain parse error: nothing entered.");
+//
+//    m_PatternChain.clear();
+//    m_PosPatternChain = 0;
+//
+//    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
+//    {
+//        try
+//        {
+//            m_PatternChain.emplace_back();
+//            m_PatternChain.back().FromString(*it);
+//        }
+//        catch ( invalid_argument )
+//        {
+//            // Do nothing and carry on with next token.
+//        }
+//
+//    }
 }
 
 string PatternStore::PatternChainToString()
 {
-    if ( m_PatternChain.empty() )
-        return "Chain empty.";
+    return m_PatternChain.ToString();
 
-    string result = "Chain";
-
-    for ( vector<ChainLink>::iterator it = m_PatternChain.begin(); it != m_PatternChain.end(); it++ )
-    {
-        result += ' ';
-        result += (*it).ToString();
-    }
-
-    return result;
-
-//    vector<ChainLink>::iterator it = m_PatternChain.begin();
+//    if ( m_PatternChain.empty() )
+//        return "Chain empty.";
 //
-//    int lastValue = *it;
-//    int repeats = 0;
+//    string result = "Chain";
 //
-//    char buf[20];
-//    int value = 0;
-//
-//    do
+//    for ( vector<ChainLink>::iterator it = m_PatternChain.begin(); it != m_PatternChain.end(); it++ )
 //    {
-//        value = (*it);
-//
-//        if ( value != lastValue )
-//        {
-//            char buf[20];
-//            if ( repeats > 1 )
-//                sprintf(buf, "%ix%i", lastValue + 1, repeats);
-//            else
-//                sprintf(buf, "%i", lastValue + 1);
-//
-//            result += buf;
-//            result += ", ";
-//
-//            repeats = 1;
-//            lastValue = value;
-//        }
-//        else
-//            repeats += 1;
-//
-//    } while ( ++it < m_PatternChain.end() );
-//
-//    if ( repeats > 1 )
-//        sprintf(buf, "%ix%i", value + 1, repeats);
-//    else
-//        sprintf(buf, "%i", value + 1);
-//
-//    result += buf;
+//        result += ' ';
+//        result += (*it).ToString();
+//    }
 //
 //    return result;
+//
 }
 
 string PatternStore::EditPatternToString()

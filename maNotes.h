@@ -210,7 +210,7 @@ struct RealTimeList : public CursorKeys
     std::string ToString();
     std::string ToStringForDisplay(int width = 75);
 
-    void SetStatus();
+    virtual void SetStatus();
     protected:
         enum rt_list_focus_t {
             rtl_loop_start,

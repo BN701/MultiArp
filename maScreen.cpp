@@ -338,8 +338,6 @@ void update_edit_panels(bool refreshList)
     wclrtobot(g_Display.EditSummaryPanel());
 
     Pattern & p = g_PatternStore.CurrentEditPattern();
-//    wmove(g_Display.EditSummaryPanel(), 0, 1);
-//    wprintw(g_Display.EditSummaryPanel(), "Edit %02i, %s", g_PatternStore.CurrentEditPatternID(), p.Label(50).c_str());
 
     wmove(g_Display.EditSummaryPanel(), 0, 1);
     wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.ListCount(), p.RealTimeListCount());

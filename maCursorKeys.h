@@ -75,10 +75,17 @@ class CursorKeys
             ctrl_shift_down
         };
 
+        enum follow_up_action_t {
+            none,
+            update_pattern_browser,
+            number_follow_up_actions
+        };
+
         virtual void SetMode(entry_modes_t m) { m_EntryMode = m; }
         entry_modes_t Mode() { return m_EntryMode; }
 
         virtual void SetReturnFocus( CursorKeys * val ) { m_ReturnFocus = val; }
+        virtual void SetStatus() {}
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
         bool RouteKey(key_type_t k) { return m_Focus->HandleKey(k); }
@@ -86,6 +93,13 @@ class CursorKeys
 
         bool FirstField() { return m_Focus->m_FirstField; }
         std::vector<screen_pos_t> & GetHighlights() { return m_Focus->m_Highlights; }
+
+        follow_up_action_t FollowUp()
+        {
+            follow_up_action_t t = m_FollowUp;
+            m_FollowUp = none;
+            return t;
+        }
 
     protected:
         virtual bool HandleKey(key_type_t k) { return false; };
@@ -99,6 +113,7 @@ class CursorKeys
         static CursorKeys * m_Focus;
 
         CursorKeys * m_ReturnFocus = NULL;
+        follow_up_action_t m_FollowUp = none;
 
     private:
 };

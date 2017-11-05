@@ -376,7 +376,7 @@ struct PatternStore : public CursorKeys
     std::string ListManager(std::string commandString, std::vector<std::string> & tokens);
     void DeleteCurrentRealTimeList();
 
-    void SetStatus();
+    virtual void SetStatus();
     virtual void SetFocus()
     {
         CursorKeys::SetFocus();

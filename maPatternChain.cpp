@@ -76,6 +76,7 @@ void PatternChain::FromSimpleString(string s)
         throw string("Pattern Chain parse error: nothing entered.");
 
     m_Chain.clear();
+    m_PosEdit = 0;
 
     for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
     {
@@ -117,7 +118,7 @@ void PatternChain::FromString(string s)
         throw string("Pattern Chain parse error: nothing entered.");
 
     m_Chain.clear();
-//    m_PosPatternChain = 0;
+    m_PosEdit = 0;
 
     for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
     {
@@ -163,11 +164,13 @@ void PatternChain::SetStatus()
 
     for ( int i = 0; i < m_Chain.size(); i++ )
     {
+        m_Status += " [";
         pos = m_Status.size();
-        sprintf(buff, " %i:", i + 1);
+        sprintf(buff, "%i:", i + 1);
         m_Status += buff;
         m_Status += m_Chain.at(i).ToStringForDisplay(1);
-        m_FieldPositions.emplace_back(pos + 1, m_Status.size() - pos - 1);
+        m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+        m_Status += ']';
     }
 
     if ( ! m_Chain.empty() )
@@ -180,7 +183,7 @@ bool PatternChain::HandleKey(key_type_t k)
     switch ( k )
     {
     case enter:
-        if ( m_PosEdit < m_Chain.size() - 1 )
+        if ( m_PosEdit < m_Chain.size() )
         {
             ChainLink & link = m_Chain.at(m_PosEdit);
             link.SetID(m_PosEdit + 1);

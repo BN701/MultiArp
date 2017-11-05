@@ -56,6 +56,7 @@ string ChainLink::ToStringForDisplay(int width)
     sprintf(buff, "%02i", m_Pattern + 1);
     result += buff;
 
+    // Show nothing if we just play once (m_Repeats == 1).
     if ( m_Remaining >= 0 )
     {
         sprintf(buff, " x%02i", m_Remaining + 1);
@@ -66,8 +67,10 @@ string ChainLink::ToStringForDisplay(int width)
         sprintf(buff, " x%02i", m_Repeats + 1);
         result += buff;
     }
+    else if ( m_Repeats < 0 )
+        result += " Hold";
 
-    if ( m_Jump >= 0 )
+    if ( m_Repeats >= 0 && m_Jump >= 0 )
     {
         sprintf(buff, " >%02i", m_Jump + 1);
         result += buff;
@@ -125,16 +128,26 @@ void ChainLink::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ", Play x ";
+    m_Status += ", Play ";
     pos = m_Status.size();
-    sprintf(buff, "%i", m_Repeats + 1);
-    m_Status += buff;
+    if ( m_Repeats >= 0 )
+    {
+        sprintf(buff, "x %i", m_Repeats + 1);
+        m_Status += buff;
+    }
+    else
+        m_Status += "(hold)";
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
     m_Status += ", Jump ";
     pos = m_Status.size();
-    sprintf(buff, "%i", m_Jump + 1);
-    m_Status += buff;
+    if ( m_Jump >= 0 )
+    {
+        sprintf(buff, "%i", m_Jump + 1);
+        m_Status += buff;
+    }
+    else
+        m_Status += "(off)";
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
     m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
@@ -145,8 +158,9 @@ bool ChainLink::HandleKey(key_type_t k)
 
     switch ( k )
     {
-    case back_space:
+    case enter:
         m_ReturnFocus->SetFocus();
+        m_ReturnFocus->SetStatus();
         break;
     case left:
         if ( m_PosEdit > 0 )
@@ -157,7 +171,43 @@ bool ChainLink::HandleKey(key_type_t k)
             m_PosEdit += 1;
         break;
     case up:
+        switch ( m_PosEdit )
+        {
+        case 0:     // Pattern
+            m_Pattern += 1;
+            m_FollowUp = update_pattern_browser;
+            break;
+        case 1:     // Repeats
+            m_Repeats += 1;
+            break;
+        case 2:     // Jump
+            m_Jump += 1;
+            break;
+        default:
+            break;
+        }
+        break;
     case down:
+        switch ( m_PosEdit )
+        {
+        case 0:     // Pattern
+            if ( m_Pattern > 0 )
+            {
+                m_Pattern -= 1;
+                m_FollowUp = update_pattern_browser;
+            }
+            break;
+        case 1:     // Repeats
+            if ( m_Repeats > -1 )
+                m_Repeats -= 1;
+            break;
+        case 2:     // Jump
+            if ( m_Jump > -1 )
+                m_Jump -= 1;
+            break;
+        default:
+            break;
+        }
         break;
     }
 

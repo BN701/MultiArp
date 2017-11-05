@@ -43,7 +43,7 @@ class PatternChain : public CursorKeys
         void FromString(std::string s);
         void FromSimpleString(std::string s);
 
-        void SetStatus();
+        virtual void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();

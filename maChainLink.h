@@ -43,7 +43,7 @@ class ChainLink : public CursorKeys
         std::string ToStringForDisplay(int width = 12);
         void FromString(std::string & s);
 
-        void SetStatus();
+        virtual void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();

@@ -125,7 +125,7 @@ class TranslateTable : public CursorKeys
         std::string ShowScale();
         std::string ShowNoteMap();
 
-        void SetStatus();
+        virtual void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();

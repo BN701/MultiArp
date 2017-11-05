@@ -41,7 +41,7 @@ class FeelMap : public CursorKeys
 
         bool Active() { return m_Active; }
 
-        void SetStatus();
+        virtual void SetStatus();
         virtual void SetFocus()
         {
             CursorKeys::SetFocus();

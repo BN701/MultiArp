@@ -480,7 +480,7 @@ void show_status()
 
 void show_status_after_navigation()
 {
-    const int width = 60;
+    const int width = 72;
 
     // Call this after any change to focus or navigation involving
     // objects derived from CursorKeys. All objects share the same

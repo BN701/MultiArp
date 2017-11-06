@@ -61,6 +61,9 @@ struct Pattern
     double Gate() { return m_Gate; }
     bool GateHold() { return m_GateHold; }
     unsigned char Velocity() { return m_Velocity; }
+
+    StepList & StepListForEdit() { return m_StepListSet.at(m_PosEdit); }
+    RealTimeList & RTListForEdit() { return m_RealTimeSet.at(m_PosRealTimeEdit); }
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
 

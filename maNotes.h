@@ -103,7 +103,9 @@ struct Cluster
     void FromString(std::string s);
 };
 
-struct StepList
+struct StepListSubMenu;
+
+struct StepList : public CursorKeys
 {
 
     std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
@@ -115,12 +117,20 @@ struct StepList
     // std::string m_Label;
 
     bool m_Complete;
+    StepListSubMenu * m_ListSubMenu = NULL;
 
     StepList():
         m_Pos(0),
         m_LastRequestedPos(0),
         m_Complete(false)
+//        m_ListSubMenu(this)
     {
+    }
+
+    ~StepList()
+    {
+        if ( m_ListSubMenu != NULL )
+            delete m_ListSubMenu;
     }
 
     void Clear ()
@@ -177,6 +187,39 @@ struct StepList
     void FromString(std::string s);
 
     bool PlayPositionInfo(int & offset,  int & length);
+
+    virtual void SetStatus();
+    protected:
+        enum step_list_focus_t {
+            sl_edit_notes,
+            number_step_list_focus_modes
+        };
+
+        virtual bool HandleKey(key_type_t k);
+        step_list_focus_t m_StepListFocus = sl_edit_notes;
+
+};
+
+struct StepListSubMenu : public CursorKeys
+{
+    std::vector<Cluster> & m_Clusters;
+//    StepList & m_Owner;
+
+    StepListSubMenu(std::vector<Cluster> & clusters):
+//        m_Owner(owner)
+        m_Clusters(clusters)
+    {}
+
+    virtual void SetStatus();
+    protected:
+//        enum step_list_focus_t {
+//            sl_edit_notes,
+//            number_step_list_focus_modes
+//        };
+
+        virtual bool HandleKey(key_type_t k);
+        int m_PosEdit = 0;
+
 };
 
 struct RealTimeList : public CursorKeys
@@ -213,6 +256,7 @@ struct RealTimeList : public CursorKeys
     virtual void SetStatus();
     protected:
         enum rt_list_focus_t {
+            rtl_edit_notes,
             rtl_loop_start,
             rtl_local_quantum,
             rtl_multiplier,
@@ -221,7 +265,7 @@ struct RealTimeList : public CursorKeys
         };
 
         virtual bool HandleKey(key_type_t k);
-        rt_list_focus_t m_RTListFocus;
+        rt_list_focus_t m_RTListFocus = rtl_edit_notes;
 
 };
 

@@ -450,6 +450,93 @@ void StepList::FromString(string s)
     }
 }
 
+void StepList::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    m_Status = "Step List - ";
+
+    pos = m_Status.size();
+    m_Status += "Edit List";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Highlights.push_back(m_FieldPositions.at(m_StepListFocus));
+
+}
+
+bool StepList::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+        if ( m_ListSubMenu != NULL )
+            delete m_ListSubMenu;
+        m_ListSubMenu = new StepListSubMenu(m_Clusters);
+        m_ListSubMenu->SetFocus();
+        m_ListSubMenu->SetStatus();
+        m_ListSubMenu->SetReturnFocus(this);
+        break;
+    case back_space:
+        m_ReturnFocus->SetFocus();
+        m_ReturnFocus->SetStatus();
+        break;
+    }
+
+    m_FirstField = m_StepListFocus == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+void StepListSubMenu::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    m_Status = "Chords - ";
+
+//    pos = m_Status.size();
+//    m_Status += "Edit List";
+//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+//
+//    m_Highlights.push_back(m_FieldPositions.at(m_StepListFocus));
+
+}
+
+bool StepListSubMenu::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+//        if ( m_ListSubMenu != NULL )
+//            delete m_ListSubMenu;
+//        m_ListSubMenu = new StepListSubMenu(m_Clusters);
+//        m_ListSubMenu->SetFocus();
+//        m_ListSubMenu->SetStatus();
+//        m_ListSubMenu->SetReturnFocus(this);
+        break;
+    case back_space:
+        m_ReturnFocus->SetFocus();
+        m_ReturnFocus->SetStatus();
+        break;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+
 enum rtl_element_names_t {
     rtl_name_loop,
     rtl_name_quantum,
@@ -470,19 +557,26 @@ unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
 
 void RealTimeList::SetStatus()
 {
+    int pos = 0;
     char buff[200];
 
-    m_Status = "RT Loop - ";
+    m_Status = "Real Time List - ";
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status += "Sta: ";
-    int pos = m_Status.size();
+    pos = m_Status.size();
+    m_Status += "Notes";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Loop - ";
+
+    m_Status += "S: ";
+    pos = m_Status.size();
     sprintf(buff, "%.2f", m_LoopStart);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
-    m_Status += " Qua: ";
+    m_Status += " Q: ";
     pos = m_Status.size();
     sprintf(buff, "%.2f", m_LocalQuantum);
     m_Status += buff;
@@ -510,16 +604,30 @@ bool RealTimeList::HandleKey(key_type_t k)
     double inc = 0.1;
     switch ( k )
     {
+    case enter:
+        if ( m_RTListFocus == rtl_edit_notes )
+        {
+            // Another object here?
+        }
+        break;
+
+    case back_space:
+        m_ReturnFocus->SetFocus();
+        m_ReturnFocus->SetStatus();
+        break;
+
     case left:
         temp = static_cast<int>(m_RTListFocus) - 1;
         if ( temp >= 0 && temp < number_rt_list_focus_modes )
             m_RTListFocus = static_cast<rt_list_focus_t>(temp);
         break;
+
     case right:
         temp = static_cast<int>(m_RTListFocus) + 1;
         if ( temp >= 0 && temp < number_rt_list_focus_modes )
             m_RTListFocus = static_cast<rt_list_focus_t>(temp);
         break;
+
     case shift_up:
         inc = 0.01;
     case up:
@@ -543,6 +651,7 @@ bool RealTimeList::HandleKey(key_type_t k)
             break;
         }
         break;
+
     case shift_down:
         inc = 0.01;
     case down:
@@ -552,8 +661,6 @@ bool RealTimeList::HandleKey(key_type_t k)
             m_LoopStart -= inc;
             break;
         case rtl_local_quantum:
-//            if ( lround(100 * m_LocalQuantum) > 0 )
-//                m_LocalQuantum -= inc;
             if ( m_LocalQuantum - inc < 0 )
                 m_LocalQuantum = 0;
             else
@@ -570,6 +677,8 @@ bool RealTimeList::HandleKey(key_type_t k)
         }
         break;
     }
+
+    m_FirstField = m_RTListFocus == 0;
 
     SetStatus();
 

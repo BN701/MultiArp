@@ -93,13 +93,22 @@ enum command_t
     C_EDIT,             // Set focus for copy/paste
     C_EDIT_CURSOR_LOCK,
     C_EDIT_CURSOR_UNLOCK,
-    C_PATTERN_CHAIN,    // Set pattern chain mode.
     C_NEW,              // Create new (empty) pattern.
     C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
     C_DELETE,           // Delete pattern and reduce size of pattern list.
     C_CLEAR,            // Clear pattern but leave empty entry in pattern list.
     C_UNDO,             // Restore deleted or cleared pattern to end of the pattern list.
     C_STATUS,           // Display current stats.
+
+    C_PATTERN_CHAIN,    // Set pattern chain mode.
+    C_PATTERN_CHAIN_OFF,
+    C_PATTERN_CHAIN_NATURAL,
+    C_PATTERN_CHAIN_QUANTUM,
+    C_PATTERN_CHAIN_CLEAR,
+    C_PATTERN_CHAIN_NEW,
+    C_PATTERN_CHAIN_DELETE,
+    C_PATTERN_CHAIN_JUMP,
+    C_PATTERN_CHAIN_HELP,
 
     C_STORE,
     C_STORE_STEP,
@@ -220,13 +229,28 @@ unordered_map<string, command_t> gCommandList =
     {"e", C_EDIT},
     {"cue", C_CUE},
     {"play", C_CUE},
-    {"chain", C_PATTERN_CHAIN},
-    {"chain:", C_PATTERN_CHAIN},
     {"new", C_NEW},
     {"copy", C_COPY},
     {"delete", C_DELETE},
     {"del", C_DELETE},
     {"clear", C_CLEAR},
+
+    {"chain", C_PATTERN_CHAIN},
+    {"c", C_PATTERN_CHAIN},
+    {"chain:", C_PATTERN_CHAIN},
+
+    {"chain off", C_PATTERN_CHAIN_OFF},
+    {"chain natural", C_PATTERN_CHAIN_NATURAL},
+    {"chain n", C_PATTERN_CHAIN_NATURAL},
+    {"c n", C_PATTERN_CHAIN_NATURAL},
+    {"chain quantum", C_PATTERN_CHAIN_QUANTUM},
+    {"chain q", C_PATTERN_CHAIN_QUANTUM},
+    {"c q", C_PATTERN_CHAIN_QUANTUM},
+    {"chain clear", C_PATTERN_CHAIN_CLEAR},
+    {"chain new", C_PATTERN_CHAIN_NEW},
+    {"chain delete", C_PATTERN_CHAIN_DELETE},
+    {"chain jump", C_PATTERN_CHAIN_JUMP},
+    {"chain help", C_PATTERN_CHAIN_HELP},
 
     {"lock", C_EDIT_CURSOR_LOCK},
     {"unlock", C_EDIT_CURSOR_UNLOCK},
@@ -726,23 +750,38 @@ bool do_command(string/*const char * */ commandString)
             break;
 
         case C_PATTERN_CHAIN :
-            if ( tokens.size() < 2 )
-            {
-                g_PatternStore.PatternChainForEdit().SetStatus();
-                g_PatternStore.PatternChainForEdit().SetFocus();
-                show_status_after_navigation();
-            }
-//                set_status(STAT_POS_2, "%s", g_PatternStore.PatternChainToString().c_str());
-            else if ( tokens[1] == "off")
-                g_PatternStore.SetPatternChainMode(PC_MODE_NONE);
-            else if ( tokens[1] == "n" || tokens[1] == "natural" )
-                g_PatternStore.SetPatternChainMode(PC_MODE_NATURAL);
-            else if ( tokens[1] == "q" || tokens[1] == "quantum" )
-                g_PatternStore.SetPatternChainMode(PC_MODE_FORCED);
-            else if (tokens[1] == "help")
-                set_status(STAT_POS_2, "chain off|natural|quantum|show");
-            else
+            if ( tokens.size() >= 2 )
                 g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
+            g_PatternStore.PatternChainForEdit().SetStatus();
+            g_PatternStore.PatternChainForEdit().SetFocus();
+            show_status_after_navigation();
+            break;
+        case C_PATTERN_CHAIN_OFF:
+            g_PatternStore.SetPatternChainMode(PC_MODE_NONE);
+            break;
+        case C_PATTERN_CHAIN_NATURAL:
+            g_PatternStore.SetPatternChainMode(PC_MODE_NATURAL);
+            break;
+        case C_PATTERN_CHAIN_QUANTUM:
+            g_PatternStore.SetPatternChainMode(PC_MODE_FORCED);
+            break;
+        case C_PATTERN_CHAIN_CLEAR:
+            g_PatternStore.PatternChainForEdit().Clear();
+            show_status_after_navigation();
+            break;
+        case C_PATTERN_CHAIN_NEW:
+            g_PatternStore.PatternChainForEdit().New();
+            show_status_after_navigation();
+            break;
+        case C_PATTERN_CHAIN_DELETE:
+            g_PatternStore.PatternChainForEdit().Delete();
+            g_PatternStore.PatternChainForEdit().SetStatus();
+            show_status_after_navigation();
+            break;
+        case C_PATTERN_CHAIN_JUMP:
+            break;
+        case C_PATTERN_CHAIN_HELP:
+            set_status(STAT_POS_2, "chain off|natural|quantum|jump|new|delete");
             break;
 
         case C_LOAD:
@@ -850,11 +889,8 @@ bool do_command(string/*const char * */ commandString)
 
         case C_NONE :
             iTemp = stoi(tokens[0]) - 1;
-            if ( ! g_PatternStore.ValidPosition(iTemp) )
-                throw string("Requested pattern number out of range at the moment.");
-            set_status(STAT_POS_2, "Cueing pattern: %i", iTemp + 1);
-            g_PatternStore.SetNewPatternPending(iTemp);
-            // newPattern = iTemp;
+            // Function returns a format string. Too obfuscated?
+            set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp).c_str(), iTemp + 1);
             break;
         default :
             break;

@@ -522,10 +522,10 @@ void show_status_after_navigation()
             adjustOffset = cursor.offset + cursor.length - width;
     }
 
-    set_status(STAT_POS_2, status.substr(adjustOffset, width).c_str());
+    set_status(STAT_POS_MENU, status.substr(adjustOffset, width).c_str());
 
     for ( size_t i = 0; i < highlights.size(); i++ )
-        highlight(STAT_POS_2, highlights.at(i).offset - adjustOffset, highlights.at(i).length, A_BOLD, CP_MENU_HIGHLIGHT);
+        highlight(STAT_POS_MENU, highlights.at(i).offset - adjustOffset, highlights.at(i).length, A_BOLD, CP_MENU_HIGHLIGHT);
 
 }
 

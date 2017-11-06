@@ -363,38 +363,32 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
         {
             case PC_MODE_NATURAL :
                 if ( m_Patterns.at(m_PosPlay).AllListsComplete() )
-                {
-//                    m_PosPatternChain++;
                     changePattern = true;
-                }
                 break;
 
             case PC_MODE_FORCED :
                 if ( m_PhaseIsZero )
-                {
-//                    m_PosPatternChain++;
                     changePattern = true;
-                }
                 break;
         }
 
-        if ( changePattern && m_PatternChain.at(m_PosPatternChain).Remaining() == 0 )
+        while ( changePattern ) // Not a loop, just something we can 'break' out of.
         {
-            int next = m_PatternChain.at(m_PosPatternChain).Jump();
+            int next = m_PatternChain.JumpOverride();
 
-            if ( next >= 0 )
-            {
-                m_PosPatternChain = next;
-            }
-            else
-            {
-                // Increment chain index and check for wraps.
+            if ( next < 0 && m_PatternChain.at(m_PosPatternChain).Remaining() > 0 )
+                break;
 
-                m_PosPatternChain += 1;
+            if ( next < 0 )
+                next = m_PatternChain.at(m_PosPatternChain).Jump();
 
-                if ( m_PosPatternChain >= m_PatternChain.size() )
-                    m_PosPatternChain = 0;
-            }
+            if ( next < 0 )
+                next = m_PosPatternChain + 1;
+
+            if ( next >= m_PatternChain.size() )
+                next = 0;
+
+            m_PosPatternChain = next;
 
             // Don't change play pointer if new pattern out of range.
 
@@ -411,6 +405,8 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
 
             if ( m_ResetOnPatternChange )
                 m_Patterns.at(m_PosPlay).ResetPosition();
+
+            break;
         }
     }
 
@@ -1032,3 +1028,27 @@ string PatternStore::ShowPatternPlayData()
     return result;
 }
 
+string PatternStore::SetNewPatternOrJump( int val )
+{
+    if ( m_PatternChainMode == PC_MODE_NONE )
+    {
+        if ( val >= 0 && val < m_Patterns.size() )
+        {
+            SetNewPatternPending(val);
+            return "Cueing pattern %i";
+        }
+        else
+            throw string("Requested pattern doesn't exist!");
+    }
+    else
+    {
+        if ( val >= 0 && val < m_PatternChain.size() )
+        {
+            m_PatternChain.at(m_PosPatternChain).ClearRemaining();
+            m_PatternChain.SetJumpOverride(val);
+            return "Jumping to chain step %i";
+        }
+        else
+            throw string("Jump stage doesn't exist!");
+    }
+}

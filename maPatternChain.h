@@ -43,6 +43,40 @@ class PatternChain : public CursorKeys
         void FromString(std::string s);
         void FromSimpleString(std::string s);
 
+        void SetJumpOverride( int val )
+        {
+            m_JumpOverride = val;
+        }
+
+        int JumpOverride()
+        {
+            int t = m_JumpOverride;
+            m_JumpOverride = -1;
+            return t;
+        }
+
+        void Clear()
+        {
+            m_Chain.clear();
+            m_PosEdit = 0;
+            SetStatus();
+        }
+
+        void New()
+        {
+            m_Chain.emplace_back();
+            m_PosEdit = m_Chain.size() - 1;
+            SetStatus();
+        }
+
+        void Delete()
+        {
+            m_Chain.pop_back();
+            if ( m_PosEdit >= m_Chain.size() )
+                m_PosEdit = m_Chain.size() - 1;
+            SetStatus();
+        }
+
         virtual void SetStatus();
         virtual void SetFocus()
         {
@@ -54,6 +88,8 @@ class PatternChain : public CursorKeys
         virtual bool HandleKey(key_type_t k);
 
         std::vector<ChainLink>::size_type m_PosEdit = 0;
+
+        std::vector<ChainLink>::size_type m_JumpOverride = -1;
 
     private:
 

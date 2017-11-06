@@ -68,6 +68,7 @@
 #define STAT_POS_STEP g_Display.ProgressPanel(), 0,0
 #define STAT_POS_PATTERN g_Display.SmallPanel(), 1,0
 #define STAT_POS_2 5,4
+#define STAT_POS_MENU 1,4
 
 
 

@@ -47,7 +47,7 @@ int ChainLink::Remaining()
     return m_Remaining--;
 }
 
-string ChainLink::ToStringForDisplay(int width)
+string ChainLink::ToStringForDisplay(bool forMenu, int width)
 {
     string result;
 
@@ -57,23 +57,43 @@ string ChainLink::ToStringForDisplay(int width)
     result += buff;
 
     // Show nothing if we just play once (m_Repeats == 1).
-    if ( m_Remaining >= 0 )
-    {
-        sprintf(buff, " x%02i", m_Remaining + 1);
-        result += buff;
-    }
-    else if ( m_Repeats > 0 )
-    {
-        sprintf(buff, " x%02i", m_Repeats + 1);
-        result += buff;
-    }
-    else if ( m_Repeats < 0 )
-        result += " Hold";
 
-    if ( m_Repeats >= 0 && m_Jump >= 0 )
+    if ( forMenu )
     {
-        sprintf(buff, " >%02i", m_Jump + 1);
-        result += buff;
+        if ( m_Repeats > 0 )
+        {
+            sprintf(buff, "x%02i", m_Repeats + 1);
+            result += buff;
+        }
+        else if ( m_Repeats < 0 )
+            result += " Hold";
+
+        if ( m_Repeats >= 0 && m_Jump >= 0 )
+        {
+            sprintf(buff, ">%02i", m_Jump + 1);
+            result += buff;
+        }
+    }
+    else
+    {
+        if ( m_Remaining >= 0 )
+        {
+            sprintf(buff, " x%02i", m_Remaining + 1);
+            result += buff;
+        }
+        else if ( m_Repeats > 0 )
+        {
+            sprintf(buff, " x%02i", m_Repeats + 1);
+            result += buff;
+        }
+        else if ( m_Repeats < 0 )
+            result += " H";
+
+        if ( m_Repeats >= 0 && m_Jump >= 0 )
+        {
+            sprintf(buff, " >%02i", m_Jump + 1);
+            result += buff;
+        }
     }
 
     bool odd = true;

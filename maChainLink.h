@@ -33,6 +33,7 @@ class ChainLink : public CursorKeys
         int Pattern() { return m_Pattern; }
         void SetPattern(int val) { m_Pattern = val; }
         int Repeats() { return m_Repeats; }
+        void ClearRemaining() { m_Remaining = -1; }
         int Remaining();
         void SetRepeats(int val) { m_Repeats = val; }
         int Jump() { return m_Jump; }
@@ -40,7 +41,7 @@ class ChainLink : public CursorKeys
         void SetID(int val) { m_ID = val; }
 
         std::string ToString();
-        std::string ToStringForDisplay(int width = 12);
+        std::string ToStringForDisplay(bool forMenu = false, int width = 12);
         void FromString(std::string & s);
 
         virtual void SetStatus();
@@ -54,7 +55,7 @@ class ChainLink : public CursorKeys
         virtual bool HandleKey(key_type_t k);
 
     private:
-        int m_Pattern = -1;
+        int m_Pattern = 0;
         int m_Repeats = 0;              // Zero means no repeat. Set to -1 for indefinite repeat.
         int m_Remaining = -1;           // -1 means initialize in RepeatsRemaining().
         int m_Jump = -1;

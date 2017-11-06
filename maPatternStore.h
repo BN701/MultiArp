@@ -93,6 +93,7 @@ struct PatternStore : public CursorKeys
         return m_Patterns.size();
     }
 
+    std::string SetNewPatternOrJump( int val );
     void SetNewPatternPending( int val )
     {
         m_NewPattern = val;

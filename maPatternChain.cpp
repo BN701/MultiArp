@@ -75,8 +75,7 @@ void PatternChain::FromSimpleString(string s)
     if ( tokens.size() == 1 )
         throw string("Pattern Chain parse error: nothing entered.");
 
-    m_Chain.clear();
-    m_PosEdit = 0;
+    std::vector<ChainLink> newChain;
 
     for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
     {
@@ -96,15 +95,21 @@ void PatternChain::FromSimpleString(string s)
                     repeats = stoi((*it).substr(pos + 1));
             }
 
-            m_Chain.emplace_back();
-            m_Chain.back().SetPattern(pattern);
-            m_Chain.back().SetRepeats(repeats - 1);
+            newChain.emplace_back();
+            newChain.back().SetPattern(pattern);
+            newChain.back().SetRepeats(repeats - 1);
         }
         catch ( invalid_argument )
         {
             // Do nothing and carry on with next token.
         }
 
+    }
+
+    if ( !newChain.empty() )
+    {
+        m_Chain = newChain;
+        m_PosEdit = 0;
     }
 }
 
@@ -160,17 +165,23 @@ void PatternChain::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
+    if ( m_Chain.empty() )
+    {
+        m_Status += " Empty";
+        return;
+    }
+
     int pos = 0;
 
     for ( int i = 0; i < m_Chain.size(); i++ )
     {
-        m_Status += " [";
+        m_Status += " ";
         pos = m_Status.size();
         sprintf(buff, "%i:", i + 1);
         m_Status += buff;
-        m_Status += m_Chain.at(i).ToStringForDisplay(1);
+        m_Status += m_Chain.at(i).ToStringForDisplay(true, 1);
         m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-        m_Status += ']';
+//        m_Status += ' ';
     }
 
     if ( ! m_Chain.empty() )

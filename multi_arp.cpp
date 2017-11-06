@@ -66,6 +66,37 @@ extern Display g_Display;
 
 int gDeferStop = 0;
 
+void do_UI_updates()
+{
+    // If pattern changed last step ...
+
+    if ( g_PatternStore.PatternChanged(true) )
+    {
+        set_top_line();
+        update_edit_panels();
+        set_status(STAT_POS_2, "Pattern changed ...");
+    }
+
+    // If phase zero last step ...
+
+    if ( g_State.PhaseIsZero() )
+    {
+        update_pattern_status_panel();
+    }
+
+    // Every step ...
+
+    update_pattern_panel();     //
+    highlight_pattern_panel();  // Moves note highlight.
+
+    update_progress_bar();
+    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
+               /*g_State.Phase(),*/
+               g_State.Beat(),
+               g_Sequencer.ScheduleTimeSeconds(),
+               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
+}
+
 void do_phase0_updates()
 {
     g_State.SetCurrentStepValue(g_PatternStore.StepValue());
@@ -114,32 +145,10 @@ void do_phase0_updates()
 
 void queue_next_step(int queueId)
 {
-
     // We're called when ALSA has played the events we scheduled last time we were here,
     // so updating position info at this point should reflect what we are hearing.
 
-    if ( g_PatternStore.PatternChanged(true) )
-    {
-//        update_pattern_panel();
-        set_top_line();
-        update_pattern_status_panel();
-        update_edit_panels();
-    }
-
-    update_pattern_panel();
-    highlight_pattern_panel();  // Moves note highlight.
-
-    update_progress_bar();
-    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
-               /*g_State.Phase(),*/
-               g_State.Beat(),
-               g_Sequencer.ScheduleTimeSeconds(),
-               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
-
-
-//    // There may have been a pattern change (especially if chaining is active).
-//
-//    update_pattern_status_panel();
+    do_UI_updates();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
@@ -194,8 +203,6 @@ void queue_next_step(int queueId)
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
         g_PatternStore.Step(nextCluster, g_State.Phase(), g_State.CurrentStepValue());
-//        if ( pNext != NULL )
-//            nextCluster = *pNext;
         if ( g_ListBuilder.RealTimeRecord() )
             nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
     }
@@ -241,8 +248,7 @@ void queue_next_step(int queueId)
             double noteLength = note.Length();
             if ( noteLength > 0 )
             {
-                // Note duration here is in beats. Convert to milliseconds.
-                // mSec/beat = 60000/tempo
+                // Note length here is in beats. Convert to milliseconds.
                 duration = 60000.0 * noteLength / tempo;
             }
 

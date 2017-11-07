@@ -198,6 +198,8 @@ void queue_next_step(int queueId)
 
     // Step the Pattern Store
 
+    return;
+
     Cluster nextCluster;
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
@@ -441,6 +443,7 @@ bool key_input_action()
     static string commandString;
 
     int c = getch();
+//    const char * key = getkey();
 
     switch (c)
     {
@@ -459,6 +462,18 @@ bool key_input_action()
         copy_clipboard(g_PatternStore.EditPatternToString());
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         break;
+
+        // After using Alt-Enter, we seem to get additional Enter - char(10) - messages
+        // on the next keypress, regardless of what that key press actually is. Disabling
+        // this bit of code (probably) doesn't prevent that peculiar behaviour, but will
+        // at least discourage using Alt-Enter or Esc all round.
+
+//    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
+//        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
+//        {
+//            show_status_after_navigation();
+//        }
+//        break;
 
     case 22: // Ctrl-V, Paste
         move(COMMAND_HOME);

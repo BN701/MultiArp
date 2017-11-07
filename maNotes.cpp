@@ -206,6 +206,11 @@ unordered_map<string, int> mapNotesToNumbers =
     {"G10", 127}
 };
 
+//
+// Note
+//
+//////////////////////////////////////////////////////////////////////////////////
+
 string Note::NoteName(int n)
 {
     if ( n >= 0 )
@@ -283,21 +288,70 @@ void Note::FromString(string s)
     else
         m_Length = 0.0;
 
-//    size_t pos = s.find(':');
-//
-//    if ( pos != string::npos )
-//    {
-//        m_NoteNumber = mapNotesToNumbers.at(s.substr(0, pos));
-//        m_NoteVelocity = stoi(s.substr(pos + 1));
-//        if ( m_NoteVelocity < 0 || m_NoteVelocity > 127 )
-//            m_NoteVelocity = -1;
-//    }
-//    else
-//    {
-//        m_NoteNumber = mapNotesToNumbers.at(s);
-//        m_NoteVelocity = -1;
-//    }
 }
+
+void Note::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    m_Status = "Note - ";
+
+    pos = m_Status.size();
+    m_Status += ToString();
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Vel ";
+    pos = m_Status.size();
+    sprintf(buff, "%i", m_NoteVelocity);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Len ";
+    pos = m_Status.size();
+    sprintf(buff, "%6.2f", m_Length);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Phase ";
+    pos = m_Status.size();
+    sprintf(buff, "%6.2f", m_Phase);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Highlights.push_back(m_FieldPositions.at(m_NoteEditFocus));
+
+}
+
+bool Note::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+    case back_space:
+    case escape:
+        ReturnFocus();
+//        m_ReturnFocus->SetFocus();
+//        m_ReturnFocus->SetStatus();
+        break;
+    default:
+        return false;
+    }
+
+    m_FirstField = m_NoteEditFocus == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+//
+// Cluster
+//
+///////////////////////////////////////////////////////////////////
 
 bool Cluster::IsRest()
 {
@@ -318,7 +372,8 @@ string Cluster::ToString(bool showVelocity)
     {
          if ( result.size() > 0 )
           result += '/';
-        result += Note(*i).ToString(showVelocity);
+//        result += Note(*i).ToString(showVelocity);
+        result += i->ToString(showVelocity);
     }
     return result;
 }
@@ -395,6 +450,74 @@ Cluster * StepList::Step()
 
     return pCluster;
 }
+
+void Cluster::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    m_Status = "Notes -";
+
+    for ( int i = 0; i < m_Notes.size(); i++ )
+    {
+        m_Status += ' ';
+        pos = m_Status.size();
+        m_Status += m_Notes.at(i).ToString();
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
+    m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+
+}
+
+bool Cluster::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+        {
+            Note & n = m_Notes.at(m_PosEdit);
+            n.SetFocus();
+            n.SetStatus();
+            n.SetReturnFocus(this);
+        }
+        break;
+
+    case back_space:
+    case escape:
+        ReturnFocus();
+//        m_ReturnFocus->SetFocus();
+//        m_ReturnFocus->SetStatus();
+        break;
+
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+
+    case right:
+        if ( m_PosEdit < m_Notes.size() - 1 )
+            m_PosEdit += 1;
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+//
+// StepList
+//
+//////////////////////////////////////////////////////////////////////////
 
 
 bool StepList::PlayPositionInfo(int & offset,  int & length)
@@ -473,17 +596,21 @@ bool StepList::HandleKey(key_type_t k)
     switch ( k )
     {
     case enter:
-        if ( m_ListSubMenu != NULL )
-            delete m_ListSubMenu;
-        m_ListSubMenu = new StepListSubMenu(m_Clusters);
-        m_ListSubMenu->SetFocus();
-        m_ListSubMenu->SetStatus();
-        m_ListSubMenu->SetReturnFocus(this);
+//        if ( m_ListSubMenu != NULL )
+//            delete m_ListSubMenu;
+        m_SubMenu = make_shared<StepListSubMenu>(m_Clusters);
+        m_SubMenu->SetFocus();
+        m_SubMenu->SetStatus();
+        m_SubMenu->SetReturnFocus(this);
         break;
     case back_space:
-        m_ReturnFocus->SetFocus();
-        m_ReturnFocus->SetStatus();
+    case escape:
+        ReturnFocus();
+//        m_ReturnFocus->SetFocus();
+//        m_ReturnFocus->SetStatus();
         break;
+    default:
+        return false;
     }
 
     m_FirstField = m_StepListFocus == 0;
@@ -501,13 +628,17 @@ void StepListSubMenu::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "Chords - ";
+    m_Status = "Chords -";
 
-//    pos = m_Status.size();
-//    m_Status += "Edit List";
-//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
-//
-//    m_Highlights.push_back(m_FieldPositions.at(m_StepListFocus));
+    for ( int i = 0; i < m_Clusters.size(); i++ )
+    {
+        m_Status += ' ';
+        pos = m_Status.size();
+        m_Status += m_Clusters.at(i).ToString();
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
+    m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 
 }
 
@@ -516,17 +647,33 @@ bool StepListSubMenu::HandleKey(key_type_t k)
     switch ( k )
     {
     case enter:
-//        if ( m_ListSubMenu != NULL )
-//            delete m_ListSubMenu;
-//        m_ListSubMenu = new StepListSubMenu(m_Clusters);
-//        m_ListSubMenu->SetFocus();
-//        m_ListSubMenu->SetStatus();
-//        m_ListSubMenu->SetReturnFocus(this);
+        {
+            Cluster & c = m_Clusters.at(m_PosEdit);
+            c.SetFocus();
+            c.SetStatus();
+            c.SetReturnFocus(this);
+        }
         break;
+
     case back_space:
-        m_ReturnFocus->SetFocus();
-        m_ReturnFocus->SetStatus();
+    case escape:
+        ReturnFocus();
+//        m_ReturnFocus->SetFocus();
+//        m_ReturnFocus->SetStatus();
         break;
+
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+
+    case right:
+        if ( m_PosEdit < m_Clusters.size() - 1 )
+            m_PosEdit += 1;
+        break;
+
+    default:
+        return false;
     }
 
     m_FirstField = m_PosEdit == 0;
@@ -536,6 +683,10 @@ bool StepListSubMenu::HandleKey(key_type_t k)
     return true;
 }
 
+//
+// RealTimeList
+//
+//////////////////////////////////////////////////////////////////////////
 
 enum rtl_element_names_t {
     rtl_name_loop,
@@ -612,8 +763,10 @@ bool RealTimeList::HandleKey(key_type_t k)
         break;
 
     case back_space:
-        m_ReturnFocus->SetFocus();
-        m_ReturnFocus->SetStatus();
+    case escape:
+        ReturnFocus();
+//        m_ReturnFocus->SetFocus();
+//        m_ReturnFocus->SetStatus();
         break;
 
     case left:
@@ -676,6 +829,9 @@ bool RealTimeList::HandleKey(key_type_t k)
             break;
         }
         break;
+
+    default:
+        return false;
     }
 
     m_FirstField = m_RTListFocus == 0;

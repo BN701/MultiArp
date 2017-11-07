@@ -153,6 +153,8 @@ bool PatternStore::HandleKey(key_type_t k)
             break;
         }
         break;
+    default:
+        return false;
     }
 
     SetStatus();

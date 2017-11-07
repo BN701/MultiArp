@@ -44,7 +44,7 @@ struct PosInfo
     {};
 };
 
-struct Note
+struct Note : public CursorKeys
 {
 
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
@@ -72,9 +72,22 @@ struct Note
     void SetLength( double val ) { m_Length = val; }
     double Length() { return m_Length; }
 
+    virtual void SetStatus();
+    protected:
+        enum note_edit_focus_t {
+            nef_edit_note_number,
+            nef_edit_velocity,
+            nef_edit_length,
+            nef_edit_phase,
+            number_nef_types
+        };
+
+        virtual bool HandleKey(key_type_t k);
+        note_edit_focus_t m_NoteEditFocus = nef_edit_note_number;
+
 };
 
-struct Cluster
+struct Cluster : public CursorKeys
 {
     std::vector<Note> m_Notes;
     int m_StepLength;           // This will be filled in at some point to indicate how many rests follow.
@@ -101,9 +114,15 @@ struct Cluster
 
     std::string ToString(bool showVelocity = true);
     void FromString(std::string s);
+
+    virtual void SetStatus();
+    protected:
+        virtual bool HandleKey(key_type_t k);
+        std::vector<Note>::size_type m_PosEdit = 0;
+
 };
 
-struct StepListSubMenu;
+//struct StepListSubMenu;
 
 struct StepList : public CursorKeys
 {
@@ -117,20 +136,18 @@ struct StepList : public CursorKeys
     // std::string m_Label;
 
     bool m_Complete;
-    StepListSubMenu * m_ListSubMenu = NULL;
 
     StepList():
         m_Pos(0),
         m_LastRequestedPos(0),
         m_Complete(false)
-//        m_ListSubMenu(this)
     {
     }
 
     ~StepList()
     {
-        if ( m_ListSubMenu != NULL )
-            delete m_ListSubMenu;
+//        if ( m_ListSubMenu != NULL )
+//            delete m_ListSubMenu;
     }
 
     void Clear ()
@@ -203,22 +220,15 @@ struct StepList : public CursorKeys
 struct StepListSubMenu : public CursorKeys
 {
     std::vector<Cluster> & m_Clusters;
-//    StepList & m_Owner;
 
     StepListSubMenu(std::vector<Cluster> & clusters):
-//        m_Owner(owner)
         m_Clusters(clusters)
     {}
 
     virtual void SetStatus();
     protected:
-//        enum step_list_focus_t {
-//            sl_edit_notes,
-//            number_step_list_focus_modes
-//        };
-
         virtual bool HandleKey(key_type_t k);
-        int m_PosEdit = 0;
+        std::vector<Cluster>::size_type m_PosEdit = 0;
 
 };
 

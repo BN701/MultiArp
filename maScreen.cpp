@@ -346,7 +346,7 @@ void update_edit_panels(bool refreshList)
     wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
         p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
 
-    TranslateTable table = p.PatternTranslateTable();
+    TranslateTable & table = p.PatternTranslateTable();
 
     wmove(g_Display.EditSummaryPanel(), 2, 1);
     wprintw(g_Display.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",

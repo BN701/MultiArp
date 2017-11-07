@@ -179,8 +179,9 @@ bool ChainLink::HandleKey(key_type_t k)
     switch ( k )
     {
     case enter:
-        m_ReturnFocus->SetFocus();
-        m_ReturnFocus->SetStatus();
+        ReturnFocus();
+//        m_ReturnFocus->SetFocus();
+//        m_ReturnFocus->SetStatus();
         break;
     case left:
         if ( m_PosEdit > 0 )
@@ -229,6 +230,8 @@ bool ChainLink::HandleKey(key_type_t k)
             break;
         }
         break;
+    default:
+        return false;
     }
 
     m_FirstField = m_PosEdit == 0;

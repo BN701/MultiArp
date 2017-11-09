@@ -81,6 +81,7 @@ class CursorKeys
             m_ReturnFocus = NULL;
         }
         virtual void SetStatus() {}
+        virtual bool HandleKey(key_type_t k) { return false; };
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
 
@@ -100,7 +101,7 @@ class CursorKeys
     protected:
         static CursorKeys * m_Focus;
 
-        virtual bool HandleKey(key_type_t k) { return false; };
+//        virtual bool HandleKey(key_type_t k) { return false; };
 
         std::string m_Status;
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
@@ -109,7 +110,7 @@ class CursorKeys
         bool m_FirstField = true;
         follow_up_action_t m_FollowUp = none;
 
-        std::shared_ptr<CursorKeys> m_SubMenu;
+//        std::shared_ptr<CursorKeys> m_SubMenu;
         CursorKeys * m_ReturnFocus = NULL;
 //        CursorKeys * m_ListSubMenu = NULL;
 

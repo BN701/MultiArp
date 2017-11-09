@@ -298,7 +298,7 @@ void Note::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "Note - ";
+    m_Status = "[Note] ";
 
     pos = m_Status.size();
     m_Status += ToString();
@@ -334,8 +334,6 @@ bool Note::HandleKey(key_type_t k)
     case back_space:
     case escape:
         ReturnFocus();
-//        m_ReturnFocus->SetFocus();
-//        m_ReturnFocus->SetStatus();
         break;
     default:
         return false;
@@ -370,9 +368,8 @@ string Cluster::ToString(bool showVelocity)
     string result;
     for ( vector<Note>::iterator i = m_Notes.begin(); i != m_Notes.end(); i++ )
     {
-         if ( result.size() > 0 )
-          result += '/';
-//        result += Note(*i).ToString(showVelocity);
+        if ( result.size() > 0 )
+            result += '/';
         result += i->ToString(showVelocity);
     }
     return result;
@@ -454,12 +451,11 @@ Cluster * StepList::Step()
 void Cluster::SetStatus()
 {
     int pos = 0;
-    char buff[200];
 
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "Notes -";
+    m_Status = "[Cluster]";
 
     for ( int i = 0; i < m_Notes.size(); i++ )
     {
@@ -489,8 +485,6 @@ bool Cluster::HandleKey(key_type_t k)
     case back_space:
     case escape:
         ReturnFocus();
-//        m_ReturnFocus->SetFocus();
-//        m_ReturnFocus->SetStatus();
         break;
 
     case left:
@@ -502,6 +496,22 @@ bool Cluster::HandleKey(key_type_t k)
         if ( m_PosEdit < m_Notes.size() - 1 )
             m_PosEdit += 1;
         break;
+
+    case up:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(right);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
+    case down:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(left);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
 
     default:
         return false;
@@ -581,54 +591,7 @@ void StepList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "Step List - ";
-
-    pos = m_Status.size();
-    m_Status += "Edit List";
-    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
-
-    m_Highlights.push_back(m_FieldPositions.at(m_StepListFocus));
-
-}
-
-bool StepList::HandleKey(key_type_t k)
-{
-    switch ( k )
-    {
-    case enter:
-//        if ( m_ListSubMenu != NULL )
-//            delete m_ListSubMenu;
-        m_SubMenu = make_shared<StepListSubMenu>(m_Clusters);
-        m_SubMenu->SetFocus();
-        m_SubMenu->SetStatus();
-        m_SubMenu->SetReturnFocus(this);
-        break;
-    case back_space:
-    case escape:
-        ReturnFocus();
-//        m_ReturnFocus->SetFocus();
-//        m_ReturnFocus->SetStatus();
-        break;
-    default:
-        return false;
-    }
-
-    m_FirstField = m_StepListFocus == 0;
-
-    SetStatus();
-
-    return true;
-}
-
-void StepListSubMenu::SetStatus()
-{
-    int pos = 0;
-    char buff[200];
-
-    m_FieldPositions.clear();
-    m_Highlights.clear();
-
-    m_Status = "Chords -";
+    m_Status = "[StepList]";
 
     for ( int i = 0; i < m_Clusters.size(); i++ )
     {
@@ -639,10 +602,9 @@ void StepListSubMenu::SetStatus()
     }
 
     m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
-
 }
 
-bool StepListSubMenu::HandleKey(key_type_t k)
+bool StepList::HandleKey(key_type_t k)
 {
     switch ( k )
     {
@@ -658,8 +620,6 @@ bool StepListSubMenu::HandleKey(key_type_t k)
     case back_space:
     case escape:
         ReturnFocus();
-//        m_ReturnFocus->SetFocus();
-//        m_ReturnFocus->SetStatus();
         break;
 
     case left:
@@ -672,6 +632,15 @@ bool StepListSubMenu::HandleKey(key_type_t k)
             m_PosEdit += 1;
         break;
 
+    case up:
+    case down:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(k);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
     default:
         return false;
     }
@@ -683,43 +652,22 @@ bool StepListSubMenu::HandleKey(key_type_t k)
     return true;
 }
 
+
 //
 // RealTimeList
 //
 //////////////////////////////////////////////////////////////////////////
 
-enum rtl_element_names_t {
-    rtl_name_loop,
-    rtl_name_quantum,
-    rtl_name_multiplier,
-    rtl_name_window_adjust,
-    num_rtl_element_names
-};
-
-
-unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
-    {rtl_name_loop, "Loop"},
-    {rtl_name_quantum, "Quantum"},
-    {rtl_name_multiplier, "Multiplier"},
-    {rtl_name_window_adjust, "Window"},
-    {num_rtl_element_names, ""}
-};
-
-
-void RealTimeList::SetStatus()
+void RealTimeListParams::SetStatus()
 {
     int pos = 0;
     char buff[200];
 
-    m_Status = "Real Time List - ";
+    m_Status = "[Real Time List Params] ";
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    pos = m_Status.size();
-    m_Status += "Notes";
-    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
-
-    m_Status += ", Loop - ";
+    m_Status += " Loop - ";
 
     m_Status += "S: ";
     pos = m_Status.size();
@@ -745,6 +693,107 @@ void RealTimeList::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
+    m_Highlights.push_back(m_FieldPositions.at(m_RTParamsFocus));
+}
+
+bool RealTimeListParams::HandleKey(key_type_t k)
+{
+    int temp;
+    double inc = 0.1;
+    switch ( k )
+    {
+    case enter:
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        temp = static_cast<int>(m_RTParamsFocus) - 1;
+        if ( temp >= 0 && temp < number_rt_params_focus_modes )
+            m_RTParamsFocus = static_cast<rt_params_focus_t>(temp);
+        break;
+
+    case right:
+        temp = static_cast<int>(m_RTParamsFocus) + 1;
+        if ( temp >= 0 && temp < number_rt_params_focus_modes )
+            m_RTParamsFocus = static_cast<rt_params_focus_t>(temp);
+        break;
+
+    case shift_up:
+        inc = 0.01;
+    case up:
+        switch ( m_RTParamsFocus )
+        {
+        case rtp_loop_start:
+            m_LoopStart += inc;
+            break;
+        case rtp_local_quantum:
+            m_LocalQuantum += inc;
+            if ( m_LocalQuantum == 0 )
+                m_LocalQuantum += inc;
+            break;
+        case rtp_multiplier:
+            m_Multiplier += inc;
+            break;
+        case rtp_window_adjust:
+            m_AdjustWindowToStep = true;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    case shift_down:
+        inc = 0.01;
+    case down:
+        switch ( m_RTParamsFocus )
+        {
+        case rtp_loop_start:
+            m_LoopStart -= inc;
+            break;
+        case rtp_local_quantum:
+            if ( m_LocalQuantum - inc < 0 )
+                m_LocalQuantum = 0;
+            else
+                m_LocalQuantum -= inc;
+            break;
+        case rtp_multiplier:
+            m_Multiplier -= inc;
+            break;
+        case rtp_window_adjust:
+            m_AdjustWindowToStep = false;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_RTParamsFocus == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+
+void RealTimeList::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_Status = "[Real Time List] ";
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    pos = m_Status.size();
+    m_Status += "Params";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
     m_Highlights.push_back(m_FieldPositions.at(m_RTListFocus));
 
 }
@@ -756,78 +805,30 @@ bool RealTimeList::HandleKey(key_type_t k)
     switch ( k )
     {
     case enter:
-        if ( m_RTListFocus == rtl_edit_notes )
+        if ( m_RTListFocus == 0 )
         {
-            // Another object here?
+            m_Params.SetFocus();
+            m_Params.SetStatus();
+            m_Params.SetReturnFocus(this);
+
         }
         break;
 
     case back_space:
     case escape:
         ReturnFocus();
-//        m_ReturnFocus->SetFocus();
-//        m_ReturnFocus->SetStatus();
         break;
 
     case left:
-        temp = static_cast<int>(m_RTListFocus) - 1;
-        if ( temp >= 0 && temp < number_rt_list_focus_modes )
-            m_RTListFocus = static_cast<rt_list_focus_t>(temp);
         break;
 
     case right:
-        temp = static_cast<int>(m_RTListFocus) + 1;
-        if ( temp >= 0 && temp < number_rt_list_focus_modes )
-            m_RTListFocus = static_cast<rt_list_focus_t>(temp);
         break;
 
-    case shift_up:
-        inc = 0.01;
     case up:
-        switch ( m_RTListFocus )
-        {
-        case rtl_loop_start:
-            m_LoopStart += inc;
-            break;
-        case rtl_local_quantum:
-            m_LocalQuantum += inc;
-            if ( m_LocalQuantum == 0 )
-                m_LocalQuantum += inc;
-            break;
-        case rtl_multiplier:
-            m_Multiplier += inc;
-            break;
-        case rtl_window_adjust:
-            m_AdjustWindowToStep = true;
-            break;
-        default:
-            break;
-        }
         break;
 
-    case shift_down:
-        inc = 0.01;
     case down:
-        switch ( m_RTListFocus )
-        {
-        case rtl_loop_start:
-            m_LoopStart -= inc;
-            break;
-        case rtl_local_quantum:
-            if ( m_LocalQuantum - inc < 0 )
-                m_LocalQuantum = 0;
-            else
-                m_LocalQuantum -= inc;
-            break;
-        case rtl_multiplier:
-            m_Multiplier -= inc;
-            break;
-        case rtl_window_adjust:
-            break;
-        default:
-            m_AdjustWindowToStep = false;
-            break;
-        }
         break;
 
     default:
@@ -840,6 +841,23 @@ bool RealTimeList::HandleKey(key_type_t k)
 
     return true;
 }
+
+enum rtl_element_names_t {
+    rtl_name_loop,
+    rtl_name_quantum,
+    rtl_name_multiplier,
+    rtl_name_window_adjust,
+    num_rtl_element_names
+};
+
+
+unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
+    {rtl_name_loop, "Loop"},
+    {rtl_name_quantum, "Quantum"},
+    {rtl_name_multiplier, "Multiplier"},
+    {rtl_name_window_adjust, "Window"},
+    {num_rtl_element_names, ""}
+};
 
 void RealTimeList::FromString(string s)
 {
@@ -864,16 +882,16 @@ void RealTimeList::FromString(string s)
             switch (e)
             {
             case rtl_name_loop:
-                m_LoopStart = stod(token);
+                m_Params.m_LoopStart = stod(token);
                 break;
             case rtl_name_quantum:
-                m_LocalQuantum = stod(token);
+                m_Params.m_LocalQuantum = stod(token);
                 break;
             case rtl_name_multiplier:
-                m_Multiplier = stod(token);
+                m_Params.m_Multiplier = stod(token);
                 break;
             case rtl_name_window_adjust:
-                m_AdjustWindowToStep = token.find("on") == 0;
+                m_Params.m_AdjustWindowToStep = token.find("on") == 0;
                 break;
             default:
                 break;
@@ -920,10 +938,10 @@ string RealTimeList::ToString()
 
     char buff[200];
     sprintf(buff, " %s %.3f %s %.3f %s %.3f %s '%s'",
-            rtl_element_names.at(rtl_name_loop), m_LoopStart,
-            rtl_element_names.at(rtl_name_quantum), m_LocalQuantum,
-            rtl_element_names.at(rtl_name_multiplier), m_Multiplier,
-            rtl_element_names.at(rtl_name_window_adjust), m_AdjustWindowToStep ? "on" : "off"
+            rtl_element_names.at(rtl_name_loop), m_Params.m_LoopStart,
+            rtl_element_names.at(rtl_name_quantum), m_Params.m_LocalQuantum,
+            rtl_element_names.at(rtl_name_multiplier), m_Params.m_Multiplier,
+            rtl_element_names.at(rtl_name_window_adjust), m_Params.m_AdjustWindowToStep ? "on" : "off"
             );
 
     result += buff;
@@ -939,57 +957,6 @@ string RealTimeList::ToString()
 
     return result;
 }
-
-
-//string RealTimeList::ToString(int step, double phase)
-//{
-//    char buff[50];
-//    sprintf(buff, "%6.2f (%.2f): ", m_LastRequestedPhase, m_LastRequestedStepValue);
-//
-//    string result = buff;
-//
-//    double space = m_LastRequestedPhase + 2.0/m_LastRequestedStepValue;
-//
-//    for (map<double,Note>::iterator it = m_RealTimeList.lower_bound(m_LastRequestedPhase - 2.0/m_LastRequestedStepValue); it != m_RealTimeList.end(); it++)
-//    {
-//        while ( space < it->second.Phase() )
-//        {
-//            result += 'a';
-//            space += 4.0/m_LastRequestedStepValue;
-//        }
-////        sprintf(buff, "%s", it->second.ToString(false).c_str());
-////        result += buff;
-//        result += it->second.ToString(false);
-//        space += 4.0/m_LastRequestedStepValue;
-//    }
-//
-//    for ( ; space < m_QuantumAtCapture; space += 4.0/m_LastRequestedStepValue )
-//        result += 'b';
-//
-//
-//    space = 2.0/m_LastRequestedPhase;
-//
-//    for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.upper_bound(m_LastRequestedPhase); it++)
-//    {
-////        for ( ; space < it->second.Phase(); space += 4.0/m_LastRequestedStepValue )
-////            result += 'c';
-//        while ( space < it->second.Phase() )
-//        {
-//            result += 'c';
-//            space += 4.0/m_LastRequestedStepValue;
-//        }
-////        sprintf(buff, "%s", it->second.ToString(false).c_str());
-////        result += buff;
-//        it->second.ToString(false);
-//        space += 4.0/m_LastRequestedStepValue;
-//    }
-//
-//    for ( ; space < m_LastRequestedPhase; space += 4.0/m_LastRequestedStepValue )
-//        result += 'd';
-//
-//    return result;
-//}
-//
 
 // Less efficient (probably) but easier to read (possibly) ...
 
@@ -1054,7 +1021,10 @@ string RealTimeList::ToStringForDisplay(int width)
         result.resize(width);
 
     sprintf(buff, "\n    Multiplier %.2f, Loop Start %.2f, Loop Quantum %.2f, Window Adjust %s",
-        m_Multiplier, m_LoopStart, m_LocalQuantum, m_AdjustWindowToStep ? "ON" : "OFF");
+        m_Params.m_Multiplier,
+        m_Params.m_LoopStart,
+        m_Params.m_LocalQuantum,
+        m_Params.m_AdjustWindowToStep ? "ON" : "OFF");
     result += buff;
 
     return result;
@@ -1063,17 +1033,17 @@ string RealTimeList::ToStringForDisplay(int width)
 
 void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
 {
-    bool localLoop = lround(m_LocalQuantum) > 0;
+    bool localLoop = lround(m_Params.m_LocalQuantum) > 0;
 
-    phase *= m_Multiplier;
+    phase *= m_Params.m_Multiplier;
 
     // Wrap to start of local loop.
 
     if ( localLoop )
-        while ( phase > m_LocalQuantum )
-            phase -= m_LocalQuantum;
+        while ( phase > m_Params.m_LocalQuantum )
+            phase -= m_Params.m_LocalQuantum;
 
-    phase += m_LoopStart;
+    phase += m_Params.m_LoopStart;
 
     // Wrap to start of capture loop loop.
 
@@ -1086,8 +1056,8 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
 
     double window = 4.0 / stepValue;
 
-    if ( m_AdjustWindowToStep && abs(m_Multiplier) < 1.0 )
-        window *= m_Multiplier;
+    if ( m_Params.m_AdjustWindowToStep && abs(m_Params.m_Multiplier) < 1.0 )
+        window *= m_Params.m_Multiplier;
 
     double windowStart = phase - window/2;
     double windowEnd = phase + window/2;

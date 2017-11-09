@@ -340,7 +340,7 @@ void update_edit_panels(bool refreshList)
     Pattern & p = g_PatternStore.CurrentEditPattern();
 
     wmove(g_Display.EditSummaryPanel(), 0, 1);
-    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.ListCount(), p.RealTimeListCount());
+    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.StepListCount(), p.RealTimeListCount());
 
     wmove(g_Display.EditSummaryPanel(), 1, 1);
     wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),

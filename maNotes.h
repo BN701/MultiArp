@@ -146,8 +146,6 @@ struct StepList : public CursorKeys
 
     ~StepList()
     {
-//        if ( m_ListSubMenu != NULL )
-//            delete m_ListSubMenu;
     }
 
     void Clear ()
@@ -207,56 +205,47 @@ struct StepList : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum step_list_focus_t {
-            sl_edit_notes,
-            number_step_list_focus_modes
-        };
-
-        virtual bool HandleKey(key_type_t k);
-        step_list_focus_t m_StepListFocus = sl_edit_notes;
-
-};
-
-struct StepListSubMenu : public CursorKeys
-{
-    std::vector<Cluster> & m_Clusters;
-
-    StepListSubMenu(std::vector<Cluster> & clusters):
-        m_Clusters(clusters)
-    {}
-
-    virtual void SetStatus();
-    protected:
         virtual bool HandleKey(key_type_t k);
         std::vector<Cluster>::size_type m_PosEdit = 0;
 
 };
+
+struct RealTimeListParams : public CursorKeys
+{
+    double m_LoopStart = 0.0;
+    double m_LocalQuantum = 0.0;  // Loop length.
+    double m_Multiplier = 1.0;
+    bool m_AdjustWindowToStep = true;  // Probably just if multiplier less than 1.
+
+    virtual void SetStatus();
+    protected:
+        enum rt_params_focus_t {
+            rtp_loop_start,
+            rtp_local_quantum,
+            rtp_multiplier,
+            rtp_window_adjust,
+            number_rt_params_focus_modes
+        };
+
+        virtual bool HandleKey(key_type_t k);
+        rt_params_focus_t m_RTParamsFocus = rtp_loop_start;
+
+};
+
 
 struct RealTimeList : public CursorKeys
 {
     double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
 
-    double m_LastRequestedStepValue;
-    double m_LastRequestedPhase;
-
-    double m_LoopStart;
-    double m_LocalQuantum;  // Loop length.
-    double m_Multiplier;
-    bool m_AdjustWindowToStep;  // Probably just if multiplier less than 1.
+    double m_LastRequestedStepValue = 4.0;
+    double m_LastRequestedPhase = 0.0;
 
     void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
     RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
         m_QuantumAtCapture(quantum),
-        m_RealTimeList(realTimeList),
-        m_LastRequestedStepValue(4.0),
-        m_LastRequestedPhase(0.0),
-        m_LoopStart(0.0),
-        m_LocalQuantum(0.0),   // Negative means don't use.
-        m_Multiplier(1.0),
-        m_AdjustWindowToStep(true),
-        m_RTListFocus(rtl_loop_start)
+        m_RealTimeList(realTimeList)
     {};
 
     void FromString(std::string s);
@@ -265,18 +254,11 @@ struct RealTimeList : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum rt_list_focus_t {
-            rtl_edit_notes,
-            rtl_loop_start,
-            rtl_local_quantum,
-            rtl_multiplier,
-            rtl_window_adjust,
-            number_rt_list_focus_modes
-        };
 
         virtual bool HandleKey(key_type_t k);
-        rt_list_focus_t m_RTListFocus = rtl_edit_notes;
+        int m_RTListFocus = 0;
 
+        RealTimeListParams m_Params;
 };
 
 

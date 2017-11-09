@@ -112,7 +112,7 @@ struct Pattern
         m_StepValue = val;
     }
 
-    int ListCount()
+    int StepListCount()
     {
         return m_StepListSet.size();
     }

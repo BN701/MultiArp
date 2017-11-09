@@ -198,7 +198,7 @@ void queue_next_step(int queueId)
 
     // Step the Pattern Store
 
-    return;
+//    return;
 
     Cluster nextCluster;
 

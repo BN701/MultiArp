@@ -92,6 +92,7 @@ bool PatternStore::HandleKey(key_type_t k)
         case psf_pattern:
             break;
         case psf_list:
+            if ( m_Patterns.at(m_PosEdit).StepListCount() > 0 )
             {
                 StepList & s = m_Patterns.at(m_PosEdit).StepListForEdit();
                 s.SetFocus();
@@ -100,6 +101,7 @@ bool PatternStore::HandleKey(key_type_t k)
             }
             break;
         case psf_rt_list:
+            if ( m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
             {
                 RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
                 r.SetFocus();
@@ -231,7 +233,7 @@ int PatternStore::PlayPatternListCount()
     if ( m_Patterns.empty() )
         return 0;
 
-    return m_Patterns.at(m_PosPlay).ListCount();
+    return m_Patterns.at(m_PosPlay).StepListCount();
 }
 
 int PatternStore::RealTimeListCount()

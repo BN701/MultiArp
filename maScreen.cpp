@@ -486,10 +486,9 @@ void show_status_after_navigation()
     // objects derived from CursorKeys. All objects share the same
     // static pointer to the object in focus, and calling Status()
     // on any of them will retrieve the status string for the object
-    // that currently has focus. (For now we use g_PatternStore itself,
-    // because it's global and always present, but there's no other
-    // special status afforded to it than that.)
+    // that currently has focus.
 
+    static int adjustOffset = 0;
     string status = g_CursorKeys.Status();
 
     // Although I started off with a mechanism which allows for multiple
@@ -499,7 +498,8 @@ void show_status_after_navigation()
     // that to position the whole string within the available width. Any
     // highlights set after the first may end up off screen.
 
-    static int adjustOffset = 0;
+    if ( status.size() < width )
+        adjustOffset = 0;
 
     vector<screen_pos_t> & highlights = g_CursorKeys.GetHighlights();
 
@@ -514,9 +514,7 @@ void show_status_after_navigation()
             cursor.offset = 0;
         }
 
-        if ( status.size() < width )
-            adjustOffset = 0;
-        else if ( cursor.offset < adjustOffset )
+        if ( cursor.offset < adjustOffset )
             adjustOffset = cursor.offset;
         else if ( cursor.offset + cursor.length - adjustOffset >= width )
             adjustOffset = cursor.offset + cursor.length - width;

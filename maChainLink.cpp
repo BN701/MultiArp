@@ -139,7 +139,7 @@ void ChainLink::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "Chain Slot %02i - ", m_ID);
+    sprintf(buff, "Chain Slot %02i - ", m_ItemID);
     m_Status = buff;
 
     m_Status += "Pattern ";
@@ -180,8 +180,6 @@ bool ChainLink::HandleKey(key_type_t k)
     {
     case enter:
         ReturnFocus();
-//        m_ReturnFocus->SetFocus();
-//        m_ReturnFocus->SetStatus();
         break;
     case left:
         if ( m_PosEdit > 0 )

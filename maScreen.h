@@ -24,6 +24,9 @@
 
 // Extra keys that aren't in ncurses.h
 
+#define KEY_INSERT  331
+#define KEY_DELETE  330
+#define KEY_SDELETE 383
 #define KEY_CLEFT   545
 #define KEY_CRIGHT  560
 #define KEY_CUP     525

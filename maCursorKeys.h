@@ -42,6 +42,9 @@ class CursorKeys
             enter,
             back_space,
             escape,
+            ins,
+            del,
+            shift_delete,
             up,
             down,
             left,
@@ -70,6 +73,9 @@ class CursorKeys
             number_follow_up_actions
         };
 
+        int ItemID() { return m_ItemID; }
+        void SetItemID( int val ) { m_ItemID = val; }
+
         virtual void SetReturnFocus( CursorKeys * val ) { m_ReturnFocus = val; }
         void ReturnFocus()
         {
@@ -80,8 +86,12 @@ class CursorKeys
             }
             m_ReturnFocus = NULL;
         }
+
+        // These two must overriden.
+
         virtual void SetStatus() {}
         virtual bool HandleKey(key_type_t k) { return false; };
+
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
 
@@ -110,9 +120,9 @@ class CursorKeys
         bool m_FirstField = true;
         follow_up_action_t m_FollowUp = none;
 
-//        std::shared_ptr<CursorKeys> m_SubMenu;
         CursorKeys * m_ReturnFocus = NULL;
-//        CursorKeys * m_ListSubMenu = NULL;
+
+        int m_ItemID = -1;
 
     private:
 };

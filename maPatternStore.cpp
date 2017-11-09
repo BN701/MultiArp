@@ -95,6 +95,7 @@ bool PatternStore::HandleKey(key_type_t k)
             if ( m_Patterns.at(m_PosEdit).StepListCount() > 0 )
             {
                 StepList & s = m_Patterns.at(m_PosEdit).StepListForEdit();
+                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
                 s.SetFocus();
                 s.SetStatus();
                 s.SetReturnFocus(this);
@@ -104,6 +105,7 @@ bool PatternStore::HandleKey(key_type_t k)
             if ( m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
             {
                 RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
+                r.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
                 r.SetFocus();
                 r.SetStatus();
                 r.SetReturnFocus(this);

@@ -132,7 +132,7 @@ Display::Display()
     m_ProgressPanel = newwin(2, 15, 3, 61);
     m_EditListPanel = newwin(4, 20, 8, 4);
     m_EditSummaryPanel = newwin(4, 52, 8, 24);
-    m_BigPanel = newwin(10, 80, 15, 0);
+    m_BigPanel = newwin(10, 80, 13, 0);
 
     bkgd(COLOR_PAIR(CP_MAIN));
     wbkgd(m_SmallPanel, COLOR_PAIR(CP_SMALL_PANEL_BKGND));

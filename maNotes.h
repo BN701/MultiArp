@@ -78,7 +78,6 @@ struct Note : public CursorKeys
             nef_edit_note_number,
             nef_edit_velocity,
             nef_edit_length,
-            nef_edit_phase,
             number_nef_types
         };
 
@@ -257,8 +256,11 @@ struct RealTimeList : public CursorKeys
 
         virtual bool HandleKey(key_type_t k);
         int m_RTListFocus = 0;
+        int m_SubMenus = 1; // How many submenu items will there be in the CursorKeys menu?
 
         RealTimeListParams m_Params;
+
+        std::vector<Note> m_UndoList;
 };
 
 

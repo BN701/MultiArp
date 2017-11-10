@@ -327,11 +327,11 @@ void Note::SetStatus()
         m_Status +=  "Off";
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
-    m_Status += ", Phase ";
-    pos = m_Status.size();
-    sprintf(buff, "%.2f", m_Phase);
-    m_Status += buff;
-    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+//    m_Status += ", Phase ";
+//    pos = m_Status.size();
+//    sprintf(buff, "%.2f", m_Phase);
+//    m_Status += buff;
+//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
     m_Highlights.push_back(m_FieldPositions.at(m_NoteEditFocus));
 
@@ -377,9 +377,6 @@ bool Note::HandleKey(key_type_t k)
         case nef_edit_length:
             m_Length += inc;
             break;
-        case nef_edit_phase:
-            m_Phase += inc;
-            break;
         default:
             break;
         }
@@ -403,14 +400,10 @@ bool Note::HandleKey(key_type_t k)
             if ( m_Length - inc > 0 )
                 m_Length -= inc;
             break;
-        case nef_edit_phase:
-            m_Phase -= inc;
-            break;
         default:
             break;
         }
         break;
-
 
     default:
         return false;
@@ -982,10 +975,20 @@ void RealTimeList::SetStatus()
     sprintf(buff, "[RT List %i] ", m_ItemID);
     m_Status = buff;
 
-
     pos = m_Status.size();
     m_Status += "Params";
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    map<double, Note>::iterator it;
+
+    for ( it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++ )
+    {
+        pos = m_Status.size() + 1; // "+ 1" because there's a space before the phase value.
+        sprintf(buff, " %.2f:", it->first);
+        m_Status += buff;
+        m_Status += it->second.ToString(false);
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
 
     m_Highlights.push_back(m_FieldPositions.at(m_RTListFocus));
 
@@ -995,16 +998,27 @@ bool RealTimeList::HandleKey(key_type_t k)
 {
     int temp;
     double inc = 0.1;
+
+    map<double, Note>::iterator it = m_RealTimeList.begin();
+    for ( int i = 0; i < m_RTListFocus - m_SubMenus; i++ )
+        it++;   // There's no + operator on iterators for maps, apparently, so we do move step-by-step.
+
     switch ( k )
     {
     case enter:
-        if ( m_RTListFocus == 0 )
+        if ( m_RTListFocus < m_SubMenus )
         {
             m_Params.SetItemID(m_ItemID);
             m_Params.SetFocus();
             m_Params.SetStatus();
             m_Params.SetReturnFocus(this);
-
+        }
+        else
+        {
+            Note & n = it->second;
+            n.SetFocus();
+            n.SetStatus();
+            n.SetReturnFocus(this);
         }
         break;
 
@@ -1014,20 +1028,97 @@ bool RealTimeList::HandleKey(key_type_t k)
         break;
 
     case left:
+        if ( m_RTListFocus > 0 )
+            m_RTListFocus -= 1;
         break;
 
     case right:
+        if ( m_RTListFocus < m_FieldPositions.size() - 1 )
+            m_RTListFocus += 1;
         break;
 
+    case shift_up:
+    case shift_down:
+        inc = 0.01;
     case up:
+    case down:
+        if ( m_RTListFocus < m_SubMenus && m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(k);
+            m_ReturnFocus->HandleKey(enter);
+            return true;
+        }
+        else if ( m_RTListFocus >= m_SubMenus )   // Update note start time (phase).
+        {
+            // Make a copy of the note and erase the original.
+
+            Note n = it->second;
+            m_RealTimeList.erase(it);
+
+            // Increment phase.
+
+            if ( k == down || k == shift_down )
+                inc *= -1;
+
+            n.SetPhase(n.Phase() + inc);
+
+            // Get ready to re-insert, avoiding clashes.
+
+            while ( true )
+            {
+                map<double,Note>::iterator it = m_RealTimeList.find(n.Phase());
+                if ( m_RealTimeList.find(n.Phase()) == m_RealTimeList.end() )
+                    break;
+                n.SetPhase(n.Phase() + 0.001);
+            }
+
+            // Insert and reset our cursor position.
+
+            pair<map<double,Note>::iterator, bool> result = m_RealTimeList.insert(make_pair(n.Phase(), n));
+
+            if ( result.second )
+            {
+                m_RTListFocus = m_SubMenus;
+                while ( m_RealTimeList.begin() != result.first-- )
+                    m_RTListFocus += 1;
+            }
+        }
         break;
 
-    case down:
+    case shift_delete:
+        if ( m_RTListFocus >= m_SubMenus )
+        {
+            m_UndoList.push_back(it->second);
+            m_RealTimeList.erase(it);
+            if ( m_RTListFocus - m_SubMenus >= m_RealTimeList.size() )
+                m_RTListFocus -= 1;
+        }
+        break;
+
+    case ctrl_delete:
+        if ( !m_UndoList.empty() )
+        {
+            // Re-insert and reset our cursor position.
+
+            Note & n = m_UndoList.back();
+
+            pair<map<double,Note>::iterator, bool> result = m_RealTimeList.insert(make_pair(n.Phase(), n));
+
+            if ( result.second )
+            {
+                m_RTListFocus = m_SubMenus;
+                while ( m_RealTimeList.begin() != result.first-- )
+                    m_RTListFocus += 1;
+            }
+
+            m_UndoList.pop_back();
+        }
         break;
 
     default:
         return false;
     }
+
 
     m_FirstField = m_RTListFocus == 0;
 

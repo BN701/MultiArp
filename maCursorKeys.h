@@ -45,6 +45,7 @@ class CursorKeys
             ins,
             del,
             shift_delete,
+            ctrl_delete,
             up,
             down,
             left,

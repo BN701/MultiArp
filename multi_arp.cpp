@@ -416,6 +416,7 @@ unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
     {KEY_INSERT, CursorKeys::ins},
     {KEY_DELETE, CursorKeys::del},
     {KEY_SDELETE, CursorKeys::shift_delete},
+    {KEY_CDELETE, CursorKeys::ctrl_delete},
     {KEY_DOWN, CursorKeys::down},
     {KEY_UP, CursorKeys::up},
     {KEY_LEFT, CursorKeys::left},
@@ -555,6 +556,7 @@ bool key_input_action()
     case KEY_INSERT:
     case KEY_DELETE:
     case KEY_SDELETE:
+    case KEY_CDELETE:
         g_CursorKeys.RouteKey(g_CursorKeyMap.at(c));
         show_status_after_navigation();
         update_edit_panels();

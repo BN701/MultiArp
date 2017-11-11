@@ -21,14 +21,74 @@
 
 CursorKeys * CursorKeys::m_Focus = NULL;
 
-CursorKeys::CursorKeys():
-    m_EntryMode(em_normal)
+CursorKeys::CursorKeys()
 {
     //ctor
+}
+
+CursorKeys::CursorKeys(const CursorKeys & val)
+{
+    // Explicitly avoid copying any pointers to other menus,
+    // nothing else to be done. (Members appear to be initialized
+    // according to their declarations. i.e. set to NULL, etc.)
 }
 
 CursorKeys::~CursorKeys()
 {
     //dtor
+
+    if ( m_Focus == this )
+        m_Focus = NULL;
 }
 
+bool CursorKeys::RouteKey(key_type_t k)
+{
+    if ( m_Focus != NULL )
+        return m_Focus->HandleKey(k);
+    else
+        return false;
+}
+
+std::string g_EmptyStatus;
+
+std::string & CursorKeys::Status()
+{
+    if ( m_Focus != NULL )
+        return m_Focus->m_Status;
+    else
+        return g_EmptyStatus;
+}
+
+bool CursorKeys::FirstField()
+{
+    if ( m_Focus != NULL )
+        return m_Focus->m_FirstField;
+    else
+        return false;
+}
+
+// Default empty containers.
+
+std::vector<screen_pos_t> g_FieldPositions;
+std::vector<screen_pos_t> g_Highlights;
+
+std::vector<screen_pos_t> & CursorKeys::GetHighlights()
+{
+    if ( m_Focus != NULL )
+        return m_Focus->m_Highlights;
+    else
+        return g_Highlights;
+
+    // Convoluted behaviour, I know, but assuming this method is (usually)
+    // called on the default global object used for routing to actual
+    // instances, the global object's array will always exist and always
+    // be empty.
+}
+
+std::vector<screen_pos_t> & CursorKeys::GetFieldPositions()
+{
+    if ( m_Focus != NULL )
+        return m_Focus->m_FieldPositions;
+    else
+        return g_FieldPositions;
+}

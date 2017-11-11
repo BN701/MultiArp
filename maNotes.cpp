@@ -206,6 +206,11 @@ unordered_map<string, int> mapNotesToNumbers =
     {"G10", 127}
 };
 
+//
+// Note
+//
+//////////////////////////////////////////////////////////////////////////////////
+
 string Note::NoteName(int n)
 {
     if ( n >= 0 )
@@ -283,21 +288,138 @@ void Note::FromString(string s)
     else
         m_Length = 0.0;
 
-//    size_t pos = s.find(':');
-//
-//    if ( pos != string::npos )
-//    {
-//        m_NoteNumber = mapNotesToNumbers.at(s.substr(0, pos));
-//        m_NoteVelocity = stoi(s.substr(pos + 1));
-//        if ( m_NoteVelocity < 0 || m_NoteVelocity > 127 )
-//            m_NoteVelocity = -1;
-//    }
-//    else
-//    {
-//        m_NoteNumber = mapNotesToNumbers.at(s);
-//        m_NoteVelocity = -1;
-//    }
 }
+
+void Note::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    sprintf(buff, "[Note %i] ", m_ItemID);
+    m_Status = buff;
+
+    pos = m_Status.size();
+    m_Status += ToString(false);
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Vel ";
+    pos = m_Status.size();
+    if ( m_NoteVelocity > 0 )
+    {
+        sprintf(buff, "%i", m_NoteVelocity);
+        m_Status += buff;
+    }
+    else
+        m_Status += "Off";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Len ";
+    pos = m_Status.size();
+    if ( m_Length > 0 )
+    {
+        sprintf(buff, "%.2f", m_Length);
+        m_Status += buff;
+    }
+    else
+        m_Status +=  "Off";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+//    m_Status += ", Phase ";
+//    pos = m_Status.size();
+//    sprintf(buff, "%.2f", m_Phase);
+//    m_Status += buff;
+//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Highlights.push_back(m_FieldPositions.at(m_NoteEditFocus));
+
+}
+
+bool Note::HandleKey(key_type_t k)
+{
+    double inc = 0.1;
+    int note_inc = 1;
+
+    switch ( k )
+    {
+    case enter:
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        if ( m_NoteEditFocus > 0 )
+            m_NoteEditFocus = static_cast<note_edit_focus_t>(m_NoteEditFocus - 1);
+        break;
+
+    case right:
+        if ( m_NoteEditFocus < number_nef_types - 1 )
+            m_NoteEditFocus = static_cast<note_edit_focus_t>(m_NoteEditFocus + 1);
+        break;
+
+    case shift_up:
+        inc = 0.01;
+        note_inc = 12;
+    case up:
+        switch ( m_NoteEditFocus )
+        {
+        case nef_edit_note_number:
+            if ( m_NoteNumber + note_inc < 128 )
+                m_NoteNumber += note_inc;
+            break;
+        case nef_edit_velocity:
+            if ( m_NoteVelocity < 127 )
+                m_NoteVelocity += 1;
+            break;
+        case nef_edit_length:
+            m_Length += inc;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    case shift_down:
+        inc = 0.01;
+        note_inc = 12;
+    case down:
+        switch ( m_NoteEditFocus )
+        {
+        case nef_edit_note_number:
+            if ( m_NoteNumber - note_inc >= -1 )
+                m_NoteNumber -= note_inc;
+            break;
+        case nef_edit_velocity:
+            if ( m_NoteVelocity > 0 )
+                m_NoteVelocity -= 1;
+            break;
+        case nef_edit_length:
+            if ( m_Length - inc > 0 )
+                m_Length -= inc;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_NoteEditFocus == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+//
+// Cluster
+//
+///////////////////////////////////////////////////////////////////
 
 bool Cluster::IsRest()
 {
@@ -316,9 +438,9 @@ string Cluster::ToString(bool showVelocity)
     string result;
     for ( vector<Note>::iterator i = m_Notes.begin(); i != m_Notes.end(); i++ )
     {
-         if ( result.size() > 0 )
-          result += '/';
-        result += Note(*i).ToString(showVelocity);
+        if ( result.size() > 0 )
+            result += '/';
+        result += i->ToString(showVelocity);
     }
     return result;
 }
@@ -396,6 +518,140 @@ Cluster * StepList::Step()
     return pCluster;
 }
 
+void Cluster::SetStatus()
+{
+    int pos = 0;
+    char buff[50];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    sprintf(buff, "[Cluster %i] ", m_ItemID);
+    m_Status = buff;
+
+    for ( int i = 0; i < m_Notes.size(); i++ )
+    {
+        if ( i > 0 )
+            m_Status += '/';
+        pos = m_Status.size();
+        m_Status += m_Notes.at(i).ToString(false);
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
+    if ( !m_FieldPositions.empty() )
+        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+
+}
+
+bool Cluster::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+        if ( !m_Notes.empty() )
+        {
+            Note & n = m_Notes.at(m_PosEdit);
+            n.SetItemID(m_PosEdit + 1);
+            n.SetFocus();
+            n.SetStatus();
+            n.SetReturnFocus(this);
+        }
+        break;
+
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+
+    case right:
+        if ( m_PosEdit < m_Notes.size() - 1 )
+            m_PosEdit += 1;
+        break;
+
+    case up:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(right);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
+    case down:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(left);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
+    case ctrl_left:
+        if ( !m_Notes.empty() )
+        {
+            m_Notes.insert(m_Notes.begin() + m_PosEdit, m_Notes.at(m_PosEdit));
+        }
+        break;
+
+    case ctrl_right:
+        if ( !m_Notes.empty() )
+        {
+            m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, m_Notes.at(m_PosEdit));
+            m_PosEdit += 1;
+        }
+        break;
+
+    case shift_left:
+        if ( m_Notes.empty() )
+        {
+            m_Notes.emplace_back();
+            m_PosEdit = 0;
+        }
+        else
+            m_Notes.insert(m_Notes.begin() + m_PosEdit, *(new Note()));
+        break;
+
+    case shift_delete:
+        if ( !m_Notes.empty() )
+        {
+            m_Notes.erase(m_Notes.begin() + m_PosEdit);
+            if ( m_PosEdit == m_Notes.size() )
+                m_PosEdit -= 1;
+        }
+        break;
+
+    case shift_right:
+        if ( m_Notes.empty() )
+        {
+            m_Notes.emplace_back();
+            m_PosEdit = 0;
+        }
+        else
+        {
+            m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, *(new Note()));
+            m_PosEdit += 1;
+        }
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+//
+// StepList
+//
+//////////////////////////////////////////////////////////////////////////
+
 
 bool StepList::PlayPositionInfo(int & offset,  int & length)
 {
@@ -450,39 +706,159 @@ void StepList::FromString(string s)
     }
 }
 
-enum rtl_element_names_t {
-    rtl_name_loop,
-    rtl_name_quantum,
-    rtl_name_multiplier,
-    rtl_name_window_adjust,
-    num_rtl_element_names
-};
-
-
-unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
-    {rtl_name_loop, "Loop"},
-    {rtl_name_quantum, "Quantum"},
-    {rtl_name_multiplier, "Multiplier"},
-    {rtl_name_window_adjust, "Window"},
-    {num_rtl_element_names, ""}
-};
-
-
-void RealTimeList::SetStatus()
+void StepList::SetStatus()
 {
+    int pos = 0;
     char buff[200];
 
-    m_Status = "RT Loop - ";
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status += "Sta: ";
-    int pos = m_Status.size();
+    sprintf(buff, "[Step List %i] ", m_ItemID);
+    m_Status = buff;
+
+
+    for ( int i = 0; i < m_Clusters.size(); i++ )
+    {
+        if ( i > 0 )
+            m_Status += ", ";
+        pos = m_Status.size();
+        Cluster & c = m_Clusters.at(i);
+        if ( !c.Empty() )
+            m_Status += c.ToString(false);
+        else
+            m_Status += "(Empty)";
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
+    if ( !m_FieldPositions.empty() )
+        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+}
+
+bool StepList::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+        if ( ! m_Clusters.empty() )
+        {
+            Cluster & c = m_Clusters.at(m_PosEdit);
+            c.SetItemID(m_PosEdit + 1);
+            c.SetFocus();
+            c.SetStatus();
+            c.SetReturnFocus(this);
+        }
+        break;
+
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+
+    case right:
+        if ( m_PosEdit < m_Clusters.size() - 1 )
+            m_PosEdit += 1;
+        break;
+
+    case up:
+    case down:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(k);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
+    case ctrl_left:
+        if ( !m_Clusters.empty() )
+        {
+            m_Clusters.insert(m_Clusters.begin() + m_PosEdit, m_Clusters.at(m_PosEdit));
+        }
+        break;
+
+    case ctrl_right:
+        if ( !m_Clusters.empty() )
+        {
+            m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, m_Clusters.at(m_PosEdit));
+            m_PosEdit += 1;
+        }
+        break;
+
+    case shift_left:
+        if ( m_Clusters.empty() )
+        {
+            m_Clusters.emplace_back();
+            m_PosEdit = 0;
+        }
+        else
+            m_Clusters.insert(m_Clusters.begin() + m_PosEdit, *(new Cluster()));
+        break;
+
+    case shift_right:
+        if ( m_Clusters.empty() )
+        {
+            m_Clusters.emplace_back();
+            m_PosEdit = 0;
+        }
+        else
+        {
+            m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, *(new Cluster()));
+            m_PosEdit += 1;
+        }
+        break;
+
+    case shift_delete:
+        if ( !m_Clusters.empty() )
+        {
+            m_Clusters.erase(m_Clusters.begin() + m_PosEdit);
+            if ( m_PosEdit == m_Clusters.size() )
+                m_PosEdit -= 1;
+        }
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+
+//
+// RealTimeList
+//
+//////////////////////////////////////////////////////////////////////////
+
+void RealTimeListParams::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    sprintf(buff, "[RT List %i] ", m_ItemID);
+    m_Status = buff;
+
+
+    m_Status += " Loop - ";
+
+    m_Status += "S: ";
+    pos = m_Status.size();
     sprintf(buff, "%.2f", m_LoopStart);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
-    m_Status += " Qua: ";
+    m_Status += " Q: ";
     pos = m_Status.size();
     sprintf(buff, "%.2f", m_LocalQuantum);
     m_Status += buff;
@@ -500,6 +876,120 @@ void RealTimeList::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
+    m_Highlights.push_back(m_FieldPositions.at(m_RTParamsFocus));
+}
+
+bool RealTimeListParams::HandleKey(key_type_t k)
+{
+    int temp;
+    double inc = 0.1;
+    switch ( k )
+    {
+    case enter:
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        temp = static_cast<int>(m_RTParamsFocus) - 1;
+        if ( temp >= 0 && temp < number_rt_params_focus_modes )
+            m_RTParamsFocus = static_cast<rt_params_focus_t>(temp);
+        break;
+
+    case right:
+        temp = static_cast<int>(m_RTParamsFocus) + 1;
+        if ( temp >= 0 && temp < number_rt_params_focus_modes )
+            m_RTParamsFocus = static_cast<rt_params_focus_t>(temp);
+        break;
+
+    case shift_up:
+        inc = 0.01;
+    case up:
+        switch ( m_RTParamsFocus )
+        {
+        case rtp_loop_start:
+            m_LoopStart += inc;
+            break;
+        case rtp_local_quantum:
+            m_LocalQuantum += inc;
+            if ( m_LocalQuantum == 0 )
+                m_LocalQuantum += inc;
+            break;
+        case rtp_multiplier:
+            m_Multiplier += inc;
+            break;
+        case rtp_window_adjust:
+            m_AdjustWindowToStep = true;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    case shift_down:
+        inc = 0.01;
+    case down:
+        switch ( m_RTParamsFocus )
+        {
+        case rtp_loop_start:
+            m_LoopStart -= inc;
+            break;
+        case rtp_local_quantum:
+            if ( m_LocalQuantum - inc < 0 )
+                m_LocalQuantum = 0;
+            else
+                m_LocalQuantum -= inc;
+            break;
+        case rtp_multiplier:
+            m_Multiplier -= inc;
+            break;
+        case rtp_window_adjust:
+            m_AdjustWindowToStep = false;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_RTParamsFocus == 0;
+
+    SetStatus();
+
+    return true;
+}
+
+
+void RealTimeList::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    sprintf(buff, "[RT List %i] ", m_ItemID);
+    m_Status = buff;
+
+    pos = m_Status.size();
+    m_Status += "Params";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    map<double, Note>::iterator it;
+
+    for ( it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++ )
+    {
+        pos = m_Status.size() + 1; // "+ 1" because there's a space before the phase value.
+        sprintf(buff, " %.2f:", it->first);
+        m_Status += buff;
+        m_Status += it->second.ToString(false);
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
     m_Highlights.push_back(m_FieldPositions.at(m_RTListFocus));
 
 }
@@ -508,73 +998,151 @@ bool RealTimeList::HandleKey(key_type_t k)
 {
     int temp;
     double inc = 0.1;
+
+    map<double, Note>::iterator it = m_RealTimeList.begin();
+    for ( int i = 0; i < m_RTListFocus - m_SubMenus; i++ )
+        it++;   // There's no + operator on iterators for maps, apparently, so we do move step-by-step.
+
     switch ( k )
     {
-    case left:
-        temp = static_cast<int>(m_RTListFocus) - 1;
-        if ( temp >= 0 && temp < number_rt_list_focus_modes )
-            m_RTListFocus = static_cast<rt_list_focus_t>(temp);
-        break;
-    case right:
-        temp = static_cast<int>(m_RTListFocus) + 1;
-        if ( temp >= 0 && temp < number_rt_list_focus_modes )
-            m_RTListFocus = static_cast<rt_list_focus_t>(temp);
-        break;
-    case shift_up:
-        inc = 0.01;
-    case up:
-        switch ( m_RTListFocus )
+    case enter:
+        if ( m_RTListFocus < m_SubMenus )
         {
-        case rtl_loop_start:
-            m_LoopStart += inc;
-            break;
-        case rtl_local_quantum:
-            m_LocalQuantum += inc;
-            if ( m_LocalQuantum == 0 )
-                m_LocalQuantum += inc;
-            break;
-        case rtl_multiplier:
-            m_Multiplier += inc;
-            break;
-        case rtl_window_adjust:
-            m_AdjustWindowToStep = true;
-            break;
-        default:
-            break;
+            m_Params.SetItemID(m_ItemID);
+            m_Params.SetFocus();
+            m_Params.SetStatus();
+            m_Params.SetReturnFocus(this);
+        }
+        else
+        {
+            Note & n = it->second;
+            n.SetFocus();
+            n.SetStatus();
+            n.SetReturnFocus(this);
         }
         break;
+
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        if ( m_RTListFocus > 0 )
+            m_RTListFocus -= 1;
+        break;
+
+    case right:
+        if ( m_RTListFocus < m_FieldPositions.size() - 1 )
+            m_RTListFocus += 1;
+        break;
+
+    case shift_up:
     case shift_down:
         inc = 0.01;
+    case up:
     case down:
-        switch ( m_RTListFocus )
+        if ( m_RTListFocus < m_SubMenus && m_ReturnFocus != NULL )
         {
-        case rtl_loop_start:
-            m_LoopStart -= inc;
-            break;
-        case rtl_local_quantum:
-//            if ( lround(100 * m_LocalQuantum) > 0 )
-//                m_LocalQuantum -= inc;
-            if ( m_LocalQuantum - inc < 0 )
-                m_LocalQuantum = 0;
-            else
-                m_LocalQuantum -= inc;
-            break;
-        case rtl_multiplier:
-            m_Multiplier -= inc;
-            break;
-        case rtl_window_adjust:
-            break;
-        default:
-            m_AdjustWindowToStep = false;
-            break;
+            m_ReturnFocus->HandleKey(k);
+            m_ReturnFocus->HandleKey(enter);
+            return true;
+        }
+        else if ( m_RTListFocus >= m_SubMenus )   // Update note start time (phase).
+        {
+            // Make a copy of the note and erase the original.
+
+            Note n = it->second;
+            m_RealTimeList.erase(it);
+
+            // Increment phase.
+
+            if ( k == down || k == shift_down )
+                inc *= -1;
+
+            n.SetPhase(n.Phase() + inc);
+
+            // Get ready to re-insert, avoiding clashes.
+
+            while ( true )
+            {
+                map<double,Note>::iterator it = m_RealTimeList.find(n.Phase());
+                if ( m_RealTimeList.find(n.Phase()) == m_RealTimeList.end() )
+                    break;
+                n.SetPhase(n.Phase() + 0.001);
+            }
+
+            // Insert and reset our cursor position.
+
+            pair<map<double,Note>::iterator, bool> result = m_RealTimeList.insert(make_pair(n.Phase(), n));
+
+            if ( result.second )
+            {
+                m_RTListFocus = m_SubMenus;
+                while ( m_RealTimeList.begin() != result.first-- )
+                    m_RTListFocus += 1;
+            }
         }
         break;
+
+    case shift_delete:
+        if ( m_RTListFocus >= m_SubMenus )
+        {
+            m_UndoList.push_back(it->second);
+            m_RealTimeList.erase(it);
+            if ( m_RTListFocus - m_SubMenus >= m_RealTimeList.size() )
+                m_RTListFocus -= 1;
+        }
+        break;
+
+    case ctrl_delete:
+        if ( !m_UndoList.empty() )
+        {
+            // Re-insert and reset our cursor position.
+
+            Note & n = m_UndoList.back();
+
+            pair<map<double,Note>::iterator, bool> result = m_RealTimeList.insert(make_pair(n.Phase(), n));
+
+            if ( result.second )
+            {
+                m_RTListFocus = m_SubMenus;
+                while ( m_RealTimeList.begin() != result.first-- )
+                    m_RTListFocus += 1;
+            }
+
+            m_UndoList.pop_back();
+        }
+        break;
+
+    default:
+        return false;
     }
+
+
+    m_FirstField = m_RTListFocus == 0;
 
     SetStatus();
 
     return true;
 }
+
+enum rtl_element_names_t {
+    rtl_name_loop,
+    rtl_name_quantum,
+    rtl_name_multiplier,
+    rtl_name_window_adjust,
+    num_rtl_element_names
+};
+
+
+unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
+    {rtl_name_loop, "Loop"},
+    {rtl_name_quantum, "Quantum"},
+    {rtl_name_multiplier, "Multiplier"},
+    {rtl_name_window_adjust, "Window"},
+    {num_rtl_element_names, ""}
+};
 
 void RealTimeList::FromString(string s)
 {
@@ -599,16 +1167,16 @@ void RealTimeList::FromString(string s)
             switch (e)
             {
             case rtl_name_loop:
-                m_LoopStart = stod(token);
+                m_Params.m_LoopStart = stod(token);
                 break;
             case rtl_name_quantum:
-                m_LocalQuantum = stod(token);
+                m_Params.m_LocalQuantum = stod(token);
                 break;
             case rtl_name_multiplier:
-                m_Multiplier = stod(token);
+                m_Params.m_Multiplier = stod(token);
                 break;
             case rtl_name_window_adjust:
-                m_AdjustWindowToStep = token.find("on") == 0;
+                m_Params.m_AdjustWindowToStep = token.find("on") == 0;
                 break;
             default:
                 break;
@@ -655,10 +1223,10 @@ string RealTimeList::ToString()
 
     char buff[200];
     sprintf(buff, " %s %.3f %s %.3f %s %.3f %s '%s'",
-            rtl_element_names.at(rtl_name_loop), m_LoopStart,
-            rtl_element_names.at(rtl_name_quantum), m_LocalQuantum,
-            rtl_element_names.at(rtl_name_multiplier), m_Multiplier,
-            rtl_element_names.at(rtl_name_window_adjust), m_AdjustWindowToStep ? "on" : "off"
+            rtl_element_names.at(rtl_name_loop), m_Params.m_LoopStart,
+            rtl_element_names.at(rtl_name_quantum), m_Params.m_LocalQuantum,
+            rtl_element_names.at(rtl_name_multiplier), m_Params.m_Multiplier,
+            rtl_element_names.at(rtl_name_window_adjust), m_Params.m_AdjustWindowToStep ? "on" : "off"
             );
 
     result += buff;
@@ -674,57 +1242,6 @@ string RealTimeList::ToString()
 
     return result;
 }
-
-
-//string RealTimeList::ToString(int step, double phase)
-//{
-//    char buff[50];
-//    sprintf(buff, "%6.2f (%.2f): ", m_LastRequestedPhase, m_LastRequestedStepValue);
-//
-//    string result = buff;
-//
-//    double space = m_LastRequestedPhase + 2.0/m_LastRequestedStepValue;
-//
-//    for (map<double,Note>::iterator it = m_RealTimeList.lower_bound(m_LastRequestedPhase - 2.0/m_LastRequestedStepValue); it != m_RealTimeList.end(); it++)
-//    {
-//        while ( space < it->second.Phase() )
-//        {
-//            result += 'a';
-//            space += 4.0/m_LastRequestedStepValue;
-//        }
-////        sprintf(buff, "%s", it->second.ToString(false).c_str());
-////        result += buff;
-//        result += it->second.ToString(false);
-//        space += 4.0/m_LastRequestedStepValue;
-//    }
-//
-//    for ( ; space < m_QuantumAtCapture; space += 4.0/m_LastRequestedStepValue )
-//        result += 'b';
-//
-//
-//    space = 2.0/m_LastRequestedPhase;
-//
-//    for (map<double,Note>::iterator it = m_RealTimeList.begin(); it != m_RealTimeList.upper_bound(m_LastRequestedPhase); it++)
-//    {
-////        for ( ; space < it->second.Phase(); space += 4.0/m_LastRequestedStepValue )
-////            result += 'c';
-//        while ( space < it->second.Phase() )
-//        {
-//            result += 'c';
-//            space += 4.0/m_LastRequestedStepValue;
-//        }
-////        sprintf(buff, "%s", it->second.ToString(false).c_str());
-////        result += buff;
-//        it->second.ToString(false);
-//        space += 4.0/m_LastRequestedStepValue;
-//    }
-//
-//    for ( ; space < m_LastRequestedPhase; space += 4.0/m_LastRequestedStepValue )
-//        result += 'd';
-//
-//    return result;
-//}
-//
 
 // Less efficient (probably) but easier to read (possibly) ...
 
@@ -789,7 +1306,10 @@ string RealTimeList::ToStringForDisplay(int width)
         result.resize(width);
 
     sprintf(buff, "\n    Multiplier %.2f, Loop Start %.2f, Loop Quantum %.2f, Window Adjust %s",
-        m_Multiplier, m_LoopStart, m_LocalQuantum, m_AdjustWindowToStep ? "ON" : "OFF");
+        m_Params.m_Multiplier,
+        m_Params.m_LoopStart,
+        m_Params.m_LocalQuantum,
+        m_Params.m_AdjustWindowToStep ? "ON" : "OFF");
     result += buff;
 
     return result;
@@ -798,17 +1318,17 @@ string RealTimeList::ToStringForDisplay(int width)
 
 void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
 {
-    bool localLoop = lround(m_LocalQuantum) > 0;
+    bool localLoop = lround(m_Params.m_LocalQuantum) > 0;
 
-    phase *= m_Multiplier;
+    phase *= m_Params.m_Multiplier;
 
     // Wrap to start of local loop.
 
     if ( localLoop )
-        while ( phase > m_LocalQuantum )
-            phase -= m_LocalQuantum;
+        while ( phase > m_Params.m_LocalQuantum )
+            phase -= m_Params.m_LocalQuantum;
 
-    phase += m_LoopStart;
+    phase += m_Params.m_LoopStart;
 
     // Wrap to start of capture loop loop.
 
@@ -821,8 +1341,8 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
 
     double window = 4.0 / stepValue;
 
-    if ( m_AdjustWindowToStep && abs(m_Multiplier) < 1.0 )
-        window *= m_Multiplier;
+    if ( m_Params.m_AdjustWindowToStep && abs(m_Params.m_Multiplier) < 1.0 )
+        window *= m_Params.m_Multiplier;
 
     double windowStart = phase - window/2;
     double windowEnd = phase + window/2;

@@ -20,22 +20,9 @@
 #ifndef CURSORKEYS_H
 #define CURSORKEYS_H
 
+#include <memory>
 #include <string>
 #include <vector>
-
-// This is probably bad practice, but classes will derive from this
-// to handle cursor keys and although the entry mode field will be
-// common to all of them, its content won't be. I could embed the enum
-// in the class, but that means the base class will need to know about
-// what derives from it, which is even more wrong.
-
-enum entry_modes_t
-{
-    em_normal,
-    em_scale,
-    em_feel,
-    number_entry_modes
-};
 
 struct screen_pos_t
 {
@@ -48,11 +35,17 @@ class CursorKeys
 {
     public:
         CursorKeys();
+        CursorKeys(const CursorKeys & val);
         virtual ~CursorKeys();
 
         enum key_type_t {
             enter,
             back_space,
+            escape,
+            ins,
+            del,
+            shift_delete,
+            ctrl_delete,
             up,
             down,
             left,
@@ -81,18 +74,33 @@ class CursorKeys
             number_follow_up_actions
         };
 
-        virtual void SetMode(entry_modes_t m) { m_EntryMode = m; }
-        entry_modes_t Mode() { return m_EntryMode; }
+        int ItemID() { return m_ItemID; }
+        void SetItemID( int val ) { m_ItemID = val; }
 
         virtual void SetReturnFocus( CursorKeys * val ) { m_ReturnFocus = val; }
+        void ReturnFocus()
+        {
+            if ( m_ReturnFocus != NULL )
+            {
+                m_ReturnFocus->SetFocus();
+                m_ReturnFocus->SetStatus();
+            }
+            m_ReturnFocus = NULL;
+        }
+
+        // These two must overriden.
+
         virtual void SetStatus() {}
+        virtual bool HandleKey(key_type_t k) { return false; };
+
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
-        bool RouteKey(key_type_t k) { return m_Focus->HandleKey(k); }
-        std::string & Status() { return m_Focus->m_Status; }
 
-        bool FirstField() { return m_Focus->m_FirstField; }
-        std::vector<screen_pos_t> & GetHighlights() { return m_Focus->m_Highlights; }
+        static bool RouteKey(key_type_t k);
+        static std::string & Status();
+        static bool FirstField();
+        static std::vector<screen_pos_t> & GetHighlights();
+        static std::vector<screen_pos_t> & GetFieldPositions();
 
         follow_up_action_t FollowUp()
         {
@@ -102,18 +110,20 @@ class CursorKeys
         }
 
     protected:
-        virtual bool HandleKey(key_type_t k) { return false; };
+        static CursorKeys * m_Focus;
 
-        entry_modes_t m_EntryMode;
+//        virtual bool HandleKey(key_type_t k) { return false; };
+
         std::string m_Status;
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.
 
         bool m_FirstField = true;
-        static CursorKeys * m_Focus;
+        follow_up_action_t m_FollowUp = none;
 
         CursorKeys * m_ReturnFocus = NULL;
-        follow_up_action_t m_FollowUp = none;
+
+        int m_ItemID = -1;
 
     private:
 };

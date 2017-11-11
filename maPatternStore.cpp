@@ -86,6 +86,35 @@ bool PatternStore::HandleKey(key_type_t k)
     int temp;
     switch ( k )
     {
+    case enter:
+        switch ( m_PatternStoreFocus )
+        {
+        case psf_pattern:
+            break;
+        case psf_list:
+            if ( m_Patterns.at(m_PosEdit).StepListCount() > 0 )
+            {
+                StepList & s = m_Patterns.at(m_PosEdit).StepListForEdit();
+                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
+                s.SetFocus();
+                s.SetStatus();
+                s.SetReturnFocus(this);
+            }
+            break;
+        case psf_rt_list:
+            if ( m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
+            {
+                RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
+                r.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
+                r.SetFocus();
+                r.SetStatus();
+                r.SetReturnFocus(this);
+            }
+            break;
+        default:
+            break;
+        }
+        break;
     case left:
         temp = static_cast<int>(m_PatternStoreFocus) - 1;
         if ( temp >= 0 && temp < number_psf_focus_modes )
@@ -128,6 +157,8 @@ bool PatternStore::HandleKey(key_type_t k)
             break;
         }
         break;
+    default:
+        return false;
     }
 
     SetStatus();
@@ -204,7 +235,7 @@ int PatternStore::PlayPatternListCount()
     if ( m_Patterns.empty() )
         return 0;
 
-    return m_Patterns.at(m_PosPlay).ListCount();
+    return m_Patterns.at(m_PosPlay).StepListCount();
 }
 
 int PatternStore::RealTimeListCount()
@@ -246,28 +277,6 @@ string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
 
     return m_PatternChain.ToStringForDisplay(firstRow, rows);
 
-//    for ( int row = firstRow; row < firstRow + rows; row++ )
-//    {
-//        if ( 4 * row >= m_PatternChain.size() )
-//            break;
-//
-//        if ( ! result.empty() )
-//            result +=  '\n';
-//
-//        char buff[20];
-//        sprintf(buff, "%02i - ", 4 * row + 1);
-//        result += buff;
-//
-//        for ( int i = 0; i < 4; i++ )
-//        {
-//            int pos = 4 * row + i;
-//            if ( pos >= m_PatternChain.size() )
-//                break;
-//            result += m_PatternChain.at(pos).ToStringForDisplay();
-//        }
-//    }
-//
-//    return result;
 }
 
 string PatternStore::PatternStatus()
@@ -282,12 +291,6 @@ string PatternStore::PatternStatus()
     sprintf(buf, "Play: %i", m_PosPlay + 1);
     result += buf;
 
-//    if ( !m_Patterns.at(m_PosPlay).LabelEmpty() )
-//    {
-//        result += ", ";
-//        result += m_Patterns.at(m_PosPlay).Label(15);
-//    }
-//
     switch ( m_PatternChainMode )
     {
         case PC_MODE_NONE :

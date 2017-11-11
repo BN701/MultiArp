@@ -44,7 +44,7 @@ struct PosInfo
     {};
 };
 
-struct Note
+struct Note : public CursorKeys
 {
 
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
@@ -72,9 +72,21 @@ struct Note
     void SetLength( double val ) { m_Length = val; }
     double Length() { return m_Length; }
 
+    virtual void SetStatus();
+    protected:
+        enum note_edit_focus_t {
+            nef_edit_note_number,
+            nef_edit_velocity,
+            nef_edit_length,
+            number_nef_types
+        };
+
+        virtual bool HandleKey(key_type_t k);
+        note_edit_focus_t m_NoteEditFocus = nef_edit_note_number;
+
 };
 
-struct Cluster
+struct Cluster : public CursorKeys
 {
     std::vector<Note> m_Notes;
     int m_StepLength;           // This will be filled in at some point to indicate how many rests follow.
@@ -101,9 +113,17 @@ struct Cluster
 
     std::string ToString(bool showVelocity = true);
     void FromString(std::string s);
+
+    virtual void SetStatus();
+    protected:
+        virtual bool HandleKey(key_type_t k);
+        std::vector<Note>::size_type m_PosEdit = 0;
+
 };
 
-struct StepList
+//struct StepListSubMenu;
+
+struct StepList : public CursorKeys
 {
 
     std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
@@ -120,6 +140,10 @@ struct StepList
         m_Pos(0),
         m_LastRequestedPos(0),
         m_Complete(false)
+    {
+    }
+
+    ~StepList()
     {
     }
 
@@ -177,33 +201,50 @@ struct StepList
     void FromString(std::string s);
 
     bool PlayPositionInfo(int & offset,  int & length);
+
+    virtual void SetStatus();
+    protected:
+        virtual bool HandleKey(key_type_t k);
+        std::vector<Cluster>::size_type m_PosEdit = 0;
+
 };
+
+struct RealTimeListParams : public CursorKeys
+{
+    double m_LoopStart = 0.0;
+    double m_LocalQuantum = 0.0;  // Loop length.
+    double m_Multiplier = 1.0;
+    bool m_AdjustWindowToStep = true;  // Probably just if multiplier less than 1.
+
+    virtual void SetStatus();
+    protected:
+        enum rt_params_focus_t {
+            rtp_loop_start,
+            rtp_local_quantum,
+            rtp_multiplier,
+            rtp_window_adjust,
+            number_rt_params_focus_modes
+        };
+
+        virtual bool HandleKey(key_type_t k);
+        rt_params_focus_t m_RTParamsFocus = rtp_loop_start;
+
+};
+
 
 struct RealTimeList : public CursorKeys
 {
     double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
 
-    double m_LastRequestedStepValue;
-    double m_LastRequestedPhase;
-
-    double m_LoopStart;
-    double m_LocalQuantum;  // Loop length.
-    double m_Multiplier;
-    bool m_AdjustWindowToStep;  // Probably just if multiplier less than 1.
+    double m_LastRequestedStepValue = 4.0;
+    double m_LastRequestedPhase = 0.0;
 
     void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
     RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
         m_QuantumAtCapture(quantum),
-        m_RealTimeList(realTimeList),
-        m_LastRequestedStepValue(4.0),
-        m_LastRequestedPhase(0.0),
-        m_LoopStart(0.0),
-        m_LocalQuantum(0.0),   // Negative means don't use.
-        m_Multiplier(1.0),
-        m_AdjustWindowToStep(true),
-        m_RTListFocus(rtl_loop_start)
+        m_RealTimeList(realTimeList)
     {};
 
     void FromString(std::string s);
@@ -212,17 +253,14 @@ struct RealTimeList : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum rt_list_focus_t {
-            rtl_loop_start,
-            rtl_local_quantum,
-            rtl_multiplier,
-            rtl_window_adjust,
-            number_rt_list_focus_modes
-        };
 
         virtual bool HandleKey(key_type_t k);
-        rt_list_focus_t m_RTListFocus;
+        int m_RTListFocus = 0;
+        int m_SubMenus = 1; // How many submenu items will there be in the CursorKeys menu?
 
+        RealTimeListParams m_Params;
+
+        std::vector<Note> m_UndoList;
 };
 
 

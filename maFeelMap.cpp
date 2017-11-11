@@ -266,6 +266,9 @@ bool FeelMap::HandleKey(key_type_t k)
         if ( tStretchPoint > m_StretchPoints.at(m_EditPoint -1) && tStretchPoint < m_StretchPoints.at(m_EditPoint + 1) )
             m_StretchPoints.at(m_EditPoint) = tStretchPoint;
         break;
+
+    default:
+        return false;
     }
 
     SetStatus();

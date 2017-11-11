@@ -197,7 +197,7 @@ bool PatternChain::HandleKey(key_type_t k)
         if ( m_PosEdit < m_Chain.size() )
         {
             ChainLink & link = m_Chain.at(m_PosEdit);
-            link.SetID(m_PosEdit + 1);
+            link.SetItemID(m_PosEdit + 1);
             link.SetFocus();
             link.SetStatus();
             link.SetReturnFocus(this);
@@ -214,6 +214,9 @@ bool PatternChain::HandleKey(key_type_t k)
     case up:
     case down:
         break;
+
+    default:
+        return false;
     }
 
     m_FirstField = m_PosEdit == 0;

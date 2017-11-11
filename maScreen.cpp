@@ -132,7 +132,7 @@ Display::Display()
     m_ProgressPanel = newwin(2, 15, 3, 61);
     m_EditListPanel = newwin(4, 20, 8, 4);
     m_EditSummaryPanel = newwin(4, 52, 8, 24);
-    m_BigPanel = newwin(10, 80, 15, 0);
+    m_BigPanel = newwin(10, 80, 13, 0);
 
     bkgd(COLOR_PAIR(CP_MAIN));
     wbkgd(m_SmallPanel, COLOR_PAIR(CP_SMALL_PANEL_BKGND));
@@ -340,13 +340,13 @@ void update_edit_panels(bool refreshList)
     Pattern & p = g_PatternStore.CurrentEditPattern();
 
     wmove(g_Display.EditSummaryPanel(), 0, 1);
-    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.ListCount(), p.RealTimeListCount());
+    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.StepListCount(), p.RealTimeListCount());
 
     wmove(g_Display.EditSummaryPanel(), 1, 1);
     wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
         p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
 
-    TranslateTable table = p.PatternTranslateTable();
+    TranslateTable & table = p.PatternTranslateTable();
 
     wmove(g_Display.EditSummaryPanel(), 2, 1);
     wprintw(g_Display.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
@@ -480,16 +480,15 @@ void show_status()
 
 void show_status_after_navigation()
 {
-    const int width = 60;
+    const int width = 72;
 
     // Call this after any change to focus or navigation involving
     // objects derived from CursorKeys. All objects share the same
     // static pointer to the object in focus, and calling Status()
     // on any of them will retrieve the status string for the object
-    // that currently has focus. (For now we use g_PatternStore itself,
-    // because it's global and always present, but there's no other
-    // special status afforded to it than that.)
+    // that currently has focus.
 
+    static int adjustOffset = 0;
     string status = g_CursorKeys.Status();
 
     // Although I started off with a mechanism which allows for multiple
@@ -499,7 +498,8 @@ void show_status_after_navigation()
     // that to position the whole string within the available width. Any
     // highlights set after the first may end up off screen.
 
-    static int adjustOffset = 0;
+    if ( status.size() < width )
+        adjustOffset = 0;
 
     vector<screen_pos_t> & highlights = g_CursorKeys.GetHighlights();
 
@@ -514,9 +514,7 @@ void show_status_after_navigation()
             cursor.offset = 0;
         }
 
-        if ( status.size() < width )
-            adjustOffset = 0;
-        else if ( cursor.offset < adjustOffset )
+        if ( cursor.offset < adjustOffset )
             adjustOffset = cursor.offset;
         else if ( cursor.offset + cursor.length - adjustOffset >= width )
             adjustOffset = cursor.offset + cursor.length - width;

@@ -31,10 +31,12 @@ class TrigList : public CursorKeys
         TrigList();
         virtual ~TrigList();
 
+    virtual void SetStatus();
     protected:
+        virtual bool HandleKey(key_type_t k);
 
     private:
-        std::vector<TrigListItem> m_TrigSteps;
+        std::vector<TrigListItem> m_TrigItems;
         std::vector<TrigListItem>::size_type m_Pos;
         std::vector<TrigListItem>::size_type m_PosEdit;
 };

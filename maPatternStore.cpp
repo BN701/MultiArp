@@ -31,6 +31,7 @@ using namespace std;
 
 void PatternStore::SetStatus()
 {
+    size_t pos = 0;
     m_Status.clear();
     m_Highlights.clear();
     m_FieldPositions.clear();
@@ -40,8 +41,8 @@ void PatternStore::SetStatus()
 
     char buff[100];
 
-    m_Status = "Editing Pattern ";
-    size_t pos = m_Status.size();
+    m_Status = "Pattern ";
+    pos = m_Status.size();
     sprintf(buff, "%i/%i", m_PosEdit + 1, m_Patterns.size());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
@@ -76,7 +77,10 @@ void PatternStore::SetStatus()
     }
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ".";
+    m_Status += ", ";
+    pos = m_Status.size();
+    m_Status += "Trig List";
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
     m_Highlights.push_back(m_FieldPositions.at(m_PatternStoreFocus));
 }
@@ -84,15 +88,18 @@ void PatternStore::SetStatus()
 bool PatternStore::HandleKey(key_type_t k)
 {
     int temp;
+
     switch ( k )
     {
     case enter:
         switch ( m_PatternStoreFocus )
         {
         case psf_pattern:
+            // TODO: Set current pattern (not Pattern Chain mode).
             break;
+
         case psf_list:
-            if ( m_Patterns.at(m_PosEdit).StepListCount() > 0 )
+            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).StepListCount() > 0 )
             {
                 StepList & s = m_Patterns.at(m_PosEdit).StepListForEdit();
                 s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
@@ -101,8 +108,9 @@ bool PatternStore::HandleKey(key_type_t k)
                 s.SetReturnFocus(this);
             }
             break;
+
         case psf_rt_list:
-            if ( m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
+            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
             {
                 RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
                 r.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
@@ -111,20 +119,35 @@ bool PatternStore::HandleKey(key_type_t k)
                 r.SetReturnFocus(this);
             }
             break;
+
+        case psf_trig_list:
+            if ( !m_Patterns.empty() )
+            {
+                TrigList & t = m_Patterns.at(m_PosEdit).PatternTrigList();
+                t.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
+                t.SetFocus();
+                t.SetStatus();
+                t.SetReturnFocus(this);
+            }
+            break;
+
         default:
             break;
         }
         break;
+
     case left:
         temp = static_cast<int>(m_PatternStoreFocus) - 1;
         if ( temp >= 0 && temp < number_psf_focus_modes )
             m_PatternStoreFocus = static_cast<pattern_store_focus_t>(temp);
         break;
+
     case right:
         temp = static_cast<int>(m_PatternStoreFocus) + 1;
         if ( temp >= 0 && temp < number_psf_focus_modes )
             m_PatternStoreFocus = static_cast<pattern_store_focus_t>(temp);
         break;
+
     case up:
         switch ( m_PatternStoreFocus )
         {
@@ -141,6 +164,7 @@ bool PatternStore::HandleKey(key_type_t k)
             break;
         }
         break;
+
     case down:
         switch ( m_PatternStoreFocus )
         {
@@ -157,6 +181,7 @@ bool PatternStore::HandleKey(key_type_t k)
             break;
         }
         break;
+
     default:
         return false;
     }

@@ -75,14 +75,14 @@ struct Note : public CursorKeys
     virtual void SetStatus();
     protected:
         enum note_edit_focus_t {
-            nef_edit_note_number,
-            nef_edit_velocity,
-            nef_edit_length,
+            nef_note_number,
+            nef_velocity,
+            nef_length,
             number_nef_types
         };
 
         virtual bool HandleKey(key_type_t k);
-        note_edit_focus_t m_NoteEditFocus = nef_edit_note_number;
+        note_edit_focus_t m_NoteEditFocus = nef_note_number;
 
 };
 

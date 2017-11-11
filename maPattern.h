@@ -50,9 +50,9 @@ struct Pattern
     bool m_GateHold;
     unsigned char m_Velocity;
 
-    TrigList m_TrigList;
-    TranslateTable m_TranslateTable;
     FeelMap m_FeelMap;
+    TranslateTable m_TranslateTable;
+    TrigList m_TrigList;
 
     void StoreStepValue( double val );
     void StoreGate( double gate);
@@ -69,6 +69,7 @@ struct Pattern
     RealTimeList & RTListForEdit() { return m_RealTimeSet.at(m_PosRealTimeEdit); }
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
+    TrigList & PatternTrigList() { return m_TrigList; }
 
     Pattern():
         m_Pos(0),

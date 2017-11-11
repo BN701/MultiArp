@@ -366,15 +366,15 @@ bool Note::HandleKey(key_type_t k)
     case up:
         switch ( m_NoteEditFocus )
         {
-        case nef_edit_note_number:
+        case nef_note_number:
             if ( m_NoteNumber + note_inc < 128 )
                 m_NoteNumber += note_inc;
             break;
-        case nef_edit_velocity:
+        case nef_velocity:
             if ( m_NoteVelocity < 127 )
                 m_NoteVelocity += 1;
             break;
-        case nef_edit_length:
+        case nef_length:
             m_Length += inc;
             break;
         default:
@@ -388,15 +388,15 @@ bool Note::HandleKey(key_type_t k)
     case down:
         switch ( m_NoteEditFocus )
         {
-        case nef_edit_note_number:
+        case nef_note_number:
             if ( m_NoteNumber - note_inc >= -1 )
                 m_NoteNumber -= note_inc;
             break;
-        case nef_edit_velocity:
+        case nef_velocity:
             if ( m_NoteVelocity > 0 )
                 m_NoteVelocity -= 1;
             break;
-        case nef_edit_length:
+        case nef_length:
             if ( m_Length - inc > 0 )
                 m_Length -= inc;
             break;

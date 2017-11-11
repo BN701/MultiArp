@@ -29,3 +29,132 @@ TrigList::~TrigList()
 {
     //dtor
 }
+
+void TrigList::SetStatus()
+{
+    int pos = 0;
+    char buff[50];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    m_Status = "[Trig List] ";
+
+    for ( int i = 0; i < m_TrigItems.size(); i++ )
+    {
+        if ( i > 0 )
+            m_Status += ' ';
+        pos = m_Status.size();
+        m_Status += m_TrigItems.at(i).MenuString();
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
+    if ( !m_FieldPositions.empty() )
+        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+
+}
+
+bool TrigList::HandleKey(key_type_t k)
+{
+    switch ( k )
+    {
+    case enter:
+        if ( !m_TrigItems.empty() )
+        {
+            TrigListItem & n = m_TrigItems.at(m_PosEdit);
+            n.SetItemID(m_PosEdit + 1);
+            n.SetFocus();
+            n.SetStatus();
+            n.SetReturnFocus(this);
+        }
+        break;
+
+    case back_space:
+    case escape:
+        ReturnFocus();
+        break;
+
+    case left:
+        if ( m_PosEdit > 0 )
+            m_PosEdit -= 1;
+        break;
+
+    case right:
+        if ( m_PosEdit < m_TrigItems.size() - 1 )
+            m_PosEdit += 1;
+        break;
+
+    case up:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(right);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
+    case down:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(left);
+            m_ReturnFocus->HandleKey(enter);
+        }
+        return true;
+
+    case ctrl_left:
+        if ( !m_TrigItems.empty() )
+        {
+            m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit, m_TrigItems.at(m_PosEdit));
+        }
+        break;
+
+    case ctrl_right:
+        if ( !m_TrigItems.empty() )
+        {
+            m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit + 1, m_TrigItems.at(m_PosEdit));
+            m_PosEdit += 1;
+        }
+        break;
+
+    case shift_left:
+        if ( m_TrigItems.empty() )
+        {
+            m_TrigItems.emplace_back();
+            m_PosEdit = 0;
+        }
+        else
+            m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit, *(new TrigListItem()));
+        break;
+
+    case shift_delete:
+        if ( !m_TrigItems.empty() )
+        {
+            m_TrigItems.erase(m_TrigItems.begin() + m_PosEdit);
+            if ( m_PosEdit == m_TrigItems.size() )
+                m_PosEdit -= 1;
+        }
+        break;
+
+    case shift_right:
+        if ( m_TrigItems.empty() )
+        {
+            m_TrigItems.emplace_back();
+            m_PosEdit = 0;
+        }
+        else
+        {
+            m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit + 1, *(new TrigListItem()));
+            m_PosEdit += 1;
+        }
+        break;
+
+    default:
+        return false;
+    }
+
+    m_FirstField = m_PosEdit == 0;
+
+    SetStatus();
+
+    return true;
+}
+

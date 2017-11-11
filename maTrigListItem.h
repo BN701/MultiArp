@@ -21,6 +21,8 @@
 #ifndef MATRIGLISTITEM_H
 #define MATRIGLISTITEM_H
 
+#include <string>
+
 #include "maCursorKeys.h"
 
 
@@ -36,15 +38,33 @@ class TrigListItem : public CursorKeys
         int GetRepeats() { return m_Repeats; }
         double GetRepeatTime() { return m_RepeatTime; }
 
+        std::string ToString();
+        std::string TrigMaskToString();
+        std::string MenuString();
+
+    virtual void SetStatus();
     protected:
+        virtual bool HandleKey(key_type_t k);
+        enum trig_list_item_focus_t {
+            tlif_trigs,
+            tlif_multiplier,
+            tlif_skip,
+            tlif_mute,
+            tlif_repeats,
+            tlif_repeat_time,
+            number_tlif_types
+        };
+
+        trig_list_item_focus_t m_TrigListItemFocus = tlif_trigs;
 
     private:
         std::vector<int> m_Trigs;
-        double m_Multiplier;
-        bool m_Skip;
-        bool m_Mute;
-        int m_Repeats;
-        double m_RepeatTime;
+        unsigned int m_TrigMask = 0;
+        double m_Multiplier = 1.0;
+        bool m_Skip = false;
+        bool m_Mute = false;
+        int m_Repeats = 0;
+        double m_RepeatTime = 0.0; // Less than means split evenly across step. (We don't use zero as that's hard to test for.)
 };
 
 #endif // MATRIGLISTITEM_H

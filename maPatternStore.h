@@ -389,6 +389,7 @@ struct PatternStore : public CursorKeys
             psf_pattern,
             psf_list,
             psf_rt_list,
+            psf_trig_list,
             number_psf_focus_modes
         };
 

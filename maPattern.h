@@ -29,6 +29,7 @@
 #include "maFeelMap.h"
 #include "maNotes.h"
 #include "maTranslateTable.h"
+#include "maTrigList.h"
 
 struct Pattern
 {
@@ -48,6 +49,8 @@ struct Pattern
     double m_Gate;
     bool m_GateHold;
     unsigned char m_Velocity;
+
+    TrigList m_TrigList;
     TranslateTable m_TranslateTable;
     FeelMap m_FeelMap;
 

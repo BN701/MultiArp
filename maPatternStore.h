@@ -62,6 +62,7 @@ struct PatternStore : public CursorKeys
     std::vector<Pattern> m_Deleted;
 
     Pattern m_DefaultPattern; // Somewhere to keep 'global' data when not using a specific pattern.
+    double m_StepValueMultiplier = 1.0;
 
     PatternStore(/*TranslateTable & table*/):
         m_PosPlay(0),
@@ -168,6 +169,8 @@ struct PatternStore : public CursorKeys
     }
 
     void Step(Cluster & cluster, double phase, double stepValue);
+    double StepValueMultiplier() { return m_StepValueMultiplier; }
+
 
     std::string EditPatternToString();
     std::string PlayPatternToString();

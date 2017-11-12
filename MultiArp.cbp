@@ -79,6 +79,8 @@
 		<Unit filename="maState.h" />
 		<Unit filename="maTranslateTable.cpp" />
 		<Unit filename="maTranslateTable.h" />
+		<Unit filename="maTrigList.cpp" />
+		<Unit filename="maTrigList.h" />
 		<Unit filename="maTrigListItem.cpp" />
 		<Unit filename="maTrigListItem.h" />
 		<Unit filename="maUnnecessary.cpp" />

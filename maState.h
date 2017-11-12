@@ -33,13 +33,14 @@ class State
         /** Default destructor */
         virtual ~State();
 
-        void Step();
+        void Step(double stepValueMultiplier);
 
         void Progress(double & progress, double & stepWidth);
         /** Access m_StepValue
          * \return The current value of m_StepValue
          */
         double CurrentStepValue() { return m_CurrentStepValue; }
+        double LastUsedStepValue() { return m_LastUsedStepValue; }
         /** Set m_StepValue
          * \param val New value to set
          */
@@ -120,6 +121,7 @@ class State
     private:
 
         double m_CurrentStepValue;
+        double m_LastUsedStepValue;
         double m_Quantum; //!< Member variable "m_Quantum"
         bool m_RunState; //!< Member variable "m_RunState"
         double m_Beat; //!< Member variable "m_Beat"

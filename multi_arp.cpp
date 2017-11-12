@@ -152,7 +152,8 @@ void queue_next_step(int queueId)
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
-    g_State.Step();
+
+    g_State.Step(g_PatternStore.StepValueMultiplier());
 
     // Get time of next step from Link.
 
@@ -204,9 +205,9 @@ void queue_next_step(int queueId)
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        g_PatternStore.Step(nextCluster, g_State.Phase(), g_State.CurrentStepValue());
+        g_PatternStore.Step(nextCluster, g_State.Phase(), g_State.LastUsedStepValue());
         if ( g_ListBuilder.RealTimeRecord() )
-            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.CurrentStepValue());
+            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     }
 
     if ( !nextCluster.Empty() )
@@ -223,7 +224,7 @@ void queue_next_step(int queueId)
               Step length in mSec = 1000*240/TV
          */
 
-        double stepLengthMilliSecs = 240000.0/(tempo * g_State.CurrentStepValue());
+        double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
         double duration = stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength());
 
         for ( unsigned int i = 0; i < nextCluster.m_Notes.size(); i++ )

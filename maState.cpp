@@ -39,9 +39,11 @@ State::~State()
     //dtor
 }
 
-void State::Step()
+void State::Step(double stepValueMultiplier)
 {
-    m_Beat += 4 / m_CurrentStepValue;
+    m_LastUsedStepValue = stepValueMultiplier * m_CurrentStepValue;
+    m_Beat += 4 / m_LastUsedStepValue;
+//    m_Beat += 4 / m_CurrentStepValue;
 }
 
 void State::Progress(double & progress, double & stepWidth)

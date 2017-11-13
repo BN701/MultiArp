@@ -38,7 +38,7 @@ struct Pattern
     std::vector<RealTimeList>::size_type m_PosRealTimeEdit;
     std::vector<StepList>::size_type m_LastRequestedPos;
 
-    std::vector<int> m_Trigs;
+//    std::vector<int> m_Trigs;
 
     std::vector<StepList> m_StepListSet;
     std::vector<RealTimeList> m_RealTimeSet;
@@ -87,7 +87,7 @@ struct Pattern
     void Clear ()
     {
         m_Label.clear();
-        m_Trigs.clear();
+//        m_Trigs.clear();
         m_StepListSet.clear();
         ResetPosition();
         m_TranslateTable.Reset();
@@ -111,20 +111,9 @@ struct Pattern
             m_PosRealTimeEdit = p;
     }
 
-    void SetStepValue( double val )
-    {
-        m_StepValue = val;
-    }
-
-    int StepListCount()
-    {
-        return m_StepListSet.size();
-    }
-
-    int RealTimeListCount()
-    {
-        return m_RealTimeSet.size();
-    }
+    void SetStepValue( double val ) { m_StepValue = val; }
+    int StepListCount() { return m_StepListSet.size(); }
+    int RealTimeListCount() { return m_RealTimeSet.size(); }
 
     void ResetPosition()
     {
@@ -144,7 +133,11 @@ struct Pattern
     std::string Label(size_t width);
     std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
     std::string ListToString(std::vector<int>::size_type n);
+    std::string TrigsToStringForDisplay();
+    std::string TrigsToString();
     std::string ToString(const char * prefix);
+    std::string Display(int centre = 30, int width = 80);
+
     bool FromString(std::string s, int & updates);
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);

@@ -207,8 +207,8 @@ void update_progress_bar()
         markerFill = '>';
         break;
     case 2:
-        lineFill = '-';
-        markerFill = '=';
+        lineFill = ' ';
+        markerFill = '>';
         break;
     default:
         lineFill = ' ';
@@ -373,23 +373,27 @@ void update_pattern_panel()
     wmove(g_Display.BigPanel(), 0, 0);
     wclrtobot(g_Display.BigPanel());
 
-	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
-
     g_ListDisplayRows.clear();
 
-    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
-    {
-        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
-    }
-
-    wprintw(g_Display.BigPanel(), "\n");
 	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+
+    wmove(g_Display.BigPanel(), 0, 4);
+    wprintw(g_Display.BigPanel(), "%s\n\n", g_PatternStore.PlayPatternTrigsToString().c_str());
 
     for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
     {
         getyx(g_Display.BigPanel(), scr_y, scr_x);
         g_ListDisplayRows.push_back(scr_y);
         wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
+    }
+
+    wprintw(g_Display.BigPanel(), "\n");
+	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
+
+
+    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
+    {
+        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
     }
 
     wattroff(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
@@ -469,6 +473,51 @@ void highlight_pattern_panel()
     }
 
     wrefresh(g_Display.BigPanel());
+}
+
+void update_pattern_panel_2()
+{
+    int scr_x, scr_y;
+
+    wmove(g_Display.BigPanel(), 0, 0);
+    wclrtobot(g_Display.BigPanel());
+
+    try
+    {
+        wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display().c_str());
+    }
+    catch (string s)
+    {
+        wprintw(g_Display.BigPanel(), s.c_str());
+    }
+
+//    g_ListDisplayRows.clear();
+//
+//	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+//
+//    wmove(g_Display.BigPanel(), 0, 4);
+//    wprintw(g_Display.BigPanel(), "%s\n\n", g_PatternStore.PlayPatternTrigsToString().c_str());
+//
+//    for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
+//    {
+//        getyx(g_Display.BigPanel(), scr_y, scr_x);
+//        g_ListDisplayRows.push_back(scr_y);
+//        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
+//    }
+//
+//    wprintw(g_Display.BigPanel(), "\n");
+//	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
+//
+//
+//    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
+//    {
+//        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
+//    }
+//
+//    wattroff(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+
+    wrefresh(g_Display.BigPanel());
+
 }
 
 

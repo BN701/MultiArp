@@ -206,6 +206,7 @@ struct StepList : public CursorKeys
     }
 
     std::string ToString(bool showVelocity = true);
+    std::string ToStringForDisplay();
     void FromString(std::string s);
 
     bool PlayPositionInfo(int & offset,  int & length);

@@ -35,6 +35,8 @@ class TrigList : public CursorKeys
         size_t Size() { return m_TrigItems.size(); }
         TrigListItem * Step();
 
+        std::string ToStringForDisplay();
+
         virtual void SetStatus();
     protected:
         virtual bool HandleKey(key_type_t k);

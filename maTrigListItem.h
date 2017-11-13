@@ -59,8 +59,8 @@ class TrigListItem : public CursorKeys
         trig_list_item_focus_t m_TrigListItemFocus = tlif_trigs;
 
     private:
-        std::vector<int> m_Trigs;
-        unsigned int m_TrigMask = 0;
+        std::vector<int> m_Trigs = {0}; // Default for individual item is to trigger the first list.
+        unsigned int m_TrigMask = 1;    // Cheat for scrolling values in menu. (Default matches m_Trigs default.)
         double m_Multiplier = 1.0;
         bool m_Skip = false;
         bool m_Mute = false;

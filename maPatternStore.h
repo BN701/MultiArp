@@ -89,10 +89,7 @@ struct PatternStore : public CursorKeys
     std::string PatternStatus();
     std::string PatternOverview();
 
-    int PatternCount()
-    {
-        return m_Patterns.size();
-    }
+    int PatternCount() { return m_Patterns.size(); }
 
     std::string SetNewPatternOrJump( int val );
     void SetNewPatternPending( int val )
@@ -120,28 +117,12 @@ struct PatternStore : public CursorKeys
             m_PosEdit = m_PosPlay;
     }
 
-    bool EditFocusFollowsPlay()
-    {
-        return m_EditPosFollowsPlay;
-    }
-
-    void SetResetOnPatternChange(bool bVal)
-    {
-        m_ResetOnPatternChange = bVal;
-    }
-
-    void SetPatternChainMode(int bVal)
-    {
-        m_PatternChainMode = bVal;
-    }
-
+    bool EditFocusFollowsPlay() { return m_EditPosFollowsPlay; }
+    void SetResetOnPatternChange(bool bVal) { m_ResetOnPatternChange = bVal; }
+    void SetPatternChainMode(int bVal) { m_PatternChainMode = bVal; }
     int PatternChainMode() { return m_PatternChainMode; }
     int CurrentPosPatternChain() { return m_PosPatternChain; }
-
-    bool EditPatternIsPlayPattern()
-    {
-        return m_PosEdit == m_PosPlay;
-    }
+    bool EditPatternIsPlayPattern() { return m_PosEdit == m_PosPlay; }
 
     void SetStepValCurrentEditPattern(int i)
     {
@@ -163,10 +144,7 @@ struct PatternStore : public CursorKeys
             return m_Patterns.at(m_PosPlay).StepValue();
     }
 
-    void SetPhaseIsZero()
-    {
-        m_PhaseIsZero = true;
-    }
+    void SetPhaseIsZero() { m_PhaseIsZero = true; }
 
     void Step(Cluster & cluster, double phase, double stepValue);
     double StepValueMultiplier() { return m_StepValueMultiplier; }
@@ -181,6 +159,7 @@ struct PatternStore : public CursorKeys
     int RealTimeListCount();
     std::string RealTimeListToStringForDisplay(int n);
     std::string PlayPatternListToString(int n);
+    std::string PlayPatternTrigsToString();
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();

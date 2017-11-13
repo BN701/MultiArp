@@ -124,6 +124,16 @@ bool Pattern::PlayPositionInfo(int & listIndex, int & offset, int & length)
     return m_StepListSet.at(m_LastRequestedPos).PlayPositionInfo(offset, length);
 }
 
+string Pattern::TrigsToStringForDisplay()
+{
+    return m_TrigList.ToStringForDisplay();
+}
+
+string Pattern::TrigsToString()
+{
+    return "";
+}
+
 string Pattern::ListToString(vector<int>::size_type n)
 {
     if ( n >= m_StepListSet.size() )
@@ -511,3 +521,45 @@ void Pattern::StoreTranslateTable( TranslateTable & table )
     m_TranslateTable = table;
 }
 
+string & Centre(string & line, int centre, int width)
+{
+    size_t p = line.find('|');
+
+    if ( p < string::npos )
+        line.at(p) = ' ';
+
+    if ( p < centre )
+        line.insert(0, centre - p, ' ');
+    else if ( p > centre )
+        line.erase(0, p - centre);
+
+    if ( line.size() > width )
+        line = line.substr(0, width);
+
+    return line;
+}
+
+string Pattern::Display(int centre, int width)
+{
+    string result;
+    string line;
+
+
+    line = m_TrigList.ToStringForDisplay();
+    result += Centre(line, centre, width);
+
+    for ( int i = 0; i < m_StepListSet.size(); i++ )
+    {
+        result += '\n';
+        line = m_StepListSet.at(i).ToStringForDisplay();
+        result += Centre(line, centre, width);
+    }
+
+    for ( int i = 0; i < m_RealTimeSet.size(); i++ )
+    {
+        result += '\n';
+        result += m_RealTimeSet.at(i).ToStringForDisplay();
+    }
+
+    return result;
+}

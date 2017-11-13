@@ -279,6 +279,14 @@ string PatternStore::PlayPatternListToString(int n)
     return m_Patterns.at(m_PosPlay).ListToString(n);
 }
 
+string PatternStore::PlayPatternTrigsToString()
+{
+    if ( m_Patterns.empty() )
+        return "";
+
+    return m_Patterns.at(m_PosPlay).TrigsToStringForDisplay();
+}
+
 string PatternStore::RealTimeListToStringForDisplay(int n)
 {
     if ( m_Patterns.empty() )

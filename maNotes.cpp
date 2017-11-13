@@ -689,6 +689,27 @@ string StepList::ToString(bool showVelocity)
     return result;
 }
 
+string StepList::ToStringForDisplay()
+{
+    string result;
+
+    char buff[50];
+
+    for ( int i = 0; i < m_Clusters.size(); i++ )
+    {
+        if ( i > 0 )
+            result += ' ';
+        if ( i == m_Pos )
+        {
+            sprintf(buff, "%3i| ", m_Pos);
+            result += buff;
+        }
+        result += m_Clusters.at(i).ToString();
+    }
+
+    return result;
+}
+
 void StepList::FromString(string s)
 {
     vector<string> chordStrings = split(s.c_str(), ',', true);

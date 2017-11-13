@@ -20,6 +20,8 @@
 
 #include "maTrigList.h"
 
+using namespace std;
+
 TrigList::TrigList()
 {
     //ctor
@@ -156,6 +158,27 @@ bool TrigList::HandleKey(key_type_t k)
     SetStatus();
 
     return true;
+}
+
+string TrigList::ToStringForDisplay()
+{
+    string result;
+
+    char buff[50];
+
+    for ( int i = 0; i < m_TrigItems.size(); i++ )
+    {
+        if ( i > 0 )
+            result += ' ';
+        if ( i == m_Pos )
+        {
+            sprintf(buff, "%3i| ", m_Pos);
+            result += buff;
+        }
+        result += m_TrigItems.at(i).MenuString();
+    }
+
+    return result;
 }
 
 TrigListItem * TrigList::Step()

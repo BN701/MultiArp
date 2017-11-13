@@ -297,7 +297,6 @@ unordered_map<string, command_t> gCommandList =
 
 command_t command_from_string(string commandName)
 {
-
     command_t command;
 
     try

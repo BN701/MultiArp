@@ -89,7 +89,7 @@ struct Note : public CursorKeys
 struct Cluster : public CursorKeys
 {
     std::vector<Note> m_Notes;
-    int m_StepLength;           // This will be filled in at some point to indicate how many rests follow.
+    int m_StepLength = 0;           // This will be filled in at some point to indicate how many rests follow.
 
     Cluster():
         m_StepLength(1)
@@ -108,7 +108,15 @@ struct Cluster : public CursorKeys
     bool Empty() { return m_Notes.empty(); }
     bool IsRest();
 
-    void SetStepsTillNextNote( int val ) { m_StepLength = val; }
+    void SetStepsTillNextNote( int val )
+    {
+        // Use val if step length hasn't been set, or
+        // if less than current value.
+
+        if ( m_StepLength == 0 || val < m_StepLength )
+            m_StepLength = val;
+    }
+
     int StepsTillNextNote() { return m_StepLength; }
 
     std::string ToString(bool showVelocity = true);

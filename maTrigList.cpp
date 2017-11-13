@@ -158,3 +158,15 @@ bool TrigList::HandleKey(key_type_t k)
     return true;
 }
 
+TrigListItem * TrigList::Step()
+{
+    if ( ! m_TrigItems.empty() )
+    {
+        m_Pos += 1;
+        if ( m_Pos >= m_TrigItems.size() )
+            m_Pos = 0;
+        return & m_TrigItems.at(m_Pos);
+    }
+    else
+        return NULL;
+}

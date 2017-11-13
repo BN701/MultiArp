@@ -133,7 +133,7 @@ struct Pattern
             (*i).ResetPosition();
     }
 
-    void Step(Cluster & cluster, double phase, double stepValue);
+    void Step(Cluster & cluster, double & stepValueMultiplier, double phase, double stepValue);
 
     bool LabelEmpty()
     {

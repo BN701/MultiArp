@@ -32,11 +32,12 @@ class TrigListItem : public CursorKeys
         TrigListItem();
         virtual ~TrigListItem();
 
-        double GetMultiplier() { return m_Multiplier; }
-        bool GetSkip() { return m_Skip; }
-        bool GetMute() { return m_Mute; }
-        int GetRepeats() { return m_Repeats; }
-        double GetRepeatTime() { return m_RepeatTime; }
+        std::vector<int> & Trigs() { return m_Trigs; }
+        double Multiplier() { return m_Multiplier; }
+        bool Skip() { return m_Skip; }
+        bool Mute() { return m_Mute; }
+        int Repeats() { return m_Repeats; }
+        double RepeatTime() { return m_RepeatTime; }
 
         std::string ToString();
         std::string TrigMaskToString();

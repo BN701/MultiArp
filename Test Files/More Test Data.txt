@@ -71,3 +71,35 @@ Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
 Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
 Pattern Feel Map
 
+// Trig List Test Pattern
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 4.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change ON
+Store Edit focus follows play ON
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale root 60 chrom 0 shift 0 scale 'Major'
+Default Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 8.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Step List 1 C5,D5,Eb5,D5
+Step List 2 C4,C3,C3,Eb3
+

@@ -41,8 +41,8 @@ State::~State()
 
 void State::Step(double stepValueMultiplier)
 {
-    m_LastUsedStepValue = stepValueMultiplier * m_CurrentStepValue;
-    m_Beat += 4 / m_LastUsedStepValue;
+    m_LastUsedStepValue = m_CurrentStepValue;
+    m_Beat += 4.0 * stepValueMultiplier / m_LastUsedStepValue;
 //    m_Beat += 4 / m_CurrentStepValue;
 }
 

@@ -27,23 +27,72 @@
 
 using namespace std;
 
-void Pattern::Step(Cluster & cluster, double phase, double stepValue)
+void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, double phase, double stepValue)
 {
     // Add in step based events, if any, and step position.
 
     if ( ! m_StepListSet.empty() )
     {
-        if ( m_Pos >= m_StepListSet.size() )
-            m_Pos = 0;
+        int loopCheck = 0;
 
-        m_LastRequestedPos = m_Pos;
-
-        Cluster * result = m_StepListSet[m_Pos++].Step();
-        if ( result != NULL )
+        if ( m_TrigList.Empty() )
         {
-            cluster.SetStepsTillNextNote(result->StepsTillNextNote());
-            cluster += *result;
+            if ( m_Pos >= m_StepListSet.size() )
+                m_Pos = 0;
+
+            m_LastRequestedPos = m_Pos;
+
+            Cluster * result = m_StepListSet[m_Pos++].Step();
+
+            if ( result != NULL )
+            {
+                cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+                cluster += *result;
+            }
         }
+        else while ( loopCheck < m_TrigList.Size() ) // Loop only if skipping entries.
+        {
+            TrigListItem * trigItem = m_TrigList.Step();
+
+            if ( trigItem->Skip() )
+            {
+                loopCheck += 1;
+                continue;
+            }
+
+            if ( trigItem->Mute() )
+                break;
+
+            stepValueMultiplier = trigItem->Multiplier();
+
+            for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
+            {
+                // Just ignore if list doesn't exist.
+
+                if ( *it < m_StepListSet.size() )
+                {
+                    m_LastRequestedPos = *it;
+
+                    Cluster * result = m_StepListSet[*it].Step();
+
+                    if ( result != NULL )
+                    {
+                        cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+                        cluster += *result;
+                    }
+                }
+            }
+
+            break;
+        }
+
+//        if ( m_Pos >= m_StepListSet.size() )
+//            m_Pos = 0;
+//
+//        m_LastRequestedPos = m_Pos;
+//
+//        Cluster * result = m_StepListSet[m_Pos++].Step();
+
     }
 
     // Collect any real time events.

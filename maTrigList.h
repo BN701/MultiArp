@@ -31,7 +31,11 @@ class TrigList : public CursorKeys
         TrigList();
         virtual ~TrigList();
 
-    virtual void SetStatus();
+        bool Empty() { return m_TrigItems.empty(); }
+        size_t Size() { return m_TrigItems.size(); }
+        TrigListItem * Step();
+
+        virtual void SetStatus();
     protected:
         virtual bool HandleKey(key_type_t k);
 

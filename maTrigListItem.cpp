@@ -171,6 +171,7 @@ void TrigListItem::SetStatus()
 
 bool TrigListItem::HandleKey(key_type_t k)
 {
+    bool newTrigs = false;
     double inc = 0.1;
 
     switch ( k )
@@ -198,6 +199,7 @@ bool TrigListItem::HandleKey(key_type_t k)
         {
         case tlif_trigs:
             m_TrigMask += 1;
+            newTrigs = true;
             break;
         case tlif_multiplier:
             m_Multiplier += inc;
@@ -226,7 +228,10 @@ bool TrigListItem::HandleKey(key_type_t k)
         {
         case tlif_trigs:
             if ( m_TrigMask > 0 )
+            {
                 m_TrigMask -= 1;
+                newTrigs = true;
+            }
             break;
         case tlif_multiplier:
             if ( lround( 100 * (m_Multiplier - inc)) > 0 )
@@ -257,10 +262,22 @@ bool TrigListItem::HandleKey(key_type_t k)
         return false;
     }
 
+    if ( newTrigs )
+    {
+        unsigned int mask = 1;
+        m_Trigs.clear();
+
+        for ( int i = 0; i < CHAR_BIT * sizeof(mask); i++ )
+        {
+            if ( (m_TrigMask & mask) > 0 )
+                m_Trigs.push_back(i);
+            mask = mask << 1;
+        }
+    }
+
     m_FirstField = m_TrigListItemFocus == 0;
 
     SetStatus();
 
     return true;
 }
-

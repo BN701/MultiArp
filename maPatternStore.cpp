@@ -440,7 +440,7 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
 
     m_PhaseIsZero = false;
 
-    m_Patterns.at(m_PosPlay).Step(cluster, phase, stepValue);
+    m_Patterns.at(m_PosPlay).Step(cluster, m_StepValueMultiplier, phase, stepValue);
 }
 
 void PatternStore::UpdatePatternChainFromSimpleString(string s)

@@ -84,7 +84,8 @@ const char * tt_numerals[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", 
 
 using namespace std;
 
-enum tt_element_names_t {
+enum tt_element_names_t
+{
     tt_scale_heading,
     tt_name_scale,
     tt_name_accidentals,

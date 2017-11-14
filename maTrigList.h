@@ -44,8 +44,8 @@ class TrigList : public CursorKeys
 
     private:
         std::vector<TrigListItem> m_TrigItems;
-        std::vector<TrigListItem>::size_type m_Pos;
-        std::vector<TrigListItem>::size_type m_PosEdit;
+        std::vector<TrigListItem>::size_type m_Pos = 0;
+        std::vector<TrigListItem>::size_type m_PosEdit = 0;
 };
 
 #endif // TRIGLIST_H

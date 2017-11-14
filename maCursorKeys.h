@@ -38,7 +38,8 @@ class CursorKeys
         CursorKeys(const CursorKeys & val);
         virtual ~CursorKeys();
 
-        enum key_type_t {
+        enum key_type_t
+        {
             enter,
             back_space,
             escape,
@@ -68,7 +69,8 @@ class CursorKeys
             ctrl_shift_down
         };
 
-        enum follow_up_action_t {
+        enum follow_up_action_t
+        {
             none,
             update_pattern_browser,
             number_follow_up_actions

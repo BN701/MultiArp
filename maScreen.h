@@ -79,8 +79,18 @@
 class Display
 {
 public:
+    enum big_panel_page_t
+    {
+        one,
+        two,
+        num_big_panel_pages
+    };
+
     Display();
     ~Display();
+
+    void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
+    big_panel_page_t BigPanelPage() { return m_BigPanelPage; }
 
     WINDOW *BigPanel() { return m_BigPanel; }
     WINDOW *SmallPanel() { return m_SmallPanel; }
@@ -95,6 +105,8 @@ private:
     WINDOW * m_EditListPanel = NULL;
     WINDOW * m_EditSummaryPanel = NULL;
 
+
+    big_panel_page_t m_BigPanelPage = one;
 };
 
 

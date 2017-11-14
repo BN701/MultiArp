@@ -593,7 +593,8 @@ void PatternStore::UpdatePattern(std::map<double,Note> & realTimeList, double qu
     m_Patterns.at(m_PosEdit).AddRealTimeList(realTimeList, quantum);
 }
 
-enum ps_element_names_t {
+enum ps_element_names_t
+{
     ps_heading,
     ps_name_pattern_chain_mode,
     ps_name_reset_on_pattern_change,

@@ -701,7 +701,7 @@ string StepList::ToStringForDisplay()
             result += ' ';
         if ( i == m_LastRequestedPos )
         {
-            sprintf(buff, "%3i| ", m_Pos);
+            sprintf(buff, "%3i| ", m_Pos + 1);
             result += buff;
         }
         result += m_Clusters.at(i).ToString(false);
@@ -732,6 +732,8 @@ string StepList::ToStringForDisplay2(int & offset, int & length, int width)
         }
     }
 
+    // Scroll left if highlight is beyond width.
+
     while ( offset + length > width )
     {
         int scroll = 3 * width / 4;
@@ -739,6 +741,8 @@ string StepList::ToStringForDisplay2(int & offset, int & length, int width)
         result.insert(0, "...");
         offset -= scroll;
     }
+
+    // Truncate if line itself goes beyond width.
 
     if ( result.size() > width )
     {
@@ -1187,7 +1191,8 @@ bool RealTimeList::HandleKey(key_type_t k)
     return true;
 }
 
-enum rtl_element_names_t {
+enum rtl_element_names_t
+{
     rtl_name_loop,
     rtl_name_quantum,
     rtl_name_multiplier,

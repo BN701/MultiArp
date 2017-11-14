@@ -74,6 +74,9 @@ enum command_t
     C_SCALE_CONTROLS,
     C_SETROOT,
 
+    C_PAGE_ONE,
+    C_PAGE_TWO,
+
     C_FEEL,
     C_FEEL_HELP,
     C_FEEL_NEW,
@@ -152,6 +155,11 @@ unordered_map<string, command_t> gCommandList =
     {"label", C_SET_LABEL},
     {"name", C_SET_LABEL},
     {"n", C_SET_LABEL},
+
+    {"page one", C_PAGE_ONE},
+    {"page 1", C_PAGE_ONE},
+    {"page two", C_PAGE_TWO},
+    {"page 2", C_PAGE_TWO},
 
     {"run", C_RUN},
     {"stop", C_STOP},
@@ -450,6 +458,13 @@ bool do_command(string/*const char * */ commandString)
             set_status(STAT_POS_2, "Pattern %i: %s",
                 g_PatternStore.CurrentEditPatternID(),
                 g_PatternStore.CurrentEditPattern().Label(50).c_str());
+            break;
+
+        case C_PAGE_ONE:
+            g_Display.SetBigPanelPage(Display::one);
+            break;
+        case C_PAGE_TWO:
+            g_Display.SetBigPanelPage(Display::two);
             break;
 
         case C_CUE  :

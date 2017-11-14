@@ -84,7 +84,8 @@ struct Note : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum note_edit_focus_t {
+        enum note_edit_focus_t
+        {
             nef_note_number,
             nef_velocity,
             nef_length,
@@ -236,7 +237,8 @@ struct RealTimeListParams : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum rt_params_focus_t {
+        enum rt_params_focus_t
+        {
             rtp_loop_start,
             rtp_local_quantum,
             rtp_multiplier,

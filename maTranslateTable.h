@@ -25,7 +25,8 @@
 
 #include "maCursorKeys.h"
 
-enum accidentals_mode_t {
+enum accidentals_mode_t
+{
     accmode_upper,
     accmode_lower,
     upper_mute_if_clash,
@@ -33,7 +34,8 @@ enum accidentals_mode_t {
     number_accidentals_modes
 };
 
-enum scale_premap_mode_t {
+enum scale_premap_mode_t
+{
     premap_off,
     premap_mute,
     premap_leave,
@@ -42,7 +44,8 @@ enum scale_premap_mode_t {
     number_premap_modes
 };
 
-enum scale_t {
+enum scale_t
+{
     major,
     harmonic_minor,
     major_dorian,
@@ -133,7 +136,8 @@ class TranslateTable : public CursorKeys
         }
 
     protected:
-        enum translate_table_focus_t {
+        enum translate_table_focus_t
+        {
             chromatic_shift,
             tonal_shift,
             root,

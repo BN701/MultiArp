@@ -86,21 +86,21 @@ bool TrigList::HandleKey(key_type_t k)
             m_PosEdit += 1;
         break;
 
-    case up:
-        if ( m_ReturnFocus != NULL )
-        {
-            m_ReturnFocus->HandleKey(right);
-            m_ReturnFocus->HandleKey(enter);
-        }
-        return true;
-
-    case down:
-        if ( m_ReturnFocus != NULL )
-        {
-            m_ReturnFocus->HandleKey(left);
-            m_ReturnFocus->HandleKey(enter);
-        }
-        return true;
+//    case up:
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(right);
+//            m_ReturnFocus->HandleKey(enter);
+//        }
+//        return true;
+//
+//    case down:
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(left);
+//            m_ReturnFocus->HandleKey(enter);
+//        }
+//        return true;
 
     case ctrl_left:
         if ( !m_TrigItems.empty() )
@@ -172,7 +172,7 @@ string TrigList::ToStringForDisplay()
             result += ' ';
         if ( i == m_Pos )
         {
-            sprintf(buff, "%3i| ", m_Pos);
+            sprintf(buff, "%3i| ", m_Pos + 1);
             result += buff;
         }
         result += m_TrigItems.at(i).MenuString();
@@ -187,6 +187,9 @@ string TrigList::ToStringForDisplay2(int & offset, int & length, int width)
 
     char buff[50];
 
+    offset = 0;
+    length = 0;
+
     for ( int i = 0; i < m_TrigItems.size(); i++ )
     {
         if ( i > 0 )
@@ -200,6 +203,24 @@ string TrigList::ToStringForDisplay2(int & offset, int & length, int width)
         {
             length = result.size() - offset;
         }
+    }
+
+    // Scroll left if highlight is beyond width.
+
+    while ( offset + length > width )
+    {
+        int scroll = 3 * width / 4;
+        result.erase(0, scroll + 3);
+        result.insert(0, "...");
+        offset -= scroll;
+    }
+
+    // Truncate if line itself goes beyond width.
+
+    if ( result.size() > width )
+    {
+        result = result.substr(0, width - 4);
+        result += "... ";
     }
 
     return result;

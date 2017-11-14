@@ -314,7 +314,8 @@ void midi_action(int queueId)
     while ( g_Sequencer.EventInputPending() );
 }
 
-enum global_element_names_t {
+enum global_element_names_t
+{
      global_heading,
      global_name_midi_channel,
      global_name_link_quantum,

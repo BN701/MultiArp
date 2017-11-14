@@ -367,7 +367,8 @@ struct PatternStore : public CursorKeys
     }
 
     protected:
-        enum pattern_store_focus_t {
+        enum pattern_store_focus_t
+        {
             psf_pattern,
             psf_list,
             psf_rt_list,

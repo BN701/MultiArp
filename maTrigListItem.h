@@ -46,7 +46,8 @@ class TrigListItem : public CursorKeys
     virtual void SetStatus();
     protected:
         virtual bool HandleKey(key_type_t k);
-        enum trig_list_item_focus_t {
+        enum trig_list_item_focus_t
+        {
             tlif_trigs,
             tlif_multiplier,
             tlif_skip,

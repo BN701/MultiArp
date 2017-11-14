@@ -36,7 +36,6 @@ extern CursorKeys g_CursorKeys;
 extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
 extern State g_State;
-//extern TranslateTable * pTranslateTable;
 
 // Additional colours beyond the basic eight that are defined
 // in ncurses.h. (Note the UK spelling to distinguish them from
@@ -485,41 +484,24 @@ void update_pattern_panel_2()
     try
     {
         vector<PosInfo2> highlights;
-        wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights).c_str());
+        switch ( g_Display.BigPanelPage() )
+        {
+        case Display::one:
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights).c_str());
+            break;
+        case Display::two:
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display().c_str());
+            break;
+        }
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )
         {
             mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, A_REVERSE, 0, NULL);
         }
     }
-    catch (string s)
+    catch (... /*string s*/)
     {
-        wprintw(g_Display.BigPanel(), s.c_str());
+        // wprintw(g_Display.BigPanel(), s.c_str());
     }
-
-//    g_ListDisplayRows.clear();
-//
-//	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
-//
-//    wmove(g_Display.BigPanel(), 0, 4);
-//    wprintw(g_Display.BigPanel(), "%s\n\n", g_PatternStore.PlayPatternTrigsToString().c_str());
-//
-//    for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
-//    {
-//        getyx(g_Display.BigPanel(), scr_y, scr_x);
-//        g_ListDisplayRows.push_back(scr_y);
-//        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
-//    }
-//
-//    wprintw(g_Display.BigPanel(), "\n");
-//	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
-//
-//
-//    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
-//    {
-//        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
-//    }
-//
-//    wattroff(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
 
     wrefresh(g_Display.BigPanel());
 

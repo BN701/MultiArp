@@ -167,7 +167,8 @@ string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
     return result;
 }
 
-enum pat_element_names_t {
+enum pat_element_names_t
+{
     pat_heading,
     pat_name_step_value,
     pat_name_gate,
@@ -543,8 +544,10 @@ string & Centre(string & line, int centre, int width)
 
 string Pattern::Display(int centre, int width)
 {
-    string result;
+    string result = "    ";
     string line;
+
+    // Allow for edit cursors in left hand column.
 
     centre -= 4;
     width -= 4;
@@ -553,7 +556,7 @@ string Pattern::Display(int centre, int width)
 
     line = m_TrigList.ToStringForDisplay();
     result += Centre(line, centre, width);
-    result += 'n';
+    result += '\n';
 
     // Step Lists
 
@@ -591,6 +594,8 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
     string result;
     string line;
 
+    width -= 4;     // Allow for edit cursors in left column.
+
     // Trigs
 
     result = "    ";
@@ -600,7 +605,6 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
         result += '\n';
 
     result += '\n';
-    width -= 4;     // Allow for cursor in left column.
 
     // Step Lists
 

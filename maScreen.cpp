@@ -484,7 +484,12 @@ void update_pattern_panel_2()
 
     try
     {
-        wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display().c_str());
+        vector<PosInfo2> highlights;
+        wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights).c_str());
+        for ( auto it = highlights.begin(); it < highlights.end(); it++ )
+        {
+            mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, A_REVERSE, 0, NULL);
+        }
     }
     catch (string s)
     {

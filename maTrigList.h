@@ -36,6 +36,7 @@ class TrigList : public CursorKeys
         TrigListItem * Step();
 
         std::string ToStringForDisplay();
+        std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
 
         virtual void SetStatus();
     protected:

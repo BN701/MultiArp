@@ -699,12 +699,51 @@ string StepList::ToStringForDisplay()
     {
         if ( i > 0 )
             result += ' ';
-        if ( i == m_Pos )
+        if ( i == m_LastRequestedPos )
         {
             sprintf(buff, "%3i| ", m_Pos);
             result += buff;
         }
-        result += m_Clusters.at(i).ToString();
+        result += m_Clusters.at(i).ToString(false);
+    }
+
+    return result;
+}
+
+string StepList::ToStringForDisplay2(int & offset, int & length, int width)
+{
+    string result;
+
+    offset = 0;
+    length = 0;
+
+    for ( int i = 0; i < m_Clusters.size(); i++ )
+    {
+        if ( i > 0 )
+            result += ' ';
+        if ( i == m_LastRequestedPos )
+        {
+            offset = result.size();
+        }
+        result += m_Clusters.at(i).ToString(false);
+        if ( i == m_LastRequestedPos )
+        {
+            length = result.size() - offset;
+        }
+    }
+
+    while ( offset + length > width )
+    {
+        int scroll = 3 * width / 4;
+        result.erase(0, scroll + 3);
+        result.insert(0, "...");
+        offset -= scroll;
+    }
+
+    if ( result.size() > width )
+    {
+        result = result.substr(0, width - 4);
+        result += "... ";
     }
 
     return result;
@@ -1326,12 +1365,14 @@ string RealTimeList::ToStringForDisplay(int width)
     if ( result.size() > width )
         result.resize(width);
 
+#if 0
     sprintf(buff, "\n    Multiplier %.2f, Loop Start %.2f, Loop Quantum %.2f, Window Adjust %s",
         m_Params.m_Multiplier,
         m_Params.m_LoopStart,
         m_Params.m_LocalQuantum,
         m_Params.m_AdjustWindowToStep ? "ON" : "OFF");
     result += buff;
+#endif
 
     return result;
 }

@@ -74,7 +74,7 @@ string TrigListItem::MenuString()
     char buff[200];
     string result = TrigMaskToString();
 
-    if ( lround(m_Multiplier) != 1 )
+    if ( lround(m_Multiplier * 100) != 100 )
     {
         sprintf(buff, "x%.2f", m_Multiplier);
         result += buff;

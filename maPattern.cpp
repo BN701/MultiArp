@@ -535,6 +535,8 @@ string & Centre(string & line, int centre, int width)
 
     if ( line.size() > width )
         line = line.substr(0, width);
+    else if ( line.size() < width )
+        line += '\n';
 
     return line;
 }
@@ -544,21 +546,89 @@ string Pattern::Display(int centre, int width)
     string result;
     string line;
 
+    centre -= 4;
+    width -= 4;
+
+    // Trigs
 
     line = m_TrigList.ToStringForDisplay();
     result += Centre(line, centre, width);
+    result += 'n';
+
+    // Step Lists
 
     for ( int i = 0; i < m_StepListSet.size(); i++ )
     {
-        result += '\n';
+        if ( i == m_PosEdit )
+            result += " -> ";
+        else
+            result += "    ";
         line = m_StepListSet.at(i).ToStringForDisplay();
         result += Centre(line, centre, width);
     }
 
+    result += '\n';
+
+    // Realtime Lists
+
     for ( int i = 0; i < m_RealTimeSet.size(); i++ )
     {
-        result += '\n';
+        if ( i == m_PosRealTimeEdit )
+            result += " -> ";
+        else
+            result += "    ";
         result += m_RealTimeSet.at(i).ToStringForDisplay();
+        result += '\n';
+    }
+
+    return result;
+}
+
+string Pattern::Display2(vector<PosInfo2> & highlights, int width)
+{
+    int offset, length;
+
+    string result;
+    string line;
+
+    // Trigs
+
+    result = "    ";
+    result += m_TrigList.ToStringForDisplay2(offset, length, width);
+    highlights.push_back(PosInfo2(0, offset + 4, length));
+    if ( result.size() < width )
+        result += '\n';
+
+    result += '\n';
+    width -= 4;     // Allow for cursor in left column.
+
+    // Step Lists
+
+    for ( int i = 0; i < m_StepListSet.size(); i++ )
+    {
+        if ( i == m_PosEdit )
+            result += " -> ";
+        else
+            result += "    ";
+        line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
+        highlights.push_back(PosInfo2(i + 2, offset + 4, length));
+        if ( line.size() < width )
+            line += '\n';
+        result += line;
+    }
+
+    result += '\n';
+
+    // Realtime Lists
+
+    for ( int i = 0; i < m_RealTimeSet.size(); i++ )
+    {
+        if ( i == m_PosRealTimeEdit )
+            result += " -> ";
+        else
+            result += "    ";
+        result += m_RealTimeSet.at(i).ToStringForDisplay();
+        result += '\n';
     }
 
     return result;

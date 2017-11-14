@@ -35,13 +35,23 @@
 
 struct PosInfo
 {
-    int offset;
-    int length;
+    int offset = 0;
+    int length = 0;
 
-    PosInfo(int ofs = 0, int len = 0):
+    PosInfo(int ofs, int len):
         offset(ofs),
         length(len)
-    {};
+    {}
+};
+
+struct PosInfo2 : public PosInfo
+{
+    int row = 0;
+
+    PosInfo2(int row, int ofs, int len):
+        PosInfo(ofs,len),
+        row(row)
+    {}
 };
 
 struct Note : public CursorKeys
@@ -129,8 +139,6 @@ struct Cluster : public CursorKeys
 
 };
 
-//struct StepListSubMenu;
-
 struct StepList : public CursorKeys
 {
 
@@ -207,6 +215,7 @@ struct StepList : public CursorKeys
 
     std::string ToString(bool showVelocity = true);
     std::string ToStringForDisplay();
+    std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
     void FromString(std::string s);
 
     bool PlayPositionInfo(int & offset,  int & length);

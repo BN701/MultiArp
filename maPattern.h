@@ -129,6 +129,7 @@ struct Pattern
         return m_Label.empty();
     }
 
+    size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
     std::string Label() { return m_Label; }
     std::string Label(size_t width);
     std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);

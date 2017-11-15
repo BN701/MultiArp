@@ -112,7 +112,7 @@ Display::Display()
 	init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
 
 	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_BLUE, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_GREEN, COLOUR_BLACK);
 	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOUR_BLACK);
 	init_pair(CP_PATTERN_LIST_PANEL_BKGND, COLOR_YELLOW, COLOUR_GREY);
 
@@ -131,7 +131,7 @@ Display::Display()
     m_ProgressPanel = newwin(2, 15, 3, 61);
     m_EditListPanel = newwin(4, 20, 8, 4);
     m_EditSummaryPanel = newwin(4, 52, 8, 24);
-    m_BigPanel = newwin(10, 80, 13, 0);
+    m_BigPanel = newwin(11, 80, 12, 0);
 
     bkgd(COLOR_PAIR(CP_MAIN));
     wbkgd(m_SmallPanel, COLOR_PAIR(CP_SMALL_PANEL_BKGND));
@@ -488,19 +488,22 @@ void update_pattern_panel_2()
         switch ( g_Display.BigPanelPage() )
         {
         case Display::one:
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights).c_str());
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights, 79).c_str());
             break;
         case Display::two:
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(highlights).c_str());
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(highlights, 25, 79).c_str());
             break;
         }
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )
         {
             mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length,
-                it->row == 0 ? A_REVERSE : 0,
-                it->row == 0 ? CP_PATTERN_LIST_PANEL : CP_MAIN,
+                it->row < 2 ? A_REVERSE : 0,
+                it->row < 2 ? CP_PATTERN_LIST_PANEL_3 : CP_MAIN,
                 NULL);
         }
+        // Kludge to show overall trig position.
+        mvwchgat(g_Display.BigPanel(), 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
+            A_UNDERLINE, CP_PATTERN_LIST_PANEL, NULL);
     }
     catch (... /*string s*/)
     {

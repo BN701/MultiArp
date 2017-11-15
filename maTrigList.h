@@ -33,6 +33,7 @@ class TrigList : public CursorKeys
 
         bool Empty() { return m_TrigItems.empty(); }
         size_t Size() { return m_TrigItems.size(); }
+        size_t PlayPosition() { return m_Pos; }
         TrigListItem * Step();
 
         std::string ToStringForDisplay();

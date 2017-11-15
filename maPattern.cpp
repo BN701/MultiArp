@@ -543,18 +543,18 @@ string & Centre(string & line, int centre, int width, int & offset)
 
     if ( line.size() > width )
         line = line.substr(0, width);
-    else if ( line.size() < width )
-        line += '\n';
+//    else if ( line.size() < width )
+    line += '\n';
 
     return line;
 }
 
 string Pattern::Display(vector<PosInfo2> & highlights, int centre, int width)
 {
-    string result = "    ";
+    string result;
     string line;
 
-    int offset = 0, length = 0, row = 0;
+    int offset = 0, length = 0, row = 1;
 
     // Allow for edit cursors in left hand column.
 
@@ -563,13 +563,12 @@ string Pattern::Display(vector<PosInfo2> & highlights, int centre, int width)
 
     // Trigs
 
-    result = "    ";
+    result = "\n    ";
     if ( ! m_TrigList.Empty() )
     {
         result += m_TrigList.ToStringForDisplay2(offset, length, width);
         highlights.push_back(PosInfo2(0, offset + 4, length));
-        if ( result.size() < width )
-            result += '\n';
+        result += '\n';
     }
     else
         result += "Triggers: Auto\n";
@@ -621,7 +620,7 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
 {
     int offset, length;
 
-    int row = 0;
+    int row = 1;
 
     string result;
     string line;
@@ -630,13 +629,14 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
 
     // Trigs
 
-    result = "    ";
+//    result.insert(0, m_TrigList.PlayPostion() + 4, ' ');
+
+    result = "\n    ";
     if ( ! m_TrigList.Empty() )
     {
         result += m_TrigList.ToStringForDisplay2(offset, length, width);
-        highlights.push_back(PosInfo2(0, offset + 4, length));
-        if ( result.size() < width )
-            result += '\n';
+        highlights.push_back(PosInfo2(row, offset + 4, length));
+        result += '\n';
     }
     else
         result += "Triggers: Auto\n";
@@ -658,8 +658,7 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
             result += "    ";
         line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
         highlights.push_back(PosInfo2(row++, offset + 4, length));
-        if ( line.size() < width )
-            line += '\n';
+        line += '\n';
         result += line;
     }
 

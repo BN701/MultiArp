@@ -181,9 +181,12 @@ string TrigList::ToStringForDisplay()
     return result;
 }
 
-string TrigList::ToStringForDisplay2(int & offset, int & length, int width)
+string TrigList::ToStringForDisplay2(int & offset, int & length, int displayWidth)
 {
     string result;
+
+    int itemWidth = 9;
+    int itemsPerRow = displayWidth/itemWidth;
 
     char buff[50];
 
@@ -192,35 +195,29 @@ string TrigList::ToStringForDisplay2(int & offset, int & length, int width)
 
     for ( int i = 0; i < m_TrigItems.size(); i++ )
     {
-//        if ( i > 0 )
-//            result += ' ';
         if ( i == m_Pos )
-        {
             offset = result.size();
-        }
+
         result += m_TrigItems.at(i).MenuString(9);
+
         if ( i == m_Pos )
-        {
             length = result.size() - offset;
-        }
     }
 
-    // Scroll left if highlight is beyond width.
+    // Scroll left if highlight is beyond displayWidth.
 
-    while ( offset + length > width )
+    while ( offset + length > displayWidth )
     {
-        int scroll = 3 * width / 4;
-        result.erase(0, scroll + 3);
-        result.insert(0, "...");
+        int scroll = itemsPerRow * itemWidth;
+        result.erase(0, scroll);
         offset -= scroll;
     }
 
     // Truncate if line itself goes beyond width.
 
-    if ( result.size() > width )
+    if ( result.size() > displayWidth )
     {
-        result = result.substr(0, width - 4);
-        result += "... ";
+        result = result.substr(0, displayWidth);
     }
 
     return result;

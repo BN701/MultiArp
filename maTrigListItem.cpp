@@ -69,7 +69,7 @@ string TrigListItem::TrigMaskToString()
 
 }
 
-string TrigListItem::MenuString()
+string TrigListItem::MenuString(int width)
 {
     char buff[200];
     string result = TrigMaskToString();
@@ -87,10 +87,22 @@ string TrigListItem::MenuString()
     }
 
     if ( m_Skip )
-        result += ",Skip ";
+        result += ",Skip";
 
     if ( m_Mute )
-        result += ",Mute ";
+        result += ",Mute";
+
+    if ( width > 0 && result.size() < width )
+    {
+        int pad = width - result.size();
+        result.insert(0, pad/2, ' ');
+        result.append(pad/2 + (pad % 2), ' ');
+    }
+    else if (width > 4 && result.size() > width )
+    {
+        result = result.substr(0, width - 3);
+        result += "...";
+    }
 
     return result;
 }

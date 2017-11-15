@@ -215,7 +215,7 @@ struct StepList : public CursorKeys
     }
 
     std::string ToString(bool showVelocity = true);
-    std::string ToStringForDisplay();
+    std::string ToStringForDisplay(int & offset, int & length);
     std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
     void FromString(std::string s);
 
@@ -269,7 +269,7 @@ struct RealTimeList : public CursorKeys
 
     void FromString(std::string s);
     std::string ToString();
-    std::string ToStringForDisplay(int width = 75);
+    std::string ToStringForDisplay(int & offset, int & length, int width = 75);
 
     virtual void SetStatus();
     protected:

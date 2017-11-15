@@ -689,11 +689,14 @@ string StepList::ToString(bool showVelocity)
     return result;
 }
 
-string StepList::ToStringForDisplay()
+string StepList::ToStringForDisplay(int & offset, int & length)
 {
     string result;
 
     char buff[50];
+
+    offset = 0;
+    length = 0;
 
     for ( int i = 0; i < m_Clusters.size(); i++ )
     {
@@ -704,7 +707,13 @@ string StepList::ToStringForDisplay()
             sprintf(buff, "%3i| ", m_Pos + 1);
             result += buff;
         }
+        if ( i == 0 )
+            offset = result.size();
+
         result += m_Clusters.at(i).ToString(false);
+
+        if ( i == 0 )
+            length = result.size() - offset;
     }
 
     return result;
@@ -1310,8 +1319,11 @@ string RealTimeList::ToString()
 
 // Less efficient (probably) but easier to read (possibly) ...
 
-string RealTimeList::ToStringForDisplay(int width)
+string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
 {
+    offset = 0;
+    length = 0;
+
     char buff[100];
     sprintf(buff, "%05.2f ", m_LastRequestedPhase);
 
@@ -1356,6 +1368,9 @@ string RealTimeList::ToStringForDisplay(int width)
                         it != m_RealTimeList.upper_bound(windowEnd); it++ )
             notes.Add(it->second);
 
+        if ( windowPos == 0 )
+            offset = result.size();
+
         if ( !notes.Empty() )
         {
             result += notes.ToString(false);
@@ -1363,6 +1378,9 @@ string RealTimeList::ToStringForDisplay(int width)
         }
         else
             result += '-';
+
+        if ( windowPos == 0 )
+            length = result.size() - offset;
 
         windowPos += windowStep;
     }

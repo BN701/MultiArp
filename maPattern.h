@@ -136,7 +136,7 @@ struct Pattern
     std::string TrigsToStringForDisplay();
     std::string TrigsToString();
     std::string ToString(const char * prefix);
-    std::string Display(int centre = 30, int width = 80);
+    std::string Display(std::vector<PosInfo2> & highlights, int centre = 30, int width = 80);
     std::string Display2(std::vector<PosInfo2> & highlights, int width = 80);
 
     bool FromString(std::string s, int & updates);

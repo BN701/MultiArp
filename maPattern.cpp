@@ -163,7 +163,8 @@ string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
     else
         result = "    ";
 
-    result += m_RealTimeSet.at(n).ToStringForDisplay();
+    int offset, length;
+    result += m_RealTimeSet.at(n).ToStringForDisplay(offset, length);
     return result;
 }
 
@@ -522,7 +523,7 @@ void Pattern::StoreTranslateTable( TranslateTable & table )
     m_TranslateTable = table;
 }
 
-string & Centre(string & line, int centre, int width)
+string & Centre(string & line, int centre, int width, int & offset)
 {
     size_t p = line.find('|');
 
@@ -530,9 +531,15 @@ string & Centre(string & line, int centre, int width)
         line.at(p) = ' ';
 
     if ( p < centre )
+    {
         line.insert(0, centre - p, ' ');
+        offset += centre - p;
+    }
     else if ( p > centre )
+    {
         line.erase(0, p - centre);
+        offset -= p - centre;
+    }
 
     if ( line.size() > width )
         line = line.substr(0, width);
@@ -542,10 +549,12 @@ string & Centre(string & line, int centre, int width)
     return line;
 }
 
-string Pattern::Display(int centre, int width)
+string Pattern::Display(vector<PosInfo2> & highlights, int centre, int width)
 {
     string result = "    ";
     string line;
+
+    int offset = 0, length = 0, row = 0;
 
     // Allow for edit cursors in left hand column.
 
@@ -554,34 +563,55 @@ string Pattern::Display(int centre, int width)
 
     // Trigs
 
-    line = m_TrigList.ToStringForDisplay();
-    result += Centre(line, centre, width);
+    result = "    ";
+    if ( ! m_TrigList.Empty() )
+    {
+        result += m_TrigList.ToStringForDisplay2(offset, length, width);
+        highlights.push_back(PosInfo2(0, offset + 4, length));
+        if ( result.size() < width )
+            result += '\n';
+    }
+    else
+        result += "Triggers: Auto\n";
+
     result += '\n';
+    row += 2;
 
     // Step Lists
 
     for ( int i = 0; i < m_StepListSet.size(); i++ )
     {
         if ( i == m_PosEdit )
+        {
             result += " -> ";
+            highlights.push_back(PosInfo2(row, 1, 2));
+        }
         else
             result += "    ";
-        line = m_StepListSet.at(i).ToStringForDisplay();
-        result += Centre(line, centre, width);
+        highlights.push_back(PosInfo2(row, centre, 4));
+        line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
+        result += Centre(line, centre, width, offset);
+        highlights.push_back(PosInfo2(row++, offset + 4, length));
     }
 
     result += '\n';
+    row += 1;
 
     // Realtime Lists
 
     for ( int i = 0; i < m_RealTimeSet.size(); i++ )
     {
         if ( i == m_PosRealTimeEdit )
+        {
             result += " -> ";
+            highlights.push_back(PosInfo2(row, 1, 2));
+        }
         else
             result += "    ";
-        result += m_RealTimeSet.at(i).ToStringForDisplay();
+        highlights.push_back(PosInfo2(row, 4, 5));
+        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
         result += '\n';
+        highlights.push_back(PosInfo2(row++, offset + 4, length));
     }
 
     return result;
@@ -591,6 +621,8 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
 {
     int offset, length;
 
+    int row = 0;
+
     string result;
     string line;
 
@@ -599,39 +631,55 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
     // Trigs
 
     result = "    ";
-    result += m_TrigList.ToStringForDisplay2(offset, length, width);
-    highlights.push_back(PosInfo2(0, offset + 4, length));
-    if ( result.size() < width )
-        result += '\n';
+    if ( ! m_TrigList.Empty() )
+    {
+        result += m_TrigList.ToStringForDisplay2(offset, length, width);
+        highlights.push_back(PosInfo2(0, offset + 4, length));
+        if ( result.size() < width )
+            result += '\n';
+    }
+    else
+        result += "Triggers: Auto\n";
 
     result += '\n';
+    row += 2;
 
     // Step Lists
+
 
     for ( int i = 0; i < m_StepListSet.size(); i++ )
     {
         if ( i == m_PosEdit )
+        {
             result += " -> ";
+            highlights.push_back(PosInfo2(row, 1, 2));
+        }
         else
             result += "    ";
         line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
-        highlights.push_back(PosInfo2(i + 2, offset + 4, length));
+        highlights.push_back(PosInfo2(row++, offset + 4, length));
         if ( line.size() < width )
             line += '\n';
         result += line;
     }
 
     result += '\n';
+    row += 1;
 
     // Realtime Lists
 
     for ( int i = 0; i < m_RealTimeSet.size(); i++ )
     {
         if ( i == m_PosRealTimeEdit )
+        {
             result += " -> ";
+            highlights.push_back(PosInfo2(row, 1, 2));
+        }
         else
             result += "    ";
-        result += m_RealTimeSet.at(i).ToStringForDisplay();
+        highlights.push_back(PosInfo2(row, 4, 5));
+        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
+        highlights.push_back(PosInfo2(row++, offset + 4, length));
         result += '\n';
     }
 

@@ -41,7 +41,7 @@ class TrigListItem : public CursorKeys
 
         std::string ToString();
         std::string TrigMaskToString();
-        std::string MenuString();
+        std::string MenuString(int width = 0);
 
     virtual void SetStatus();
     protected:

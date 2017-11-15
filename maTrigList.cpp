@@ -168,14 +168,14 @@ string TrigList::ToStringForDisplay()
 
     for ( int i = 0; i < m_TrigItems.size(); i++ )
     {
-        if ( i > 0 )
-            result += ' ';
+//        if ( i > 0 )
+//            result += ' ';
         if ( i == m_Pos )
         {
             sprintf(buff, "%3i| ", m_Pos + 1);
             result += buff;
         }
-        result += m_TrigItems.at(i).MenuString();
+        result += m_TrigItems.at(i).MenuString(9);
     }
 
     return result;
@@ -192,13 +192,13 @@ string TrigList::ToStringForDisplay2(int & offset, int & length, int width)
 
     for ( int i = 0; i < m_TrigItems.size(); i++ )
     {
-        if ( i > 0 )
-            result += ' ';
+//        if ( i > 0 )
+//            result += ' ';
         if ( i == m_Pos )
         {
             offset = result.size();
         }
-        result += m_TrigItems.at(i).MenuString();
+        result += m_TrigItems.at(i).MenuString(9);
         if ( i == m_Pos )
         {
             length = result.size() - offset;

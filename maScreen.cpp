@@ -484,18 +484,22 @@ void update_pattern_panel_2()
     try
     {
         vector<PosInfo2> highlights;
+        wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
         switch ( g_Display.BigPanelPage() )
         {
         case Display::one:
             wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights).c_str());
             break;
         case Display::two:
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display().c_str());
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(highlights).c_str());
             break;
         }
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )
         {
-            mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, A_REVERSE, 0, NULL);
+            mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length,
+                it->row == 0 ? A_REVERSE : 0,
+                it->row == 0 ? CP_PATTERN_LIST_PANEL : CP_MAIN,
+                NULL);
         }
     }
     catch (... /*string s*/)

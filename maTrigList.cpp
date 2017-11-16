@@ -194,13 +194,30 @@ void TrigList::FromString(string s)
     if ( tokens.size() <= 1 )
         throw string("TrigList::FromString() - Nothing found.");
 
-
     m_TrigItems.clear();
 
     for ( auto it = tokens.begin() + 1; it != tokens.end(); it++ )
     {
         m_TrigItems.emplace_back();
         m_TrigItems.back().FromString(*it);
+    }
+}
+
+void TrigList::FromSimpleString(string s)
+{
+    vector<string> tokens = split(s.c_str(), ' ');
+
+    // TODO: Less than what?
+
+    if ( tokens.size() <= 1 )
+        throw string("TrigList::FromSimpleString() - Nothing found.");
+
+    m_TrigItems.clear();
+
+    for ( auto it = tokens.begin() + 1; it != tokens.end(); it++ )
+    {
+        m_TrigItems.emplace_back();
+        m_TrigItems.back().FromSimpleString(*it);
     }
 }
 

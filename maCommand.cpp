@@ -59,6 +59,8 @@ enum command_t
 
     C_SET_LABEL,
 
+    C_TRIGS, // Open the trig menu on current pattern or enter a list.
+
     C_STEPVAL,
     C_QUANTUM,
     C_GATELENGTH,
@@ -185,6 +187,9 @@ unordered_map<string, command_t> gCommandList =
 
     {"tran", C_TRANSPOSE},
     {"transpose", C_TRANSPOSE},
+
+    {"trigs", C_TRIGS},
+    {"t", C_TRIGS},
 
     {"scale", C_SCALE},
     {"s", C_SCALE},
@@ -895,6 +900,16 @@ bool do_command(string/*const char * */ commandString)
 
         case C_STATUS :
             show_status();
+            break;
+
+        case C_TRIGS:
+            if ( tokens.size() > 1 )
+            {
+                g_PatternStore.CurrentPlayPattern().PatternTrigList().FromSimpleString(commandString);
+            }
+            g_PatternStore.CurrentPlayPattern().PatternTrigList().SetStatus();
+            g_PatternStore.CurrentPlayPattern().PatternTrigList().SetFocus();
+            show_status_after_navigation();
             break;
 
         case C_EXIT :

@@ -34,10 +34,13 @@ class TrigList : public CursorKeys
         bool Empty() { return m_TrigItems.empty(); }
         size_t Size() { return m_TrigItems.size(); }
         size_t PlayPosition() { return m_Pos; }
+        void ResetPosition() { m_Pos = 0; }
+
         TrigListItem * Step();
 
         std::string ToString(const char * prefix);
         void FromString(std::string s);
+        void FromSimpleString(std::string s);
 
         std::string ToStringForDisplay();
         std::string ToStringForDisplay2(int & offset, int & length, int width = 80);

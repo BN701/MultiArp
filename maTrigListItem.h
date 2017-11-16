@@ -41,7 +41,13 @@ class TrigListItem : public CursorKeys
 
         std::string ToString();
         void FromString(std::string s);
+        void FromSimpleString(std::string s);
+
         std::string TrigMaskToString();
+
+        void TrigsFromMask(unsigned long trigMask);
+        unsigned long MaskFromTrigs();
+
         std::string MenuString(int width = 0);
 
     virtual void SetStatus();
@@ -62,7 +68,7 @@ class TrigListItem : public CursorKeys
 
     private:
         std::vector<int> m_Trigs = {0}; // Default for individual item is to trigger the first list.
-        unsigned int m_TrigMask = 1;    // Cheat for scrolling values in menu. (Default matches m_Trigs default.)
+        unsigned long m_TrigMask = 1;    // Cheat for scrolling values in menu. (Default matches m_Trigs default.)
         double m_Multiplier = 1.0;
         bool m_Skip = false;
         bool m_Mute = false;

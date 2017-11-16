@@ -283,7 +283,7 @@ Pattern Chain empty.
 
 Store Pattern Chain Mode 0
 Store Reset on pattern change ON
-Store Edit focus follows play ON
+Store Edit focus follows play OFF
 
 << Pattern Default >>
 
@@ -297,12 +297,26 @@ Default Trigs
 
 << Pattern 1 >>
 
+Pattern Label "Eric the Red" Step Value 17.00 Gate 0.55 Hold OFF Vel 73
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs ,\
+     Trig Mask 2 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 4 Repeat Time 0.000
+
+<< Pattern 2 >>
+
 Pattern Label "New" Step Value 16.00 Gate 0.50 Hold OFF Vel 64
 Pattern Scale\
     root 60 chrom 0 shift 0 scale 'Major'\
     degrees 7 accidentals 'lo+mute' premap 'off'
 Pattern Feel Map
-Pattern Trigs
+Pattern Trigs ,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000
 Step List 1
 
 

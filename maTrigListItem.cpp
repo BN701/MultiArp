@@ -124,15 +124,81 @@ void TrigListItem::FromString(string s)
     }
 }
 
+void TrigListItem::FromSimpleString(string s)
+{
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
+
+    if ( s == "all" )
+    {
+        m_TrigMask = ULONG_MAX;
+        TrigsFromMask(m_TrigMask);
+        return;
+    }
+
+    m_Trigs.clear();
+
+    while ( s.size() > 0 )
+    {
+        try
+        {
+            int i = stoi(s);
+            if ( i <= 64 )
+                m_Trigs.push_back(i - 1);
+
+            size_t pos = s.find('+');
+            if ( pos == string::npos )
+                break;
+            s.erase(0, pos + 1);
+        }
+        catch (...)
+        {
+            break;
+        }
+    }
+
+    m_TrigMask = MaskFromTrigs();
+
+}
+
+void TrigListItem::TrigsFromMask(unsigned long trigMask)
+{
+    unsigned long mask = 1;
+    m_Trigs.clear();
+
+    for ( int i = 0; i < CHAR_BIT * sizeof(mask); i++ )
+    {
+        if ( (trigMask & mask) > 0 )
+            m_Trigs.push_back(i);
+        mask = mask << 1;
+    }
+
+}
+
+unsigned long TrigListItem::MaskFromTrigs()
+{
+    unsigned long result = 0;
+
+    for ( auto it = m_Trigs.begin(); it < m_Trigs.end(); it++ )
+    {
+        result += (unsigned long) 1 << *it;
+    }
+
+    return result;
+}
+
 string TrigListItem::TrigMaskToString()
 {
-    if ( m_TrigMask != 0 )
+    if ( m_TrigMask == 0 )
+        return "None";
+    else if ( m_TrigMask == ULONG_MAX )
+        return "All";
+    else
     {
         string result;
         char buff[20];
 
         bool addSpacer = false;
-        unsigned int mask = 1;
+        unsigned long mask = 1;
 
         for ( int i = 0; i < CHAR_BIT * sizeof(mask); i++ )
         {
@@ -147,9 +213,6 @@ string TrigListItem::TrigMaskToString()
 
         return result;
     }
-    else
-        return "None";
-
 }
 
 string TrigListItem::MenuString(int width)
@@ -202,16 +265,6 @@ void TrigListItem::SetStatus()
     m_Status = "[Trigs] ";
 
     pos = m_Status.size();
-//    if ( !m_Trigs.empty() )
-//    {
-//        for ( int i = 0; i < m_Trigs.size(); i++)
-//        {
-//            if ( i > 0 )
-//                m_Status += '/';
-//            sprintf(buff, "%i", m_Trigs.at(i));
-//            m_Status += buff;
-//        }
-//    }
     m_Status += TrigMaskToString();
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
@@ -322,7 +375,7 @@ bool TrigListItem::HandleKey(key_type_t k)
         switch ( m_TrigListItemFocus )
         {
         case tlif_trigs:
-            if ( m_TrigMask > 0 )
+            if ( (int) m_TrigMask >= 0 ) // m_TrigMask is unsigned, so can't be -ve. Make it an int and allow -1 equals 'all'.
             {
                 m_TrigMask -= 1;
                 newTrigs = true;
@@ -359,15 +412,7 @@ bool TrigListItem::HandleKey(key_type_t k)
 
     if ( newTrigs )
     {
-        unsigned int mask = 1;
-        m_Trigs.clear();
-
-        for ( int i = 0; i < CHAR_BIT * sizeof(mask); i++ )
-        {
-            if ( (m_TrigMask & mask) > 0 )
-                m_Trigs.push_back(i);
-            mask = mask << 1;
-        }
+        TrigsFromMask(m_TrigMask);
     }
 
     m_FirstField = m_TrigListItemFocus == 0;

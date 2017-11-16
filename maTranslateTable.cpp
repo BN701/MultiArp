@@ -410,7 +410,7 @@ string TranslateTable::ToString(const char * prefix)
         result += ' ';
     }
 
-    sprintf(buff, "%s %s %i %s %i %s %i %s '%s'",
+    sprintf(buff, "%s\\\n    %s %i %s %i %s %i %s '%s'",
             tt_element_names.at(tt_scale_heading),
             tt_element_names.at(tt_name_root), m_Root,
             tt_element_names.at(tt_name_chromatic), m_Transpose,
@@ -419,16 +419,22 @@ string TranslateTable::ToString(const char * prefix)
             );
 
     result += buff;
-    result += '\n';
+//    result += "\\\n    ";
 
-    if ( prefix != NULL )
-    {
-        result += prefix;
-        result += ' ';
-    }
+//    if ( prefix != NULL )
+//    {
+//        result += prefix;
+//        result += ' ';
+//    }
 
-    sprintf(buff, "%s %s %i %s '%s' %s '%s'",
-            tt_element_names.at(tt_scale_heading),
+//    sprintf(buff, "%s %s %i %s '%s' %s '%s'",
+//            tt_element_names.at(tt_scale_heading),
+//            tt_element_names.at(tt_name_degrees), m_ScaleDegrees,
+//            tt_element_names.at(tt_name_accidentals), tt_accidentals_mode_names.at(m_AccidentalsMode),
+//            tt_element_names.at(tt_name_premap), tt_premap_mode_names.at(m_PremapMode)
+//            );
+
+    sprintf(buff, "\\\n    %s %i %s '%s' %s '%s'",
             tt_element_names.at(tt_name_degrees), m_ScaleDegrees,
             tt_element_names.at(tt_name_accidentals), tt_accidentals_mode_names.at(m_AccidentalsMode),
             tt_element_names.at(tt_name_premap), tt_premap_mode_names.at(m_PremapMode)

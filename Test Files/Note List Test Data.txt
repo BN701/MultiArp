@@ -261,3 +261,48 @@ Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
 Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
 List 1  C5, D5, Eb5, F5, G5, Eb5, Bb5, C6
 
+Pattern Label "New"
+Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale root 60 chrom 0 shift 0 scale 'Major'
+Pattern Scale degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 5 Multiplier 0.700 Skip 'On' Mute 'On' Repeats 3 Repeat Time 0.300
+Step List 1
+
+--------------------------------------------------------------------------------------
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change ON
+Store Edit focus follows play ON
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Label "New" Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs
+Step List 1
+
+

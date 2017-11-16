@@ -19,6 +19,7 @@
 
 
 #include "maTrigList.h"
+#include "maUtility.h"
 
 using namespace std;
 
@@ -159,6 +160,50 @@ bool TrigList::HandleKey(key_type_t k)
 
     return true;
 }
+
+string TrigList::ToString(const char * prefix)
+{
+    string result;
+
+    if ( prefix != NULL )
+    {
+        result += prefix;
+        result += ' ';
+    }
+
+    result += "Trigs ";
+
+    for (auto it = m_TrigItems.begin(); it != m_TrigItems.end(); it++)
+    {
+        result += ",\\\n     ";
+        result += it->ToString();
+    }
+
+    return result;
+}
+
+void TrigList::FromString(string s)
+{
+    if ( s.find("Trigs") == string::npos )
+        throw string("TrigList::FromString() - Not a valid trig list.");
+
+    vector<string> tokens = split(s.c_str(), ',');
+
+    // TODO: Less than what?
+
+    if ( tokens.size() <= 1 )
+        throw string("TrigList::FromString() - Nothing found.");
+
+
+    m_TrigItems.clear();
+
+    for ( auto it = tokens.begin() + 1; it != tokens.end(); it++ )
+    {
+        m_TrigItems.emplace_back();
+        m_TrigItems.back().FromString(*it);
+    }
+}
+
 
 string TrigList::ToStringForDisplay()
 {

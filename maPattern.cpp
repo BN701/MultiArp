@@ -129,44 +129,44 @@ string Pattern::TrigsToStringForDisplay()
     return m_TrigList.ToStringForDisplay();
 }
 
-string Pattern::TrigsToString()
-{
-    return "";
-}
+//string Pattern::TrigsToString()
+//{
+//    return "";
+//}
 
-string Pattern::ListToString(vector<int>::size_type n)
-{
-    if ( n >= m_StepListSet.size() )
-        return "";
-
-    string result;
-
-    if ( n == m_PosEdit )
-        result = " -> ";
-    else
-        result = "    ";
-
-    result += m_StepListSet.at(n).ToString(false);
-
-    return result;
-}
-
-string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
-{
-    if ( n >= m_RealTimeSet.size() )
-        return "";
-
-    string result;
-
-    if ( n == m_PosRealTimeEdit )
-        result = " -> ";
-    else
-        result = "    ";
-
-    int offset, length;
-    result += m_RealTimeSet.at(n).ToStringForDisplay(offset, length);
-    return result;
-}
+//string Pattern::ListToString(vector<int>::size_type n)
+//{
+//    if ( n >= m_StepListSet.size() )
+//        return "";
+//
+//    string result;
+//
+//    if ( n == m_PosEdit )
+//        result = " -> ";
+//    else
+//        result = "    ";
+//
+//    result += m_StepListSet.at(n).ToString(false);
+//
+//    return result;
+//}
+//
+//string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
+//{
+//    if ( n >= m_RealTimeSet.size() )
+//        return "";
+//
+//    string result;
+//
+//    if ( n == m_PosRealTimeEdit )
+//        result = " -> ";
+//    else
+//        result = "    ";
+//
+//    int offset, length;
+//    result += m_RealTimeSet.at(n).ToStringForDisplay(offset, length);
+//    return result;
+//}
 
 enum pat_element_names_t
 {
@@ -206,7 +206,7 @@ string Pattern::ToString(const char * prefix)
         result += pat_element_names.at(pat_name_label);
         result += " \"";
         result += m_Label;
-        result += "\"\n";
+        result += "\" ";
     }
 
     char buffer[200];
@@ -231,6 +231,10 @@ string Pattern::ToString(const char * prefix)
 
     result += "\n";
     result += m_FeelMap.ToString(prefix);
+
+    result += "\n";
+    result += m_TrigList.ToString(prefix);
+
     result += "\n";
 
     int index = 1;
@@ -347,6 +351,7 @@ bool Pattern::FromString(string s, int & updates)
         }
         else if ( s.find(" Trigs ") == 7 )
         {
+            m_TrigList.FromString(s);
             updates += 1;
             return true;
         }

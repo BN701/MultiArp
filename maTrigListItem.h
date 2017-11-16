@@ -40,6 +40,7 @@ class TrigListItem : public CursorKeys
         double RepeatTime() { return m_RepeatTime; }
 
         std::string ToString();
+        void FromString(std::string s);
         std::string TrigMaskToString();
         std::string MenuString(int width = 0);
 

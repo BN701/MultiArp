@@ -363,7 +363,7 @@ void load_from_string(string s, int & created, int & updated )
     {
         try
         {
-            if ( g_PatternStore.LoadFromString(*i, created, updated) ) // Give Pattern Store a chance to see the header.
+            if ( g_PatternStore.FromString(*i, created, updated) ) // Give Pattern Store a chance to see the header.
                 continue;
 
             // Handle global fields here (for the time being).

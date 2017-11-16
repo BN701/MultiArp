@@ -135,10 +135,10 @@ struct Pattern
     size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
     std::string Label() { return m_Label; }
     std::string Label(size_t width);
-    std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
-    std::string ListToString(std::vector<int>::size_type n);
+//    std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
+//    std::string ListToString(std::vector<int>::size_type n);
     std::string TrigsToStringForDisplay();
-    std::string TrigsToString();
+//    std::string TrigsToString();
     std::string ToString(const char * prefix);
 //    std::string DisplayNonScrolling(std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
     std::string Display(int mode, std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);

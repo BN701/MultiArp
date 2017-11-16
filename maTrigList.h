@@ -36,6 +36,9 @@ class TrigList : public CursorKeys
         size_t PlayPosition() { return m_Pos; }
         TrigListItem * Step();
 
+        std::string ToString(const char * prefix);
+        void FromString(std::string s);
+
         std::string ToStringForDisplay();
         std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
 

@@ -255,45 +255,45 @@ void PatternStore::DownRTListPos()
         m_Patterns[m_PosEdit].DownRTEditPos();
 }
 
-int PatternStore::PlayPatternListCount()
-{
-    if ( m_Patterns.empty() )
-        return 0;
+//int PatternStore::PlayPatternListCount()
+//{
+//    if ( m_Patterns.empty() )
+//        return 0;
+//
+//    return m_Patterns.at(m_PosPlay).StepListCount();
+//}
+//
+//int PatternStore::RealTimeListCount()
+//{
+//    if ( m_Patterns.empty() )
+//        return 0;
+//
+//    return m_Patterns.at(m_PosPlay).RealTimeListCount();
+//}
 
-    return m_Patterns.at(m_PosPlay).StepListCount();
-}
-
-int PatternStore::RealTimeListCount()
-{
-    if ( m_Patterns.empty() )
-        return 0;
-
-    return m_Patterns.at(m_PosPlay).RealTimeListCount();
-}
-
-string PatternStore::PlayPatternListToString(int n)
-{
-    if ( m_Patterns.empty() )
-        return "";
-
-    return m_Patterns.at(m_PosPlay).ListToString(n);
-}
-
-string PatternStore::PlayPatternTrigsToString()
-{
-    if ( m_Patterns.empty() )
-        return "";
-
-    return m_Patterns.at(m_PosPlay).TrigsToStringForDisplay();
-}
-
-string PatternStore::RealTimeListToStringForDisplay(int n)
-{
-    if ( m_Patterns.empty() )
-        return "";
-
-    return m_Patterns.at(m_PosPlay).RealTimeListToStringForDisplay(n);
-}
+//string PatternStore::PlayPatternListToString(int n)
+//{
+//    if ( m_Patterns.empty() )
+//        return "";
+//
+//    return m_Patterns.at(m_PosPlay).ListToString(n);
+//}
+//
+//string PatternStore::PlayPatternTrigsToString()
+//{
+//    if ( m_Patterns.empty() )
+//        return "";
+//
+//    return m_Patterns.at(m_PosPlay).TrigsToStringForDisplay();
+//}
+//
+//string PatternStore::RealTimeListToStringForDisplay(int n)
+//{
+//    if ( m_Patterns.empty() )
+//        return "";
+//
+//    return m_Patterns.at(m_PosPlay).RealTimeListToStringForDisplay(n);
+//}
 
 bool PatternStore::PlayPositionInfo(int & listIndex, int & offset, int & length)
 {
@@ -551,12 +551,12 @@ string PatternStore::EditPatternToString()
     return m_Patterns.at(m_PosEdit).ToString("Pattern");
 }
 
-string PatternStore::PlayPatternToString()
-{
-    if ( m_Patterns.empty() )
-        return "";
-    return m_Patterns.at(m_PosPlay).ToString("Pattern");
-}
+//string PatternStore::PlayPatternToString()
+//{
+//    if ( m_Patterns.empty() )
+//        return "";
+//    return m_Patterns.at(m_PosPlay).ToString("Pattern");
+//}
 
 string PatternStore::PatternSelectionList(int start, int rows)
 {
@@ -682,7 +682,7 @@ void PatternStore::SetFieldsFromString(string s)
 }
 
 
-bool PatternStore::LoadFromString(string s, int & created, int & updates)
+bool PatternStore::FromString(string s, int & created, int & updates)
 {
     try
     {

@@ -17,10 +17,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include <climits>
 #include <cmath>
+#include <unordered_map>
 
 #include "maTrigListItem.h"
+#include "maUtility.h"
 
 using namespace std;
 
@@ -34,11 +37,91 @@ TrigListItem::~TrigListItem()
     //dtor
 }
 
+enum tli_element_names_t
+{
+    tli_trig_mask,
+    tli_multiplier,
+    tli_skip,
+    tli_mute,
+    tli_repeats,
+    tli_repeat_time,
+    num_tli_element_names
+};
+
+
+unordered_map<tli_element_names_t, const char *> tli_element_names = {
+    {tli_trig_mask, "Trig Mask"},
+    {tli_multiplier, "Multiplier"},
+    {tli_skip, "Skip"},
+    {tli_mute, "Mute"},
+    {tli_repeats, "Repeats"},
+    {tli_repeat_time, "Repeat Time"},
+    {num_tli_element_names, ""}
+};
+
+
 string TrigListItem::ToString()
 {
-    string result = "TrigListItem";
+    char buff[200];
 
-    return result;
+    sprintf(buff, "%s %i %s %.3f %s '%s' %s '%s' %s %i %s %.3f",
+            tli_element_names.at(tli_trig_mask), m_TrigMask,
+            tli_element_names.at(tli_multiplier), m_Multiplier,
+            tli_element_names.at(tli_skip), m_Skip ? "On" : "Off",
+            tli_element_names.at(tli_mute), m_Mute ? "On" : "Off",
+            tli_element_names.at(tli_repeats), m_Repeats,
+            tli_element_names.at(tli_repeat_time), m_RepeatTime
+            );
+
+    return buff;
+}
+
+void TrigListItem::FromString(string s)
+{
+    for ( tli_element_names_t e = static_cast<tli_element_names_t>(0);
+          e < num_tli_element_names;
+          e = static_cast<tli_element_names_t>(static_cast<int>(e) + 1) )
+    {
+        string token = find_token(s, tli_element_names.at(e));
+
+        if ( token.empty() )
+            continue;
+
+        transform(token.begin(), token.end(), token.begin(), ::tolower);
+
+        try
+        {
+            switch (e)
+            {
+            case tli_trig_mask:
+                m_TrigMask = stoi(token);
+                break;
+            case tli_multiplier:
+                m_Multiplier = stod(token);
+            case tli_skip:
+                m_Skip = token == "on";
+                break;
+            case tli_mute:
+                m_Mute = token == "on";
+                break;
+            case tli_repeats:
+                m_Repeats = stoi(token);
+                break;
+            case tli_repeat_time:
+                m_RepeatTime = stod(token);
+                break;
+            default:
+                break;
+            }
+        }
+        catch(invalid_argument ex)
+        {
+
+        }
+        catch(out_of_range ex)
+        {
+        }
+    }
 }
 
 string TrigListItem::TrigMaskToString()

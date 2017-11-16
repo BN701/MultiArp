@@ -83,8 +83,6 @@ struct PatternStore : public CursorKeys
 
     bool Empty() { return m_Patterns.empty(); }
     bool PatternChainEmpty() { return m_PatternChain.empty(); }
-    std::string ToString();
-    void FromString(const char * s);
 
     std::string PatternStatus();
     std::string PatternOverview();
@@ -151,24 +149,26 @@ struct PatternStore : public CursorKeys
 
 
     std::string EditPatternToString();
-    std::string PlayPatternToString();
+//    std::string PlayPatternToString();
 
     std::string PatternSelectionList(int start, int rows);
 
-    int PlayPatternListCount();
-    int RealTimeListCount();
-    std::string RealTimeListToStringForDisplay(int n);
-    std::string PlayPatternListToString(int n);
-    std::string PlayPatternTrigsToString();
+//    int PlayPatternListCount();
+//    int RealTimeListCount();
+//    std::string RealTimeListToStringForDisplay(int n);
+//    std::string PlayPatternListToString(int n);
+//    std::string PlayPatternTrigsToString();
     bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
     std::string PatternChainToStringForDisplay(int firstRow, int rows);
 
+    std::string ToString();
+//    void FromString(const char * s);
+    bool FromString(std::string s, int & created, int & updates);
     void UpdatePattern(StepList & noteList);
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
     void SetFieldsFromString(std::string s);
-    bool LoadFromString(std::string s, int & created, int & updates);
     void UpdatePatternChainFromSimpleString(std::string s); // Old style, from chain command, no support for jumps.
     void UpdatePatternChainFromString(std::string s);
 
@@ -331,7 +331,7 @@ struct PatternStore : public CursorKeys
         m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
     }
 
-    void StorePatternPlayData( unsigned char mask = PLAY_DATA_ALL);
+    void StorePatternPlayData( unsigned char mask = PLAY_DATA_ALL );
     std::string LoadPatternPlayData( unsigned char mask = PLAY_DATA_ALL );
     std::string ShowPatternPlayData();
 

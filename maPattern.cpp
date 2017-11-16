@@ -549,82 +549,82 @@ string & Centre(string & line, int centre, int width, int & offset)
     return line;
 }
 
-string Pattern::Display(vector<PosInfo2> & highlights, int centre, int width)
-{
-    string result;
-    string line;
+//string Pattern::DisplayNonScrolling(vector<PosInfo2> & highlights, int centre, int width, int rows)
+//{
+//    string result;
+//    string line;
+//
+//    int offset = 0, length = 0, row = 1;
+//
+//    // Allow for edit cursors in left hand column.
+//
+//    centre -= 4;
+//    width -= 4;
+//
+//    // Trigs
+//
+//    result = "\n    ";
+//    if ( ! m_TrigList.Empty() )
+//    {
+//        result += m_TrigList.ToStringForDisplay2(offset, length, width);
+//        highlights.push_back(PosInfo2(0, offset + 4, length));
+//        result += '\n';
+//    }
+//    else
+//        result += "Triggers: Auto\n";
+//
+//    result += '\n';
+//    row += 2;
+//
+//    // Step Lists
+//
+//    for ( int i = 0; i < m_StepListSet.size(); i++ )
+//    {
+//        if ( i == m_PosEdit )
+//        {
+//            result += " -> ";
+//            highlights.push_back(PosInfo2(row, 1, 2));
+//        }
+//        else
+//            result += "    ";
+//        highlights.push_back(PosInfo2(row, centre, 4));
+//        line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
+//        result += Centre(line, centre, width, offset);
+//        highlights.push_back(PosInfo2(row++, offset + 4, length));
+//    }
+//
+//    result += '\n';
+//    row += 1;
+//
+//    // Realtime Lists
+//
+//    for ( int i = 0; i < m_RealTimeSet.size(); i++ )
+//    {
+//        if ( i == m_PosRealTimeEdit )
+//        {
+//            result += " -> ";
+//            highlights.push_back(PosInfo2(row, 1, 2));
+//        }
+//        else
+//            result += "    ";
+//        highlights.push_back(PosInfo2(row, 4, 5));
+//        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
+//        result += '\n';
+//        highlights.push_back(PosInfo2(row++, offset + 4, length));
+//    }
+//
+//    return result;
+//}
 
-    int offset = 0, length = 0, row = 1;
-
-    // Allow for edit cursors in left hand column.
-
-    centre -= 4;
-    width -= 4;
-
-    // Trigs
-
-    result = "\n    ";
-    if ( ! m_TrigList.Empty() )
-    {
-        result += m_TrigList.ToStringForDisplay2(offset, length, width);
-        highlights.push_back(PosInfo2(0, offset + 4, length));
-        result += '\n';
-    }
-    else
-        result += "Triggers: Auto\n";
-
-    result += '\n';
-    row += 2;
-
-    // Step Lists
-
-    for ( int i = 0; i < m_StepListSet.size(); i++ )
-    {
-        if ( i == m_PosEdit )
-        {
-            result += " -> ";
-            highlights.push_back(PosInfo2(row, 1, 2));
-        }
-        else
-            result += "    ";
-        highlights.push_back(PosInfo2(row, centre, 4));
-        line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
-        result += Centre(line, centre, width, offset);
-        highlights.push_back(PosInfo2(row++, offset + 4, length));
-    }
-
-    result += '\n';
-    row += 1;
-
-    // Realtime Lists
-
-    for ( int i = 0; i < m_RealTimeSet.size(); i++ )
-    {
-        if ( i == m_PosRealTimeEdit )
-        {
-            result += " -> ";
-            highlights.push_back(PosInfo2(row, 1, 2));
-        }
-        else
-            result += "    ";
-        highlights.push_back(PosInfo2(row, 4, 5));
-        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
-        result += '\n';
-        highlights.push_back(PosInfo2(row++, offset + 4, length));
-    }
-
-    return result;
-}
-
-string Pattern::Display2(vector<PosInfo2> & highlights, int width)
+string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int width, int displayRows)
 {
     int offset, length;
-
     int row = 1;
 
     string result;
     string line;
 
+    centre -= 4;
     width -= 4;     // Allow for edit cursors in left column.
 
     // Trigs
@@ -644,10 +644,33 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
     result += '\n';
     row += 2;
 
+    // How many list rows can we show.
+
+    displayRows -= row;
+
+    int limitStep = m_StepListSet.size();
+    int limitRealTime = m_RealTimeSet.size();
+
+    if ( limitStep > 0 && limitRealTime > 0 )
+        displayRows -= 1; // Allow for spacer row.
+
+    while ( limitStep + limitRealTime > displayRows )
+    {
+        if ( limitRealTime >= limitStep )
+            limitRealTime -= 1;
+        else
+            limitStep -= 1;
+    }
+
     // Step Lists
 
+    while ( m_DisplayStartStep > m_PosEdit )
+        m_DisplayStartStep -= 1;
 
-    for ( int i = 0; i < m_StepListSet.size(); i++ )
+    while ( m_DisplayStartStep + limitStep <= m_PosEdit )
+        m_DisplayStartStep += 1;
+
+    for ( int i = m_DisplayStartStep; i < m_DisplayStartStep + limitStep; i++ )
     {
         if ( i == m_PosEdit )
         {
@@ -656,18 +679,42 @@ string Pattern::Display2(vector<PosInfo2> & highlights, int width)
         }
         else
             result += "    ";
-        line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
-        highlights.push_back(PosInfo2(row++, offset + 4, length));
-        line += '\n';
-        result += line;
+        switch(mode)
+        {
+        case 1:
+            highlights.push_back(PosInfo2(row, centre, 4));
+            line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
+            result += Centre(line, centre, width, offset);
+            highlights.push_back(PosInfo2(row++, offset + 4, length));
+            break;
+        case 2:
+            line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
+            highlights.push_back(PosInfo2(row++, offset + 4, length));
+            line += '\n';
+            result += line;
+            break;
+        default:
+            break;
+        }
     }
 
-    result += '\n';
-    row += 1;
+    // Add spacer if both kinds of list are present.
+
+    if ( limitStep > 0 && limitRealTime > 0 )
+    {
+        result += '\n';
+        row += 1;
+    }
 
     // Realtime Lists
 
-    for ( int i = 0; i < m_RealTimeSet.size(); i++ )
+    while ( m_DisplayStartRealTime > m_PosRealTimeEdit )
+        m_DisplayStartRealTime -= 1;
+
+    while ( m_DisplayStartRealTime + limitRealTime <= m_PosRealTimeEdit )
+        m_DisplayStartRealTime += 1;
+
+    for ( int i = m_DisplayStartRealTime; i < m_DisplayStartRealTime + limitRealTime; i++ )
     {
         if ( i == m_PosRealTimeEdit )
         {

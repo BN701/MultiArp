@@ -488,10 +488,10 @@ void update_pattern_panel_2()
         switch ( g_Display.BigPanelPage() )
         {
         case Display::one:
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display2(highlights, 79).c_str());
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79).c_str());
             break;
         case Display::two:
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(highlights, 25, 79).c_str());
+            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
             break;
         }
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )

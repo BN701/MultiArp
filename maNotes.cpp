@@ -702,9 +702,9 @@ string StepList::ToStringForDisplay(int & offset, int & length)
     {
         if ( i > 0 )
             result += ' ';
-        if ( i == m_Pos )
+        if ( i == m_LastRequestedPos )
         {
-            sprintf(buff, "%3i| ", m_Pos + 1);
+            sprintf(buff, "%3i| ", m_LastRequestedPos + 1);
             result += buff;
         }
         if ( i == 0 )

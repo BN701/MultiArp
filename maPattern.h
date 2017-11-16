@@ -54,6 +54,9 @@ struct Pattern
     TranslateTable m_TranslateTable;
     TrigList m_TrigList;
 
+    int m_DisplayStartStep = 0;
+    int m_DisplayStartRealTime = 0;
+
     void StoreStepValue( double val );
     void StoreGate( double gate);
     void StoreGateHold( bool val );
@@ -137,8 +140,8 @@ struct Pattern
     std::string TrigsToStringForDisplay();
     std::string TrigsToString();
     std::string ToString(const char * prefix);
-    std::string Display(std::vector<PosInfo2> & highlights, int centre = 30, int width = 80);
-    std::string Display2(std::vector<PosInfo2> & highlights, int width = 80);
+//    std::string DisplayNonScrolling(std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
+    std::string Display(int mode, std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
 
     bool FromString(std::string s, int & updates);
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);

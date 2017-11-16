@@ -88,7 +88,7 @@ void do_UI_updates()
 
 //    update_pattern_panel();     // TODO: Revert to updating this when updates are actually made.
 //    highlight_pattern_panel();  // Moves note highlight.
-    update_pattern_panel_2();
+    update_pattern_panel();
 
     update_progress_bar();
     set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",

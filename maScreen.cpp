@@ -64,9 +64,8 @@ enum colour_pairs
 {
     CP_MAIN = 1,
     CP_PATTERN_LIST_PANEL,
-    CP_PATTERN_LIST_PANEL_2,
-    CP_PATTERN_LIST_PANEL_3,
-    CP_PATTERN_LIST_PANEL_BKGND,
+    CP_PATTERN_LIST_PANEL_HIGHLIGHT,
+    CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG,
     CP_PROGRESS_BAR_HIGHLIGHT,
     CP_PROGRESS_BAR_BKGND,
     CP_SMALL_PANEL_BKGND,
@@ -92,7 +91,7 @@ Display::Display()
     start_color();
 
     init_color(COLOUR_GREEN, 0, 400, 0);
-    init_color(COLOUR_BRIGHT_GREEN, 0, 750, 0);
+    init_color(COLOUR_BRIGHT_GREEN, 400, 750, 400);
     init_color(COLOUR_YELLOW, 750, 500, 0);
     init_color(COLOUR_RED, 750, 0, 0);
     init_color(COLOUR_REDDISH, 750, 300, 200);
@@ -112,18 +111,17 @@ Display::Display()
 	init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
 
 	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_2, COLOUR_GREEN, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_3, COLOUR_REDDISH, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_BKGND, COLOR_YELLOW, COLOUR_GREY);
+	init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
+	init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, COLOUR_BRIGHT_GREEN, COLOUR_DARKER_GREY);
 
     init_pair(CP_LIST_PANEL_BKGND, COLOUR_GREY, COLOUR_BLACK);
     init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
-    init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOR_BLACK);
-    init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOR_YELLOW, COLOUR_GREEN);
+    init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOUR_BLACK);
+    init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOR_YELLOW, COLOUR_DARKER_GREY);
 
-    init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOR_BLACK);
-    init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOR_BLACK);
+    init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOUR_BLACK);
+    init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
 
     mvprintw(6, 1, "=> ");
 
@@ -138,7 +136,7 @@ Display::Display()
     wbkgd(m_ProgressPanel, COLOR_PAIR(CP_SMALL_PANEL_2_BKGND));
     wbkgd(m_EditListPanel, COLOR_PAIR(CP_LIST_PANEL_BKGND));
     wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
-    wbkgd(m_BigPanel, COLOR_PAIR(CP_MAIN));
+    wbkgd(m_BigPanel, COLOR_PAIR(CP_PATTERN_LIST_PANEL));
 }
 
 
@@ -253,6 +251,11 @@ void update_progress_bar()
 
     attroff(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
 
+    // Extra kludge to show overall pattern chain progress.
+
+    mvchgat(2, 4, g_PatternStore.CurrentPosPatternChain() + 1,
+            A_UNDERLINE, CP_PROGRESS_BAR_BKGND, NULL);
+
     move(scr_y, scr_x);
     refresh();
 
@@ -363,118 +366,118 @@ void update_edit_panels(bool refreshList)
     wrefresh(g_Display.EditSummaryPanel());
 }
 
-std::vector<int> g_ListDisplayRows;
+//std::vector<int> g_ListDisplayRows;
+//
+//void update_pattern_panel_old()
+//{
+//    int scr_x, scr_y;
+//
+//    wmove(g_Display.BigPanel(), 0, 0);
+//    wclrtobot(g_Display.BigPanel());
+//
+//    g_ListDisplayRows.clear();
+//
+//	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+//
+//    wmove(g_Display.BigPanel(), 0, 4);
+//    wprintw(g_Display.BigPanel(), "%s\n\n", g_PatternStore.PlayPatternTrigsToString().c_str());
+//
+//    for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
+//    {
+//        getyx(g_Display.BigPanel(), scr_y, scr_x);
+//        g_ListDisplayRows.push_back(scr_y);
+//        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
+//    }
+//
+//    wprintw(g_Display.BigPanel(), "\n");
+//	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
+//
+//
+//    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
+//    {
+//        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
+//    }
+//
+//    wattroff(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+//
+//    wrefresh(g_Display.BigPanel());
+//
+//}
+
+//void highlight_pattern_panel_old()
+//{
+///*
+//    Clear previous highlist.
+//
+//    Get list number and highlight info from g_PatternStore.
+//
+//    Translate to screen location for highlight.
+//
+//    How to allow for lines that wrap?
+//        - Probably OK for first List = 1.
+//        - But need to account for any wraps on previous lists when updating List > 1.
+//
+//    Update attributes.
+//*/
+//    static std::vector<int> clearPositions;
+//
+//    while ( clearPositions.size() >= 3 )
+//    {
+//        int lastLength = clearPositions.back();
+//        clearPositions.pop_back();
+//        int lastOffset = clearPositions.back();
+//        clearPositions.pop_back();
+//        int lastRow = clearPositions.back();
+//        clearPositions.pop_back();
+//
+//        mvwchgat(g_Display.BigPanel(), lastRow, lastOffset, lastLength, 0, 1, NULL);
+//    }
+//
+//    int listIndex, offset, length;
+//
+//    if ( g_PatternStore.PlayPositionInfo(listIndex, offset, length) )
+//    {
+//        int row = g_ListDisplayRows.at(listIndex);
+//
+//        // TODO: (Sort of.) This is a hack to cope with the fact that the pattern now inserts a simple
+//        //       arrow at the start of each row to show selection. The 'big panel' now uses the full width
+//        //       of the screen, but the play list ToString() routine still store's highlight positions
+//        //       relative to the beginning of the string it creates, which doesn't include the selection
+//        //       arrow. If we keep this flickering highlight mechanism, we need to make this better.
+//
+//        offset += 4;
+//
+//        while ( offset >= 76 )
+//        {
+//            row += 1;
+//            offset -= 76;
+//        }
+//
+//        if ( (offset + length) >= 76 )
+//        {
+//            int length0 = 76 - offset;
+//            mvwchgat(g_Display.BigPanel(), row, offset, length0, A_BOLD, 1, NULL);
+//
+//            clearPositions.push_back(row);
+//            clearPositions.push_back(offset);
+//            clearPositions.push_back(length0);
+//
+//            row += 1;
+//            offset = 0;
+//            length -= length0;
+//        }
+//
+//        mvwchgat(g_Display.BigPanel(), row, offset, length, A_REVERSE, 1, NULL);
+//
+//        clearPositions.push_back(row);
+//        clearPositions.push_back(offset);
+//        clearPositions.push_back(length);
+//    }
+//
+//    wrefresh(g_Display.BigPanel());
+//}
 
 void update_pattern_panel()
-{
-    int scr_x, scr_y;
-
-    wmove(g_Display.BigPanel(), 0, 0);
-    wclrtobot(g_Display.BigPanel());
-
-    g_ListDisplayRows.clear();
-
-	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
-
-    wmove(g_Display.BigPanel(), 0, 4);
-    wprintw(g_Display.BigPanel(), "%s\n\n", g_PatternStore.PlayPatternTrigsToString().c_str());
-
-    for ( int i = 0; i < g_PatternStore.PlayPatternListCount(); i++ )
-    {
-        getyx(g_Display.BigPanel(), scr_y, scr_x);
-        g_ListDisplayRows.push_back(scr_y);
-        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.PlayPatternListToString(i).c_str());
-    }
-
-    wprintw(g_Display.BigPanel(), "\n");
-	wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL_2));
-
-
-    for ( int i = 0; i < g_PatternStore.RealTimeListCount(); i++ )
-    {
-        wprintw(g_Display.BigPanel(), "%s\n", g_PatternStore.RealTimeListToStringForDisplay(i).c_str());
-    }
-
-    wattroff(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
-
-    wrefresh(g_Display.BigPanel());
-
-}
-
-void highlight_pattern_panel()
-{
-/*
-    Clear previous highlist.
-
-    Get list number and highlight info from g_PatternStore.
-
-    Translate to screen location for highlight.
-
-    How to allow for lines that wrap?
-        - Probably OK for first List = 1.
-        - But need to account for any wraps on previous lists when updating List > 1.
-
-    Update attributes.
-*/
-    static std::vector<int> clearPositions;
-
-    while ( clearPositions.size() >= 3 )
-    {
-        int lastLength = clearPositions.back();
-        clearPositions.pop_back();
-        int lastOffset = clearPositions.back();
-        clearPositions.pop_back();
-        int lastRow = clearPositions.back();
-        clearPositions.pop_back();
-
-        mvwchgat(g_Display.BigPanel(), lastRow, lastOffset, lastLength, 0, 1, NULL);
-    }
-
-    int listIndex, offset, length;
-
-    if ( g_PatternStore.PlayPositionInfo(listIndex, offset, length) )
-    {
-        int row = g_ListDisplayRows.at(listIndex);
-
-        // TODO: (Sort of.) This is a hack to cope with the fact that the pattern now inserts a simple
-        //       arrow at the start of each row to show selection. The 'big panel' now uses the full width
-        //       of the screen, but the play list ToString() routine still store's highlight positions
-        //       relative to the beginning of the string it creates, which doesn't include the selection
-        //       arrow. If we keep this flickering highlight mechanism, we need to make this better.
-
-        offset += 4;
-
-        while ( offset >= 76 )
-        {
-            row += 1;
-            offset -= 76;
-        }
-
-        if ( (offset + length) >= 76 )
-        {
-            int length0 = 76 - offset;
-            mvwchgat(g_Display.BigPanel(), row, offset, length0, A_BOLD, 1, NULL);
-
-            clearPositions.push_back(row);
-            clearPositions.push_back(offset);
-            clearPositions.push_back(length0);
-
-            row += 1;
-            offset = 0;
-            length -= length0;
-        }
-
-        mvwchgat(g_Display.BigPanel(), row, offset, length, A_REVERSE, 1, NULL);
-
-        clearPositions.push_back(row);
-        clearPositions.push_back(offset);
-        clearPositions.push_back(length);
-    }
-
-    wrefresh(g_Display.BigPanel());
-}
-
-void update_pattern_panel_2()
 {
     int scr_x, scr_y;
 
@@ -484,7 +487,7 @@ void update_pattern_panel_2()
     try
     {
         vector<PosInfo2> highlights;
-        wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+//        wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
         switch ( g_Display.BigPanelPage() )
         {
         case Display::one:
@@ -496,9 +499,9 @@ void update_pattern_panel_2()
         }
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )
         {
-            mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length,
-                it->row < 2 ? A_REVERSE : 0,
-                it->row < 2 ? CP_PATTERN_LIST_PANEL_3 : CP_MAIN,
+            mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, 0,
+//                it->row < 2 ? A_REVERSE : 0,
+                it->row < 2 ? CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG : CP_PATTERN_LIST_PANEL_HIGHLIGHT,
                 NULL);
         }
         // Kludge to show overall trig position.

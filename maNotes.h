@@ -147,7 +147,7 @@ struct StepList : public CursorKeys
     std::vector<Cluster>::size_type m_LastRequestedPos;     // Last position for which note info was requested.
     std::vector<Cluster> m_Clusters;
 
-    std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
+//    std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
 
     // std::string m_Label;
 
@@ -219,7 +219,7 @@ struct StepList : public CursorKeys
     std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
     void FromString(std::string s);
 
-    bool PlayPositionInfo(int & offset,  int & length);
+//    bool PlayPositionInfo(int & offset,  int & length);
 
     virtual void SetStatus();
     protected:

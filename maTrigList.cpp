@@ -173,10 +173,13 @@ string TrigList::ToString(const char * prefix)
 
     result += "Trigs ";
 
-    for (auto it = m_TrigItems.begin(); it != m_TrigItems.end(); it++)
+    for (auto it = m_TrigItems.begin(); it != m_TrigItems.end(); )
     {
-        result += ",\\\n     ";
+        result += " \\\n    ";
         result += it->ToString();
+        if ( ++it < m_TrigItems.end() )
+            result += ", ";
+
     }
 
     return result;
@@ -184,19 +187,17 @@ string TrigList::ToString(const char * prefix)
 
 void TrigList::FromString(string s)
 {
-    if ( s.find("Trigs") == string::npos )
-        throw string("TrigList::FromString() - Not a valid trig list.");
+//    if ( s.find("Trigs") == string::npos )
+//        throw string("TrigList::FromString() - Not a valid trig list.");
 
     vector<string> tokens = split(s.c_str(), ',');
 
-    // TODO: Less than what?
-
-    if ( tokens.size() <= 1 )
-        throw string("TrigList::FromString() - Nothing found.");
+    if ( tokens.size() == 0 )
+        return;
 
     m_TrigItems.clear();
 
-    for ( auto it = tokens.begin() + 1; it != tokens.end(); it++ )
+    for ( auto it = tokens.begin(); it != tokens.end(); it++ )
     {
         m_TrigItems.emplace_back();
         m_TrigItems.back().FromString(*it);

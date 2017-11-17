@@ -18,13 +18,48 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef MATRIGLISTITEM_H
-#define MATRIGLISTITEM_H
+#ifndef TRIGLISTITEM_H
+#define TRIGLISTITEM_H
 
 #include <string>
 
 #include "maCursorKeys.h"
 
+class TrigRepeater : public CursorKeys
+{
+    public:
+        void SetRepeats( int val ) { m_Repeats = val; }
+        int Repeats() { return m_Repeats; }
+        void SetRepeatTime( double val ) { m_RepeatTime = val; }
+        double RepeatTime() { return m_RepeatTime; }
+
+        void Init(double tempo, double stepLengthMilliSecs);
+        void Reset(int noteNumber, int noteVelocity);
+        bool Step(int64_t & queue_delta, int & noteNumber, unsigned char & noteVelocity);
+
+    private:
+        enum decay_mode_t
+        {
+            off,
+            exponential,
+            linear,
+            exponential_unlimited,
+            linear_unlimited,
+            num_decay_modes
+        };
+
+        int m_Steps = 0;
+        int m_Repeats = 0;
+        double m_RepeatTime = 0.0; // Less than means split evenly across step. (We don't use zero as that's hard to test for.)
+        double m_VelocityDecay = 0.8;
+        decay_mode_t m_DecayMode = linear;
+
+        // Working data.
+        int64_t m_RepeatTimeMicroSecs = 0;
+        double m_NoteVelocity = 0;
+        double m_VelocityDecrement = 0;
+
+};
 
 class TrigListItem : public CursorKeys
 {
@@ -36,8 +71,8 @@ class TrigListItem : public CursorKeys
         double Multiplier() { return m_Multiplier; }
         bool Skip() { return m_Skip; }
         bool Mute() { return m_Mute; }
-        int Repeats() { return m_Repeats; }
-        double RepeatTime() { return m_RepeatTime; }
+
+        TrigRepeater & Repeater() { return m_Repeater; }
 
         std::string ToString();
         void FromString(std::string s);
@@ -72,8 +107,8 @@ class TrigListItem : public CursorKeys
         double m_Multiplier = 1.0;
         bool m_Skip = false;
         bool m_Mute = false;
-        int m_Repeats = 0;
-        double m_RepeatTime = 0.0; // Less than means split evenly across step. (We don't use zero as that's hard to test for.)
+
+        TrigRepeater m_Repeater;
 };
 
-#endif // MATRIGLISTITEM_H
+#endif // TRIGLISTITEM_H

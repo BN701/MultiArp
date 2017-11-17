@@ -27,6 +27,69 @@
 
 using namespace std;
 
+//
+// TrigRepeater
+//
+//////////////////////////////////////////////////////////////
+
+
+void TrigRepeater::Init(double tempo, double stepLengthMilliSecs)
+{
+    m_Steps = 0;
+
+    if ( lround(m_RepeatTime * 100) != 0 )
+        m_RepeatTimeMicroSecs = 1000 * 60000.0 * m_RepeatTime/tempo;
+    else
+        m_RepeatTimeMicroSecs = 1000 * stepLengthMilliSecs/((double) m_Repeats + 1);
+
+}
+
+void TrigRepeater::Reset(int noteNumber, int noteVelocity)
+{
+    m_Steps = m_Repeats;
+    m_NoteVelocity = noteVelocity;
+    m_VelocityDecrement = m_NoteVelocity * (1 - m_VelocityDecay);
+}
+
+bool TrigRepeater::Step(int64_t & queue_delta, int & noteNumber, unsigned char & noteVelocity)
+{
+    if ( m_Steps == 0 )
+        return false;
+
+    queue_delta += m_RepeatTimeMicroSecs;
+
+    switch ( m_DecayMode )
+    {
+    case exponential:
+        m_Steps -= 1;
+    case exponential_unlimited:
+        m_NoteVelocity *= m_VelocityDecay;
+        noteVelocity = m_NoteVelocity;
+        break;
+    case linear:
+        m_Steps -= 1;
+    case linear_unlimited:
+        m_NoteVelocity -= m_VelocityDecrement;
+        if ( m_NoteVelocity > 0 )
+            noteVelocity = m_NoteVelocity;
+        else
+            noteVelocity = 0;
+        break;
+    case off:
+        m_Steps -= 1;
+        break;
+    default:
+        return false;
+    }
+
+    return noteVelocity > 0;
+}
+
+//
+// TrigListItem
+//
+//////////////////////////////////////////////////////////////
+
 TrigListItem::TrigListItem()
 {
     //ctor
@@ -69,8 +132,8 @@ string TrigListItem::ToString()
             tli_element_names.at(tli_multiplier), m_Multiplier,
             tli_element_names.at(tli_skip), m_Skip ? "On" : "Off",
             tli_element_names.at(tli_mute), m_Mute ? "On" : "Off",
-            tli_element_names.at(tli_repeats), m_Repeats,
-            tli_element_names.at(tli_repeat_time), m_RepeatTime
+            tli_element_names.at(tli_repeats), m_Repeater.Repeats(),
+            tli_element_names.at(tli_repeat_time), m_Repeater.RepeatTime()
             );
 
     return buff;
@@ -105,10 +168,10 @@ void TrigListItem::FromString(string s)
                 m_Mute = token == "on";
                 break;
             case tli_repeats:
-                m_Repeats = stoi(token);
+                m_Repeater.SetRepeats( stoi(token) );
                 break;
             case tli_repeat_time:
-                m_RepeatTime = stod(token);
+                m_Repeater.SetRepeatTime( stod(token) );
                 break;
             default:
                 break;
@@ -226,9 +289,9 @@ string TrigListItem::MenuString(int width)
         result += buff;
     }
 
-    if ( m_Repeats > 0 )
+    if ( m_Repeater.Repeats() > 0 )
     {
-        sprintf(buff, "/R%i", m_Repeats);
+        sprintf(buff, "/R%i", m_Repeater.Repeats());
         result += buff;
     }
 
@@ -293,9 +356,9 @@ void TrigListItem::SetStatus()
 
     m_Status += ", Rep ";
     pos = m_Status.size();
-    if ( m_Repeats > 0 )
+    if ( m_Repeater.Repeats() > 0 )
     {
-        sprintf(buff, "%i", m_Repeats);
+        sprintf(buff, "%i", m_Repeater.Repeats());
         m_Status += buff;
     }
     else
@@ -304,9 +367,9 @@ void TrigListItem::SetStatus()
 
     m_Status += ", Rep Time ";
     pos = m_Status.size();
-    if ( lround(100 * m_RepeatTime) > 0 )
+    if ( lround(100 * m_Repeater.RepeatTime()) > 0 )
     {
-        sprintf(buff, "%.2f", m_RepeatTime);
+        sprintf(buff, "%.2f", m_Repeater.RepeatTime());
         m_Status += buff;
     }
     else
@@ -359,10 +422,10 @@ bool TrigListItem::HandleKey(key_type_t k)
             m_Mute = false;
             break;
         case tlif_repeats:
-            m_Repeats += 1;
+            m_Repeater.SetRepeats(m_Repeater.Repeats() + 1);
             break;
         case tlif_repeat_time:
-            m_RepeatTime += inc;
+            m_Repeater.SetRepeatTime(m_Repeater.RepeatTime() + inc);
             break;
         default:
             break;
@@ -392,15 +455,23 @@ bool TrigListItem::HandleKey(key_type_t k)
             m_Mute = true;
             break;
         case tlif_repeats:
-            if ( m_Repeats > 0 )
-                m_Repeats -= 1;
+            if ( m_Repeater.Repeats() > 0 )
+                m_Repeater.SetRepeats(m_Repeater.Repeats() - 1);
             break;
         case tlif_repeat_time:
-//            if ( lround( 100 * (m_RepeatTime - inc) ) >= 0 )
-            m_RepeatTime -= inc;
-            if ( m_RepeatTime < 0 )
-                m_RepeatTime = 0.0;
+            m_Repeater.SetRepeatTime(m_Repeater.RepeatTime() - inc);
+            if ( m_Repeater.RepeatTime() < 0 )
+                m_Repeater.SetRepeatTime(0);
             break;
+//        case tlif_repeats:
+//            if ( m_Repeats > 0 )
+//                m_Repeats -= 1;
+//            break;
+//        case tlif_repeat_time:
+//            m_RepeatTime -= inc;
+//            if ( m_RepeatTime < 0 )
+//                m_RepeatTime = 0.0;
+//            break;
         default:
             break;
         }

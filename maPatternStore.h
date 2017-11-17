@@ -144,7 +144,7 @@ struct PatternStore : public CursorKeys
 
     void SetPhaseIsZero() { m_PhaseIsZero = true; }
 
-    void Step(Cluster & cluster, int & repeats, double & repeatTime, double phase, double stepValue);
+    void Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue);
     double StepValueMultiplier() { return m_StepValueMultiplier; }
 
 
@@ -158,7 +158,7 @@ struct PatternStore : public CursorKeys
 //    std::string RealTimeListToStringForDisplay(int n);
 //    std::string PlayPatternListToString(int n);
 //    std::string PlayPatternTrigsToString();
-    bool PlayPositionInfo(int & listIndex, int & offset, int & length);
+//    bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
     std::string PatternChainToStringForDisplay(int firstRow, int rows);

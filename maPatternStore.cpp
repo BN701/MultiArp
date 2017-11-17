@@ -19,7 +19,7 @@
 
 #include "maPatternStore.h"
 
-
+#include <algorithm>
 #include <cstring>
 #include <stdexcept>
 #include <unordered_map>
@@ -295,13 +295,13 @@ void PatternStore::DownRTListPos()
 //    return m_Patterns.at(m_PosPlay).RealTimeListToStringForDisplay(n);
 //}
 
-bool PatternStore::PlayPositionInfo(int & listIndex, int & offset, int & length)
-{
-    if ( m_Patterns.empty() )
-        return false;
-
-    return m_Patterns.at(m_PosPlay).PlayPositionInfo(listIndex, offset, length);
-}
+//bool PatternStore::PlayPositionInfo(int & listIndex, int & offset, int & length)
+//{
+//    if ( m_Patterns.empty() )
+//        return false;
+//
+//    return m_Patterns.at(m_PosPlay).PlayPositionInfo(listIndex, offset, length);
+//}
 
 string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
 {
@@ -382,7 +382,7 @@ string PatternStore::PatternOverview()
     return buff;
 }
 
-void PatternStore::Step(Cluster & cluster, int & repeats, double & repeatTime, double phase, double stepValue)
+void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue)
 {
     /*
         As long as PatternChanged() is called for every step, we
@@ -448,7 +448,7 @@ void PatternStore::Step(Cluster & cluster, int & repeats, double & repeatTime, d
 
     m_PhaseIsZero = false;
 
-    m_Patterns.at(m_PosPlay).Step(cluster, m_StepValueMultiplier, repeats, repeatTime, phase, stepValue);
+    m_Patterns.at(m_PosPlay).Step(cluster, repeater, m_StepValueMultiplier, phase, stepValue);
 }
 
 void PatternStore::UpdatePatternChainFromSimpleString(string s)
@@ -599,6 +599,7 @@ enum ps_element_names_t
     ps_name_pattern_chain_mode,
     ps_name_reset_on_pattern_change,
     ps_name_edit_focus_follows_play,
+    ps_name_use_pattern_play_data,
     number_ps_element_names
 };
 
@@ -607,7 +608,8 @@ unordered_map<ps_element_names_t, const char *> ps_element_names = {
     {ps_heading, "Pattern Store"},
     {ps_name_pattern_chain_mode, "Pattern Chain Mode"},
     {ps_name_reset_on_pattern_change, "Reset on pattern change"},
-    {ps_name_edit_focus_follows_play, "Edit focus follows play"}
+    {ps_name_edit_focus_follows_play, "Edit focus follows play"},
+    {ps_name_use_pattern_play_data, "Use Pattern Play Data"}
 };
 
 
@@ -620,13 +622,15 @@ string PatternStore::ToString()
     result += PatternChainToString();
     result += "\n\n";
 
-    sprintf(buff, "Store %s %i\nStore %s %s\nStore %s %s\n\n",
-                ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChainMode),
-                ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "ON" : "OFF",
-                ps_element_names.at(ps_name_edit_focus_follows_play), m_EditPosFollowsPlay ? "ON" : "OFF"
-            );
-
+    sprintf(buff, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChainMode));
     result += buff;
+    sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "On" : "Off");
+    result += buff;
+    sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_edit_focus_follows_play), m_EditPosFollowsPlay ? "On" : "Off");
+    result += buff;
+    sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_use_pattern_play_data), m_UsePatternPlayData ? "On" : "Off");
+    result += buff;
+    result += '\n';
 
     result += "<< Pattern Default >>\n\n";
     result += m_DefaultPattern.ToString("Default");
@@ -654,6 +658,8 @@ void PatternStore::SetFieldsFromString(string s)
         if ( token.empty() )
             continue;
 
+        transform(token.begin(), token.end(), token.begin(), ::tolower);
+
         try
         {
             switch (e)
@@ -662,10 +668,13 @@ void PatternStore::SetFieldsFromString(string s)
                 m_PatternChainMode = stoi(token);
                 break;
             case ps_name_reset_on_pattern_change:
-                m_ResetOnPatternChange = token == "ON";
+                m_ResetOnPatternChange = token == "on";
                 break;
             case ps_name_edit_focus_follows_play:
-                m_EditPosFollowsPlay = token == "ON";
+                m_EditPosFollowsPlay = token == "on";
+                break;
+            case ps_name_use_pattern_play_data:
+                m_UsePatternPlayData = token == "on";
                 break;
             default:
                 break;

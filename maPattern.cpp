@@ -27,7 +27,7 @@
 
 using namespace std;
 
-void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, int & repeats, double & repeatTime, double phase, double stepValue)
+void Pattern::Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue)
 {
     // Add in step based events, if any, and step position.
 
@@ -64,8 +64,10 @@ void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, int & repeat
                 break;
 
             stepValueMultiplier = trigItem->Multiplier();
-            repeats = trigItem->Repeats();
-            repeatTime = trigItem->RepeatTime();
+
+            repeater = trigItem->Repeater();
+//            repeats = trigItem->Repeats();
+//            repeatTime = trigItem->RepeatTime();
 
             for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
             {
@@ -87,14 +89,6 @@ void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, int & repeat
 
             break;
         }
-
-//        if ( m_Pos >= m_StepListSet.size() )
-//            m_Pos = 0;
-//
-//        m_LastRequestedPos = m_Pos;
-//
-//        Cluster * result = m_StepListSet[m_Pos++].Step();
-
     }
 
     // Collect any real time events.
@@ -116,15 +110,15 @@ bool Pattern::AllListsComplete()
     return bResult;
 }
 
-bool Pattern::PlayPositionInfo(int & listIndex, int & offset, int & length)
-{
-    if ( m_StepListSet.empty() )
-        return false;
-
-    listIndex = m_LastRequestedPos;
-
-    return m_StepListSet.at(m_LastRequestedPos).PlayPositionInfo(offset, length);
-}
+//bool Pattern::PlayPositionInfo(int & listIndex, int & offset, int & length)
+//{
+//    if ( m_StepListSet.empty() )
+//        return false;
+//
+//    listIndex = m_LastRequestedPos;
+//
+//    return m_StepListSet.at(m_LastRequestedPos).PlayPositionInfo(offset, length);
+//}
 
 string Pattern::TrigsToStringForDisplay()
 {
@@ -227,16 +221,15 @@ string Pattern::ToString(const char * prefix)
         result += ' ';
     sprintf(buffer, "%s %i", pat_element_names.at(pat_name_velocity), m_Velocity);
     result += buffer;
-
     result += "\n";
+
     result += m_TranslateTable.ToString(prefix);
-
     result += "\n";
+
     result += m_FeelMap.ToString(prefix);
-
     result += "\n";
-    result += m_TrigList.ToString(prefix);
 
+    result += m_TrigList.ToString(prefix);
     result += "\n";
 
     int index = 1;
@@ -353,7 +346,7 @@ bool Pattern::FromString(string s, int & updates)
         }
         else if ( s.find(" Trigs ") == 7 )
         {
-            m_TrigList.FromString(s);
+            m_TrigList.FromString(s.substr(14));
             updates += 1;
             return true;
         }

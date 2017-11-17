@@ -318,7 +318,7 @@ void Note::SetStatus()
 
     m_Status += ", Len ";
     pos = m_Status.size();
-    if ( m_Length > 0 )
+    if ( lround(100 * m_Length) > 0 )
     {
         sprintf(buff, "%.2f", m_Length);
         m_Status += buff;
@@ -326,12 +326,6 @@ void Note::SetStatus()
     else
         m_Status +=  "Off";
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
-
-//    m_Status += ", Phase ";
-//    pos = m_Status.size();
-//    sprintf(buff, "%.2f", m_Phase);
-//    m_Status += buff;
-//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
     m_Highlights.push_back(m_FieldPositions.at(m_NoteEditFocus));
 
@@ -397,8 +391,9 @@ bool Note::HandleKey(key_type_t k)
                 m_NoteVelocity -= 1;
             break;
         case nef_length:
-            if ( m_Length - inc > 0 )
-                m_Length -= inc;
+            m_Length -= inc;
+            if ( m_Length < 0 )
+                m_Length = 0;
             break;
         default:
             break;
@@ -653,38 +648,40 @@ bool Cluster::HandleKey(key_type_t k)
 //////////////////////////////////////////////////////////////////////////
 
 
-bool StepList::PlayPositionInfo(int & offset,  int & length)
-{
-    if ( m_LastRequestedPos >= m_PosInfo.size() )
-        return false;
-
-    /*
-        Why m_LastRequestedPos?
-
-        Display updates are triggered just before a set of events is
-        about to be scheduled. m_Pos always points to the next
-        item to be used, but we need to display info about what just
-        happened. Hence we need store a 'previous' pointer, too.
-
-     */
-
-    offset = m_PosInfo.at(m_LastRequestedPos).offset;
-    length = m_PosInfo.at(m_LastRequestedPos).length;
-
-    return true;
-}
+//bool StepList::PlayPositionInfo(int & offset,  int & length)
+//{
+//    if ( m_LastRequestedPos >= m_PosInfo.size() )
+//        return false;
+//
+//    /*
+//        Why m_LastRequestedPos?
+//
+//        Display updates are triggered just before a set of events is
+//        about to be scheduled. m_Pos always points to the next
+//        item to be used, but we need to display info about what just
+//        happened. Hence we need store a 'previous' pointer, too.
+//
+//     */
+//
+//    offset = m_PosInfo.at(m_LastRequestedPos).offset;
+//    length = m_PosInfo.at(m_LastRequestedPos).length;
+//
+//    return true;
+//}
 
 string StepList::ToString(bool showVelocity)
 {
     string result;
-    m_PosInfo.clear();
+//    m_PosInfo.clear();
     for ( vector<Cluster>::iterator i = m_Clusters.begin(); i != m_Clusters.end(); )
     {
-        int iStart = result.size();
+//        int iStart = result.size();
+        if ( (i - m_Clusters.begin()) % 4 == 0 )
+            result += " \\\n    ";
         result += Cluster(*i).ToString(showVelocity);
         if ( ++i < m_Clusters.end() )
-            result += ",";
-        m_PosInfo.push_back(PosInfo(iStart, result.size() - iStart));
+            result += ", ";
+//        m_PosInfo.push_back(PosInfo(iStart, result.size() - iStart));
     }
     return result;
 }

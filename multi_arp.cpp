@@ -209,12 +209,11 @@ void queue_next_step(int queueId)
     // Step the Pattern Store
 
     Cluster nextCluster;
-    int repeats = 0;
-    double repeatTime = 0;
+    TrigRepeater repeater;
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        g_PatternStore.Step(nextCluster, repeats, repeatTime, g_State.Phase(), g_State.LastUsedStepValue());
+        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue());
         if ( g_ListBuilder.RealTimeRecord() )
             nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     }
@@ -236,12 +235,8 @@ void queue_next_step(int queueId)
 
     double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
     double duration = stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength());
-    int64_t repeatIncMicroSecs = 0;
 
-    if ( lround(repeatTime  * 100) != 0 )
-        repeatIncMicroSecs = 1000 * 60000.0 * repeatTime/tempo;
-    else
-        repeatIncMicroSecs = 1000 * stepLengthMilliSecs/((double) repeats + 1);
+    repeater.Init(tempo, stepLengthMilliSecs);
 
     for ( unsigned int i = 0; i < nextCluster.m_Notes.size(); i++ )
     {
@@ -271,11 +266,16 @@ void queue_next_step(int queueId)
             duration = 60000.0 * noteLength / tempo;
         }
 
-        for ( int r = 0; r < repeats + 1; r ++)
+        int64_t queue_time_delta = 0;
+
+        repeater.Reset(noteNumber, noteVelocity);
+
+        do
         {
-            g_Sequencer.SetScheduleTime(queue_time_usec + repeatIncMicroSecs * r);
+            g_Sequencer.SetScheduleTime(queue_time_usec + queue_time_delta);
             g_Sequencer.ScheduleNote(queueId, noteNumber, noteVelocity, duration);
         }
+        while ( repeater.Step(queue_time_delta, noteNumber, noteVelocity) );
     }
 
 }
@@ -332,6 +332,7 @@ enum global_element_names_t
      global_heading,
      global_name_midi_channel,
      global_name_link_quantum,
+//     global_name_use_state,
      number_global_element_names
 };
 
@@ -339,7 +340,9 @@ enum global_element_names_t
 unordered_map<global_element_names_t, const char *> global_element_names = {
     {global_heading, "Global"},
     {global_name_midi_channel, "Midi Channel"},
-    {global_name_link_quantum, "Link Quantum"}
+    {global_name_link_quantum, "Link Quantum"},
+//    {global_name_use_state, "Use Pattern Play Data"}
+
 };
 
 string globals_to_string()
@@ -354,6 +357,8 @@ string globals_to_string()
     result += buff;
     sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
     result += buff;
+//    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_use_state), ...);
+//    result += buff;
 
     result += '\n';
 
@@ -390,6 +395,8 @@ void load_from_string(string s, int & created, int & updated )
                 if ( token.empty() )
                     continue;
 
+                transform(token.begin(), token.end(), token.begin(), ::tolower);
+
                 try
                 {
                     switch (e)
@@ -399,6 +406,9 @@ void load_from_string(string s, int & created, int & updated )
                         break;
                     case global_name_link_quantum:
                         g_State.SetNewQuantumPending(stod(token));
+                        break;
+//                    case global_name_use_state:
+//                        g_PatternStore.SetUsePatternPlayData(token == "on");
                         break;
                     default:
                         break;

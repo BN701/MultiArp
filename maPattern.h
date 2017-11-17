@@ -132,7 +132,7 @@ struct Pattern
 
     }
 
-    void Step(Cluster & cluster, double & stepValueMultiplier, int & repeats, double & repeatTime, double phase, double stepValue);
+    void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue);
 
     bool LabelEmpty()
     {
@@ -155,7 +155,7 @@ struct Pattern
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
-    bool PlayPositionInfo(int & listIndex, int & offset, int & length);
+//    bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     void ReplaceList(StepList & noteList);
     int NewList();

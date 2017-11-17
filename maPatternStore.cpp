@@ -382,7 +382,7 @@ string PatternStore::PatternOverview()
     return buff;
 }
 
-void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
+void PatternStore::Step(Cluster & cluster, int & repeats, double & repeatTime, double phase, double stepValue)
 {
     /*
         As long as PatternChanged() is called for every step, we
@@ -448,7 +448,7 @@ void PatternStore::Step(Cluster & cluster, double phase, double stepValue)
 
     m_PhaseIsZero = false;
 
-    m_Patterns.at(m_PosPlay).Step(cluster, m_StepValueMultiplier, phase, stepValue);
+    m_Patterns.at(m_PosPlay).Step(cluster, m_StepValueMultiplier, repeats, repeatTime, phase, stepValue);
 }
 
 void PatternStore::UpdatePatternChainFromSimpleString(string s)

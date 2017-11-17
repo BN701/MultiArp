@@ -132,7 +132,7 @@ struct Pattern
 
     }
 
-    void Step(Cluster & cluster, double & stepValueMultiplier, double phase, double stepValue);
+    void Step(Cluster & cluster, double & stepValueMultiplier, int & repeats, double & repeatTime, double phase, double stepValue);
 
     bool LabelEmpty()
     {

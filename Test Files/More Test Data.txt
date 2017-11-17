@@ -163,3 +163,51 @@ Pattern Feel Map
 Step List 1 C5,D5,Eb5,D5
 Step List 2 C4,C3,C3,Eb3
 
+----------------------------------------------------------------------------------------
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 4.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change ON
+Store Edit focus follows play ON
+
+<< Pattern Default >>
+
+Default Step Value 4.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 4.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs ,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 200 Repeat Time 0.490,\
+     Trig Mask 2 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 2 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 3 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 200 Repeat Time 0.510,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000,\
+     Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 0 Repeat Time 0.000
+Step List 1 C4:127:0.000:0.000,C4:127:0.000:0.000,G4:127:0.000:0.000,G4:127:0.000:0.000,F4:127:0.000:0.000,Eb4:127:0.000:0.000,D4:127:0.000:0.000,-
+Step List 2 F4:127:0.000:0.000,G4:127:0.000:0.000,Bb4:127:0.000:0.000
+

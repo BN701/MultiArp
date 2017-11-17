@@ -144,7 +144,7 @@ struct PatternStore : public CursorKeys
 
     void SetPhaseIsZero() { m_PhaseIsZero = true; }
 
-    void Step(Cluster & cluster, double phase, double stepValue);
+    void Step(Cluster & cluster, int & repeats, double & repeatTime, double phase, double stepValue);
     double StepValueMultiplier() { return m_StepValueMultiplier; }
 
 

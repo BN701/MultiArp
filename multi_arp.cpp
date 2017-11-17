@@ -198,72 +198,85 @@ void queue_next_step(int queueId)
 
     g_Sequencer.SetScheduleTime(queue_time_usec);
 
+    // Schedule an event to be fired back to our own app which prompts another
+    // arpeggio to be placed in the queue.
+
+    // TODO: We used to do this after scheduling all midi events. Have there
+    //       been any noticable effects of doing it first.
+
+    g_Sequencer.ScheduleEcho(queueId);
+
     // Step the Pattern Store
 
-//    return;
-
     Cluster nextCluster;
+    int repeats = 0;
+    double repeatTime = 0;
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        g_PatternStore.Step(nextCluster, g_State.Phase(), g_State.LastUsedStepValue());
+        g_PatternStore.Step(nextCluster, repeats, repeatTime, g_State.Phase(), g_State.LastUsedStepValue());
         if ( g_ListBuilder.RealTimeRecord() )
             nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     }
 
-    if ( !nextCluster.Empty() )
+    if ( nextCluster.Empty() )
+        return;
+
+    double tempo = timeline.tempo();
+
+    /*
+          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
+          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
+
+          Steps per beat, v = V/4.
+          Steps per minute = Tv = TV/4
+          Steps per second = TV/240
+          Step length in mSec = 1000*240/TV
+     */
+
+    double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
+    double duration = stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength());
+    int64_t repeatIncMicroSecs = 0;
+
+    if ( lround(repeatTime  * 100) != 0 )
+        repeatIncMicroSecs = 1000 * 60000.0 * repeatTime/tempo;
+    else
+        repeatIncMicroSecs = 1000 * stepLengthMilliSecs/((double) repeats + 1);
+
+    for ( unsigned int i = 0; i < nextCluster.m_Notes.size(); i++ )
     {
-        double tempo = timeline.tempo();
+        Note & note = nextCluster.m_Notes[i];
 
-        /*
-              V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
-              eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
+        int noteNumber = note.m_NoteNumber;
 
-              Steps per beat, v = V/4.
-              Steps per minute = Tv = TV/4
-              Steps per second = TV/240
-              Step length in mSec = 1000*240/TV
-         */
+        if ( noteNumber < 0 )
+            continue;
 
-        double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
-        double duration = stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength());
+        noteNumber = g_PatternStore.TranslateTableForPlay().Translate(noteNumber);
 
-        for ( unsigned int i = 0; i < nextCluster.m_Notes.size(); i++ )
+        if ( noteNumber < 0 )
+            continue;
+
+        unsigned char noteVelocity;
+
+        if ( note.m_NoteVelocity > 0 )
+            noteVelocity = note.m_NoteVelocity;
+        else
+            noteVelocity = g_PatternStore.NoteVelocity();
+
+        double noteLength = note.Length();
+        if ( noteLength > 0 )
         {
-            Note & note = nextCluster.m_Notes[i];
+            // Note length here is in beats. Convert to milliseconds.
+            duration = 60000.0 * noteLength / tempo;
+        }
 
-            int noteNumber = note.m_NoteNumber;
-
-            if ( noteNumber < 0 )
-                continue;
-
-            noteNumber = g_PatternStore.TranslateTableForPlay().Translate(noteNumber);
-
-            if ( noteNumber < 0 )
-                continue;
-
-            unsigned char noteVelocity;
-
-            if ( note.m_NoteVelocity > 0 )
-                noteVelocity = note.m_NoteVelocity;
-            else
-                noteVelocity = g_PatternStore.NoteVelocity();
-
-            double noteLength = note.Length();
-            if ( noteLength > 0 )
-            {
-                // Note length here is in beats. Convert to milliseconds.
-                duration = 60000.0 * noteLength / tempo;
-            }
-
+        for ( int r = 0; r < repeats + 1; r ++)
+        {
+            g_Sequencer.SetScheduleTime(queue_time_usec + repeatIncMicroSecs * r);
             g_Sequencer.ScheduleNote(queueId, noteNumber, noteVelocity, duration);
         }
     }
-
-    // Schedule an event to be fired back to our own app which prompts another
-    // arpeggio to be placed in the queue.
-
-    g_Sequencer.ScheduleEcho(queueId);
 
 }
 

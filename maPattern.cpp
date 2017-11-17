@@ -27,7 +27,7 @@
 
 using namespace std;
 
-void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, double phase, double stepValue)
+void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, int & repeats, double & repeatTime, double phase, double stepValue)
 {
     // Add in step based events, if any, and step position.
 
@@ -64,6 +64,8 @@ void Pattern::Step(Cluster & cluster, double & stepValueMultiplier, double phase
                 break;
 
             stepValueMultiplier = trigItem->Multiplier();
+            repeats = trigItem->Repeats();
+            repeatTime = trigItem->RepeatTime();
 
             for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
             {

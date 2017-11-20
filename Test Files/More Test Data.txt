@@ -242,3 +242,81 @@ Step List 1 C4:80:0.000:0.000, D4:80:0.000:0.000, E4:80:0.000:0.000, F4:80:0.000
 
 << Global >>
 
+Midi Channel 1
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change On
+Store Edit focus follows play On
+Store Use Pattern Play Data On
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 4.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs , \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 3 Repeat Time 0.000, \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 2 Repeat Time 0.000, \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 1 Repeat Time 0.000
+Step List 1  \
+    C4:80:0.000:0.000, D4:80:0.000:0.000, E4:80:0.000:0.000, F4:80:0.000:0.000,  \
+    G4:80:0.000:0.000, A4:80:0.000:0.000, B4:80:0.000:0.000, C5:80:0.000:0.000
+
+============================
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 4.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change On
+Store Edit focus follows play On
+Store Use Pattern Play Data On
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 1.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs  \
+    Trig Mask 1 Multiplier 3.000 Skip 'Off' Mute 'Off' Repeats 36 Repeat Time 0.250,  \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 2 Repeat Time 0.000,  \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 1 Repeat Time 0.000
+Step List 1  \
+    C4:80:0.000:0.000, D4:80:0.000:0.000, E4:80:0.000:0.000, F4:80:0.000:0.000,  \
+    G4:80:0.000:0.000, A4:80:0.000:0.000, B4:80:0.000:0.000, C5:80:0.000:0.000
+

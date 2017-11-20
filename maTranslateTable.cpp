@@ -1134,5 +1134,10 @@ int TranslateTable::Translate(int note)
     return TranslateUsingNoteMap(note);
 }
 
+int TranslateTable::Translate2(int interval, int note)
+{
+    return note + interval;
+}
+
 
 

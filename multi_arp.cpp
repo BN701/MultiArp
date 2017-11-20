@@ -210,6 +210,7 @@ void queue_next_step(int queueId)
 
     Cluster nextCluster;
     TrigRepeater repeater;
+    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
@@ -247,7 +248,7 @@ void queue_next_step(int queueId)
         if ( noteNumber < 0 )
             continue;
 
-        noteNumber = g_PatternStore.TranslateTableForPlay().Translate(noteNumber);
+        noteNumber = translator.Translate(noteNumber);
 
         if ( noteNumber < 0 )
             continue;
@@ -267,15 +268,16 @@ void queue_next_step(int queueId)
         }
 
         int64_t queue_time_delta = 0;
-
-        repeater.Reset(noteNumber, noteVelocity);
+        int interval = 0;
+        repeater.Reset(/*noteNumber,*/ noteVelocity);
 
         do
         {
+            int note = translator.Translate2(interval, noteNumber);
             g_Sequencer.SetScheduleTime(queue_time_usec + queue_time_delta);
-            g_Sequencer.ScheduleNote(queueId, noteNumber, noteVelocity, duration);
+            g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
         }
-        while ( repeater.Step(queue_time_delta, noteNumber, noteVelocity) );
+        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
 
 }

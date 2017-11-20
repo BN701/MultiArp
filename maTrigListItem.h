@@ -47,8 +47,8 @@ class TrigRepeater : public CursorKeys
         double RepeatTime() { return m_RepeatTime; }
 
         void Init(double tempo, double stepLengthMilliSecs);
-        void Reset(int noteNumber, int noteVelocity);
-        bool Step(int64_t & queue_delta, int & noteNumber, unsigned char & noteVelocity);
+        void Reset(/*int noteNumber, */int noteVelocity);
+        bool Step(int64_t & queue_delta, int & interval, unsigned char & velocity);
 
         void AddArpStage(int interval, int steps)
         {
@@ -76,7 +76,7 @@ class TrigRepeater : public CursorKeys
 
         // Working data.
         int64_t m_RepeatTimeMicroSecs = 0;
-        double m_NoteNumber = 0;
+//        double m_NoteNumber = 0;
         double m_NoteVelocity = 0;
         double m_VelocityDecrement = 0;
 

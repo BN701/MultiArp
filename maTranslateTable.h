@@ -95,6 +95,7 @@ class TranslateTable : public CursorKeys
         int TranslateUsingNoteMap(int note);
         int PreMapScale(int note);
         int Translate(int note);
+        int Translate2(int interval, int note);
         // int Transpose(int n) { return n + m_Transpose; };
 
         int Transpose() { return m_Transpose; }

@@ -42,6 +42,8 @@ class TrigList : public CursorKeys
         void FromString(std::string s);
         void FromSimpleString(std::string s);
 
+        void AddArpeggio(std::string s);
+
         std::string ToStringForDisplay();
         std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
 

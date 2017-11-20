@@ -60,6 +60,7 @@ enum command_t
     C_SET_LABEL,
 
     C_TRIGS, // Open the trig menu on current pattern or enter a list.
+    C_TRIGS_ARPEGGIO,
 
     C_STEPVAL,
     C_QUANTUM,
@@ -190,6 +191,8 @@ unordered_map<string, command_t> gCommandList =
 
     {"trigs", C_TRIGS},
     {"t", C_TRIGS},
+    {"trigs arp", C_TRIGS_ARPEGGIO},
+    {"t arp", C_TRIGS_ARPEGGIO},
 
     {"scale", C_SCALE},
     {"s", C_SCALE},
@@ -907,6 +910,13 @@ bool do_command(string/*const char * */ commandString)
             {
                 g_PatternStore.CurrentPlayPattern().PatternTrigList().FromSimpleString(commandString);
             }
+            g_PatternStore.CurrentPlayPattern().PatternTrigList().SetStatus();
+            g_PatternStore.CurrentPlayPattern().PatternTrigList().SetFocus();
+            show_status_after_navigation();
+            break;
+
+        case C_TRIGS_ARPEGGIO:
+            g_PatternStore.CurrentPlayPattern().PatternTrigList().AddArpeggio(commandString);
             g_PatternStore.CurrentPlayPattern().PatternTrigList().SetStatus();
             g_PatternStore.CurrentPlayPattern().PatternTrigList().SetFocus();
             show_status_after_navigation();

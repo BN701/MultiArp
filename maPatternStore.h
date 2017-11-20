@@ -147,24 +147,14 @@ struct PatternStore : public CursorKeys
     void Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue);
     double StepValueMultiplier() { return m_StepValueMultiplier; }
 
-
     std::string EditPatternToString();
-//    std::string PlayPatternToString();
 
     std::string PatternSelectionList(int start, int rows);
-
-//    int PlayPatternListCount();
-//    int RealTimeListCount();
-//    std::string RealTimeListToStringForDisplay(int n);
-//    std::string PlayPatternListToString(int n);
-//    std::string PlayPatternTrigsToString();
-//    bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     std::string PatternChainToString();
     std::string PatternChainToStringForDisplay(int firstRow, int rows);
 
     std::string ToString();
-//    void FromString(const char * s);
     bool FromString(std::string s, int & created, int & updates);
     void UpdatePattern(StepList & noteList);
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);

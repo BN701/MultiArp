@@ -47,8 +47,12 @@ void TrigRepeater::Init(double tempo, double stepLengthMilliSecs)
 void TrigRepeater::Reset(int noteNumber, int noteVelocity)
 {
     m_Steps = m_Repeats;
+    m_NoteNumber = noteNumber;
     m_NoteVelocity = noteVelocity;
     m_VelocityDecrement = m_NoteVelocity * (1 - m_VelocityDecay);
+
+    for ( auto it = m_Arpeggio.begin(); it < m_Arpeggio.end(); it++ )
+        it->m_Position = it == m_Arpeggio.begin() ? 1 : 0;
 }
 
 bool TrigRepeater::Step(int64_t & queue_delta, int & noteNumber, unsigned char & noteVelocity)
@@ -80,6 +84,27 @@ bool TrigRepeater::Step(int64_t & queue_delta, int & noteNumber, unsigned char &
         break;
     default:
         return false;
+    }
+
+    bool stepNext = true;
+    noteNumber = m_NoteNumber;
+
+    for ( int i = 0; i < m_Arpeggio.size(); i ++ )
+    {
+        ArpeggioStage & s = m_Arpeggio.at(i);
+        noteNumber += s.m_Interval * s.m_Position;
+
+        if ( stepNext )
+        {
+            s.m_Position += 1;
+            if ( s.m_Position == s.m_Steps )
+            {
+                s.m_Position = 0;
+                stepNext = true;
+            }
+            else
+                stepNext = false;
+        }
     }
 
     return noteVelocity > 0;

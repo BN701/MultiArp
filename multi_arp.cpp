@@ -332,7 +332,6 @@ enum global_element_names_t
      global_heading,
      global_name_midi_channel,
      global_name_link_quantum,
-//     global_name_use_state,
      number_global_element_names
 };
 
@@ -341,7 +340,6 @@ unordered_map<global_element_names_t, const char *> global_element_names = {
     {global_heading, "Global"},
     {global_name_midi_channel, "Midi Channel"},
     {global_name_link_quantum, "Link Quantum"},
-//    {global_name_use_state, "Use Pattern Play Data"}
 
 };
 
@@ -357,8 +355,6 @@ string globals_to_string()
     result += buff;
     sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
     result += buff;
-//    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_use_state), ...);
-//    result += buff;
 
     result += '\n';
 
@@ -406,9 +402,6 @@ void load_from_string(string s, int & created, int & updated )
                         break;
                     case global_name_link_quantum:
                         g_State.SetNewQuantumPending(stod(token));
-                        break;
-//                    case global_name_use_state:
-//                        g_PatternStore.SetUsePatternPlayData(token == "on");
                         break;
                     default:
                         break;

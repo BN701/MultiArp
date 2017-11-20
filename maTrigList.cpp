@@ -204,11 +204,24 @@ void TrigList::FromString(string s)
     }
 }
 
-void TrigList::FromSimpleString(string s)
+void TrigList::AddArpeggio(string s)
 {
     vector<string> tokens = split(s.c_str(), ' ');
 
-    // TODO: Less than what?
+    // TODO: Currently just a aplaceholder to set up some test data.
+
+    if ( m_TrigItems.empty() )
+        return;
+
+    m_TrigItems.front().Repeater().AddArpStage(1, 4);
+    m_TrigItems.front().Repeater().AddArpStage(1, 3);
+    m_TrigItems.front().Repeater().AddArpStage(-2, 4);
+}
+
+
+void TrigList::FromSimpleString(string s)
+{
+    vector<string> tokens = split(s.c_str(), ' ');
 
     if ( tokens.size() <= 1 )
         throw string("TrigList::FromSimpleString() - Nothing found.");

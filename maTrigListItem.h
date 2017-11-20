@@ -25,6 +25,19 @@
 
 #include "maCursorKeys.h"
 
+struct ArpeggioStage
+{
+    int m_Position = 0;
+    int m_Interval = 1;
+    int m_Steps = 0;
+
+    ArpeggioStage(int interval, int steps):
+        m_Interval(interval),
+        m_Steps(steps)
+    {}
+};
+
+
 class TrigRepeater : public CursorKeys
 {
     public:
@@ -36,6 +49,11 @@ class TrigRepeater : public CursorKeys
         void Init(double tempo, double stepLengthMilliSecs);
         void Reset(int noteNumber, int noteVelocity);
         bool Step(int64_t & queue_delta, int & noteNumber, unsigned char & noteVelocity);
+
+        void AddArpStage(int interval, int steps)
+        {
+            m_Arpeggio.push_back(ArpeggioStage(interval, steps));
+        }
 
     private:
         enum decay_mode_t
@@ -50,12 +68,15 @@ class TrigRepeater : public CursorKeys
 
         int m_Steps = 0;
         int m_Repeats = 0;
-        double m_RepeatTime = 0.0; // Less than means split evenly across step. (We don't use zero as that's hard to test for.)
-        double m_VelocityDecay = 0.8;
-        decay_mode_t m_DecayMode = linear;
+        double m_RepeatTime = 0.0; // Zero means split evenly across step.
+        double m_VelocityDecay = 0.0;
+        decay_mode_t m_DecayMode = off;
+
+        std::vector<ArpeggioStage> m_Arpeggio;
 
         // Working data.
         int64_t m_RepeatTimeMicroSecs = 0;
+        double m_NoteNumber = 0;
         double m_NoteVelocity = 0;
         double m_VelocityDecrement = 0;
 

@@ -25,8 +25,9 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include "maUtility.h"
+#include "maNotes.h"
 #include "maPatternStore.h"
+#include "maUtility.h"
 
 // These tables aren't needed at the moment, but
 // could perhaps be used for some other experiments
@@ -713,7 +714,7 @@ void TranslateTable::SetStatus()
 
 string TranslateTable::RootName()
 {
-    return Note::NoteName(m_Root);
+    return Note::NoteString(m_Root);
 }
 
 const char * TranslateTable::ScaleName()
@@ -988,7 +989,204 @@ int TranslateTable::PreMapScale(int note)
     }
 }
 
-int TranslateTable::TranslateUsingNoteMap(int note)
+void TranslateDiags::ResetLog()
+{
+    m_Log = "Root Octave In Premap Degree/Actual = Shift Chro Final\n";
+}
+
+string TranslateDiags::ToString()
+{
+    char buff[200];
+    string result;
+
+//                "Root Octave In Premap Degree/Actual = Shift Chro Final";
+    sprintf(buff, "%4s %2i+%-3i %2s -> %-3s %6i/%-6i = %-5s %4i %-5s %s",
+        Note::NoteString(m_Root).c_str(),
+        m_Octave,
+        m_OctaveShift,
+        Note::NoteNameOnly(m_NoteIn),
+        Note::NoteNameOnly(m_NoteAfterPremap),
+        m_DegreeShift,
+        m_ModalShift,
+        Note::NoteNameOnly(m_NoteAfterShift),
+        m_Transpose,
+        Note::NoteString(m_NoteOut).c_str(),
+        m_InScale ? "In Scale" : "Accidental");
+
+    m_Log += buff;
+    m_Log += '\n';
+
+    return buff;
+}
+
+#if 1
+
+// With diagnositics.
+
+int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
+{
+
+    m_Diags.m_Root = m_Root;
+    m_Diags.m_Transpose = m_Transpose;
+
+    // Make note a value relative to root.
+    note -= m_Root;
+
+    // Normalize note within single octave so that
+    // m_Root + octave + note = original note value.
+
+    int octave = 0; // Zero means note is in the same octave as the root.
+
+    // (Only one of these loops will apply.)
+
+    while ( note >= 12 )
+    {
+        note -= 12;
+        octave += 12;
+    }
+
+    while ( note < 0 )
+    {
+        note += 12;
+        octave -= 12;
+    }
+
+    m_Diags.m_Octave = octave/12;
+    m_Diags.m_NoteIn = note;
+
+    if ( m_PremapMode > premap_off )
+    {
+        note = PreMapScale(note);
+        if ( note < 0 )
+            return -1;
+    }
+
+    m_Diags.m_NoteAfterPremap = note;
+
+    // Similarly, normalise degree shift to single octave.
+
+    int octaveShift = 0;
+    int degreeShift = degreeShiftOverride == 0 ? m_DegreeShift : degreeShiftOverride;
+
+    while ( degreeShift >= m_ScaleDegrees )
+    {
+        degreeShift -= m_ScaleDegrees;
+        octaveShift += 12;
+    }
+
+    while ( degreeShift < 0 )
+    {
+        degreeShift += m_ScaleDegrees;
+        octaveShift -= 12;
+    }
+
+    m_Diags.m_OctaveShift = octaveShift/12;
+    m_Diags.m_DegreeShift = degreeShift;
+
+    /*
+        m_NoteMap give us the degree, I, II, III, etc., of the note we're
+        processing. This is the index, zero based, in m_Intervals.
+
+        For the major scale ...
+
+        m_NoteMap looks like this: [ 0, 0, 1, 0, 2, 3, 0, 4, 0, 5, 0, 6 ]
+        m_Intervals looks liks this: [ 2, 2, 1, 2, 2, 2, 1 ]
+
+        So, shift is the cumulative number of semitones we have to move the note up.
+     */
+
+    int shift = 0;
+
+    // int degree = m_NoteMap[note];
+
+    if ( note == 0 || m_NoteMap[note] > 0 )
+    {
+        m_Diags.m_InScale = true;
+        shift = ShiftSum(m_NoteMap[note], degreeShift);
+#if 0
+        int degreeIndex = degree - 1;
+
+        for ( int i = degreeIndex; i < degreeIndex + degreeShift; i++ )
+            shift += m_Intervals[i % m_ScaleDegrees];
+#endif
+    }
+    else
+    {
+        m_Diags.m_InScale = false;
+
+        // Accidental (not in the scale).
+
+        // int d = 0;
+        int nLower = note;
+        int nUpper = note;
+
+        while ( nLower > 0 )
+        {
+            if ( m_NoteMap[nLower] != 0 )
+                break;
+            nLower -= 1;
+        }
+
+        while ( nUpper < 12 )
+        {
+            if ( m_NoteMap[nUpper] != 0 )
+                break;
+            nUpper += 1;
+        }
+
+        int dLower = m_NoteMap[nLower];
+        int dUpper = m_NoteMap[nUpper % 12];
+
+        int sLower = ShiftSum(dLower, degreeShift);
+        int sUpper = ShiftSum(dUpper, degreeShift);
+
+        switch ( m_AccidentalsMode )
+        {
+            case accmode_upper:
+                shift = sUpper;
+                break;
+            case accmode_lower:
+                shift = sLower;
+                break;
+            case upper_mute_if_clash:
+                if ( note + sUpper > nLower + sLower )
+                    shift = sUpper;
+                else
+                    return -1;
+            case lower_mute_if_clash:
+                if ( note + sLower < nUpper + sUpper )
+                    shift = sLower;
+                else
+                    return -1;
+            default:
+                break;
+        }
+
+#if 0
+        // Find next free accidental slot.
+
+        while ( d < degreeShift )
+        {
+            shift += 1;
+            if ( m_NoteMap[++n % 12] == 0 )
+                d += 1;
+        }
+#endif
+    }
+
+    m_Diags.m_ModalShift = shift;
+    m_Diags.m_NoteAfterShift = note + shift;
+    m_Diags.m_NoteOut = m_Root + octave + note + octaveShift + shift + m_Transpose;
+
+    m_Diags.ToString();
+
+    return m_Root + octave + note + octaveShift + shift + m_Transpose;
+}
+#endif
+
+#if 0
+
+int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 {
     // Make note a value relative to root.
     note -= m_Root;
@@ -1019,11 +1217,10 @@ int TranslateTable::TranslateUsingNoteMap(int note)
             return -1;
     }
 
-
     // Similarly, normalise degree shift to single octave.
 
     int octaveShift = 0;
-    int degreeShift = m_DegreeShift;
+    int degreeShift = degreeShiftOverride == 0 ? m_DegreeShift : degreeShiftOverride;
 
     while ( degreeShift >= m_ScaleDegrees )
     {
@@ -1125,8 +1322,9 @@ int TranslateTable::TranslateUsingNoteMap(int note)
 #endif
     }
 
-    return m_Root + octave + note + octaveShift + shift + m_Transpose;;
+    return m_Root + octave + note + octaveShift + shift + m_Transpose;
 }
+#endif
 
 int TranslateTable::Translate(int note)
 {
@@ -1134,9 +1332,9 @@ int TranslateTable::Translate(int note)
     return TranslateUsingNoteMap(note);
 }
 
-int TranslateTable::Translate2(int interval, int note)
+int TranslateTable::Translate2(int note, int interval)
 {
-    return note + interval;
+    return TranslateUsingNoteMap(note, interval);
 }
 
 

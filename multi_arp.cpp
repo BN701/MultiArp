@@ -273,7 +273,7 @@ void queue_next_step(int queueId)
 
         do
         {
-            int note = translator.Translate2(interval, noteNumber);
+            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
             g_Sequencer.SetScheduleTime(queue_time_usec + queue_time_delta);
             g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
         }

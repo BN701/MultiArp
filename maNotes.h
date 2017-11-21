@@ -73,7 +73,8 @@ struct Note : public CursorKeys
     std::string ToString(bool showVelocity = true);
     void FromString(std::string);
 
-    static std::string NoteName(int n); // Expose the notes/numbers look up table.
+    static const char * NoteNameOnly(int n); // Expose the notes/numbers look up table.
+    static std::string NoteString(int n); // Expose the notes/numbers look up table.
     static int NoteNumberFromString(std::string note);
 
     void SetPhase( double val ) { m_Phase = val; }

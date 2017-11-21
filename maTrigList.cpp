@@ -213,9 +213,9 @@ void TrigList::AddArpeggio(string s)
     if ( m_TrigItems.empty() )
         return;
 
-    m_TrigItems.front().Repeater().AddArpStage(1, 4);
-    m_TrigItems.front().Repeater().AddArpStage(1, 3);
-    m_TrigItems.front().Repeater().AddArpStage(-2, 4);
+    m_TrigItems.front().Repeater().AddArpStage(2, 8);
+    m_TrigItems.front().Repeater().AddArpStage(1, 2);
+//    m_TrigItems.front().Repeater().AddArpStage(-2, 4);
 }
 
 

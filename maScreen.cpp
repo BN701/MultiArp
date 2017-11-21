@@ -496,6 +496,10 @@ void update_pattern_panel()
         case Display::two:
             wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
             break;
+        case Display::three:
+            wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log().c_str());
+            g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
+            break;
         }
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )
         {

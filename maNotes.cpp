@@ -211,7 +211,15 @@ unordered_map<string, int> mapNotesToNumbers =
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-string Note::NoteName(int n)
+const char * Note::NoteNameOnly(int n)
+{
+    if ( n >= 0 )
+        return mapNumbersToNotes.at(n % 12).c_str();
+    else
+        return "-";
+}
+
+string Note::NoteString(int n)
 {
     if ( n >= 0 )
     {

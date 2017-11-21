@@ -89,23 +89,29 @@ bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & n
     bool stepNext = true;
     interval = 0;
 
-    for ( int i = 0; i < m_Arpeggio.size(); i ++ )
-    {
-        ArpeggioStage & s = m_Arpeggio.at(i);
-        interval += s.m_Interval * s.m_Position;
+    for ( auto it = m_Arpeggio.begin(); it < m_Arpeggio.end(); it ++ )
+        stepNext = it->Step(interval, stepNext);
 
-        if ( stepNext )
-        {
-            s.m_Position += 1;
-            if ( s.m_Position == s.m_Steps )
-            {
-                s.m_Position = 0;
-                stepNext = true;
-            }
-            else
-                stepNext = false;
-        }
-    }
+//    bool stepNext = true;
+//    interval = 0;
+//
+//    for ( int i = 0; i < m_Arpeggio.size(); i ++ )
+//    {
+//        ArpeggioStage & s = m_Arpeggio.at(i);
+//        interval += s.m_Interval * s.m_Position;
+//
+//        if ( stepNext )
+//        {
+//            s.m_Position += 1;
+//            if ( s.m_Position == s.m_Steps )
+//            {
+//                s.m_Position = 0;
+//                stepNext = true;
+//            }
+//            else
+//                stepNext = false;
+//        }
+//    }
 
     return noteVelocity > 0;
 }

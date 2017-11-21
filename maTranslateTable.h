@@ -75,6 +75,26 @@ class StepList; // Passed as parameter to one of the SetScale() methods.
 
 typedef std::vector<std::vector<int>> matrix_t;
 
+struct TranslateDiags
+{
+    int m_Root;
+    int m_NoteIn;
+    int m_Octave;
+    int m_NoteAfterPremap;
+    int m_OctaveShift;
+    int m_DegreeShift;
+    bool m_InScale;
+    int m_ModalShift;
+    int m_NoteAfterShift;
+    int m_Transpose;
+    int m_NoteOut;
+
+    std::string ToString();
+    std::string & Log() { return m_Log; }
+    void ResetLog();
+    std::string m_Log;
+};
+
 class TranslateTable : public CursorKeys
 {
     public:
@@ -92,10 +112,10 @@ class TranslateTable : public CursorKeys
         int TranslateUsingTable(int root, int scale, int degree, int note);
         bool CanTranslate(int scale, int degree);
 
-        int TranslateUsingNoteMap(int note);
+        int TranslateUsingNoteMap(int note, int degreeShiftOverride = 0);
         int PreMapScale(int note);
         int Translate(int note);
-        int Translate2(int interval, int note);
+        int Translate2(int note, int interval);
         // int Transpose(int n) { return n + m_Transpose; };
 
         int Transpose() { return m_Transpose; }
@@ -136,6 +156,8 @@ class TranslateTable : public CursorKeys
             // SetStatus();
         }
 
+        TranslateDiags & Diags() { return m_Diags; }
+
     protected:
         enum translate_table_focus_t
         {
@@ -150,7 +172,6 @@ class TranslateTable : public CursorKeys
 
         virtual bool HandleKey(key_type_t k);
         translate_table_focus_t m_TranslateTableFocus;
-
 
     private:
 
@@ -176,6 +197,8 @@ class TranslateTable : public CursorKeys
 
         bool m_NewTransposePending;
         int m_NewTranspose;
+
+        TranslateDiags m_Diags;
 
 };
 

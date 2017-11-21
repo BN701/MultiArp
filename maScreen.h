@@ -83,6 +83,7 @@ public:
     {
         one,
         two,
+        three,
         num_big_panel_pages
     };
 

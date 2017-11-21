@@ -320,3 +320,40 @@ Step List 1  \
     C4:80:0.000:0.000, D4:80:0.000:0.000, E4:80:0.000:0.000, F4:80:0.000:0.000,  \
     G4:80:0.000:0.000, A4:80:0.000:0.000, B4:80:0.000:0.000, C5:80:0.000:0.000
 
+======= One note for scale diags ==========================================================
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 4.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change On
+Store Edit focus follows play On
+Store Use Pattern Play Data On
+
+<< Pattern Default >>
+
+Default Step Value 4.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'upper'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 4.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs
+Step List 1  \
+    C5
+

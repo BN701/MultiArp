@@ -35,6 +35,21 @@ struct ArpeggioStage
         m_Interval(interval),
         m_Steps(steps)
     {}
+
+    bool Step(int & interval, bool stepNext)
+    {
+        interval += m_Interval * m_Position;
+        if ( stepNext )
+        {
+            m_Position += 1;
+            if ( m_Position == m_Steps )
+            {
+                m_Position = 0;
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 

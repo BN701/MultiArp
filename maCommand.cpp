@@ -79,6 +79,7 @@ enum command_t
 
     C_PAGE_ONE,
     C_PAGE_TWO,
+    C_PAGE_THREE,
 
     C_FEEL,
     C_FEEL_HELP,
@@ -163,6 +164,8 @@ unordered_map<string, command_t> gCommandList =
     {"page 1", C_PAGE_ONE},
     {"page two", C_PAGE_TWO},
     {"page 2", C_PAGE_TWO},
+    {"page three", C_PAGE_THREE},
+    {"page 3", C_PAGE_THREE},
 
     {"run", C_RUN},
     {"stop", C_STOP},
@@ -473,6 +476,9 @@ bool do_command(string/*const char * */ commandString)
             break;
         case C_PAGE_TWO:
             g_Display.SetBigPanelPage(Display::two);
+            break;
+        case C_PAGE_THREE:
+            g_Display.SetBigPanelPage(Display::three);
             break;
 
         case C_CUE  :

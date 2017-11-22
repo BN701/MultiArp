@@ -92,6 +92,8 @@ public:
 
     void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
     big_panel_page_t BigPanelPage() { return m_BigPanelPage; }
+    void ToggleBigPanelHold() { m_BigPanelHold = ! m_BigPanelHold; }
+    bool BigPanelHold() { return m_BigPanelHold; }
 
     WINDOW *BigPanel() { return m_BigPanel; }
     WINDOW *SmallPanel() { return m_SmallPanel; }
@@ -108,6 +110,7 @@ private:
 
 
     big_panel_page_t m_BigPanelPage = one;
+    bool m_BigPanelHold = false;
 };
 
 

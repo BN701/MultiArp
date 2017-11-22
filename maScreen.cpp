@@ -481,36 +481,44 @@ void update_pattern_panel()
 {
     int scr_x, scr_y;
 
+    if ( g_Display.BigPanelHold() )
+        return;
+
     wmove(g_Display.BigPanel(), 0, 0);
     wclrtobot(g_Display.BigPanel());
 
     try
     {
+        bool showTrigProgress = false;
         vector<PosInfo2> highlights;
-//        wattron(g_Display.BigPanel(), COLOR_PAIR(CP_PATTERN_LIST_PANEL));
+
         switch ( g_Display.BigPanelPage() )
         {
         case Display::one:
             wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79).c_str());
+            showTrigProgress = true;
             break;
         case Display::two:
             wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
+            showTrigProgress = true;
             break;
         case Display::three:
             wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log().c_str());
-            g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
             break;
         }
+
         for ( auto it = highlights.begin(); it < highlights.end(); it++ )
         {
             mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, 0,
-//                it->row < 2 ? A_REVERSE : 0,
                 it->row < 2 ? CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG : CP_PATTERN_LIST_PANEL_HIGHLIGHT,
                 NULL);
         }
+
         // Kludge to show overall trig position.
-        mvwchgat(g_Display.BigPanel(), 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
-            A_UNDERLINE, CP_PATTERN_LIST_PANEL, NULL);
+
+        if ( showTrigProgress )
+            mvwchgat(g_Display.BigPanel(), 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
+                A_UNDERLINE, CP_PATTERN_LIST_PANEL, NULL);
     }
     catch (... /*string s*/)
     {

@@ -70,7 +70,7 @@ struct Note : public CursorKeys
         m_Length(0)
     {}
 
-    std::string ToString(bool showVelocity = true);
+    std::string ToString(bool fullFormat = true);
     void FromString(std::string);
 
     static const char * NoteNameOnly(int n); // Expose the notes/numbers look up table.
@@ -131,7 +131,7 @@ struct Cluster : public CursorKeys
 
     int StepsTillNextNote() { return m_StepLength; }
 
-    std::string ToString(bool showVelocity = true);
+    std::string ToString(bool fullFormat = true);
     void FromString(std::string s);
 
     virtual void SetStatus();
@@ -215,7 +215,7 @@ struct StepList : public CursorKeys
         m_Complete = false;
     }
 
-    std::string ToString(bool showVelocity = true);
+    std::string ToString(bool fullFormat = true);
     std::string ToStringForDisplay(int & offset, int & length);
     std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
     void FromString(std::string s);

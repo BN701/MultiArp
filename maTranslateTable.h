@@ -77,17 +77,27 @@ typedef std::vector<std::vector<int>> matrix_t;
 
 struct TranslateDiags
 {
-    int m_Root;
-    int m_NoteIn;
-    int m_Octave;
-    int m_NoteAfterPremap;
-    int m_OctaveShift;
-    int m_DegreeShift;
-    bool m_InScale;
-    int m_ModalShift;
-    int m_NoteAfterShift;
-    int m_Transpose;
-    int m_NoteOut;
+    scale_t m_Scale;
+    scale_premap_mode_t m_PremapMode;
+    accidentals_mode_t m_AccidentalsMode;
+
+    int m_Root = -1;
+    int m_NoteIn = -1;
+    int m_Degree = -1;
+    int m_Octave = -1;
+    int m_DegreeAfterPremap = -1;
+    int m_OctaveShift = 0;
+    int m_DegreeShift = 0;
+    bool m_InScale = true;
+    int m_ModalShift = -1;
+    int m_DegreeAfterShift = -1;
+    int m_Transpose = 0;
+    int m_NoteOut = -1;
+
+    void Reset()
+    {
+        *this = *(new TranslateDiags);
+    }
 
     std::string ToString();
     std::string & Log() { return m_Log; }

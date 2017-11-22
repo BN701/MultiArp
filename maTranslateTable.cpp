@@ -80,7 +80,10 @@ const char * tt_harmonic_minor = {
 };
 
 const char * tt_numerals[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-// int tt_scale_degrees[] = {7, 7, 7, 0};
+const char * tt_intervals[] = {"I", "IIb", "II", "IIIb", "III", "IV", "Vb", "V", "VIb", "VI",
+        "VIIb", "VII", "VIII", "IXb", "IX", "Xb", "X", "XI", "XIIb", "XII"};
+
+
 
 
 using namespace std;
@@ -991,7 +994,15 @@ int TranslateTable::PreMapScale(int note)
 
 void TranslateDiags::ResetLog()
 {
-    m_Log = "Root Octave In Premap Degree/Actual = Shift Chro Final\n";
+    m_Log = "         Input Octave Premap Degree/Actual Chro Final\n";
+}
+
+const char * Interval(int n)
+{
+    if ( n >= 0 )
+        return tt_intervals[n % 12];
+    else
+        return "-";
 }
 
 string TranslateDiags::ToString()
@@ -999,16 +1010,22 @@ string TranslateDiags::ToString()
     char buff[200];
     string result;
 
-//                "Root Octave In Premap Degree/Actual = Shift Chro Final";
-    sprintf(buff, "%4s %2i+%-3i %2s -> %-3s %6i/%-6i = %-5s %4i %-5s %s",
+//                "         Note In Octave Premap Degree/Actual Chro Final";
+    sprintf(buff, "     %3s %-10.10s %3s %2i+%-3i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %s",
         Note::NoteString(m_Root).c_str(),
+        tt_scale_names.at(m_Scale),
+        Note::NoteString(m_NoteIn).c_str(),
         m_Octave,
         m_OctaveShift,
-        Note::NoteNameOnly(m_NoteIn),
-        Note::NoteNameOnly(m_NoteAfterPremap),
+//        Note::NoteNameOnly(m_NoteIn),
+        Note::NoteString(m_NoteIn).c_str(),
+//        Note::NoteNameOnly(m_NoteAfterPremap),
+        Interval(m_Degree),
+        Interval(m_DegreeAfterPremap),
         m_DegreeShift,
         m_ModalShift,
-        Note::NoteNameOnly(m_NoteAfterShift),
+//        Note::NoteNameOnly(m_NoteAfterShift),
+        Interval(m_DegreeAfterShift),
         m_Transpose,
         Note::NoteString(m_NoteOut).c_str(),
         m_InScale ? "In Scale" : "Accidental");
@@ -1027,7 +1044,11 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 {
 
     m_Diags.m_Root = m_Root;
+    m_Diags.m_NoteIn = note;
     m_Diags.m_Transpose = m_Transpose;
+    m_Diags.m_Scale = m_Scale;
+    m_Diags.m_PremapMode = m_PremapMode;
+    m_Diags.m_AccidentalsMode = m_AccidentalsMode;
 
     // Make note a value relative to root.
     note -= m_Root;
@@ -1052,21 +1073,25 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     }
 
     m_Diags.m_Octave = octave/12;
-    m_Diags.m_NoteIn = note;
+    m_Diags.m_Degree = note;
 
     if ( m_PremapMode > premap_off )
     {
         note = PreMapScale(note);
         if ( note < 0 )
+        {
+            m_Diags.m_DegreeAfterPremap = note;
+            m_Diags.ToString();
             return -1;
+        }
     }
 
-    m_Diags.m_NoteAfterPremap = note;
+    m_Diags.m_DegreeAfterPremap = note;
 
     // Similarly, normalise degree shift to single octave.
 
     int octaveShift = 0;
-    int degreeShift = degreeShiftOverride == 0 ? m_DegreeShift : degreeShiftOverride;
+    int degreeShift = m_DegreeShift + degreeShiftOverride;
 
     while ( degreeShift >= m_ScaleDegrees )
     {
@@ -1175,7 +1200,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     }
 
     m_Diags.m_ModalShift = shift;
-    m_Diags.m_NoteAfterShift = note + shift;
+    m_Diags.m_DegreeAfterShift = note + shift;
     m_Diags.m_NoteOut = m_Root + octave + note + octaveShift + shift + m_Transpose;
 
     m_Diags.ToString();

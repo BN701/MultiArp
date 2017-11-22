@@ -100,8 +100,8 @@ char ListBuilder::MidiInputModeAsChar()
         case MIDI_INPUT_REAL_TIME:
             return 'R';
 
-        case MIDI_INPUT_FULL:
-            return 'F';
+        case MIDI_INPUT_STEP:
+            return 'S';
 
         case MIDI_INPUT_QUICK:
             return 'Q';
@@ -124,7 +124,7 @@ std::string ListBuilder::ToString()
             }
             break;
 
-        case MIDI_INPUT_FULL:
+        case MIDI_INPUT_STEP:
             if ( m_StepList.Empty() )
                 return m_Captured.ToString();
             else if ( m_Captured.Empty() )
@@ -151,7 +151,7 @@ bool ListBuilder::HandleKeybInput(int c)
             case MIDI_INPUT_REAL_TIME:
                 return !m_RealTimeList.empty();
 
-            case MIDI_INPUT_FULL:
+            case MIDI_INPUT_STEP:
                 return !m_StepList.Empty();
 
             default:
@@ -174,7 +174,7 @@ bool ListBuilder::HandleKeybInput(int c)
                 }
                 else
                     return false;
-            case MIDI_INPUT_FULL:
+            case MIDI_INPUT_STEP:
                 return m_StepList.DeleteLast();
             default:
                 return false;
@@ -271,7 +271,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
             }
             return false;
 
-        case MIDI_INPUT_FULL:
+        case MIDI_INPUT_STEP:
 
             // Build the current chord and addto the note list when all keys
             // are released. Keep adding chords - which can be single notes,

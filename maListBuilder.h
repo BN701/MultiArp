@@ -31,7 +31,7 @@ enum midi_input_modes_t
 {
     MIDI_INPUT_OFF,
     MIDI_INPUT_QUICK,
-    MIDI_INPUT_FULL,
+    MIDI_INPUT_STEP,
     MIDI_INPUT_REAL_TIME
 };
 

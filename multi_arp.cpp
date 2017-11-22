@@ -82,6 +82,7 @@ void do_UI_updates()
     if ( g_State.PhaseIsZero() )
     {
         update_pattern_status_panel();
+        g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
     }
 
     // Every step ...
@@ -89,6 +90,7 @@ void do_UI_updates()
 //    update_pattern_panel();     // TODO: Revert to updating this when updates are actually made.
 //    highlight_pattern_panel();  // Moves note highlight.
     update_pattern_panel();
+//    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
 
     update_progress_bar();
     set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
@@ -248,10 +250,10 @@ void queue_next_step(int queueId)
         if ( noteNumber < 0 )
             continue;
 
-        noteNumber = translator.Translate(noteNumber);
-
-        if ( noteNumber < 0 )
-            continue;
+//        noteNumber = translator.Translate(noteNumber);
+//
+//        if ( noteNumber < 0 )
+//            continue;
 
         unsigned char noteVelocity;
 

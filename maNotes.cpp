@@ -228,7 +228,7 @@ string Note::NoteString(int n)
         return buffer;
     }
     else
-        return "0";
+        return "-";
 }
 
 int Note::NoteNumberFromString(string note)
@@ -244,13 +244,13 @@ int Note::NoteNumberFromString(string note)
 }
 
 
-string Note::ToString(bool showVelocity)
+string Note::ToString(bool fullFormat)
 {
     if ( m_NoteNumber == -1 )
         return "-";
 
     char buffer[25];
-    if ( showVelocity && m_NoteVelocity >= 0 )
+    if ( fullFormat && m_NoteVelocity >= 0 )
         sprintf(buffer, "%s%i:%i:%.3f:%.3f",
             mapNumbersToNotes.at(m_NoteNumber % 12).c_str(),
             m_NoteNumber / 12,
@@ -436,14 +436,14 @@ bool Cluster::IsRest()
     return true;
 }
 
-string Cluster::ToString(bool showVelocity)
+string Cluster::ToString(bool fullFormat)
 {
     string result;
     for ( vector<Note>::iterator i = m_Notes.begin(); i != m_Notes.end(); i++ )
     {
         if ( result.size() > 0 )
             result += '/';
-        result += i->ToString(showVelocity);
+        result += i->ToString(fullFormat);
     }
     return result;
 }
@@ -677,19 +677,16 @@ bool Cluster::HandleKey(key_type_t k)
 //    return true;
 //}
 
-string StepList::ToString(bool showVelocity)
+string StepList::ToString(bool fullFormat)
 {
     string result;
-//    m_PosInfo.clear();
     for ( vector<Cluster>::iterator i = m_Clusters.begin(); i != m_Clusters.end(); )
     {
-//        int iStart = result.size();
-        if ( (i - m_Clusters.begin()) % 4 == 0 )
+        if ( fullFormat && (i - m_Clusters.begin()) % 4 == 0 )
             result += " \\\n    ";
-        result += Cluster(*i).ToString(showVelocity);
+        result += Cluster(*i).ToString(fullFormat);
         if ( ++i < m_Clusters.end() )
             result += ", ";
-//        m_PosInfo.push_back(PosInfo(iStart, result.size() - iStart));
     }
     return result;
 }

@@ -80,6 +80,7 @@ enum command_t
     C_PAGE_ONE,
     C_PAGE_TWO,
     C_PAGE_THREE,
+    C_PAGE_HOLD,
 
     C_FEEL,
     C_FEEL_HELP,
@@ -92,7 +93,7 @@ enum command_t
 
     C_MIDI,
     C_MIDI_REAL_TIME,
-    C_MIDI_FULL,
+    C_MIDI_STEP,
     C_MIDI_QUICK,
     C_MIDI_OFF,
 
@@ -166,6 +167,7 @@ unordered_map<string, command_t> gCommandList =
     {"page 2", C_PAGE_TWO},
     {"page three", C_PAGE_THREE},
     {"page 3", C_PAGE_THREE},
+    {"page hold", C_PAGE_HOLD},
 
     {"run", C_RUN},
     {"stop", C_STOP},
@@ -235,9 +237,9 @@ unordered_map<string, command_t> gCommandList =
     {"midi real time", C_MIDI_REAL_TIME},
     {"midi rt", C_MIDI_REAL_TIME},
     {"m rt", C_MIDI_REAL_TIME},
-    {"midi full", C_MIDI_FULL},
-    {"midi f", C_MIDI_FULL},
-    {"m f", C_MIDI_FULL},
+    {"midi step", C_MIDI_STEP},
+    {"midi s", C_MIDI_STEP},
+    {"m s", C_MIDI_STEP},
     {"midi quick", C_MIDI_QUICK},
     {"midi q", C_MIDI_QUICK},
     {"m q", C_MIDI_QUICK},
@@ -480,6 +482,10 @@ bool do_command(string/*const char * */ commandString)
         case C_PAGE_THREE:
             g_Display.SetBigPanelPage(Display::three);
             break;
+        case C_PAGE_HOLD:
+            g_Display.ToggleBigPanelHold();
+            break;
+
 
         case C_CUE  :
         case C_EDIT :
@@ -738,9 +744,9 @@ bool do_command(string/*const char * */ commandString)
             set_status(STAT_POS_2, "Midi Input set to REAL TIME.");
             set_top_line();
             break;
-        case C_MIDI_FULL:
-            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_FULL);
-            set_status(STAT_POS_2, "Midi Input set to FULL mode.");
+        case C_MIDI_STEP:
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_STEP);
+            set_status(STAT_POS_2, "Midi Input set to STEP mode.");
             set_top_line();
             break;
         case C_MIDI_QUICK:

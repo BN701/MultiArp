@@ -490,7 +490,7 @@ void update_pattern_panel()
     try
     {
         bool showTrigProgress = false;
-        vector<PosInfo2> highlights;
+        static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
 
         switch ( g_Display.BigPanelPage() )
         {
@@ -507,13 +507,31 @@ void update_pattern_panel()
         case Display::three:
             wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log(highlights).c_str());
             break;
+        default:
+            break;
         }
 
-        for ( auto it = highlights.begin(); it < highlights.end(); it++ )
+        switch ( g_Display.BigPanelPage() )
         {
-            mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, 0,
-                it->row < 2 ? CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG : CP_PATTERN_LIST_PANEL_HIGHLIGHT,
-                NULL);
+        case Display::one:
+        case Display::two:
+            for ( auto it = highlights.begin(); it < highlights.end(); it++ )
+            {
+                mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, 0,
+                    it->row < 2 ? CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG : CP_PATTERN_LIST_PANEL_HIGHLIGHT,
+                    NULL);
+            }
+            highlights.clear(); // Clear highlights here in case page switches before next update.
+            break;
+        case Display::three:
+            // Row highlighting here depends on the current row position inserted at the front of the list.
+            mvwchgat(g_Display.BigPanel(), highlights.back().row, highlights.back().offset, highlights.back().length, 0, CP_PATTERN_LIST_PANEL, NULL);
+            mvwchgat(g_Display.BigPanel(), highlights.front().row, highlights.front().offset, highlights.front().length, 0, CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, NULL);
+            if ( highlights.size() > 1 )
+                highlights.pop_back();
+            break;
+        default:
+            break;
         }
 
         // Kludge to show overall trig position.

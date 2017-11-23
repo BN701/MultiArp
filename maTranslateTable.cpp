@@ -1011,7 +1011,7 @@ string TranslateDiags::ToString()
     char buff[200];
     string result;
 
-//                              In   Octave   Premap Degree/Actual Chro Final
+    //                          In   Octave   Premap Degree/Actual Chro Final
     sprintf(buff, " %3s %-10.10s %3s  %2i+%-2i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %-12s",
         Note::NoteString(m_Root).c_str(),
         tt_scale_names.at(m_Scale),
@@ -1022,15 +1022,12 @@ string TranslateDiags::ToString()
         Interval(m_DegreeAfterPremap),
         m_DegreeShift,
         m_ModalShift,
-//        Note::NoteNameOnly(m_NoteAfterShift),
         Interval(m_DegreeAfterShift),
         m_Transpose,
         Note::NoteString(m_NoteOut).c_str(),
         m_InScale ? "" : "Accidental");
 
-    m_LastPos = m_Log.size();
     m_Log += buff;
-    m_LastLength = m_Log.size() - m_LastPos;
     m_Log += '\n';
     m_Entries += 1;
 

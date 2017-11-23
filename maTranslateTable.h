@@ -83,8 +83,6 @@ struct TranslateDiags
     accidentals_mode_t m_AccidentalsMode;
 
     int m_Entries = 0;
-    int m_LastPos = 0;
-    int m_LastLength = 0;
 
     int m_Root = -1;
     int m_NoteIn = -1;
@@ -119,7 +117,7 @@ struct TranslateDiags
     std::string & Log(std::vector<PosInfo2> & highlights)
     {
 //        entries = m_Entries;
-        highlights.emplace_back(m_Entries, m_LastPos, m_LastLength);
+        highlights.emplace(highlights.begin(), m_Entries, 0, 80);
         return m_Log;
     }
 

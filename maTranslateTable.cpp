@@ -1006,10 +1006,12 @@ const char * Interval(int n)
         return "-";
 }
 
-string TranslateDiags::ToString()
+string TranslateDiags::UpdateLog()
 {
     char buff[200];
     string result;
+
+    m_InOutPairs.emplace_back(m_NoteIn, m_NoteOut);
 
     //                          In   Octave   Premap Degree/Actual Chro Final
     sprintf(buff, " %3s %-10.10s %3s  %2i+%-2i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %-12s",
@@ -1079,7 +1081,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
         if ( note < 0 )
         {
             m_Diags.m_DegreeAfterPremap = note;
-            m_Diags.ToString();
+            m_Diags.UpdateLog();
             return -1;
         }
     }
@@ -1189,7 +1191,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
         if ( mute )
         {
-            m_Diags.ToString();
+            m_Diags.UpdateLog();
             return -1;
         }
 #if 0
@@ -1208,7 +1210,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     m_Diags.m_DegreeAfterShift = note + shift;
     m_Diags.m_NoteOut = m_Root + octave + note + octaveShift + shift + m_Transpose;
 
-    m_Diags.ToString();
+    m_Diags.UpdateLog();
 
     return m_Root + octave + note + octaveShift + shift + m_Transpose;
 }

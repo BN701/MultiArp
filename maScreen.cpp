@@ -17,15 +17,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <set>
+
+
 #include "maScreen.h"
 
-#include "maState.h"
-#include "maUtility.h"
 #include "maAlsaSequencer.h"
 #include "maAlsaSequencerQueue.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
+#include "maState.h"
 #include "maTranslateTable.h"
+#include "maUtility.h"
 
 using namespace std;
 
@@ -66,6 +69,8 @@ enum colour_pairs
     CP_PATTERN_LIST_PANEL,
     CP_PATTERN_LIST_PANEL_HIGHLIGHT,
     CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG,
+    CP_PIANO_WHITE_KEY,
+    CP_PIANO_BLACK_KEY,
     CP_PROGRESS_BAR_HIGHLIGHT,
     CP_PROGRESS_BAR_BKGND,
     CP_SMALL_PANEL_BKGND,
@@ -114,6 +119,9 @@ Display::Display()
 	init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
 	init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, COLOUR_BRIGHT_GREEN, COLOUR_DARKER_GREY);
 
+	init_pair(CP_PIANO_WHITE_KEY, COLOUR_GREY, COLOUR_DARKER_GREY);
+	init_pair(CP_PIANO_BLACK_KEY, COLOUR_GREY, COLOUR_BLACK);
+
     init_pair(CP_LIST_PANEL_BKGND, COLOUR_GREY, COLOUR_BLACK);
     init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
     init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
@@ -138,7 +146,7 @@ Display::Display()
     wbkgd(m_EditListPanel, COLOR_PAIR(CP_LIST_PANEL_BKGND));
     wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
     wbkgd(m_BigPanel, COLOR_PAIR(CP_PATTERN_LIST_PANEL));
-    wbkgd(m_BigPanelExtra, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
+    wbkgd(m_BigPanelExtra, COLOR_PAIR(CP_PIANO_WHITE_KEY));
 }
 
 
@@ -377,13 +385,89 @@ void update_edit_panels(bool refreshList)
     wrefresh(g_Display.EditSummaryPanel());
 }
 
-void layout_pattern_extra_panel()
+void layout_pattern_extra_panel(vector<InOutPair> & pairs)
 {
-    wmove(g_Display.BigPanelExtra(), 0, 0);
-    wclrtobot(g_Display.BigPanelExtra());
+    const int kbdStart = 29;
+    WINDOW *panel = g_Display.BigPanelExtra();
+    wmove(panel, 0, 0);
+    wclrtobot(panel);
+
+    set<int> ins;
+    set<int> outs;
+
+    if ( !pairs.empty() )
+    {
+        for ( auto it = pairs.begin(); it != pairs.end(); it++ )
+        {
+            if ( it-> m_NoteIn >= 0 )
+            {
+                mvwaddch(panel, 3, it->m_NoteIn - kbdStart, '^');
+                ins.insert(it->m_NoteIn);
+            }
+
+            if ( it->m_NoteOut >= 0 )
+            {
+                mvwaddch(panel, 1, it->m_NoteOut - kbdStart, 'o');
+                outs.insert(it->m_NoteOut);
+            }
+        }
+
+        int first, last;
+        if ( outs.size() > 0 ) // We'll always have an input.
+        {
+            first = min(*(ins.begin()), *(outs.begin()));
+            last = max(*(ins.rbegin()), *(outs.rbegin()));
+        }
+        else
+        {
+            first = *(ins.begin());
+            last = *(ins.rbegin());
+        }
+
+        chtype boxChar = ' ';
+        if ( first == last )
+        {
+            boxChar = ACS_SBSB;
+            mvwaddch(panel, 2, first - kbdStart, boxChar);
+        }
+        else
+        {
+            if ( ins.find(first) != ins.end() && outs.find(first) != outs.end() )
+                boxChar = ACS_SSSB;
+            else if ( ins.find(first) != ins.end() )
+                boxChar = ACS_BSSB;
+            else
+                boxChar = ACS_SSBB;
+
+            mvwaddch(panel, 2, first - kbdStart, boxChar);
+
+            if ( ins.find(last) != ins.end() && outs.find(last) != outs.end() )
+                boxChar = ACS_SBSS;
+            else if ( ins.find(last) != ins.end() )
+                boxChar = ACS_BBSS;
+            else
+                boxChar = ACS_SBBS;
+
+            mvwaddch(panel, 2, last - kbdStart, boxChar);
+        }
+
+        for ( int i = first + 1; i < last; i++ )
+        {
+            if ( ins.find(i) != ins.end() && outs.find(i) != outs.end() )
+                boxChar = ACS_SSSS;
+            else if ( ins.find(i) != ins.end() )
+                boxChar = ACS_BSSS;
+            else if ( outs.find(i) != outs.end() )
+                boxChar = ACS_SSBS;
+            else
+                boxChar = ACS_BSBS;
+
+            mvwaddch(panel, 2, i - kbdStart, boxChar);
+        }
+    }
 
     for ( int row = 0; row < 2; row++ )
-        for ( int col = 0; col < 72; col++ )
+        for ( int col = kbdStart; col < kbdStart + 72; col++ )
             switch ( col % 12 )
             {
             case 1:
@@ -391,13 +475,56 @@ void layout_pattern_extra_panel()
             case 6:
             case 8:
             case 10:
-                mvwchgat(g_Display.BigPanelExtra(), row, col, 1, 0, CP_PATTERN_LIST_PANEL_HIGHLIGHT, NULL);
+                mvwchgat(panel, row, col - kbdStart, 1, 0, CP_PIANO_BLACK_KEY, NULL);
                 break;
             default:
                 break;
             }
 
-    wrefresh(g_Display.BigPanelExtra());
+    mvwchgat(panel, 3, 0, 72, A_BOLD, CP_PIANO_BLACK_KEY, NULL);
+
+    pairs.clear();
+
+    wrefresh(panel);
+}
+
+void layout_pattern_extra_panel_test()
+{
+    WINDOW *panel = g_Display.BigPanelExtra();
+    wmove(panel, 0, 0);
+    wclrtobot(panel);
+
+    for ( int row = 0; row < 3; row++ )
+    {
+        mvwaddch(panel, row, 0,  ACS_BSSB);
+        mvwaddch(panel, row, 2,  ACS_SSBB);
+        mvwaddch(panel, row, 4,  ACS_BBSS);
+        mvwaddch(panel, row, 6,  ACS_SBBS);
+        mvwaddch(panel, row, 8,  ACS_SBSS);
+        mvwaddch(panel, row, 10, ACS_SSSB);
+        mvwaddch(panel, row, 12, ACS_SSBS);
+        mvwaddch(panel, row, 14, ACS_BSSS);
+        mvwaddch(panel, row, 16, ACS_BSBS);
+        mvwaddch(panel, row, 18, ACS_SBSB);
+        mvwaddch(panel, row, 20, ACS_SSSS);
+
+        mvwaddch(panel, row, 22,  ACS_S1		);
+        mvwaddch(panel, row, 24,  ACS_S9		);
+        mvwaddch(panel, row, 26,  ACS_DIAMOND	);
+        mvwaddch(panel, row, 28,  ACS_CKBOARD	);
+        mvwaddch(panel, row, 30,  ACS_DEGREE	);
+        mvwaddch(panel, row, 32,  ACS_PLMINUS	);
+        mvwaddch(panel, row, 34,  ACS_BULLET	);
+        mvwaddch(panel, row, 36,  ACS_LARROW	);
+        mvwaddch(panel, row, 38,  ACS_RARROW	);
+        mvwaddch(panel, row, 40,  ACS_DARROW	);
+        mvwaddch(panel, row, 42,  ACS_UARROW	);
+        mvwaddch(panel, row, 44,  ACS_BOARD	    );
+        mvwaddch(panel, row, 46,  ACS_LANTERN	);
+        mvwaddch(panel, row, 48,  ACS_BLOCK	    );
+    }
+
+    wrefresh(panel);
 }
 
 void update_pattern_panel()
@@ -408,7 +535,6 @@ void update_pattern_panel()
         return;
 
     wmove(g_Display.BigPanel(), 0, 0);
-//    wclrtobot(g_Display.BigPanel());
 
     try
     {
@@ -428,7 +554,8 @@ void update_pattern_panel()
             showTrigProgress = true;
             break;
         case Display::three:
-            layout_pattern_extra_panel();
+//            layout_pattern_extra_panel_test();
+            layout_pattern_extra_panel(g_PatternStore.TranslateTableForPlay().Diags().InOutPairs());
             wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log(highlights).c_str());
             break;
         default:

@@ -76,6 +76,17 @@ class StepList; // Passed as parameter to one of the SetScale() methods.
 
 typedef std::vector<std::vector<int>> matrix_t;
 
+struct InOutPair
+{
+    int m_NoteIn = -1;
+    int m_NoteOut = -1;
+
+    InOutPair(int in, int out):
+        m_NoteIn(in),
+        m_NoteOut(out)
+    {}
+};
+
 struct TranslateDiags
 {
     scale_t m_Scale;
@@ -97,6 +108,9 @@ struct TranslateDiags
     int m_Transpose = 0;
     int m_NoteOut = -1;
 
+    std::vector<InOutPair> m_InOutPairs;
+    std::string m_Log;
+
     void Reset()
     {
         m_Root = -1;
@@ -113,16 +127,16 @@ struct TranslateDiags
         m_NoteOut = -1;
     }
 
-    std::string ToString();
+    std::string UpdateLog();
     std::string & Log(std::vector<PosInfo2> & highlights)
     {
-//        entries = m_Entries;
         highlights.emplace(highlights.begin(), m_Entries, 0, 80);
         return m_Log;
     }
 
+    std::vector<InOutPair> & InOutPairs() { return m_InOutPairs; }
     void ResetLog();
-    std::string m_Log;
+    void ResetPairs() { m_InOutPairs.clear(); }
 };
 
 class TranslateTable : public CursorKeys

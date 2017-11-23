@@ -163,11 +163,15 @@ unordered_map<string, command_t> gCommandList =
 
     {"page one", C_PAGE_ONE},
     {"page 1", C_PAGE_ONE},
+    {"p 1", C_PAGE_ONE},
     {"page two", C_PAGE_TWO},
     {"page 2", C_PAGE_TWO},
+    {"p 2", C_PAGE_TWO},
     {"page three", C_PAGE_THREE},
     {"page 3", C_PAGE_THREE},
+    {"p 3", C_PAGE_THREE},
     {"page hold", C_PAGE_HOLD},
+    {"p hold", C_PAGE_HOLD},
 
     {"run", C_RUN},
     {"stop", C_STOP},

@@ -96,6 +96,7 @@ public:
     bool BigPanelHold() { return m_BigPanelHold; }
 
     WINDOW *BigPanel() { return m_BigPanel; }
+    WINDOW *BigPanelExtra() { return m_BigPanelExtra; }
     WINDOW *SmallPanel() { return m_SmallPanel; }
     WINDOW *ProgressPanel() { return m_ProgressPanel; }
     WINDOW *EditListPanel() { return m_EditListPanel; }
@@ -107,6 +108,7 @@ private:
     WINDOW * m_ProgressPanel = NULL;
     WINDOW * m_EditListPanel = NULL;
     WINDOW * m_EditSummaryPanel = NULL;
+    WINDOW * m_BigPanelExtra = NULL;
 
 
     big_panel_page_t m_BigPanelPage = one;

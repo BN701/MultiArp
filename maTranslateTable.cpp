@@ -994,7 +994,8 @@ int TranslateTable::PreMapScale(int note)
 
 void TranslateDiags::ResetLog()
 {
-    m_Log = "         Input Octave Premap Degree/Actual Chro Final\n";
+    m_Log = "                 In Octave   Premap   Degree/Actual  Trns  Out\n";
+    m_Entries = 0;
 }
 
 const char * Interval(int n)
@@ -1010,16 +1011,13 @@ string TranslateDiags::ToString()
     char buff[200];
     string result;
 
-//                "         Note In Octave Premap Degree/Actual Chro Final";
-    sprintf(buff, "     %3s %-10.10s %3s %2i+%-3i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %s",
+//                              In   Octave   Premap Degree/Actual Chro Final
+    sprintf(buff, " %3s %-10.10s %3s  %2i+%-2i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %-12s",
         Note::NoteString(m_Root).c_str(),
         tt_scale_names.at(m_Scale),
         Note::NoteString(m_NoteIn).c_str(),
         m_Octave,
         m_OctaveShift,
-//        Note::NoteNameOnly(m_NoteIn),
-        Note::NoteString(m_NoteIn).c_str(),
-//        Note::NoteNameOnly(m_NoteAfterPremap),
         Interval(m_Degree),
         Interval(m_DegreeAfterPremap),
         m_DegreeShift,
@@ -1028,10 +1026,13 @@ string TranslateDiags::ToString()
         Interval(m_DegreeAfterShift),
         m_Transpose,
         Note::NoteString(m_NoteOut).c_str(),
-        m_InScale ? "In Scale" : "Accidental");
+        m_InScale ? "" : "Accidental");
 
+    m_LastPos = m_Log.size();
     m_Log += buff;
+    m_LastLength = m_Log.size() - m_LastPos;
     m_Log += '\n';
+    m_Entries += 1;
 
     return buff;
 }
@@ -1042,7 +1043,7 @@ string TranslateDiags::ToString()
 
 int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 {
-
+    m_Diags.Reset();
     m_Diags.m_Root = m_Root;
     m_Diags.m_NoteIn = note;
     m_Diags.m_Transpose = m_Transpose;
@@ -1165,6 +1166,8 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
         int sLower = ShiftSum(dLower, degreeShift);
         int sUpper = ShiftSum(dUpper, degreeShift);
 
+        bool mute = false;
+
         switch ( m_AccidentalsMode )
         {
             case accmode_upper:
@@ -1177,16 +1180,21 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
                 if ( note + sUpper > nLower + sLower )
                     shift = sUpper;
                 else
-                    return -1;
+                    mute = true;
             case lower_mute_if_clash:
                 if ( note + sLower < nUpper + sUpper )
                     shift = sLower;
                 else
-                    return -1;
+                    mute = true;
             default:
                 break;
         }
 
+        if ( mute )
+        {
+            m_Diags.ToString();
+            return -1;
+        }
 #if 0
         // Find next free accidental slot.
 

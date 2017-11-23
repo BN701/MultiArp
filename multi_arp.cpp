@@ -82,7 +82,6 @@ void do_UI_updates()
     if ( g_State.PhaseIsZero() )
     {
         update_pattern_status_panel();
-        g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
     }
 
     // Every step ...
@@ -102,6 +101,8 @@ void do_UI_updates()
 
 void do_phase0_updates()
 {
+    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
+
     g_State.SetCurrentStepValue(g_PatternStore.StepValue());
 
     if ( g_State.NewQuantumPending() )

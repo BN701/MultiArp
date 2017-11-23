@@ -485,7 +485,7 @@ void update_pattern_panel()
         return;
 
     wmove(g_Display.BigPanel(), 0, 0);
-    wclrtobot(g_Display.BigPanel());
+//    wclrtobot(g_Display.BigPanel());
 
     try
     {
@@ -495,15 +495,17 @@ void update_pattern_panel()
         switch ( g_Display.BigPanelPage() )
         {
         case Display::one:
+            wclrtobot(g_Display.BigPanel());
             wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79).c_str());
             showTrigProgress = true;
             break;
         case Display::two:
+            wclrtobot(g_Display.BigPanel());
             wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
             showTrigProgress = true;
             break;
         case Display::three:
-            wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log().c_str());
+            wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log(highlights).c_str());
             break;
         }
 

@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "maCursorKeys.h"
+#include "maNotes.h"
 
 enum accidentals_mode_t
 {
@@ -81,6 +82,10 @@ struct TranslateDiags
     scale_premap_mode_t m_PremapMode;
     accidentals_mode_t m_AccidentalsMode;
 
+    int m_Entries = 0;
+    int m_LastPos = 0;
+    int m_LastLength = 0;
+
     int m_Root = -1;
     int m_NoteIn = -1;
     int m_Degree = -1;
@@ -89,18 +94,35 @@ struct TranslateDiags
     int m_OctaveShift = 0;
     int m_DegreeShift = 0;
     bool m_InScale = true;
-    int m_ModalShift = -1;
-    int m_DegreeAfterShift = -1;
+    int m_ModalShift = 0;
+    int m_DegreeAfterShift = 0;
     int m_Transpose = 0;
     int m_NoteOut = -1;
 
     void Reset()
     {
-        *this = *(new TranslateDiags);
+        m_Root = -1;
+        m_NoteIn = -1;
+        m_Degree = -1;
+        m_Octave = -1;
+        m_DegreeAfterPremap = -1;
+        m_OctaveShift = 0;
+        m_DegreeShift = 0;
+        m_InScale = true;
+        m_ModalShift = 0;
+        m_DegreeAfterShift = 0;
+        m_Transpose = 0;
+        m_NoteOut = -1;
     }
 
     std::string ToString();
-    std::string & Log() { return m_Log; }
+    std::string & Log(std::vector<PosInfo2> & highlights)
+    {
+//        entries = m_Entries;
+        highlights.emplace_back(m_Entries, m_LastPos, m_LastLength);
+        return m_Log;
+    }
+
     void ResetLog();
     std::string m_Log;
 };

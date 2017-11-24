@@ -392,79 +392,108 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
     wmove(panel, 0, 0);
     wclrtobot(panel);
 
-    set<int> ins;
-    set<int> outs;
+    map<int, set<int>> inOutMap;
 
     if ( !pairs.empty() )
     {
+        typedef map<int, set<int>> inOutMap_t;
+        inOutMap_t inOutMap;
+
         for ( auto it = pairs.begin(); it != pairs.end(); it++ )
         {
             if ( it-> m_NoteIn >= 0 )
             {
                 mvwaddch(panel, 3, it->m_NoteIn - kbdStart, '^');
-                ins.insert(it->m_NoteIn);
             }
 
             if ( it->m_NoteOut >= 0 )
             {
                 mvwaddch(panel, 1, it->m_NoteOut - kbdStart, 'o');
-                outs.insert(it->m_NoteOut);
+
+                // Create or update a set of output notes for this input note.
+
+                // This fails silently if the set already exists.
+
+                pair<inOutMap_t::iterator,bool> p = inOutMap.emplace(it->m_NoteIn, initializer_list<int>{});
+
+                // (The previous call is supposed to return the set that was either found or
+                // created but I couldn't work out how to access it using the pair above, so
+                // I just do a standard lookup instead.)
+
+                inOutMap.at(it->m_NoteIn).insert(it->m_NoteOut);
+
             }
         }
 
-        int first, last;
-        if ( outs.size() > 0 ) // We'll always have an input.
-        {
-            first = min(*(ins.begin()), *(outs.begin()));
-            last = max(*(ins.rbegin()), *(outs.rbegin()));
-        }
-        else
-        {
-            first = *(ins.begin());
-            last = *(ins.rbegin());
-        }
+        // For each input note, draw a tree from it's output set.
+        // (Will overwrite each other at the moment.)
 
-        chtype boxChar = ' ';
-        if ( first == last )
+        for ( inOutMap_t::iterator it = inOutMap.begin(); it != inOutMap.end(); it++ )
         {
-            boxChar = ACS_SBSB;
-            mvwaddch(panel, 2, first - kbdStart, boxChar);
-        }
-        else
-        {
-            if ( ins.find(first) != ins.end() && outs.find(first) != outs.end() )
-                boxChar = ACS_SSSB;
-            else if ( ins.find(first) != ins.end() )
-                boxChar = ACS_BSSB;
+            // Input note is in it->first, output set is in it->second. There's
+            // no entry created unless there's at least one output note.
+
+            int lower = min(it->first, *(it->second.begin()));
+            int upper = max(it->first, *(it->second.rbegin()));
+
+            chtype boxChar = '*';
+
+            if ( lower == upper )
+            {
+                // Single vertical bar.
+
+                boxChar = ACS_SBSB;
+                mvwaddch(panel, 2, lower - kbdStart, boxChar);
+            }
             else
-                boxChar = ACS_SSBB;
+            {
+                // Left hand end character.
 
-            mvwaddch(panel, 2, first - kbdStart, boxChar);
+                if ( lower == it->first && it->second.find(lower) != it->second.end() )
+                    boxChar = ACS_SSSB;
+                else if ( lower == it->first )
+                    boxChar = ACS_BSSB;
+                else
+                    boxChar = ACS_SSBB;
 
-            if ( ins.find(last) != ins.end() && outs.find(last) != outs.end() )
-                boxChar = ACS_SBSS;
-            else if ( ins.find(last) != ins.end() )
-                boxChar = ACS_BBSS;
-            else
-                boxChar = ACS_SBBS;
+                mvwaddch(panel, 2, lower - kbdStart, boxChar);
 
-            mvwaddch(panel, 2, last - kbdStart, boxChar);
-        }
+                // Right hand end character.
 
-        for ( int i = first + 1; i < last; i++ )
-        {
-            if ( ins.find(i) != ins.end() && outs.find(i) != outs.end() )
-                boxChar = ACS_SSSS;
-            else if ( ins.find(i) != ins.end() )
-                boxChar = ACS_BSSS;
-            else if ( outs.find(i) != outs.end() )
-                boxChar = ACS_SSBS;
-            else
-                boxChar = ACS_BSBS;
+                if ( upper == it->first && it->second.find(upper) != it->second.end() )
+                    boxChar = ACS_SBSS;
+                else if ( upper == it->first )
+                    boxChar = ACS_BBSS;
+                else
+                    boxChar = ACS_SBBS;
 
-            mvwaddch(panel, 2, i - kbdStart, boxChar);
+                mvwaddch(panel, 2, upper - kbdStart, boxChar);
+            }
+
+            // Draw the bits in between.
+
+            for ( int i = lower + 1; i < upper; i++ )
+            {
+                if ( i == it->first && it->second.find(i) != it->second.end() )
+                    boxChar = ACS_SSSS;
+                else if ( i == it->first )
+                    boxChar = ACS_BSSS;
+                else if ( it->second.find(i) != it->second.end() )
+                    boxChar = ACS_SSBS;
+                else
+                    boxChar = ACS_BSBS;
+
+                mvwaddch(panel, 2, i - kbdStart, boxChar);
+            }
         }
     }
+
+    // Layout the keyboard pattern.
+
+    // It seems we can't set special (box) characters without mucking
+    // up the attributes - attrset() didn't have any effect - and if we
+    // use mvchgat() to set an attribute over a box character, we meess
+    // up the character as well.
 
     for ( int row = 0; row < 2; row++ )
         for ( int col = kbdStart; col < kbdStart + 72; col++ )
@@ -480,6 +509,8 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
             default:
                 break;
             }
+
+    // Make the fourth row black.
 
     mvwchgat(panel, 3, 0, 72, A_BOLD, CP_PIANO_BLACK_KEY, NULL);
 

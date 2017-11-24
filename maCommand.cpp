@@ -38,6 +38,7 @@ using namespace std;
 // Global objects.
 
 extern AlsaSequencer g_Sequencer;
+extern CursorKeys g_CursorKeys;
 extern State g_State;
 extern PatternStore g_PatternStore;
 extern Display g_Display;
@@ -413,7 +414,10 @@ void do_help(string topicName)
             break;
 
         case C_NONE :
-            set_status(STAT_POS_2, "Topics: 'control', 'pattern', 'misc' or try a command name");
+            if ( g_CursorKeys.MenuActive() )
+                set_status(STAT_POS_2, g_CursorKeys.Help().c_str());
+            else
+                set_status(STAT_POS_2, "Topics: 'control', 'pattern', 'misc' or try a command name");
             break;
         default:
             break;

@@ -39,6 +39,26 @@ struct ArpeggioStage
         m_Steps(steps)
     {}
 
+    void Increment(bool shift)
+    {
+        if ( shift )
+            m_Steps += 1;
+        else
+            m_Interval += 1;
+    }
+
+    void Decrement(bool shift)
+    {
+        if ( shift )
+        {
+            if ( m_Steps > 1 )
+                m_Steps -= 1;
+        }
+        else
+            m_Interval -= 1;
+    }
+
+
     bool Step(int & interval, bool stepNext)
     {
         interval += m_Interval * m_Position;
@@ -79,6 +99,8 @@ class TrigRepeater : public CursorKeys
         double VelocityDecay() { return m_VelocityDecay; }
         void SetDecayMode( decay_mode_t val ) { m_DecayMode = val; }
         decay_mode_t DecayMode() { return m_DecayMode; }
+
+        void NextVelocityDecayMode( int dir );
 
         std::vector<ArpeggioStage> & Arpeggio() { return m_Arpeggio; }
 
@@ -147,6 +169,8 @@ class TrigListItem : public CursorKeys
             tlif_mute,
             tlif_repeats,
             tlif_repeat_time,
+            tlif_decay_mode,
+            tlif_velocity_decay,
             number_tlif_types
         };
 

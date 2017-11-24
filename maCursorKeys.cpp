@@ -41,6 +41,11 @@ CursorKeys::~CursorKeys()
         m_Focus = NULL;
 }
 
+bool CursorKeys::MenuActive()
+{
+    return m_Focus != NULL;
+}
+
 bool CursorKeys::RouteKey(key_type_t k)
 {
     if ( m_Focus != NULL )
@@ -55,6 +60,14 @@ std::string & CursorKeys::Status()
 {
     if ( m_Focus != NULL )
         return m_Focus->m_Status;
+    else
+        return g_EmptyStatus;
+}
+
+std::string & CursorKeys::Help()
+{
+    if ( m_Focus != NULL )
+        return m_Focus->m_Help;
     else
         return g_EmptyStatus;
 }

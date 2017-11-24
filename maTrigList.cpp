@@ -26,6 +26,7 @@ using namespace std;
 TrigList::TrigList()
 {
     //ctor
+    m_Help = "S-L/R: add trig stage, C-L/R: copy trig stage, S-Del: delete ";
 }
 
 TrigList::~TrigList()
@@ -86,22 +87,6 @@ bool TrigList::HandleKey(key_type_t k)
         if ( m_PosEdit < m_TrigItems.size() - 1 )
             m_PosEdit += 1;
         break;
-
-//    case up:
-//        if ( m_ReturnFocus != NULL )
-//        {
-//            m_ReturnFocus->HandleKey(right);
-//            m_ReturnFocus->HandleKey(enter);
-//        }
-//        return true;
-//
-//    case down:
-//        if ( m_ReturnFocus != NULL )
-//        {
-//            m_ReturnFocus->HandleKey(left);
-//            m_ReturnFocus->HandleKey(enter);
-//        }
-//        return true;
 
     case ctrl_left:
         if ( !m_TrigItems.empty() )

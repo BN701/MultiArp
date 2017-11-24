@@ -251,11 +251,6 @@ void queue_next_step(int queueId)
         if ( noteNumber < 0 )
             continue;
 
-//        noteNumber = translator.Translate(noteNumber);
-//
-//        if ( noteNumber < 0 )
-//            continue;
-
         unsigned char noteVelocity;
 
         if ( note.m_NoteVelocity > 0 )

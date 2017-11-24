@@ -90,7 +90,7 @@ class CursorKeys
             m_ReturnFocus = NULL;
         }
 
-        // These two must overriden.
+        // These two must be overriden.
 
         virtual void SetStatus() {}
         virtual bool HandleKey(key_type_t k) { return false; };
@@ -98,8 +98,10 @@ class CursorKeys
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
 
+        static bool MenuActive();
         static bool RouteKey(key_type_t k);
         static std::string & Status();
+        static std::string & Help();
         static bool FirstField();
         static std::vector<screen_pos_t> & GetHighlights();
         static std::vector<screen_pos_t> & GetFieldPositions();
@@ -117,6 +119,7 @@ class CursorKeys
 //        virtual bool HandleKey(key_type_t k) { return false; };
 
         std::string m_Status;
+        std::string m_Help;
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.
 

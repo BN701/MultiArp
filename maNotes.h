@@ -105,7 +105,9 @@ struct Cluster : public CursorKeys
 
     Cluster():
         m_StepLength(1)
-    { }
+    {
+        m_Help = "S-Left/Right: insert note, C-Left/Right: copy note, S-Del: delete";
+    }
 
     Cluster & operator+=(const Cluster & rhs)
     {
@@ -159,6 +161,7 @@ struct StepList : public CursorKeys
         m_LastRequestedPos(0),
         m_Complete(false)
     {
+        m_Help = "S-Left/Right: insert cluster, C-Left/Right: copy cluster, S-Del: delete";
     }
 
     ~StepList()
@@ -266,7 +269,9 @@ struct RealTimeList : public CursorKeys
     RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
         m_QuantumAtCapture(quantum),
         m_RealTimeList(realTimeList)
-    {};
+    {
+        m_Help = "S-Del: delete note, C-Del: UNDO delete!, Up/Down: move note";
+    }
 
     void FromString(std::string s);
     std::string ToString();

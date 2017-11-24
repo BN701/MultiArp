@@ -78,6 +78,15 @@ void TrigRepeater::ArpeggioFromString(std::string s)
 
 }
 
+void TrigRepeater::NextVelocityDecayMode( int dir )
+{
+    int m = static_cast<int>(m_DecayMode) + dir;
+
+    if ( m >= 0 && m < static_cast<int>(num_decay_modes) )
+        m_DecayMode = static_cast<decay_mode_t>(m);
+}
+
+
 void TrigRepeater::Reset(/*int noteNumber,*/ int noteVelocity)
 {
     m_Steps = m_Repeats;
@@ -90,8 +99,16 @@ void TrigRepeater::Reset(/*int noteNumber,*/ int noteVelocity)
 
 bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & noteVelocity)
 {
-    if ( m_Steps == 0 )
-        return false;
+    switch ( m_DecayMode )
+    {
+    case exponential_unlimited:
+    case linear_unlimited:
+        break;
+    default:
+        if ( m_Steps == 0 )
+            return false;
+        break;
+    }
 
     queue_delta += m_RepeatTimeMicroSecs;
 
@@ -136,6 +153,7 @@ bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & n
 TrigListItem::TrigListItem()
 {
     //ctor
+    m_Help = "S-L/R: add arp stage. S-Del: delete. Up/Dn: interval, S-Up/Dn: steps";
 }
 
 TrigListItem::~TrigListItem()
@@ -433,7 +451,7 @@ void TrigListItem::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "[Trigs] ";
+    m_Status = "[Trig] ";
 
     pos = m_Status.size();
     m_Status += TrigMaskToString();
@@ -484,6 +502,36 @@ void TrigListItem::SetStatus()
         m_Status +=  "Off";
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
+    m_Status += ", Decay Mode ";
+    pos = m_Status.size();
+    m_Status += tr_decay_mode_names.at(m_Repeater.DecayMode());
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += ", Vel Decay ";
+    pos = m_Status.size();
+    if ( lround(100 * m_Repeater.VelocityDecay()) > 0 )
+    {
+        sprintf(buff, "%.2f", m_Repeater.VelocityDecay());
+        m_Status += buff;
+    }
+    else
+        m_Status +=  "Off";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    if ( !m_Repeater.Arpeggio().empty() )
+    {
+        m_Status += " Arp (interval/steps): ";
+        for ( auto it = m_Repeater.Arpeggio().begin(); it != m_Repeater.Arpeggio().end(); )
+        {
+            sprintf(buff, "%i/%i", it->m_Interval, it->m_Steps);
+            pos = m_Status.size();
+            m_Status += buff;
+            m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+            if ( ++it != m_Repeater.Arpeggio().end() )
+                m_Status += ' ';
+        }
+    }
+
     m_Highlights.push_back(m_FieldPositions.at(m_TrigListItemFocus));
 
 }
@@ -491,7 +539,10 @@ void TrigListItem::SetStatus()
 bool TrigListItem::HandleKey(key_type_t k)
 {
     bool newTrigs = false;
+    bool shift = false;
     double inc = 0.1;
+
+    vector<ArpeggioStage> & arp = m_Repeater.Arpeggio();
 
     switch ( k )
     {
@@ -507,11 +558,45 @@ bool TrigListItem::HandleKey(key_type_t k)
         break;
 
     case right:
-        if ( m_TrigListItemFocus < number_tlif_types - 1 )
+        if ( m_TrigListItemFocus < number_tlif_types + arp.size() - 1 )
             m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus + 1);
         break;
 
+    case shift_left:
+        if ( arp.empty() )
+        {
+            arp.emplace_back();
+            m_TrigListItemFocus = number_tlif_types;
+        }
+        else
+            arp.insert(arp.begin() + m_TrigListItemFocus - number_tlif_types, *(new ArpeggioStage(1,1)));
+        break;
+
+    case shift_delete:
+        if ( !arp.empty() )
+        {
+            int index = m_TrigListItemFocus - number_tlif_types;
+            arp.erase(arp.begin() + index);
+            if ( index == arp.size() )
+                m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus - 1);
+        }
+        break;
+
+    case shift_right:
+        if ( arp.empty() )
+        {
+            arp.emplace_back();
+            m_TrigListItemFocus = number_tlif_types;
+        }
+        else
+        {
+            arp.insert(arp.begin() + m_TrigListItemFocus - number_tlif_types + 1, *(new ArpeggioStage(1,1)));
+            m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus + 1);
+        }
+        break;
+
     case shift_up:
+        shift = true;
         inc = 0.01;
     case up:
         switch ( m_TrigListItemFocus )
@@ -535,12 +620,23 @@ bool TrigListItem::HandleKey(key_type_t k)
         case tlif_repeat_time:
             m_Repeater.SetRepeatTime(m_Repeater.RepeatTime() + inc);
             break;
+        case tlif_velocity_decay:
+            m_Repeater.SetVelocityDecay(m_Repeater.VelocityDecay() + inc);
+            break;
+        case tlif_decay_mode:
+            m_Repeater.NextVelocityDecayMode(-1);
+            break;
         default:
+            {
+                int index = m_TrigListItemFocus - number_tlif_types;
+                arp.at(index).Increment(shift);
+            }
             break;
         }
         break;
 
     case shift_down:
+        shift = true;
         inc = 0.01;
     case down:
         switch ( m_TrigListItemFocus )
@@ -571,16 +667,19 @@ bool TrigListItem::HandleKey(key_type_t k)
             if ( m_Repeater.RepeatTime() < 0 )
                 m_Repeater.SetRepeatTime(0);
             break;
-//        case tlif_repeats:
-//            if ( m_Repeats > 0 )
-//                m_Repeats -= 1;
-//            break;
-//        case tlif_repeat_time:
-//            m_RepeatTime -= inc;
-//            if ( m_RepeatTime < 0 )
-//                m_RepeatTime = 0.0;
-//            break;
+        case tlif_velocity_decay:
+            m_Repeater.SetVelocityDecay(m_Repeater.VelocityDecay() - inc);
+            if ( m_Repeater.VelocityDecay() < 0 )
+                m_Repeater.SetVelocityDecay(0);
+            break;
+        case tlif_decay_mode:
+            m_Repeater.NextVelocityDecayMode(1);
+            break;
         default:
+            {
+                int index = m_TrigListItemFocus - number_tlif_types;
+                arp.at(index).Decrement(shift);
+            }
             break;
         }
         break;

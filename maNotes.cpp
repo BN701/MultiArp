@@ -655,28 +655,6 @@ bool Cluster::HandleKey(key_type_t k)
 //
 //////////////////////////////////////////////////////////////////////////
 
-
-//bool StepList::PlayPositionInfo(int & offset,  int & length)
-//{
-//    if ( m_LastRequestedPos >= m_PosInfo.size() )
-//        return false;
-//
-//    /*
-//        Why m_LastRequestedPos?
-//
-//        Display updates are triggered just before a set of events is
-//        about to be scheduled. m_Pos always points to the next
-//        item to be used, but we need to display info about what just
-//        happened. Hence we need store a 'previous' pointer, too.
-//
-//     */
-//
-//    offset = m_PosInfo.at(m_LastRequestedPos).offset;
-//    length = m_PosInfo.at(m_LastRequestedPos).length;
-//
-//    return true;
-//}
-
 string StepList::ToString(bool fullFormat)
 {
     string result;

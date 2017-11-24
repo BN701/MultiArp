@@ -397,3 +397,46 @@ Step List 1  \
     C5:127:0.000:0.000, D5:127:0.000:0.000, E5:127:0.000:0.000, F5:127:0.000:0.000,  \
     G5:127:0.000:0.000, A5:127:0.000:0.000, B5:127:0.000:0.000, C6:127:0.000:0.000
 
+
+========== Test Output with arpeggio ===================================================
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 16.00
+
+<< Pattern Store >>
+
+Pattern Chain empty.
+
+Store Pattern Chain Mode 0
+Store Reset on pattern change On
+Store Edit focus follows play On
+Store Use Pattern Play Data Off
+
+<< Pattern Default >>
+
+Default Step Value 2.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs  \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 3 Repeat Time 0.000 \
+      Velocity Decay 0.000 Decay Mode 'off' Arp Stages {1/4 3/2 -2/2},  \
+    Trig Mask 1 Multiplier 1.000 Skip 'Off' Mute 'Off' Repeats 4 Repeat Time 0.000 \
+      Velocity Decay 0.000 Decay Mode 'off'
+Step List 1  \
+    C5:127:0.000:0.000, D5:127:0.000:0.000, E5:127:0.000:0.000, F5:127:0.000:0.000,  \
+    G5:127:0.000:0.000, A5:127:0.000:0.000, B5:127:0.000:0.000, C6:127:0.000:0.000
+

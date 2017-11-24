@@ -28,6 +28,23 @@
 using namespace std;
 
 //
+// ArepeggioStage
+//
+//////////////////////////////////////////////////////////////
+
+
+void ArpeggioStage::FromString(std::string s)
+{
+    vector<string> tokens = split(s.c_str(), '/');
+
+    if ( tokens.size() < 0 )
+        return;
+
+    m_Interval = stoi(tokens.at(0));
+    m_Steps = stoi(tokens.at(1));
+}
+
+//
 // TrigRepeater
 //
 //////////////////////////////////////////////////////////////
@@ -44,10 +61,26 @@ void TrigRepeater::Init(double tempo, double stepLengthMilliSecs)
 
 }
 
+void TrigRepeater::ArpeggioFromString(std::string s)
+{
+    vector<string> tokens = split(s.c_str());
+
+    if ( tokens.size() == 0 )
+        return;
+
+    m_Arpeggio.clear();
+
+    for ( auto it = tokens.begin(); it != tokens.end(); it++ )
+    {
+        m_Arpeggio.emplace_back();
+        m_Arpeggio.back().FromString(*it);
+    }
+
+}
+
 void TrigRepeater::Reset(/*int noteNumber,*/ int noteVelocity)
 {
     m_Steps = m_Repeats;
-//    m_NoteNumber = noteNumber;
     m_NoteVelocity = noteVelocity;
     m_VelocityDecrement = m_NoteVelocity * (1 - m_VelocityDecay);
 
@@ -92,27 +125,6 @@ bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & n
     for ( auto it = m_Arpeggio.begin(); it < m_Arpeggio.end(); it ++ )
         stepNext = it->Step(interval, stepNext);
 
-//    bool stepNext = true;
-//    interval = 0;
-//
-//    for ( int i = 0; i < m_Arpeggio.size(); i ++ )
-//    {
-//        ArpeggioStage & s = m_Arpeggio.at(i);
-//        interval += s.m_Interval * s.m_Position;
-//
-//        if ( stepNext )
-//        {
-//            s.m_Position += 1;
-//            if ( s.m_Position == s.m_Steps )
-//            {
-//                s.m_Position = 0;
-//                stepNext = true;
-//            }
-//            else
-//                stepNext = false;
-//        }
-//    }
-
     return noteVelocity > 0;
 }
 
@@ -131,6 +143,33 @@ TrigListItem::~TrigListItem()
     //dtor
 }
 
+unordered_map<TrigRepeater::decay_mode_t, const char *> tr_decay_mode_names =
+{
+    {TrigRepeater::off, "off"},
+    {TrigRepeater::exponential, "exponential"},
+    {TrigRepeater::linear, "linear"},
+    {TrigRepeater::exponential_unlimited, "exponential-unlimited"},
+    {TrigRepeater::linear_unlimited, "linear-unlimited"}
+};
+
+TrigRepeater::decay_mode_t tr_decay_mode_lookup(string s)
+{
+    static unordered_map<string, TrigRepeater::decay_mode_t> map;
+
+    // Initialize on first use.
+
+    if ( map.size() == 0 )
+        for ( TrigRepeater::decay_mode_t m = static_cast<TrigRepeater::decay_mode_t>(0);
+              m < TrigRepeater::num_decay_modes;
+              m = static_cast<TrigRepeater::decay_mode_t>(static_cast<int>(m) + 1) )
+        {
+            map.insert(std::make_pair(tr_decay_mode_names.at(m), m));
+        }
+
+    return map.at(s);
+}
+
+
 enum tli_element_names_t
 {
     tli_trig_mask,
@@ -139,6 +178,9 @@ enum tli_element_names_t
     tli_mute,
     tli_repeats,
     tli_repeat_time,
+    tli_velocity_decay,
+    tli_decay_mode,
+    tli_arpeggio,
     num_tli_element_names
 };
 
@@ -150,6 +192,9 @@ unordered_map<tli_element_names_t, const char *> tli_element_names = {
     {tli_mute, "Mute"},
     {tli_repeats, "Repeats"},
     {tli_repeat_time, "Repeat Time"},
+    {tli_velocity_decay, "Velocity Decay"},
+    {tli_decay_mode, "Decay Mode"},
+    {tli_arpeggio, "Arp Stages"},
     {num_tli_element_names, ""}
 };
 
@@ -158,7 +203,9 @@ string TrigListItem::ToString()
 {
     char buff[200];
 
-    sprintf(buff, "%s %i %s %.3f %s '%s' %s '%s' %s %i %s %.3f",
+    string result;
+
+    sprintf(buff, "%s %i %s %.3f %s '%s' %s '%s' %s %i %s %.3f \\\n",
             tli_element_names.at(tli_trig_mask), m_TrigMask,
             tli_element_names.at(tli_multiplier), m_Multiplier,
             tli_element_names.at(tli_skip), m_Skip ? "On" : "Off",
@@ -166,8 +213,29 @@ string TrigListItem::ToString()
             tli_element_names.at(tli_repeats), m_Repeater.Repeats(),
             tli_element_names.at(tli_repeat_time), m_Repeater.RepeatTime()
             );
+    result += buff;
 
-    return buff;
+    sprintf(buff, "      %s %.3f %s '%s'",
+            tli_element_names.at(tli_velocity_decay), m_Repeater.VelocityDecay(),
+            tli_element_names.at(tli_decay_mode), tr_decay_mode_names.at(m_Repeater.DecayMode())
+            );
+    result += buff;
+
+    if ( !m_Repeater.Arpeggio().empty() )
+    {
+        sprintf(buff, " %s {", tli_element_names.at(tli_arpeggio));
+        result += buff;
+        for ( auto it = m_Repeater.Arpeggio().begin(); it != m_Repeater.Arpeggio().end(); )
+        {
+            sprintf(buff, "%i/%i", it->m_Interval, it->m_Steps);
+            result += buff;
+            if ( ++it != m_Repeater.Arpeggio().end() )
+                result += ' ';
+        }
+        result += "}";
+    }
+
+    return result;
 }
 
 void TrigListItem::FromString(string s)
@@ -199,10 +267,19 @@ void TrigListItem::FromString(string s)
                 m_Mute = token == "on";
                 break;
             case tli_repeats:
-                m_Repeater.SetRepeats( stoi(token) );
+                m_Repeater.SetRepeats(stoi(token));
                 break;
             case tli_repeat_time:
-                m_Repeater.SetRepeatTime( stod(token) );
+                m_Repeater.SetRepeatTime(stod(token));
+                break;
+            case tli_velocity_decay:
+                m_Repeater.SetVelocityDecay(stod(token));
+                break;
+            case tli_decay_mode:
+                m_Repeater.SetDecayMode(tr_decay_mode_lookup(token));
+                break;
+            case tli_arpeggio:
+                m_Repeater.ArpeggioFromString(token);
                 break;
             default:
                 break;

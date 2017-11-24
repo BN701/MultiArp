@@ -31,6 +31,9 @@ struct ArpeggioStage
     int m_Interval = 1;
     int m_Steps = 0;
 
+    ArpeggioStage()
+    {}
+
     ArpeggioStage(int interval, int steps):
         m_Interval(interval),
         m_Steps(steps)
@@ -50,27 +53,14 @@ struct ArpeggioStage
         }
         return false;
     }
+
+    void FromString(std::string s);
 };
 
 
 class TrigRepeater : public CursorKeys
 {
     public:
-        void SetRepeats( int val ) { m_Repeats = val; }
-        int Repeats() { return m_Repeats; }
-        void SetRepeatTime( double val ) { m_RepeatTime = val; }
-        double RepeatTime() { return m_RepeatTime; }
-
-        void Init(double tempo, double stepLengthMilliSecs);
-        void Reset(/*int noteNumber, */int noteVelocity);
-        bool Step(int64_t & queue_delta, int & interval, unsigned char & velocity);
-
-        void AddArpStage(int interval, int steps)
-        {
-            m_Arpeggio.push_back(ArpeggioStage(interval, steps));
-        }
-
-    private:
         enum decay_mode_t
         {
             off,
@@ -81,6 +71,31 @@ class TrigRepeater : public CursorKeys
             num_decay_modes
         };
 
+        void SetRepeats( int val ) { m_Repeats = val; }
+        int Repeats() { return m_Repeats; }
+        void SetRepeatTime( double val ) { m_RepeatTime = val; }
+        double RepeatTime() { return m_RepeatTime; }
+        void SetVelocityDecay( double val) {m_VelocityDecay = val; }
+        double VelocityDecay() { return m_VelocityDecay; }
+        void SetDecayMode( decay_mode_t val ) { m_DecayMode = val; }
+        decay_mode_t DecayMode() { return m_DecayMode; }
+
+        std::vector<ArpeggioStage> & Arpeggio() { return m_Arpeggio; }
+
+        void Init(double tempo, double stepLengthMilliSecs);
+        void Reset(int noteVelocity);
+        bool Step(int64_t & queue_delta, int & interval, unsigned char & velocity);
+
+        void ArpeggioFromString(std::string s);
+
+        void AddArpStage(int interval, int steps)
+        {
+            m_Arpeggio.push_back(ArpeggioStage(interval, steps));
+        }
+
+    private:
+        // Persistent variables
+
         int m_Steps = 0;
         int m_Repeats = 0;
         double m_RepeatTime = 0.0; // Zero means split evenly across step.
@@ -89,9 +104,9 @@ class TrigRepeater : public CursorKeys
 
         std::vector<ArpeggioStage> m_Arpeggio;
 
-        // Working data.
+        // Working variables
+
         int64_t m_RepeatTimeMicroSecs = 0;
-//        double m_NoteNumber = 0;
         double m_NoteVelocity = 0;
         double m_VelocityDecrement = 0;
 

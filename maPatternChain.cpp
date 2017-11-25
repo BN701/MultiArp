@@ -28,6 +28,7 @@ using namespace std;
 PatternChain::PatternChain()
 {
     //ctor
+    m_Help = "S-Left/Right: new item at end of list, S-Del: delete current item";
 }
 
 PatternChain::~PatternChain()
@@ -213,6 +214,15 @@ bool PatternChain::HandleKey(key_type_t k)
         break;
     case up:
     case down:
+        break;
+
+    case shift_left:
+    case shift_right:
+        New();
+        break;
+
+    case shift_delete:
+        Delete();
         break;
 
     default:

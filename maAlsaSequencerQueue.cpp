@@ -20,8 +20,8 @@
 #include "maAlsaSequencerQueue.h"
 
 AlsaSequencerQueue::AlsaSequencerQueue():
-    mSeqHandle(NULL),
-    mQueueId(-1)
+    m_SeqHandle(NULL),
+    m_QueueId(-1)
 {
 }
 
@@ -31,8 +31,8 @@ int AlsaSequencerQueue::Create(snd_seq_t * h, int pool_size)
     // these items are kept in a pre-allocated vector<> and maybe
     // copied and destroyed at times we can't control.
 
-    mSeqHandle = h;
-    mQueueId = snd_seq_alloc_queue(mSeqHandle);
+    m_SeqHandle = h;
+    m_QueueId = snd_seq_alloc_queue(m_SeqHandle);
 
     /*
         From the original example notes by Matthias Nagorni:
@@ -56,7 +56,7 @@ int AlsaSequencerQueue::Create(snd_seq_t * h, int pool_size)
 
     // snd_seq_set_client_pool_output(seq_handle, (seq_len<<1) + 4);
 
-    return mQueueId;
+    return m_QueueId;
 }
 
 AlsaSequencerQueue::~AlsaSequencerQueue()
@@ -65,14 +65,14 @@ AlsaSequencerQueue::~AlsaSequencerQueue()
 
     // clear_queue();
     // sleep(2);
-    snd_seq_stop_queue(mSeqHandle, mQueueId, NULL);
-    snd_seq_free_queue(mSeqHandle, mQueueId);
+    snd_seq_stop_queue(m_SeqHandle, m_QueueId, NULL);
+    snd_seq_free_queue(m_SeqHandle, m_QueueId);
 }
 
 bool AlsaSequencerQueue::Start()
 {
-    snd_seq_start_queue(mSeqHandle, mQueueId, NULL);
-    snd_seq_drain_output(mSeqHandle); // I still don't know what this does (can't find any docs for it)
+    snd_seq_start_queue(m_SeqHandle, m_QueueId, NULL);
+    snd_seq_drain_output(m_SeqHandle); // I still don't know what this does (can't find any docs for it)
 
     // TODO: How do we check for success here?
 

@@ -39,6 +39,7 @@ FeelMap::FeelMap():
     m_EditPoint(1)
 {
     //ctor
+    m_Help = "S-Left/Right: insert point, S-Del: delete, (S-)Up/Dn: change value";
 #if LOG_ON
     fLog.open("FeelMap.log");
 #endif
@@ -239,32 +240,97 @@ void FeelMap::SetStatus()
 
 bool FeelMap::HandleKey(key_type_t k)
 {
-    if ( ! m_Active || m_EditPoint == 0 || m_EditPoint == m_StretchPoints.size() - 1 )
+    if ( ! m_Active /*|| m_EditPoint == 0 || m_EditPoint == m_StretchPoints.size() - 1*/ )
         return true;
 
-    int tEditPoint = m_EditPoint;
+    // A couple of klunky steps to get things started. (This code was first
+    // written before I started using shift/ctrl to add elements to lists.)
+
+    if ( m_StretchPoints.empty() )
+    {
+        if ( k == shift_left || k == shift_right )
+        {
+            m_StretchPoints.push_back(0.0);
+            m_StretchPoints.push_back(1.0);
+            SetStatus();
+        }
+        return true;
+    }
+
+    if ( m_StretchPoints.size() < 3 )
+    {
+        if ( k == shift_left || k == shift_right )
+        {
+            m_EditPoint = 0;
+            Add();
+            SetStatus();
+        }
+        return true;
+    }
+
+
+//    int tEditPoint = m_EditPoint;
     double tStretchPoint = m_StretchPoints.at(m_EditPoint);
+    double inc = 0.1;
 
     switch ( k )
     {
-
     case left:
-    case right:
-        if ( k == left )
-            tEditPoint -= 1;
-        else
-            tEditPoint += 1;
-        if ( tEditPoint >= 1 && tEditPoint < m_StretchPoints.size() - 1 )
-            m_EditPoint = tEditPoint;
+        if ( m_EditPoint > 1 )
+            m_EditPoint -= 1;
         break;
+    case right:
+        if ( m_EditPoint < m_StretchPoints.size() - 2 )
+            m_EditPoint += 1;
+        break;
+
+//    case left:
+//    case right:
+//        if ( k == left )
+//            tEditPoint -= 1;
+//        else
+//            tEditPoint += 1;
+//        if ( tEditPoint >= 1 && tEditPoint < m_StretchPoints.size() - 1 )
+//            m_EditPoint = tEditPoint;
+//        break;
+
+    case shift_up:
+        inc = 0.01;
     case up:
-    case down:
-        if ( k == up )
-            tStretchPoint += 0.01;
-        else
-            tStretchPoint -= 0.01;
-        if ( tStretchPoint > m_StretchPoints.at(m_EditPoint -1) && tStretchPoint < m_StretchPoints.at(m_EditPoint + 1) )
+        tStretchPoint += inc;
+        if ( tStretchPoint < m_StretchPoints.at(m_EditPoint + 1) )
             m_StretchPoints.at(m_EditPoint) = tStretchPoint;
+        break;
+
+    case shift_down:
+        inc = 0.01;
+    case down:
+        tStretchPoint -= inc;
+        if ( tStretchPoint > m_StretchPoints.at(m_EditPoint -1) )
+            m_StretchPoints.at(m_EditPoint) = tStretchPoint;
+        break;
+
+//    case up:
+//    case down:
+//        if ( k == up )
+//            tStretchPoint += 0.01;
+//        else
+//            tStretchPoint -= 0.01;
+//        if ( tStretchPoint > m_StretchPoints.at(m_EditPoint -1) && tStretchPoint < m_StretchPoints.at(m_EditPoint + 1) )
+//            m_StretchPoints.at(m_EditPoint) = tStretchPoint;
+//        break;
+
+    case shift_left:
+        m_EditPoint -= 1;
+        Add();
+        break;
+
+    case shift_right:
+        Add();
+        break;
+
+    case shift_delete:
+        Remove();
         break;
 
     default:

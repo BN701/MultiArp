@@ -677,7 +677,7 @@ bool do_command(string/*const char * */ commandString)
             show_status_after_navigation();
             break;
         case C_FEEL_HELP:
-            throw string("feel new[list]|add|remove|respace|bypass");
+            throw string("feel new[list]|on|off|add|remove|respace|bypass");
             break;
         case C_FEEL_ON:
             g_PatternStore.FeelMapForEdit().SetActive(true);

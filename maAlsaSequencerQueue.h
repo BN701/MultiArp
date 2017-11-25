@@ -35,15 +35,15 @@ class AlsaSequencerQueue
          * \return The current value of m_queueId
          */
 
-        int GetQueueId() { return mQueueId; }
+        int GetQueueId() { return m_QueueId; }
 
         int Create(snd_seq_t * h, int pool_size);
 
         bool Start();
 
     protected:
-        snd_seq_t *mSeqHandle;
-        int mQueueId; //!< Member variable "qeueId"
+        snd_seq_t *m_SeqHandle;
+        int m_QueueId; //!< Member variable "qeueId"
 
     private:
 };

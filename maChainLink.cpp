@@ -18,6 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "maChainLink.h"
+#include "maPatternChain.h"
 #include "maUtility.h"
 
 using namespace std;
@@ -25,6 +26,7 @@ using namespace std;
 ChainLink::ChainLink()
 {
     //ctor
+    m_Help = "In PC mode, enter number on command line to jump to stage.";
 }
 
 ChainLink::~ChainLink()
@@ -139,7 +141,7 @@ void ChainLink::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "Chain Slot %02i - ", m_ItemID);
+    sprintf(buff, "[Chain Slot %02i] ", m_ItemID);
     m_Status = buff;
 
     m_Status += "Pattern ";
@@ -170,23 +172,38 @@ void ChainLink::SetStatus()
         m_Status += "(off)";
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
+    m_Status += ' ';
+    pos = m_Status.size();
+    m_Status += "Jump Here";
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+
     m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
 bool ChainLink::HandleKey(key_type_t k)
 {
-
     switch ( k )
     {
     case enter:
+        if ( m_PosEdit == 3 && m_Parent != NULL )
+        {
+            m_Parent->at(m_Parent->PosPlay()).ClearRemaining();
+            m_Parent->SetJumpOverride(m_ItemID - 1);
+        }
+        else
+            ReturnFocus();
+        break;
+
+    case back_space:
         ReturnFocus();
         break;
+
     case left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
     case right:
-        if ( m_PosEdit < 2 )
+        if ( m_PosEdit < 3 )
             m_PosEdit += 1;
         break;
     case up:

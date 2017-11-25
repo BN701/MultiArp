@@ -138,14 +138,14 @@ bool PatternStore::HandleKey(key_type_t k)
 
     case left:
         temp = static_cast<int>(m_PatternStoreFocus) - 1;
-        if ( temp >= 0 && temp < number_psf_focus_modes )
-            m_PatternStoreFocus = static_cast<pattern_store_focus_t>(temp);
+        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
+            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
         break;
 
     case right:
         temp = static_cast<int>(m_PatternStoreFocus) + 1;
-        if ( temp >= 0 && temp < number_psf_focus_modes )
-            m_PatternStoreFocus = static_cast<pattern_store_focus_t>(temp);
+        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
+            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
         break;
 
     case up:
@@ -276,18 +276,18 @@ string PatternStore::PatternStatus()
     sprintf(buf, "Play: %i", m_PosPlay + 1);
     result += buf;
 
-    switch ( m_PatternChainMode )
+    switch ( m_PatternChain.Mode() )
     {
-        case PC_MODE_NONE :
+        case PatternChain::off :
             strcpy(buf, ", Chain: Off");
             break;
 
-        case PC_MODE_NATURAL :
-            sprintf(buf, ", Chain: N [%i/%i]", m_PosPatternChain + 1, m_PatternChain.size());
+        case PatternChain::natural :
+            sprintf(buf, ", Chain: N [%i/%i]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
             break;
 
-        case PC_MODE_FORCED :
-            sprintf(buf, ", Chain: Q, [%i/%i]", m_PosPatternChain + 1, m_PatternChain.size());
+        case PatternChain::quantum :
+            sprintf(buf, ", Chain: Q, [%i/%i]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
             break;
     }
 
@@ -338,17 +338,17 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
     if ( m_Patterns.empty() )
         return;
 
-    if ( m_PatternChainMode != PC_MODE_NONE && ! m_PatternChain.empty() )
+    if ( m_PatternChain.Mode() != PatternChain::off && ! m_PatternChain.empty() )
     {
         bool changePattern = false;
-        switch ( m_PatternChainMode )
+        switch ( m_PatternChain.Mode() )
         {
-            case PC_MODE_NATURAL :
+            case PatternChain::natural :
                 if ( m_Patterns.at(m_PosPlay).AllListsComplete() )
                     changePattern = true;
                 break;
 
-            case PC_MODE_FORCED :
+            case PatternChain::quantum :
                 if ( m_PhaseIsZero )
                     changePattern = true;
                 break;
@@ -358,23 +358,25 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
         {
             int next = m_PatternChain.JumpOverride();
 
-            if ( next < 0 && m_PatternChain.at(m_PosPatternChain).Remaining() > 0 )
+            // TODO: Can probably do this internally to PatternChain at some point.
+
+            if ( next < 0 && m_PatternChain.at(m_PatternChain.PosPlay()).Remaining() > 0 )
                 break;
 
             if ( next < 0 )
-                next = m_PatternChain.at(m_PosPatternChain).Jump();
+                next = m_PatternChain.at(m_PatternChain.PosPlay()).Jump();
 
             if ( next < 0 )
-                next = m_PosPatternChain + 1;
+                next = m_PatternChain.PosPlay() + 1;
 
             if ( next >= m_PatternChain.size() )
                 next = 0;
 
-            m_PosPatternChain = next;
+            m_PatternChain.SetPosPlay(next);
 
             // Don't change play pointer if new pattern out of range.
 
-            int pos = m_PatternChain.at(m_PosPatternChain).Pattern();
+            int pos = m_PatternChain.at(m_PatternChain.PosPlay()).Pattern();
 
             if ( pos < m_Patterns.size() )
             {
@@ -400,13 +402,13 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
 void PatternStore::UpdatePatternChainFromSimpleString(string s)
 {
     m_PatternChain.FromSimpleString(s);
-    m_PosPatternChain = 0;
+    m_PatternChain.ResetPosPlay();
 }
 
 void PatternStore::UpdatePatternChainFromString(string s)
 {
     m_PatternChain.FromString(s);
-    m_PosPatternChain = 0;
+    m_PatternChain.ResetPosPlay();
 }
 
 string PatternStore::PatternChainToString()
@@ -463,7 +465,7 @@ enum ps_element_names_t
     ps_name_reset_on_pattern_change,
     ps_name_edit_focus_follows_play,
     ps_name_use_pattern_play_data,
-    number_ps_element_names
+    num_ps_element_names
 };
 
 
@@ -485,7 +487,7 @@ string PatternStore::ToString()
     result += PatternChainToString();
     result += "\n\n";
 
-    sprintf(buff, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChainMode));
+    sprintf(buff, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChain.Mode()));
     result += buff;
     sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "On" : "Off");
     result += buff;
@@ -513,7 +515,7 @@ string PatternStore::ToString()
 void PatternStore::SetFieldsFromString(string s)
 {
     for ( ps_element_names_t e = static_cast<ps_element_names_t>(1);
-          e < number_ps_element_names;
+          e < num_ps_element_names;
           e = static_cast<ps_element_names_t>(static_cast<int>(e) + 1) )
     {
         string token = find_token(s, ps_element_names.at(e));
@@ -528,7 +530,7 @@ void PatternStore::SetFieldsFromString(string s)
             switch (e)
             {
             case ps_name_pattern_chain_mode:
-                m_PatternChainMode = stoi(token);
+                m_PatternChain.SetMode(static_cast<PatternChain::pattern_chain_mode_t>(stoi(token)));
                 break;
             case ps_name_reset_on_pattern_change:
                 m_ResetOnPatternChange = token == "on";
@@ -939,7 +941,7 @@ string PatternStore::ShowPatternPlayData()
 
 string PatternStore::SetNewPatternOrJump( int val )
 {
-    if ( m_PatternChainMode == PC_MODE_NONE )
+    if ( m_PatternChain.Mode() == PatternChain::off )
     {
         if ( val >= 0 && val < m_Patterns.size() )
         {
@@ -953,7 +955,7 @@ string PatternStore::SetNewPatternOrJump( int val )
     {
         if ( val >= 0 && val < m_PatternChain.size() )
         {
-            m_PatternChain.at(m_PosPatternChain).ClearRemaining();
+            m_PatternChain.at(m_PatternChain.PosPlay()).ClearRemaining();
             m_PatternChain.SetJumpOverride(val);
             return "Jumping to chain step %i";
         }

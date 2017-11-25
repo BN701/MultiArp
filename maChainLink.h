@@ -24,6 +24,8 @@
 
 #include "maCursorKeys.h"
 
+class PatternChain;
+
 class ChainLink : public CursorKeys
 {
     public:
@@ -38,12 +40,12 @@ class ChainLink : public CursorKeys
         void SetRepeats(int val) { m_Repeats = val; }
         int Jump() { return m_Jump; }
         void SetJump(int val) { m_Jump = val; }
-//        void SetID(int val) { m_ID = val; }
 
         std::string ToString();
         std::string ToStringForDisplay(bool forMenu = false, int width = 12);
         void FromString(std::string & s);
 
+        void SetParent( PatternChain * val ) { m_Parent = val; }
         virtual void SetStatus();
         virtual void SetFocus()
         {
@@ -60,9 +62,9 @@ class ChainLink : public CursorKeys
         int m_Remaining = -1;           // -1 means initialize in RepeatsRemaining().
         int m_Jump = -1;
 
-//        int m_ID = -1;
-
         int m_PosEdit = 0;
+
+        PatternChain * m_Parent = NULL;
 };
 
 #endif // CHAINLINK_H

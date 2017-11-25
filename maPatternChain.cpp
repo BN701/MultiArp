@@ -18,6 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <stdexcept>
+#include <unordered_map>
 
 #include "maPatternChain.h"
 #include "maUtility.h"
@@ -28,7 +29,7 @@ using namespace std;
 PatternChain::PatternChain()
 {
     //ctor
-    m_Help = "S-Left/Right: new item at end of list, S-Del: delete current item";
+    m_Help = "S-Left/Right: new item at end of list, S-Del: delete last item";
 }
 
 PatternChain::~PatternChain()
@@ -141,6 +142,32 @@ void PatternChain::FromString(string s)
     }
 }
 
+unordered_map<PatternChain::pattern_chain_mode_t, const char *> pc_mode_names =
+{
+    {PatternChain::off, "off"},
+    {PatternChain::natural, "natural"},
+    {PatternChain::quantum, "quantum"},
+};
+
+PatternChain::pattern_chain_mode_t pc_pattern_chain_mode_lookup(string s)
+{
+    static unordered_map<string, PatternChain::pattern_chain_mode_t> map;
+
+    // Initialize on first use.
+
+    if ( map.size() == 0 )
+        for ( PatternChain::pattern_chain_mode_t m = static_cast<PatternChain::pattern_chain_mode_t>(0);
+              m < PatternChain::num_pattern_chain_modes;
+              m = static_cast<PatternChain::pattern_chain_mode_t>(static_cast<int>(m) + 1) )
+        {
+            map.insert(std::make_pair(pc_mode_names.at(m), m));
+        }
+
+    return map.at(s);
+}
+
+
+
 string PatternChain::ToString()
 {
     if ( m_Chain.empty() )
@@ -158,11 +185,20 @@ string PatternChain::ToString()
 
 }
 
+void PatternChain::NextPatternChainMode( int dir )
+{
+    int m = static_cast<int>(m_PatternChainMode) + dir;
+
+    if ( m >= 0 && m < static_cast<int>(num_pattern_chain_modes) )
+        m_PatternChainMode = static_cast<pattern_chain_mode_t>(m);
+}
+
 void PatternChain::SetStatus()
 {
+    int pos = 0;
     char buff[20];
 
-    m_Status = "Chain -";
+    m_Status = "[Chain]";
     m_FieldPositions.clear();
     m_Highlights.clear();
 
@@ -172,7 +208,11 @@ void PatternChain::SetStatus()
         return;
     }
 
-    int pos = 0;
+    m_Status += " Mode: ";
+    pos = m_Status.size();
+    m_Status += pc_mode_names.at(m_PatternChainMode);
+    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+
 
     for ( int i = 0; i < m_Chain.size(); i++ )
     {
@@ -182,46 +222,79 @@ void PatternChain::SetStatus()
         m_Status += buff;
         m_Status += m_Chain.at(i).ToStringForDisplay(true, 1);
         m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-//        m_Status += ' ';
     }
 
     if ( ! m_Chain.empty() )
-        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+        m_Highlights.push_back(m_FieldPositions.at(m_MenuFocus));
 }
 
 bool PatternChain::HandleKey(key_type_t k)
 {
-
     switch ( k )
     {
     case enter:
-        if ( m_PosEdit < m_Chain.size() )
+        if ( m_MenuFocus >= num_pc_menu_focus_modes && m_PosEdit < m_Chain.size() )
         {
             ChainLink & link = m_Chain.at(m_PosEdit);
             link.SetItemID(m_PosEdit + 1);
             link.SetFocus();
             link.SetStatus();
-            link.SetReturnFocus(this);
+            link.SetParent(this);       // Specific pointer to PatternChain.
+            link.SetReturnFocus(this);  // Generic return pointer to CursorKeys object.
         }
         break;
     case left:
-        if ( m_PosEdit > 0 )
-            m_PosEdit -= 1;
+        if ( m_MenuFocus > 0 )
+        {
+            m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
+            m_PosEdit = max(m_MenuFocus - num_pc_menu_focus_modes, 0);
+        }
+//        if ( m_PosEdit > 0 )
+//            m_PosEdit -= 1;
         break;
     case right:
-        if ( m_PosEdit < m_Chain.size() - 1 )
-            m_PosEdit += 1;
+        if ( m_MenuFocus < num_pc_menu_focus_modes + m_Chain.size() - 1 )
+        {
+            m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
+            m_PosEdit = max(m_MenuFocus - num_pc_menu_focus_modes, 0);
+        }
+//        if ( m_PosEdit < m_Chain.size() - 1 )
+//            m_PosEdit += 1;
         break;
     case up:
+        switch (m_MenuFocus)
+        {
+        case mode:
+            NextPatternChainMode(-1);
+            break;
+        default:
+            break;
+        }
+        break;
+
     case down:
+        switch (m_MenuFocus)
+        {
+        case mode:
+            NextPatternChainMode(1);
+            break;
+        default:
+            break;
+        }
         break;
 
     case shift_left:
     case shift_right:
+        // New() just adds an item to the end of the list. If we allowed
+        // genuine insertions at any point, we'd have to renumber jumps
+        // (or accept that some or all will be invalidated).
         New();
         break;
 
     case shift_delete:
+        // Given the comment about New(), above, deleting an item
+        // from the middle of the chain will invalidate any jumps
+        // referring to items above it.
         Delete();
         break;
 
@@ -229,7 +302,7 @@ bool PatternChain::HandleKey(key_type_t k)
         return false;
     }
 
-    m_FirstField = m_PosEdit == 0;
+    m_FirstField = m_MenuFocus == 0;
 
     SetStatus();
 

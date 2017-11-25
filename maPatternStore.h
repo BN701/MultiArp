@@ -35,9 +35,9 @@
 
 // Patternchain modes
 
-#define PC_MODE_NONE 0
-#define PC_MODE_NATURAL 1
-#define PC_MODE_FORCED 2
+//#define PC_MODE_NONE 0
+//#define PC_MODE_NATURAL 1
+//#define PC_MODE_FORCED 2
 
 // class State;
 
@@ -45,9 +45,9 @@ struct PatternStore : public CursorKeys
 {
     std::vector<int>::size_type m_PosPlay;
     std::vector<int>::size_type m_PosEdit;
-    std::vector<int>::size_type m_PosPatternChain;
+//    std::vector<int>::size_type m_PosPatternChain;
 
-    int m_PatternChainMode;
+//    int m_PatternChainMode;
     bool m_ResetOnPatternChange;
     bool m_PhaseIsZero;
     bool m_EditPosFollowsPlay;
@@ -67,8 +67,8 @@ struct PatternStore : public CursorKeys
     PatternStore(/*TranslateTable & table*/):
         m_PosPlay(0),
         m_PosEdit(0),
-        m_PosPatternChain(0),
-        m_PatternChainMode(PC_MODE_NONE),
+//        m_PosPatternChain(0),
+//        m_PatternChainMode(PatternChain::off),
         m_ResetOnPatternChange(true),
         m_PhaseIsZero(false),
         m_EditPosFollowsPlay(true),
@@ -117,9 +117,9 @@ struct PatternStore : public CursorKeys
 
     bool EditFocusFollowsPlay() { return m_EditPosFollowsPlay; }
     void SetResetOnPatternChange(bool bVal) { m_ResetOnPatternChange = bVal; }
-    void SetPatternChainMode(int bVal) { m_PatternChainMode = bVal; }
-    int PatternChainMode() { return m_PatternChainMode; }
-    int CurrentPosPatternChain() { return m_PosPatternChain; }
+    void SetPatternChainMode(PatternChain::pattern_chain_mode_t bVal) { m_PatternChain.SetMode(bVal); }
+    PatternChain::pattern_chain_mode_t PatternChainMode() { return m_PatternChain.Mode(); }
+    std::vector<ChainLink>::size_type CurrentPosPatternChain() { return m_PatternChain.PosPlay(); }
     bool EditPatternIsPlayPattern() { return m_PosEdit == m_PosPlay; }
 
     void SetStepValCurrentEditPattern(int i)
@@ -318,7 +318,8 @@ struct PatternStore : public CursorKeys
     {
         for ( std::vector<Pattern>::iterator i = m_Patterns.begin(); i != m_Patterns.end(); i++ )
             (*i).ResetPosition();
-        m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
+        m_PatternChain.ResetPosPlay();
+//        m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
     }
 
     void StorePatternPlayData( unsigned char mask = PLAY_DATA_ALL );
@@ -357,18 +358,18 @@ struct PatternStore : public CursorKeys
     }
 
     protected:
-        enum pattern_store_focus_t
+        enum pattern_store_menu_focus_t
         {
             psf_pattern,
             psf_list,
             psf_rt_list,
             psf_trig_list,
-            number_psf_focus_modes
+            num_psf_menu_focus_modes
         };
 
 
         virtual bool HandleKey(key_type_t k);
-        pattern_store_focus_t m_PatternStoreFocus;
+        pattern_store_menu_focus_t m_PatternStoreFocus;
 
 };
 

@@ -354,12 +354,12 @@ bool Note::HandleKey(key_type_t k)
 
     case left:
         if ( m_NoteEditFocus > 0 )
-            m_NoteEditFocus = static_cast<note_edit_focus_t>(m_NoteEditFocus - 1);
+            m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus - 1);
         break;
 
     case right:
-        if ( m_NoteEditFocus < number_nef_types - 1 )
-            m_NoteEditFocus = static_cast<note_edit_focus_t>(m_NoteEditFocus + 1);
+        if ( m_NoteEditFocus < num_nef_types - 1 )
+            m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus + 1);
         break;
 
     case shift_up:
@@ -946,14 +946,14 @@ bool RealTimeListParams::HandleKey(key_type_t k)
 
     case left:
         temp = static_cast<int>(m_RTParamsFocus) - 1;
-        if ( temp >= 0 && temp < number_rt_params_focus_modes )
-            m_RTParamsFocus = static_cast<rt_params_focus_t>(temp);
+        if ( temp >= 0 && temp < num_rt_params_menu_focus_modes )
+            m_RTParamsFocus = static_cast<rt_params_menu_focus_t>(temp);
         break;
 
     case right:
         temp = static_cast<int>(m_RTParamsFocus) + 1;
-        if ( temp >= 0 && temp < number_rt_params_focus_modes )
-            m_RTParamsFocus = static_cast<rt_params_focus_t>(temp);
+        if ( temp >= 0 && temp < num_rt_params_menu_focus_modes )
+            m_RTParamsFocus = static_cast<rt_params_menu_focus_t>(temp);
         break;
 
     case shift_up:

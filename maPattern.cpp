@@ -172,7 +172,7 @@ enum pat_element_names_t
     pat_name_gate_hold,
     pat_name_velocity,
     pat_name_label,
-    number_pat_element_names
+    num_pat_element_names
 };
 
 
@@ -258,7 +258,7 @@ string Pattern::ToString(const char * prefix)
 void Pattern::SetFieldsFromString(string s)
 {
     for ( pat_element_names_t e = static_cast<pat_element_names_t>(1);
-          e < number_pat_element_names;
+          e < num_pat_element_names;
           e = static_cast<pat_element_names_t>(static_cast<int>(e) + 1) )
     {
         string token = find_token(s, pat_element_names.at(e));

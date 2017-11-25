@@ -278,7 +278,7 @@ void update_pattern_status_panel()
     wmove(g_Display.SmallPanel(), 2, 0);
     wclrtoeol(g_Display.SmallPanel());
 
-    if ( g_PatternStore.PatternChainMode() == PC_MODE_NONE ||
+    if ( g_PatternStore.PatternChainMode() == PatternChain::off ||
          g_PatternStore.Empty() ||
          g_PatternStore.PatternChainEmpty() )
     {

@@ -85,16 +85,16 @@ struct Note : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum note_edit_focus_t
+        enum note_edit_menu_focus_t
         {
             nef_note_number,
             nef_velocity,
             nef_length,
-            number_nef_types
+            num_nef_types
         };
 
         virtual bool HandleKey(key_type_t k);
-        note_edit_focus_t m_NoteEditFocus = nef_note_number;
+        note_edit_menu_focus_t m_NoteEditFocus = nef_note_number;
 
 };
 
@@ -241,17 +241,17 @@ struct RealTimeListParams : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        enum rt_params_focus_t
+        enum rt_params_menu_focus_t
         {
             rtp_loop_start,
             rtp_local_quantum,
             rtp_multiplier,
             rtp_window_adjust,
-            number_rt_params_focus_modes
+            num_rt_params_menu_focus_modes
         };
 
         virtual bool HandleKey(key_type_t k);
-        rt_params_focus_t m_RTParamsFocus = rtp_loop_start;
+        rt_params_menu_focus_t m_RTParamsFocus = rtp_loop_start;
 
 };
 

@@ -49,6 +49,33 @@ void ArpeggioStage::FromString(std::string s)
 //
 //////////////////////////////////////////////////////////////
 
+unordered_map<TrigRepeater::decay_mode_t, const char *> tr_decay_mode_names =
+{
+    {TrigRepeater::off, "off"},
+    {TrigRepeater::exponential, "exponential"},
+    {TrigRepeater::linear, "linear"},
+    {TrigRepeater::exponential_unlimited, "exponential-unlimited"},
+    {TrigRepeater::linear_unlimited, "linear-unlimited"}
+};
+
+TrigRepeater::decay_mode_t tr_decay_mode_lookup(string s)
+{
+    static unordered_map<string, TrigRepeater::decay_mode_t> map;
+
+    // Initialize on first use.
+
+    if ( map.size() == 0 )
+        for ( TrigRepeater::decay_mode_t m = static_cast<TrigRepeater::decay_mode_t>(0);
+              m < TrigRepeater::num_decay_modes;
+              m = static_cast<TrigRepeater::decay_mode_t>(static_cast<int>(m) + 1) )
+        {
+            map.insert(std::make_pair(tr_decay_mode_names.at(m), m));
+        }
+
+    return map.at(s);
+}
+
+
 
 void TrigRepeater::Init(double tempo, double stepLengthMilliSecs)
 {
@@ -160,33 +187,6 @@ TrigListItem::~TrigListItem()
 {
     //dtor
 }
-
-unordered_map<TrigRepeater::decay_mode_t, const char *> tr_decay_mode_names =
-{
-    {TrigRepeater::off, "off"},
-    {TrigRepeater::exponential, "exponential"},
-    {TrigRepeater::linear, "linear"},
-    {TrigRepeater::exponential_unlimited, "exponential-unlimited"},
-    {TrigRepeater::linear_unlimited, "linear-unlimited"}
-};
-
-TrigRepeater::decay_mode_t tr_decay_mode_lookup(string s)
-{
-    static unordered_map<string, TrigRepeater::decay_mode_t> map;
-
-    // Initialize on first use.
-
-    if ( map.size() == 0 )
-        for ( TrigRepeater::decay_mode_t m = static_cast<TrigRepeater::decay_mode_t>(0);
-              m < TrigRepeater::num_decay_modes;
-              m = static_cast<TrigRepeater::decay_mode_t>(static_cast<int>(m) + 1) )
-        {
-            map.insert(std::make_pair(tr_decay_mode_names.at(m), m));
-        }
-
-    return map.at(s);
-}
-
 
 enum tli_element_names_t
 {
@@ -554,31 +554,31 @@ bool TrigListItem::HandleKey(key_type_t k)
 
     case left:
         if ( m_TrigListItemFocus > 0 )
-            m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus - 1);
+            m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus - 1);
         break;
 
     case right:
-        if ( m_TrigListItemFocus < number_tlif_types + arp.size() - 1 )
-            m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus + 1);
+        if ( m_TrigListItemFocus < num_tlif_types + arp.size() - 1 )
+            m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus + 1);
         break;
 
     case shift_left:
         if ( arp.empty() )
         {
             arp.emplace_back();
-            m_TrigListItemFocus = number_tlif_types;
+            m_TrigListItemFocus = num_tlif_types;
         }
         else
-            arp.insert(arp.begin() + m_TrigListItemFocus - number_tlif_types, *(new ArpeggioStage(1,1)));
+            arp.insert(arp.begin() + m_TrigListItemFocus - num_tlif_types, *(new ArpeggioStage(1,1)));
         break;
 
     case shift_delete:
         if ( !arp.empty() )
         {
-            int index = m_TrigListItemFocus - number_tlif_types;
+            int index = m_TrigListItemFocus - num_tlif_types;
             arp.erase(arp.begin() + index);
             if ( index == arp.size() )
-                m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus - 1);
+                m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus - 1);
         }
         break;
 
@@ -586,12 +586,12 @@ bool TrigListItem::HandleKey(key_type_t k)
         if ( arp.empty() )
         {
             arp.emplace_back();
-            m_TrigListItemFocus = number_tlif_types;
+            m_TrigListItemFocus = num_tlif_types;
         }
         else
         {
-            arp.insert(arp.begin() + m_TrigListItemFocus - number_tlif_types + 1, *(new ArpeggioStage(1,1)));
-            m_TrigListItemFocus = static_cast<trig_list_item_focus_t>(m_TrigListItemFocus + 1);
+            arp.insert(arp.begin() + m_TrigListItemFocus - num_tlif_types + 1, *(new ArpeggioStage(1,1)));
+            m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus + 1);
         }
         break;
 
@@ -628,7 +628,7 @@ bool TrigListItem::HandleKey(key_type_t k)
             break;
         default:
             {
-                int index = m_TrigListItemFocus - number_tlif_types;
+                int index = m_TrigListItemFocus - num_tlif_types;
                 arp.at(index).Increment(shift);
             }
             break;
@@ -677,7 +677,7 @@ bool TrigListItem::HandleKey(key_type_t k)
             break;
         default:
             {
-                int index = m_TrigListItemFocus - number_tlif_types;
+                int index = m_TrigListItemFocus - num_tlif_types;
                 arp.at(index).Decrement(shift);
             }
             break;

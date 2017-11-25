@@ -73,7 +73,7 @@ class CursorKeys
         {
             none,
             update_pattern_browser,
-            number_follow_up_actions
+            num_follow_up_actions
         };
 
         int ItemID() { return m_ItemID; }

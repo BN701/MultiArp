@@ -799,13 +799,13 @@ bool do_command(string/*const char * */ commandString)
             show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_OFF:
-            g_PatternStore.SetPatternChainMode(PC_MODE_NONE);
+            g_PatternStore.SetPatternChainMode(PatternChain::off);
             break;
         case C_PATTERN_CHAIN_NATURAL:
-            g_PatternStore.SetPatternChainMode(PC_MODE_NATURAL);
+            g_PatternStore.SetPatternChainMode(PatternChain::natural);
             break;
         case C_PATTERN_CHAIN_QUANTUM:
-            g_PatternStore.SetPatternChainMode(PC_MODE_FORCED);
+            g_PatternStore.SetPatternChainMode(PatternChain::quantum);
             break;
         case C_PATTERN_CHAIN_CLEAR:
             g_PatternStore.PatternChainForEdit().Clear();

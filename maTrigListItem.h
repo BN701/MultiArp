@@ -161,7 +161,7 @@ class TrigListItem : public CursorKeys
     virtual void SetStatus();
     protected:
         virtual bool HandleKey(key_type_t k);
-        enum trig_list_item_focus_t
+        enum trig_list_item_menu_focus_t
         {
             tlif_trigs,
             tlif_multiplier,
@@ -171,10 +171,10 @@ class TrigListItem : public CursorKeys
             tlif_repeat_time,
             tlif_decay_mode,
             tlif_velocity_decay,
-            number_tlif_types
+            num_tlif_types
         };
 
-        trig_list_item_focus_t m_TrigListItemFocus = tlif_trigs;
+        trig_list_item_menu_focus_t m_TrigListItemFocus = tlif_trigs;
 
     private:
         std::vector<int> m_Trigs = {0}; // Default for individual item is to trigger the first list.

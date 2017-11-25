@@ -157,7 +157,7 @@ scale_t tt_scale_lookup(string s)
 
     if ( map.size() == 0 )
         for ( scale_t m = static_cast<scale_t>(0);
-              m < number_scale_types;
+              m < num_scale_types;
               m = static_cast<scale_t>(static_cast<int>(m) + 1) )
         {
             map.insert(std::make_pair(tt_scale_names.at(m), m));
@@ -197,7 +197,7 @@ accidentals_mode_t tt_accidentals_mode_lookup(string s)
 
     if ( map.size() == 0 )
         for ( accidentals_mode_t m = static_cast<accidentals_mode_t>(0);
-              m < number_accidentals_modes;
+              m < num_accidentals_modes;
               m = static_cast<accidentals_mode_t>(static_cast<int>(m) + 1) )
         {
             map.insert(std::make_pair(tt_accidentals_mode_names.at(m), m));
@@ -214,7 +214,7 @@ unordered_map<scale_premap_mode_t, const char *> tt_premap_mode_names =
     {premap_leave, "leave"},
     {premap_upper, "upper"},
     {premap_lower, "lower"},
-    {number_premap_modes, ""}
+    {num_premap_modes, ""}
 };
 
 scale_premap_mode_t tt_premap_mode_lookup(string s)
@@ -225,7 +225,7 @@ scale_premap_mode_t tt_premap_mode_lookup(string s)
 
     if ( map.size() == 0 )
         for ( scale_premap_mode_t m = static_cast<scale_premap_mode_t>(0);
-              m < number_premap_modes;
+              m < num_premap_modes;
               m = static_cast<scale_premap_mode_t>(static_cast<int>(m) + 1) )
         {
             map.insert(std::make_pair(tt_premap_mode_names.at(m), m));
@@ -278,13 +278,13 @@ bool TranslateTable::HandleKey(key_type_t k)
     {
     case left:
         temp = static_cast<int>(m_TranslateTableFocus) - 1;
-        if ( temp >= 0 && temp < number_tt_focus_modes )
-            m_TranslateTableFocus = static_cast<translate_table_focus_t>(temp);
+        if ( temp >= 0 && temp < num_tt_menu_focus_modes )
+            m_TranslateTableFocus = static_cast<translate_table_menu_focus_t>(temp);
         break;
     case right:
         temp = static_cast<int>(m_TranslateTableFocus) + 1;
-        if ( temp >= 0 && temp < number_tt_focus_modes )
-            m_TranslateTableFocus = static_cast<translate_table_focus_t>(temp);
+        if ( temp >= 0 && temp < num_tt_menu_focus_modes )
+            m_TranslateTableFocus = static_cast<translate_table_menu_focus_t>(temp);
         break;
     case up:
         switch ( m_TranslateTableFocus )
@@ -524,7 +524,7 @@ void TranslateTable::NextPremapMode( int dir )
 
     int t = static_cast<int>(m_PremapMode) + dir;
 
-    if ( t >= 0 && t < static_cast<int>(number_premap_modes))
+    if ( t >= 0 && t < static_cast<int>(num_premap_modes))
     {
         m_PremapMode = static_cast<scale_premap_mode_t>(t);
     }
@@ -638,7 +638,7 @@ void TranslateTable::NextAccidentalsMode( int dir )
 {
     int m = static_cast<int>(m_AccidentalsMode) + dir;
 
-    if ( m >= 0 && m < static_cast<int>(number_accidentals_modes) )
+    if ( m >= 0 && m < static_cast<int>(num_accidentals_modes) )
         m_AccidentalsMode = static_cast<accidentals_mode_t>(m);
 }
 

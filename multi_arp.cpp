@@ -332,7 +332,7 @@ enum global_element_names_t
      global_heading,
      global_name_midi_channel,
      global_name_link_quantum,
-     number_global_element_names
+     num_global_element_names
 };
 
 
@@ -383,7 +383,7 @@ void load_from_string(string s, int & created, int & updated )
             // Handle global fields here (for the time being).
 
             for ( global_element_names_t e = static_cast<global_element_names_t>(1);
-                  e < number_global_element_names;
+                  e < num_global_element_names;
                   e = static_cast<global_element_names_t>(static_cast<int>(e) + 1) )
             {
                 string token = find_token(*i, global_element_names.at(e));

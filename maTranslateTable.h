@@ -32,7 +32,7 @@ enum accidentals_mode_t
     accmode_lower,
     upper_mute_if_clash,
     lower_mute_if_clash,
-    number_accidentals_modes
+    num_accidentals_modes
 };
 
 enum scale_premap_mode_t
@@ -42,7 +42,7 @@ enum scale_premap_mode_t
     premap_leave,
     premap_upper,
     premap_lower,
-    number_premap_modes
+    num_premap_modes
 };
 
 enum scale_t
@@ -64,7 +64,7 @@ enum scale_t
                           // undefined.
     scale_unknown,
     from_list,
-    number_scale_types
+    num_scale_types
 };
 
 // #include "maPatternStore.h"
@@ -203,7 +203,7 @@ class TranslateTable : public CursorKeys
         TranslateDiags & Diags() { return m_Diags; }
 
     protected:
-        enum translate_table_focus_t
+        enum translate_table_menu_focus_t
         {
             chromatic_shift,
             tonal_shift,
@@ -211,11 +211,11 @@ class TranslateTable : public CursorKeys
             scale,
             premap,
             accidentals,
-            number_tt_focus_modes
+            num_tt_menu_focus_modes
         };
 
         virtual bool HandleKey(key_type_t k);
-        translate_table_focus_t m_TranslateTableFocus;
+        translate_table_menu_focus_t m_TranslateTableFocus;
 
     private:
 

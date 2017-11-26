@@ -29,7 +29,7 @@ using namespace std;
 PatternChain::PatternChain()
 {
     //ctor
-    m_Help = "S-Left/Right: new item at end of list, S-Del: delete last item";
+    m_Help = "S-Left/Right: new item before/after cursor, S-Del: delete current item";
 }
 
 PatternChain::~PatternChain()
@@ -142,6 +142,50 @@ void PatternChain::FromString(string s)
     }
 }
 
+void PatternChain::New()
+{
+    if ( m_PosEdit >= m_Chain.size() )
+    {
+        m_Chain.emplace_back();
+        m_PosEdit = m_Chain.size() - 1;
+    }
+    else
+    {
+        m_Chain.insert(m_Chain.begin() + m_PosEdit, ChainLink() );
+    }
+
+    m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_PosEdit + num_pc_menu_items);
+
+    for ( auto it = m_Chain.begin(); it != m_Chain.end(); it++ )
+        if ( it->Jump() >= static_cast<int>(m_PosEdit) )
+            it->SetJump(it->Jump() + 1 );
+
+    SetStatus();
+}
+
+void PatternChain::Delete()
+{
+    m_Chain.erase(m_Chain.begin() + m_PosEdit);
+
+    for ( auto it = m_Chain.begin(); it != m_Chain.end(); it++ )
+        if ( it->Jump() == static_cast<int>(m_PosEdit) )
+            it->SetJump(-1);
+        else if ( it->Jump() > static_cast<int>(m_PosEdit) )
+            it->SetJump(it->Jump() - 1 );
+
+    if ( m_PosEdit >= m_Chain.size() )
+    {
+        m_PosEdit = m_Chain.size() - 1;
+        // Menu focus will also be at max, so reset it.
+        m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
+    }
+    if ( m_PosPlay >= m_Chain.size() )
+        m_PosPlay = m_Chain.size() - 1;
+
+    SetStatus();
+}
+
+
 unordered_map<PatternChain::pattern_chain_mode_t, const char *> pc_mode_names =
 {
     {PatternChain::off, "off"},
@@ -233,7 +277,7 @@ bool PatternChain::HandleKey(key_type_t k)
     switch ( k )
     {
     case enter:
-        if ( m_MenuFocus >= num_pc_menu_focus_modes && m_PosEdit < m_Chain.size() )
+        if ( m_MenuFocus >= num_pc_menu_items && m_PosEdit < m_Chain.size() )
         {
             ChainLink & link = m_Chain.at(m_PosEdit);
             link.SetItemID(m_PosEdit + 1);
@@ -247,16 +291,16 @@ bool PatternChain::HandleKey(key_type_t k)
         if ( m_MenuFocus > 0 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
-            m_PosEdit = max(m_MenuFocus - num_pc_menu_focus_modes, 0);
+            m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
         }
 //        if ( m_PosEdit > 0 )
 //            m_PosEdit -= 1;
         break;
     case right:
-        if ( m_MenuFocus < num_pc_menu_focus_modes + m_Chain.size() - 1 )
+        if ( m_MenuFocus < num_pc_menu_items + m_Chain.size() - 1 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
-            m_PosEdit = max(m_MenuFocus - num_pc_menu_focus_modes, 0);
+            m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
         }
 //        if ( m_PosEdit < m_Chain.size() - 1 )
 //            m_PosEdit += 1;
@@ -283,19 +327,31 @@ bool PatternChain::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_left:
+
     case shift_right:
-        // New() just adds an item to the end of the list. If we allowed
-        // genuine insertions at any point, we'd have to renumber jumps
-        // (or accept that some or all will be invalidated).
-        New();
+    case shift_left:
+        switch (m_MenuFocus)
+        {
+        case mode:
+            if ( !m_Chain.empty() )
+                break;
+        default:
+            if ( k == shift_right)
+                m_PosEdit += 1;
+            New();
+            break;
+        }
         break;
 
     case shift_delete:
-        // Given the comment about New(), above, deleting an item
-        // from the middle of the chain will invalidate any jumps
-        // referring to items above it.
-        Delete();
+        switch (m_MenuFocus)
+        {
+        case mode:
+            break;
+        default:
+            Delete();
+            break;
+        }
         break;
 
     default:

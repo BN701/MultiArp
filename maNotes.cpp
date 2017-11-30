@@ -684,7 +684,7 @@ string StepList::ToStringForDisplay(int & offset, int & length)
             result += ' ';
         if ( i == m_LastRequestedPos )
         {
-            sprintf(buff, "%3i| ", m_LastRequestedPos + 1);
+            sprintf(buff, "%3lu| ", m_LastRequestedPos + 1);
             result += buff;
         }
         if ( i == 0 )
@@ -1049,7 +1049,7 @@ void RealTimeList::SetStatus()
 
 bool RealTimeList::HandleKey(key_type_t k)
 {
-    int temp;
+//    int temp;
     double inc = 0.1;
 
     map<double, Note>::iterator it = m_RealTimeList.begin();
@@ -1119,7 +1119,7 @@ bool RealTimeList::HandleKey(key_type_t k)
 
             while ( true )
             {
-                map<double,Note>::iterator it = m_RealTimeList.find(n.Phase());
+//                map<double,Note>::iterator it = m_RealTimeList.find(n.Phase());
                 if ( m_RealTimeList.find(n.Phase()) == m_RealTimeList.end() )
                     break;
                 n.SetPhase(n.Phase() + 0.001);
@@ -1378,6 +1378,11 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
 #endif
 
     return result;
+}
+
+void RealTimeList::FromMidiFile(string s)
+{
+
 }
 
 

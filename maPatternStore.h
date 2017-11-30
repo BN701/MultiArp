@@ -158,6 +158,7 @@ struct PatternStore : public CursorKeys
     bool FromString(std::string s, int & created, int & updates);
     void UpdatePattern(StepList & noteList);
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
+    void UpdatePatternFromMidiFile(std::string s);
     void SetFieldsFromString(std::string s);
     void UpdatePatternChainFromSimpleString(std::string s); // Old style, from chain command, no support for jumps.
     void UpdatePatternChainFromString(std::string s);

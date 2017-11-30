@@ -139,6 +139,7 @@ enum command_t
     C_USE_HELP,
 
     C_LIST,             // Note list commands.
+    C_LIST_IMPORT,      // Import from midi file.
 
     C_LIST_RT,          // Real time list commands.
     C_LIST_RT_DELETE,
@@ -283,6 +284,8 @@ unordered_map<string, command_t> gCommandList =
 
     {"list", C_LIST},
     {"l", C_LIST},
+    {"import", C_LIST_IMPORT},
+    {"i", C_LIST_IMPORT},
     {"real time", C_LIST_RT},
     {"rt", C_LIST_RT},
     {"real time delete", C_LIST_RT_DELETE},
@@ -894,20 +897,28 @@ bool do_command(string/*const char * */ commandString)
             set_status(STAT_POS_2, "use g[lobal]|p[attern]");
             break;
 
-        case C_LIST :
+        case C_LIST:
             if ( tokens.size() < 2 )
                 throw string("Hint: list new|delete|n [clear|: n1, n2 ,...]");
             set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
             update_pattern_panel();
             break;
 
-        case C_LIST_RT :
+        case C_LIST_IMPORT:
+            if ( tokens.size() < 2 )
+                throw string("Hint: import filename[.mid]");
+            g_PatternStore.UpdatePatternFromMidiFile(commandString);
+            set_status(STAT_POS_2, "File imported to Real Time list.");
+            update_pattern_panel();
+            break;
+
+        case C_LIST_RT:
             g_PatternStore.CurrentEditRealTimeList().SetStatus();
             g_PatternStore.CurrentEditRealTimeList().SetFocus();
             show_status_after_navigation();
             break;
 
-        case C_LIST_RT_DELETE :
+        case C_LIST_RT_DELETE:
             g_PatternStore.DeleteCurrentRealTimeList();
             g_PatternStore.SetFocus();
             g_PatternStore.SetStatus();

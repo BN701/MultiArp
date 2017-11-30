@@ -414,7 +414,7 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
 
                 // This fails silently if the set already exists.
 
-                pair<inOutMap_t::iterator,bool> p = inOutMap.emplace(it->m_NoteIn, initializer_list<int>{});
+                /* pair<inOutMap_t::iterator,bool> p = */ inOutMap.emplace(it->m_NoteIn, initializer_list<int>{});
 
                 // (The previous call is supposed to return the set that was either found or
                 // created but I couldn't work out how to access it using the pair above, so
@@ -560,7 +560,7 @@ void layout_pattern_extra_panel_test()
 
 void update_pattern_panel()
 {
-    int scr_x, scr_y;
+//    int scr_x, scr_y;
 
     if ( g_Display.BigPanelHold() )
         return;

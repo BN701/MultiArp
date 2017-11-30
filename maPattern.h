@@ -153,6 +153,7 @@ struct Pattern
     bool FromString(std::string s, int & updates);
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
+    void AddRealTimeListFromMidiFile(std::string s);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
 //    bool PlayPositionInfo(int & listIndex, int & offset, int & length);

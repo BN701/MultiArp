@@ -274,6 +274,7 @@ struct RealTimeList : public CursorKeys
     }
 
     void FromString(std::string s);
+    void FromMidiFile(std::string s);
     std::string ToString();
     std::string ToStringForDisplay(int & offset, int & length, int width = 75);
 

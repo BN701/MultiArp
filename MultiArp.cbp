@@ -36,6 +36,7 @@
 			<Add directory="../rtmidi-2.1.1" />
 			<Add directory="../github/link/include" />
 			<Add directory="../github/link/modules/asio-standalone/asio/include" />
+			<Add directory="../midifile/include/" />
 		</Compiler>
 		<Linker>
 			<Add option="-pthread" />

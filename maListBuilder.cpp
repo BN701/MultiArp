@@ -37,10 +37,8 @@ using namespace std;
 ofstream fLog;
 #endif
 
-ListBuilder::ListBuilder(ableton::Link & linkInstance):
-    m_Link(linkInstance),
-    m_MidiInputMode(MIDI_INPUT_OFF),
-    m_openNotes(0)
+ListBuilder::ListBuilder(ableton::Link * linkInstance):
+    m_Link(linkInstance)
 {
     //ctor
 #if LOG_ON
@@ -119,7 +117,7 @@ std::string ListBuilder::ToString()
         case MIDI_INPUT_REAL_TIME:
             {
                 char buff[100];
-                sprintf(buff, " Open: %i, captured: %i", m_OpenNotes.size(), m_RealTimeList.size());
+                sprintf(buff, " Open: %lu, captured: %lu", m_OpenNotes.size(), m_RealTimeList.size());
                 return buff;
             }
             break;
@@ -191,15 +189,17 @@ void ListBuilder::SetPhaseIsZero(double beat, double quantum)
     m_LinkQuantum = quantum;
 }
 
-bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
+bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
 {
 
     switch ( m_MidiInputMode )
     {
         case MIDI_INPUT_REAL_TIME:
             {
-                std::chrono::microseconds t_now = m_Link.clock().micros();
-                ableton::Link::Timeline timeline = m_Link.captureAppTimeline();
+                if ( m_Link == NULL )
+                    throw string("ListBuilder::HandleMidi() - Expecting Ableton Link Instance to be set.");
+                chrono::microseconds t_now = m_Link->clock().micros();
+                ableton::Link::Timeline timeline = m_Link->captureAppTimeline();
                 double beat = timeline.beatAtTime(t_now, m_LinkQuantum);
 
                 // Create notes for note-on, complete notes and calculate
@@ -264,6 +264,41 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev)
 
                         fLog << buff;
 #endif
+                    }
+
+                }
+
+            }
+            return false;
+
+        case MIDI_INPUT_FILE:
+            {
+                // Similar to real time capture, except we don't get time from link
+                // and we don't try to normalize the beat as that's provided as input.
+
+                if ( ev->type == SND_SEQ_EVENT_NOTEON )
+                {
+                    Note note(ev->data.note.note, ev->data.note.velocity);
+                    note.SetPhase(inBeat);    // Temporarily store beat in the notes Phase member.
+
+                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
+                    if ( it != m_OpenNotes.end() )
+                        m_OpenNotes.at(ev->data.note.note) = note;
+                    else
+                        m_OpenNotes.insert(make_pair(ev->data.note.note, note));
+                }
+                else
+                {
+                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
+                    if ( it != m_OpenNotes.end() )
+                    {
+                        Note note = m_OpenNotes.at(ev->data.note.note);
+                        m_OpenNotes.erase(it);
+
+                        double beatStart = note.Phase();
+                        note.SetLength(inBeat - beatStart);
+
+                        m_RealTimeList.insert(make_pair(note.Phase(), note));
                     }
 
                 }

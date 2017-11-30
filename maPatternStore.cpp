@@ -43,7 +43,7 @@ void PatternStore::SetStatus()
 
     m_Status = "Pattern ";
     pos = m_Status.size();
-    sprintf(buff, "%i/%i", m_PosEdit + 1, m_Patterns.size());
+    sprintf(buff, "%lu/%lu", m_PosEdit + 1, m_Patterns.size());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
@@ -51,7 +51,7 @@ void PatternStore::SetStatus()
     pos = m_Status.size();
     if ( !m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
-        sprintf(buff, "%i/%i",
+        sprintf(buff, "%lu/%lu",
             m_Patterns.at(m_PosEdit).m_PosEdit + 1,
             m_Patterns.at(m_PosEdit).m_StepListSet.size());
         m_Status += buff;
@@ -66,7 +66,7 @@ void PatternStore::SetStatus()
     pos = m_Status.size();
     if ( !m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
     {
-        sprintf(buff, "%i/%i",
+        sprintf(buff, "%lu/%lu",
             m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1,
             m_Patterns.at(m_PosEdit).m_RealTimeSet.size());
         m_Status += buff;
@@ -273,7 +273,7 @@ string PatternStore::PatternStatus()
 
     char buf[80];
 
-    sprintf(buf, "Play: %i", m_PosPlay + 1);
+    sprintf(buf, "Play: %lu", m_PosPlay + 1);
     result += buf;
 
     switch ( m_PatternChain.Mode() )
@@ -283,23 +283,25 @@ string PatternStore::PatternStatus()
             break;
 
         case PatternChain::natural :
-            sprintf(buf, ", Chain: N [%i/%i]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+            sprintf(buf, ", Chain: N [%lu/%lu]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
             break;
 
         case PatternChain::quantum :
-            sprintf(buf, ", Chain: Q, [%i/%i]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+            sprintf(buf, ", Chain: Q, [%lu/%lu]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+            break;
+        default:
             break;
     }
 
     result += buf;
 
 
-    sprintf(buf, "\nEdit: %i", m_PosEdit + 1);
+    sprintf(buf, "\nEdit: %lu", m_PosEdit + 1);
     result += buf;
 
     if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
-        sprintf(buf, ", List %i", m_Patterns.at(m_PosEdit).m_PosEdit + 1);
+        sprintf(buf, ", List %lu", m_Patterns.at(m_PosEdit).m_PosEdit + 1);
         result += buf;
 
         int listCount = m_Patterns.at(m_PosEdit).m_StepListSet.size();
@@ -351,6 +353,8 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
             case PatternChain::quantum :
                 if ( m_PhaseIsZero )
                     changePattern = true;
+                break;
+            default:
                 break;
         }
 
@@ -433,7 +437,7 @@ string PatternStore::PatternSelectionList(int start, int rows)
     for ( size_t pos = start; pos < start + rows && pos < m_Patterns.size(); pos++ )
     {
         char buff[50];
-        sprintf(buff, " %02i ", pos + 1);
+        sprintf(buff, " %02lu ", pos + 1);
         result += buff;
         result += m_Patterns.at(pos).Label(15);
         result += '\n';
@@ -456,6 +460,14 @@ void PatternStore::UpdatePattern(std::map<double,Note> & realTimeList, double qu
         m_Patterns.emplace_back();
 
     m_Patterns.at(m_PosEdit).AddRealTimeList(realTimeList, quantum);
+}
+
+void PatternStore::UpdatePatternFromMidiFile(string s)
+{
+    if ( m_Patterns.empty() )
+        m_Patterns.emplace_back();
+
+    m_Patterns.at(m_PosEdit).AddRealTimeListFromMidiFile(s);
 }
 
 enum ps_element_names_t
@@ -915,7 +927,7 @@ string PatternStore::ShowPatternPlayData()
 
     if ( usePatternPlayData )
     {
-        sprintf(buff, "P %02i: ", m_PosEdit + 1);
+        sprintf(buff, "P %02lu: ", m_PosEdit + 1);
         result += buff;
     }
     else

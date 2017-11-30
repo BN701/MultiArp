@@ -56,7 +56,7 @@ chrono::microseconds g_LinkStartTime(-1);
 // Global instances.
 
 CursorKeys g_CursorKeys;
-ListBuilder g_ListBuilder(g_Link);
+ListBuilder g_ListBuilder(&g_Link);
 PatternStore g_PatternStore;
 AlsaSequencer g_Sequencer;
 State g_State;

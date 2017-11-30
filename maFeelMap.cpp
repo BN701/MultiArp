@@ -365,7 +365,7 @@ double FeelMap::Adjust( double beat )
     double P = static_cast<double>(m_Points);
     double T;
 
-    char buff[100];
+//    char buff[100];
 
     if ( n == 0 )
     {

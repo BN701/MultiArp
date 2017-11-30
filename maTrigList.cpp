@@ -37,7 +37,7 @@ TrigList::~TrigList()
 void TrigList::SetStatus()
 {
     int pos = 0;
-    char buff[50];
+//    char buff[50];
 
     m_FieldPositions.clear();
     m_Highlights.clear();
@@ -249,7 +249,7 @@ string TrigList::ToStringForDisplay2(int & offset, int & length, int displayWidt
     int itemWidth = 9;
     int itemsPerRow = displayWidth/itemWidth;
 
-    char buff[50];
+//    char buff[50];
 
     offset = 0;
     length = 0;

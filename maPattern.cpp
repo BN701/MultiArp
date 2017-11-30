@@ -17,7 +17,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "maListBuilder.h"
 #include "maPattern.h"
+
+#include "MidiFile.h"
 
 
 #include <cstring>
@@ -402,9 +405,65 @@ void Pattern::AddRealTimeListFromString(vector<RealTimeList>::size_type index, s
     if ( index >= m_RealTimeSet.size() )
         m_RealTimeSet.resize(index + 1);
 
-//    m_RealTimeSet.at(index).Clear();
     m_RealTimeSet.at(index).FromString(s);
+}
 
+void Pattern::AddRealTimeListFromMidiFile(string s)
+{
+    MidiFile midiFile;
+
+    s = s.substr(s.find(' ') + 1);
+    if ( s.find(".mid") == string::npos )
+        s += ".mid";
+
+    if ( midiFile.read(s.c_str()) == 0 )
+        throw string("Couldn't open the file.");
+
+    int importedTracks = 0;
+    int tracks = midiFile.getTrackCount();
+    int ppq = midiFile.getTicksPerQuarterNote();
+
+    for ( int track = 0; track < tracks; track++ )
+    {
+        ListBuilder builder;
+        builder.SetMidiInputMode(MIDI_INPUT_FILE);
+
+        double quantum = 0;
+
+        for (int event = 0; event < midiFile[track].size(); event++ )
+        {
+            double beat = static_cast<double>(midiFile[track][event].tick)/ppq;
+            snd_seq_event_t ev = {0};
+
+            if ( midiFile[track][event].isNoteOn() )
+                ev.type = SND_SEQ_EVENT_NOTEON;
+            else if ( midiFile[track][event].isNoteOff() )
+                ev.type = SND_SEQ_EVENT_NOTEOFF;
+            else
+                continue;
+
+            ev.data.note.note = midiFile[track][event][1];
+            ev.data.note.velocity = midiFile[track][event][2];
+
+            builder.HandleMidi(&ev, beat);
+
+            if ( beat > quantum )
+            {
+                quantum = beat;
+            }
+        }
+
+        if ( ! builder.RealTimeList().empty() )
+        {
+            quantum = ceil(quantum);
+            m_RealTimeSet.emplace_back(builder.RealTimeList(), quantum);
+            m_PosRealTimeEdit = m_RealTimeSet.size() - 1;
+            importedTracks += 1;
+        }
+    }
+
+    if ( importedTracks == 0 )
+        throw string("Something went wrong, nothing imported.");
 }
 
 int Pattern::NewList()
@@ -432,7 +491,7 @@ string Pattern::Label(size_t width)
         width = 80;
 
     if ( m_Label.size() > width - 2 )                    // Allow for quotes.
-        sprintf(format, "%%.%is...", width - 5);    // Allow for quotes and ellipsis.
+        sprintf(format, "%%.%lus...", width - 5);    // Allow for quotes and ellipsis.
     else
         strcpy(format, "%s");
 

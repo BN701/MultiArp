@@ -32,16 +32,18 @@ enum midi_input_modes_t
     MIDI_INPUT_OFF,
     MIDI_INPUT_QUICK,
     MIDI_INPUT_STEP,
-    MIDI_INPUT_REAL_TIME
+    MIDI_INPUT_REAL_TIME,
+    MIDI_INPUT_FILE
 };
 
 class ListBuilder
 {
     public:
-        ListBuilder(ableton::Link & linkInstance);
+        ListBuilder() {};
+        ListBuilder(ableton::Link * linkInstance);
         virtual ~ListBuilder();
 
-        bool HandleMidi(snd_seq_event_t *ev);
+        bool HandleMidi(snd_seq_event_t *ev, double inBeat = 0);
         bool HandleKeybInput(int c);
 
         StepList & CurrentList() { return m_StepList; }
@@ -71,9 +73,9 @@ class ListBuilder
         Cluster * Step(double phase, double stepValue);
 
     protected:
-        ableton::Link & m_Link;
-        int m_MidiInputMode;
-        int m_openNotes;
+        ableton::Link * m_Link = NULL;
+        int m_MidiInputMode = MIDI_INPUT_OFF;
+        int m_openNotes = 0;
         Note m_Activity;   // Something to show what's coming in.
         Cluster m_Captured;
         StepList m_StepList;

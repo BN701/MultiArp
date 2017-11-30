@@ -156,7 +156,6 @@ void queue_next_step(int queueId)
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
-
     g_State.Step(g_PatternStore.StepValueMultiplier());
 
     // Get time of next step from Link.
@@ -242,23 +241,30 @@ void queue_next_step(int queueId)
 
     repeater.Init(tempo, stepLengthMilliSecs);
 
-    for ( unsigned int i = 0; i < nextCluster.m_Notes.size(); i++ )
+    for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
     {
-        Note & note = nextCluster.m_Notes[i];
-
-        int noteNumber = note.m_NoteNumber;
+        int noteNumber = note->m_NoteNumber;
 
         if ( noteNumber < 0 )
             continue;
 
         unsigned char noteVelocity;
 
-        if ( note.m_NoteVelocity > 0 )
-            noteVelocity = note.m_NoteVelocity;
+        if ( true )
+        {
+            // Calculate adjustment in microseconds.
+            double phase = note->Phase();
+            double phaseAdjust = phase - g_State.Phase();
+            double timeAdjust = 60000000.0 * phaseAdjust/tempo;
+            queue_time_usec += static_cast<int64_t>(timeAdjust);
+        }
+
+        if ( note->m_NoteVelocity > 0 )
+            noteVelocity = note->m_NoteVelocity;
         else
             noteVelocity = g_PatternStore.NoteVelocity();
 
-        double noteLength = note.Length();
+        double noteLength = note->Length();
         if ( noteLength > 0 )
         {
             // Note length here is in beats. Convert to milliseconds.
@@ -267,7 +273,7 @@ void queue_next_step(int queueId)
 
         int64_t queue_time_delta = 0;
         int interval = 0;
-        repeater.Reset(/*noteNumber,*/ noteVelocity);
+        repeater.Reset(noteVelocity);
 
         do
         {

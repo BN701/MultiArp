@@ -44,6 +44,7 @@
 			<Add option="-lpanel" />
 			<Add library="../rtmidi-2.1.1/.libs/librtmidi.so" />
 			<Add library="libasound.a" />
+			<Add library="../midifile/lib/libmidifile.a" />
 		</Linker>
 		<Unit filename="Test Files/More Test Data.txt" />
 		<Unit filename="Test Files/Nice Clips, Autumn 2017.txt" />

@@ -891,6 +891,43 @@ bool StepList::HandleKey(key_type_t k)
 //
 //////////////////////////////////////////////////////////////////////////
 
+unordered_map<RealTimeListParams::rtp_window_mode_t, const char *> rtp_window_mode_names =
+{
+    {RealTimeListParams::normal, "normal"},
+    {RealTimeListParams::small, "small"},
+    {RealTimeListParams::look_ahead, "ahead"}
+};
+
+RealTimeListParams::rtp_window_mode_t rtp_window_mode_lookup(string s)
+{
+    static unordered_map<string, RealTimeListParams::rtp_window_mode_t> map;
+
+    // Initialize on first use.
+
+    if ( map.size() == 0 )
+        for ( RealTimeListParams::rtp_window_mode_t m = static_cast<RealTimeListParams::rtp_window_mode_t>(0);
+              m < RealTimeListParams::num_rtp_window_modes;
+              m = static_cast<RealTimeListParams::rtp_window_mode_t>(static_cast<int>(m) + 1) )
+        {
+            map.insert(std::make_pair(rtp_window_mode_names.at(m), m));
+        }
+
+    return map.at(s);
+}
+
+void RealTimeListParams::NextWindowMode( int dir )
+{
+    // Move up and down list but don't wrap.
+
+    int t = static_cast<int>(m_WindowMode) + dir;
+
+    if ( t >= 0 && t < static_cast<int>(num_rtp_window_modes))
+    {
+        m_WindowMode = static_cast<rtp_window_mode_t>(t);
+    }
+}
+
+
 void RealTimeListParams::SetStatus()
 {
     int pos = 0;
@@ -923,9 +960,9 @@ void RealTimeListParams::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
-    m_Status += " Small Window: ";
+    m_Status += " Window: Mode";
     pos = m_Status.size();
-    sprintf(buff, "%s", m_AdjustWindowToStep ? "on" : "off");
+    sprintf(buff, "%s", rtp_window_mode_names.at(m_WindowMode));
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
@@ -973,7 +1010,8 @@ bool RealTimeListParams::HandleKey(key_type_t k)
             m_Multiplier += inc;
             break;
         case rtp_window_adjust:
-            m_AdjustWindowToStep = true;
+            NextWindowMode(-1);
+//            m_AdjustWindowToStep = true;
             break;
         default:
             break;
@@ -998,7 +1036,8 @@ bool RealTimeListParams::HandleKey(key_type_t k)
             m_Multiplier -= inc;
             break;
         case rtp_window_adjust:
-            m_AdjustWindowToStep = false;
+            NextWindowMode(1);
+//            m_AdjustWindowToStep = false;
             break;
         default:
             break;
@@ -1230,7 +1269,7 @@ void RealTimeList::FromString(string s)
                 m_Params.m_Multiplier = stod(token);
                 break;
             case rtl_name_window_adjust:
-                m_Params.m_AdjustWindowToStep = token.find("on") == 0;
+                m_Params.m_WindowMode = rtp_window_mode_lookup(token);
                 break;
             default:
                 break;
@@ -1280,7 +1319,7 @@ string RealTimeList::ToString()
             rtl_element_names.at(rtl_name_loop), m_Params.m_LoopStart,
             rtl_element_names.at(rtl_name_quantum), m_Params.m_LocalQuantum,
             rtl_element_names.at(rtl_name_multiplier), m_Params.m_Multiplier,
-            rtl_element_names.at(rtl_name_window_adjust), m_Params.m_AdjustWindowToStep ? "on" : "off"
+            rtl_element_names.at(rtl_name_window_adjust), rtp_window_mode_names.at(m_Params.m_WindowMode)
             );
 
     result += buff;
@@ -1411,11 +1450,33 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
 
     double window = 4.0 / stepValue;
 
-    if ( m_Params.m_AdjustWindowToStep && abs(m_Params.m_Multiplier) < 1.0 )
-        window *= m_Params.m_Multiplier;
+//    if ( m_Params.m_AdjustWindowToStep && abs(m_Params.m_Multiplier) < 1.0 )
+//        window *= m_Params.m_Multiplier;
+//
+//    double windowStart = phase - window/2;
+//    double windowEnd = phase + window/2;
 
-    double windowStart = phase - window/2;
-    double windowEnd = phase + window/2;
+    double windowStart, windowEnd;
+
+    switch ( m_Params.m_WindowMode )
+    {
+    case RealTimeListParams::normal:
+    case RealTimeListParams::small:
+        if ( m_Params.m_WindowMode == RealTimeListParams::small && abs(m_Params.m_Multiplier) < 1.0 )
+            window *= m_Params.m_Multiplier;
+
+        windowStart = phase - window/2;
+        windowEnd = phase + window/2;
+        break;
+
+    case RealTimeListParams::look_ahead:
+        windowStart = phase;
+        windowEnd = phase + window;
+        break;
+
+    default:
+        break;
+    }
 
     for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(windowEnd); it++ )

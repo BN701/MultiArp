@@ -234,10 +234,21 @@ struct StepList : public CursorKeys
 
 struct RealTimeListParams : public CursorKeys
 {
+    enum rtp_window_mode_t
+    {
+        normal,
+        small,
+        look_ahead,
+        num_rtp_window_modes
+    };
+
     double m_LoopStart = 0.0;
     double m_LocalQuantum = 0.0;  // Loop length.
     double m_Multiplier = 1.0;
-    bool m_AdjustWindowToStep = true;  // Probably just if multiplier less than 1.
+    rtp_window_mode_t m_WindowMode = normal;
+//    bool m_AdjustWindowToStep = true;  // Probably just if multiplier less than 1.
+
+    void NextWindowMode( int dir );
 
     virtual void SetStatus();
     protected:

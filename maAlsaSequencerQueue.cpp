@@ -56,6 +56,24 @@ int AlsaSequencerQueue::Create(snd_seq_t * h, int pool_size)
 
     // snd_seq_set_client_pool_output(seq_handle, (seq_len<<1) + 4);
 
+#if 0
+    // Experiment to increase queue resolution.
+
+    // According to this, https://www.alsa-project.org/alsa-doc/alsa-lib/seq.html, there
+    // are actually two queues: one for events scheduled with ticks, the other for real time
+    // events. Working with Link, we're scheduling real time events.
+    //
+    // I think changing the PPQ only affects events scheduled with ticks. Certainly,
+    // reducing PPQ something very low has no effect on our own timing. (To check that
+    // these calls are working, use "cat queues" in /proc/asound/seq/.)
+
+    snd_seq_queue_tempo_t *tempo;
+    snd_seq_queue_tempo_alloca(&tempo);
+    snd_seq_queue_tempo_set_tempo(tempo, 1000000); // 60 BPM
+    snd_seq_queue_tempo_set_ppq(tempo, 12); // 960 is what we get with Reaper midi export.
+    snd_seq_set_queue_tempo(m_SeqHandle, m_QueueId, tempo);
+#endif
+
     return m_QueueId;
 }
 

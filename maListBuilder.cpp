@@ -289,16 +289,22 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                 }
                 else
                 {
-                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
-                    if ( it != m_OpenNotes.end() )
+                    map<unsigned char,Note>::iterator openPair = m_OpenNotes.find(ev->data.note.note);
+                    if ( openPair != m_OpenNotes.end() )
                     {
-                        Note note = m_OpenNotes.at(ev->data.note.note);
-                        m_OpenNotes.erase(it);
+                        double beatStart = openPair->second.Phase();
+                        openPair->second.SetLength(inBeat - beatStart);
 
-                        double beatStart = note.Phase();
-                        note.SetLength(inBeat - beatStart);
+                        m_RealTimeList.insert(make_pair(openPair->second.Phase(), openPair->second));
+                        m_OpenNotes.erase(openPair);
 
-                        m_RealTimeList.insert(make_pair(note.Phase(), note));
+//                        Note note = m_OpenNotes.at(ev->data.note.note);
+//                        m_OpenNotes.erase(it);
+//
+//                        double beatStart = note.Phase();
+//                        note.SetLength(inBeat - beatStart);
+//
+//                        m_RealTimeList.insert(make_pair(note.Phase(), note));
                     }
 
                 }

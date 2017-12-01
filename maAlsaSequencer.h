@@ -50,7 +50,7 @@ public:
         return m_NextScheduleTime.tv_nsec;
     }
 
-    bool ScheduleNote(int queueId, int note, int vel, int len);
+    bool ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len);
     bool ScheduleEcho(int queueId);
 
     snd_seq_t * Handle()

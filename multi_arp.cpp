@@ -237,7 +237,7 @@ void queue_next_step(int queueId)
      */
 
     double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
-    double duration = stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength());
+    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
 
     repeater.Init(tempo, stepLengthMilliSecs);
 
@@ -250,14 +250,18 @@ void queue_next_step(int queueId)
 
         unsigned char noteVelocity;
 
+        int64_t timeAdjust = 0;
+
         if ( true )
         {
             // Calculate adjustment in microseconds.
-            double phase = note->Phase();
-            double phaseAdjust = phase - g_State.Phase();
-            double timeAdjust = 60000000.0 * phaseAdjust/tempo;
-            queue_time_usec += static_cast<int64_t>(timeAdjust);
+            double phase = g_State.Phase();
+            double notePhase = note->Phase();
+            double phaseAdjust = note->Phase() - g_State.Phase();
+            timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
         }
+
+        int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
 
         if ( note->m_NoteVelocity > 0 )
             noteVelocity = note->m_NoteVelocity;
@@ -265,10 +269,10 @@ void queue_next_step(int queueId)
             noteVelocity = g_PatternStore.NoteVelocity();
 
         double noteLength = note->Length();
-        if ( noteLength > 0 )
+        if ( lround(noteLength * 100) > 0 )
         {
             // Note length here is in beats. Convert to milliseconds.
-            duration = 60000.0 * noteLength / tempo;
+            duration = lround(60000.0 * noteLength / tempo);
         }
 
         int64_t queue_time_delta = 0;
@@ -278,7 +282,7 @@ void queue_next_step(int queueId)
         do
         {
             int note = translator.TranslateUsingNoteMap(noteNumber, interval);
-            g_Sequencer.SetScheduleTime(queue_time_usec + queue_time_delta);
+            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
             g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
         }
         while ( repeater.Step(queue_time_delta, interval, noteVelocity) );

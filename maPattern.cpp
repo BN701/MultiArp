@@ -412,7 +412,12 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
 {
     MidiFile midiFile;
 
+    // Extract file name and add default path and extension if
+    // not already present.
+
     s = s.substr(s.find(' ') + 1);
+    if ( s.find('/') == string::npos )
+        s.insert(0, "Midi Files/");
     if ( s.find(".mid") == string::npos )
         s += ".mid";
 
@@ -433,6 +438,7 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
         for (int event = 0; event < midiFile[track].size(); event++ )
         {
             double beat = static_cast<double>(midiFile[track][event].tick)/ppq;
+//            beat = static_cast<double>(lround(beat*100))/100;
             snd_seq_event_t ev = {0};
 
             if ( midiFile[track][event].isNoteOn() )

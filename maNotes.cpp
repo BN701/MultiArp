@@ -893,8 +893,8 @@ bool StepList::HandleKey(key_type_t k)
 
 unordered_map<RealTimeListParams::rtp_window_mode_t, const char *> rtp_window_mode_names =
 {
-    {RealTimeListParams::normal, "normal"},
-    {RealTimeListParams::small, "small"},
+    {RealTimeListParams::normal, "centered"},
+    {RealTimeListParams::small, "centered-small"},
     {RealTimeListParams::look_ahead, "ahead"}
 };
 
@@ -960,7 +960,7 @@ void RealTimeListParams::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
-    m_Status += " Window: Mode";
+    m_Status += " Window Mode: ";
     pos = m_Status.size();
     sprintf(buff, "%s", rtp_window_mode_names.at(m_WindowMode));
     m_Status += buff;

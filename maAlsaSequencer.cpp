@@ -74,7 +74,7 @@ void AlsaSequencer::SetScheduleTime(uint64_t t)
     m_NextScheduleTime.tv_nsec = (t % 1000000) * 1000;
 }
 
-bool AlsaSequencer::ScheduleNote(int queueId, int note, int vel, int len)
+bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len)
 {
     snd_seq_event_t ev;
 

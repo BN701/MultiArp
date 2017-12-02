@@ -78,6 +78,7 @@ struct Note : public CursorKeys
     static int NoteNumberFromString(std::string note);
 
     void SetPhase( double val ) { m_Phase = val; }
+    void AdjustPhase ( double mul, double ofs = 0 ) { m_Phase = m_Phase * mul + ofs; }
     double Phase() { return m_Phase; }
 
     void SetLength( double val ) { m_Length = val; }
@@ -115,8 +116,17 @@ struct Cluster : public CursorKeys
         return *this; // return the result by reference
     }
 
-    void Add(int n, int v = -1) { m_Notes.push_back(Note(n, v)); }
-    void Add(Note & note) { m_Notes.push_back(note); }
+    Note & Add(int n, int v = -1)
+    {
+        m_Notes.push_back(Note(n, v));
+        return m_Notes.back();
+    }
+
+    Note & Add(Note & note)
+    {
+        m_Notes.push_back(note);
+        return m_Notes.back();
+    }
 
     void Clear() { m_Notes.clear(); }
     bool Empty() { return m_Notes.empty(); }

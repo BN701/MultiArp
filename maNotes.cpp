@@ -939,7 +939,6 @@ void RealTimeListParams::SetStatus()
     sprintf(buff, "[RT List %i] ", m_ItemID);
     m_Status = buff;
 
-
     m_Status += " Loop - ";
 
     m_Status += "S: ";
@@ -1448,7 +1447,7 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;
 
-    double window = 4.0 / stepValue;
+    double window = 4.0 * m_Params.m_Multiplier/stepValue;
 
 //    if ( m_Params.m_AdjustWindowToStep && abs(m_Params.m_Multiplier) < 1.0 )
 //        window *= m_Params.m_Multiplier;
@@ -1480,7 +1479,9 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
 
     for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(windowEnd); it++ )
-        cluster.Add(it->second);
+    {
+        cluster.Add(it->second).AdjustPhase(1.0 / m_Params.m_Multiplier);
+    }
 
     // When phase is zero, window start will be negative, so we also need to
     // look for notes at the top of the loop that would normally be quantized

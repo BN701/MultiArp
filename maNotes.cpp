@@ -419,6 +419,13 @@ bool Note::HandleKey(key_type_t k)
     return true;
 }
 
+void Note::AdjustPhase( double multiplier, double phase, double globalPhase, double base )
+{
+    double phaseOffset = (phase - m_Phase - base) / multiplier;
+    m_Phase = globalPhase - phaseOffset;
+}
+
+
 //
 // Cluster
 //
@@ -1344,6 +1351,7 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
 
     char buff[100];
     sprintf(buff, "%05.2f ", m_LastRequestedPhase);
+//    sprintf(buff, "%05.2f ", m_InternalBeat);
 
     string result = buff;
 
@@ -1448,13 +1456,6 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
     m_LastRequestedPhase = phase;
 
     double window = 4.0 * m_Params.m_Multiplier/stepValue;
-
-//    if ( m_Params.m_AdjustWindowToStep && abs(m_Params.m_Multiplier) < 1.0 )
-//        window *= m_Params.m_Multiplier;
-//
-//    double windowStart = phase - window/2;
-//    double windowEnd = phase + window/2;
-
     double windowStart, windowEnd;
 
     switch ( m_Params.m_WindowMode )
@@ -1480,8 +1481,97 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
     for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
                     it != m_RealTimeList.upper_bound(windowEnd); it++ )
     {
-        cluster.Add(it->second).AdjustPhase(1.0 / m_Params.m_Multiplier);
+        cluster.Add(it->second);
     }
+
+    // When phase is zero, window start will be negative, so we also need to
+    // look for notes at the top of the loop that would normally be quantized
+    // up to next beat zero.
+
+//    if ( windowStart < 0 )
+//    {
+//        windowStart += m_LinkQuantum;
+//        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+//                    it != m_RealTimeList.upper_bound(m_LinkQuantum); it++ )
+//            m_Captured.Add(it->second);
+//    }
+
+//    return result;
+
+}
+
+void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue /*, double quantum*/)
+{
+    bool localLoop = lround(m_Params.m_LocalQuantum) > 0;
+
+//    phase *= m_Params.m_Multiplier;
+
+    double phase = fmod(m_Params.m_Multiplier * m_InternalBeat, m_QuantumAtCapture);
+
+//    phase = lround(phase * 100)/100.0;
+
+    // Wrap to start of local loop.
+
+    if ( localLoop )
+        while ( phase > m_Params.m_LocalQuantum )
+            phase -= m_Params.m_LocalQuantum;
+
+    phase += m_Params.m_LoopStart;
+
+    // Wrap to start of capture loop loop.
+
+
+    if ( localLoop )
+        while ( phase > m_QuantumAtCapture )
+            phase -= m_QuantumAtCapture;
+
+    m_LastRequestedStepValue = stepValue;
+    m_LastRequestedPhase = phase;
+
+    double window = 4.0 * m_Params.m_Multiplier/stepValue;
+    double windowStart, windowEnd;
+
+    switch ( m_Params.m_WindowMode )
+    {
+    case RealTimeListParams::normal:
+    case RealTimeListParams::small:
+        if ( m_Params.m_WindowMode == RealTimeListParams::small && abs(m_Params.m_Multiplier) < 1.0 )
+            window *= m_Params.m_Multiplier;
+
+        windowStart = phase - window/2;
+        windowEnd = phase + window/2;
+        break;
+
+    case RealTimeListParams::look_ahead:
+        windowStart = phase;
+        windowEnd = phase + window;
+        break;
+
+    default:
+        break;
+    }
+
+    for ( int N = ceil(windowStart/m_QuantumAtCapture) - 1; N < ceil(windowEnd/m_QuantumAtCapture); N++ )
+    {
+        double lower = windowStart - N * m_QuantumAtCapture;
+        double upper = windowEnd - N * m_QuantumAtCapture;
+        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(lower);
+                        it != m_RealTimeList.upper_bound(upper); it++ )
+            cluster.Add(it->second).AdjustPhase(m_Params.m_Multiplier, phase, globalPhase, N * m_QuantumAtCapture);
+    }
+
+//    for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
+//                    it != m_RealTimeList.upper_bound(windowEnd); it++ )
+//    {
+////        Note & n = cluster.Add(it->second);
+////
+////        double phaseOffset = phase - n.Phase();
+////        phaseOffset *= 1.0 / m_Params.m_Multiplier;
+////        n.SetPhase(globalPhase - phaseOffset);
+//        cluster.Add(it->second).AdjustPhase(1.0 / m_Params.m_Multiplier, globalPhase - phase);
+//    }
+
+    m_InternalBeat += 4.0 / stepValue;
 
     // When phase is zero, window start will be negative, so we also need to
     // look for notes at the top of the loop that would normally be quantized

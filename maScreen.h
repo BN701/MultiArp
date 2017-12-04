@@ -57,6 +57,9 @@
 #define KEY_SPGUP   398
 #define KEY_SPGDOWN 396
 
+#define KEY_TAB     9
+#define KEY_STAB    353
+
 // These are no different to plain PGUP/PGDOWN
 
 #define KEY_CPGUP
@@ -91,6 +94,7 @@ public:
     ~Display();
 
     void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
+    void NextBigPanelPage( int direction );
     big_panel_page_t BigPanelPage() { return m_BigPanelPage; }
     void ToggleBigPanelHold() { m_BigPanelHold = ! m_BigPanelHold; }
     bool BigPanelHold() { return m_BigPanelHold; }

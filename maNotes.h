@@ -78,7 +78,7 @@ struct Note : public CursorKeys
     static int NoteNumberFromString(std::string note);
 
     void SetPhase( double val ) { m_Phase = val; }
-    void AdjustPhase ( double mul, double ofs = 0 ) { m_Phase = m_Phase * mul + ofs; }
+    void AdjustPhase ( double multiplier, double phase, double globalPhase, double base );
     double Phase() { return m_Phase; }
 
     void SetLength( double val ) { m_Length = val; }
@@ -155,7 +155,6 @@ struct Cluster : public CursorKeys
 
 struct StepList : public CursorKeys
 {
-
     std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
     std::vector<Cluster>::size_type m_LastRequestedPos;     // Last position for which note info was requested.
     std::vector<Cluster> m_Clusters;
@@ -282,16 +281,26 @@ struct RealTimeList : public CursorKeys
     double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
 
+    double m_InternalBeat = 0;
+    void ResetPosition() { m_InternalBeat = 0; }
+
     double m_LastRequestedStepValue = 4.0;
     double m_LastRequestedPhase = 0.0;
 
     void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
+    void Step2(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
     RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
         m_QuantumAtCapture(quantum),
         m_RealTimeList(realTimeList)
     {
         m_Help = "S-Del: delete note, C-Del: UNDO delete!, Up/Down: move note";
+    }
+
+    void RaiseQuantumAtCapture( double val )
+    {
+        if ( m_QuantumAtCapture < val )
+            m_QuantumAtCapture = val;
     }
 
     void FromString(std::string s);

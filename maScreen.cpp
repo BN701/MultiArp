@@ -157,6 +157,22 @@ Display::~Display()
     endwin();			/* End curses mode		  */
 }
 
+void Display::NextBigPanelPage( int direction )
+{
+    if ( direction > 0 )
+    {
+        m_BigPanelPage = static_cast<big_panel_page_t>(m_BigPanelPage + 1);
+        if ( m_BigPanelPage == num_big_panel_pages )
+            m_BigPanelPage = one;
+    }
+    else
+    {
+        m_BigPanelPage = static_cast<big_panel_page_t>(m_BigPanelPage - 1);
+        if ( m_BigPanelPage < one )
+            m_BigPanelPage = static_cast<big_panel_page_t>(num_big_panel_pages - 1);
+    }
+}
+
 Display g_Display;
 
 void highlight(int base_row, int base_col, int ofs, int len, int attr, int colour)
@@ -401,10 +417,10 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
 
         for ( auto it = pairs.begin(); it != pairs.end(); it++ )
         {
-            if ( it-> m_NoteIn >= 0 )
-            {
-                mvwaddch(panel, 3, it->m_NoteIn - kbdStart, '^');
-            }
+//            if ( it-> m_NoteIn >= 0 )
+//            {
+//                mvwaddch(panel, 3, it->m_NoteIn - kbdStart, '^');
+//            }
 
             if ( it->m_NoteOut >= 0 )
             {

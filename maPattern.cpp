@@ -97,7 +97,7 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater, double & stepValu
     // Collect any real time events.
 
     for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
-        it->Step(cluster, phase, stepValue);
+        it->Step2(cluster, phase, stepValue);
 
 }
 
@@ -428,12 +428,12 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
     int tracks = midiFile.getTrackCount();
     int ppq = midiFile.getTicksPerQuarterNote();
 
+    double captureQuantum = 0;
+
     for ( int track = 0; track < tracks; track++ )
     {
         ListBuilder builder;
         builder.SetMidiInputMode(MIDI_INPUT_FILE);
-
-        double quantum = 0;
 
         for (int event = 0; event < midiFile[track].size(); event++ )
         {
@@ -453,20 +453,26 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
 
             builder.HandleMidi(&ev, beat);
 
-            if ( beat > quantum )
+            if ( beat > captureQuantum )
             {
-                quantum = beat;
+                captureQuantum = beat;
             }
         }
 
         if ( ! builder.RealTimeList().empty() )
         {
-            quantum = ceil(quantum);
-            m_RealTimeSet.emplace_back(builder.RealTimeList(), quantum);
+            captureQuantum = ceil(captureQuantum);
+            m_RealTimeSet.emplace_back(builder.RealTimeList(), captureQuantum);
             m_PosRealTimeEdit = m_RealTimeSet.size() - 1;
             importedTracks += 1;
         }
     }
+
+    // TODO: This is fine if we're loading a pattern from scratch, but is this
+    //       OK if there were already lists in the pattern?
+
+    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList ++ )
+        rtList->RaiseQuantumAtCapture(ceil(captureQuantum));
 
     if ( importedTracks == 0 )
         throw string("Something went wrong, nothing imported.");

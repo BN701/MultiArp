@@ -123,13 +123,11 @@ struct Pattern
         m_Pos = 0;
         m_TrigList.ResetPosition();
 
-        for ( std::vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++ )
-            (*i).ResetPosition();
+        for ( auto stepList = m_StepListSet.begin(); stepList != m_StepListSet.end(); stepList++ )
+            stepList->ResetPosition();
 
-        // Note: Realtime Lists have no intrinsic play pointer. We pass them
-        // a beat value and window size, and gather up whatever notes are within
-        // range. (Maybe this will change in future.)
-
+        for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++ )
+            rtList->ResetPosition();
     }
 
     void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue);

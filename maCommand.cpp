@@ -143,7 +143,7 @@ enum command_t
 
     C_LIST_RT,          // Real time list commands.
     C_LIST_RT_DELETE,
-
+    C_LIST_RT_RATE,     // Set playback multipliers for all lists
     C_HELP_1,
     C_HELP_2,
     C_HELP_3,
@@ -290,6 +290,9 @@ unordered_map<string, command_t> gCommandList =
     {"rt", C_LIST_RT},
     {"real time delete", C_LIST_RT_DELETE},
     {"rt delete", C_LIST_RT_DELETE},
+    {"rt del", C_LIST_RT_DELETE},
+    {"real time rate", C_LIST_RT_RATE},
+    {"rt rate", C_LIST_RT_RATE},
     {"status", C_STATUS},
     {"stat", C_STATUS},
     {"undo", C_UNDO},
@@ -922,6 +925,12 @@ bool do_command(string/*const char * */ commandString)
             g_PatternStore.DeleteCurrentRealTimeList();
             g_PatternStore.SetFocus();
             g_PatternStore.SetStatus();
+            show_status_after_navigation();
+            break;
+
+        case C_LIST_RT_RATE:
+            g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens);
+            set_status(STAT_POS_2, "Playback rates set for all Real Time lists in this pattern.");
             show_status_after_navigation();
             break;
 

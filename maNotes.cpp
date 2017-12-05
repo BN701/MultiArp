@@ -956,7 +956,7 @@ void RealTimeListParams::SetStatus()
 
     m_Status += " Q: ";
     pos = m_Status.size();
-    sprintf(buff, "%.2f", m_LocalQuantum);
+    sprintf(buff, "%.2f", m_Quantum);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
@@ -999,6 +999,23 @@ bool RealTimeListParams::HandleKey(key_type_t k)
             m_RTParamsFocus = static_cast<rt_params_menu_focus_t>(temp);
         break;
 
+    case del:
+        switch ( m_RTParamsFocus )
+        {
+        case rtp_loop_start:
+            m_LoopStart = 0;
+            break;
+        case rtp_local_quantum:
+            m_Quantum = m_QuantumAtCapture;
+            break;
+        case rtp_multiplier:
+            m_Multiplier = 1.0;
+            break;
+        default:
+            break;
+        }
+        break;
+
     case shift_up:
         inc = 0.01;
     case up:
@@ -1008,16 +1025,15 @@ bool RealTimeListParams::HandleKey(key_type_t k)
             m_LoopStart += inc;
             break;
         case rtp_local_quantum:
-            m_LocalQuantum += inc;
-            if ( m_LocalQuantum == 0 )
-                m_LocalQuantum += inc;
+            m_Quantum += inc;
+            if ( m_Quantum == 0 )
+                m_Quantum += inc;
             break;
         case rtp_multiplier:
             m_Multiplier += inc;
             break;
         case rtp_window_adjust:
             NextWindowMode(-1);
-//            m_AdjustWindowToStep = true;
             break;
         default:
             break;
@@ -1033,17 +1049,16 @@ bool RealTimeListParams::HandleKey(key_type_t k)
             m_LoopStart -= inc;
             break;
         case rtp_local_quantum:
-            if ( m_LocalQuantum - inc < 0 )
-                m_LocalQuantum = 0;
+            if ( m_Quantum - inc < 0.01 )
+                m_Quantum = 0.01;
             else
-                m_LocalQuantum -= inc;
+                m_Quantum -= inc;
             break;
         case rtp_multiplier:
             m_Multiplier -= inc;
             break;
         case rtp_window_adjust:
             NextWindowMode(1);
-//            m_AdjustWindowToStep = false;
             break;
         default:
             break;
@@ -1269,7 +1284,7 @@ void RealTimeList::FromString(string s)
                 m_Params.m_LoopStart = stod(token);
                 break;
             case rtl_name_quantum:
-                m_Params.m_LocalQuantum = stod(token);
+                m_Params.m_Quantum = stod(token);
                 break;
             case rtl_name_multiplier:
                 m_Params.m_Multiplier = stod(token);
@@ -1323,7 +1338,7 @@ string RealTimeList::ToString()
     char buff[200];
     sprintf(buff, " %s %.3f %s %.3f %s %.3f %s '%s'",
             rtl_element_names.at(rtl_name_loop), m_Params.m_LoopStart,
-            rtl_element_names.at(rtl_name_quantum), m_Params.m_LocalQuantum,
+            rtl_element_names.at(rtl_name_quantum), m_Params.m_Quantum,
             rtl_element_names.at(rtl_name_multiplier), m_Params.m_Multiplier,
             rtl_element_names.at(rtl_name_window_adjust), rtp_window_mode_names.at(m_Params.m_WindowMode)
             );
@@ -1355,7 +1370,7 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
 
     string result = buff;
 
-    long topLimit = lround(1000 * m_QuantumAtCapture);
+    long topLimit = lround(1000 * m_Params.m_QuantumAtCapture);
     long midLimit = lround(1000 * m_LastRequestedPhase);
 
     double windowPos = m_LastRequestedPhase;
@@ -1426,31 +1441,26 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
     return result;
 }
 
-void RealTimeList::FromMidiFile(string s)
-{
-
-}
-
 
 void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
 {
-    bool localLoop = lround(m_Params.m_LocalQuantum) > 0;
+    bool localLoop = lround(m_Params.m_Quantum) > 0;
 
     phase *= m_Params.m_Multiplier;
 
     // Wrap to start of local loop.
 
     if ( localLoop )
-        while ( phase > m_Params.m_LocalQuantum )
-            phase -= m_Params.m_LocalQuantum;
+        while ( phase > m_Params.m_Quantum )
+            phase -= m_Params.m_Quantum;
 
     phase += m_Params.m_LoopStart;
 
     // Wrap to start of capture loop loop.
 
     if ( localLoop )
-        while ( phase > m_QuantumAtCapture )
-            phase -= m_QuantumAtCapture;
+        while ( phase > m_Params.m_QuantumAtCapture )
+            phase -= m_Params.m_QuantumAtCapture;
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;
@@ -1502,28 +1512,8 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
 
 void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue /*, double quantum*/)
 {
-    bool localLoop = lround(m_Params.m_LocalQuantum) > 0;
-
-//    phase *= m_Params.m_Multiplier;
-
-    double phase = fmod(m_Params.m_Multiplier * m_InternalBeat, m_QuantumAtCapture);
-
-//    phase = lround(phase * 100)/100.0;
-
-    // Wrap to start of local loop.
-
-    if ( localLoop )
-        while ( phase > m_Params.m_LocalQuantum )
-            phase -= m_Params.m_LocalQuantum;
-
-    phase += m_Params.m_LoopStart;
-
-    // Wrap to start of capture loop loop.
-
-
-    if ( localLoop )
-        while ( phase > m_QuantumAtCapture )
-            phase -= m_QuantumAtCapture;
+    double phase = fmod(m_Params.m_Multiplier * m_InternalBeat, m_Params.m_Quantum);
+    m_InternalBeat += 4.0 / stepValue;
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;
@@ -1551,40 +1541,32 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
         break;
     }
 
-    for ( int N = ceil(windowStart/m_QuantumAtCapture) - 1; N < ceil(windowEnd/m_QuantumAtCapture); N++ )
+    // Swap round if negative multiplier (reverse play).
+
+    if ( windowStart > windowEnd )
     {
-        double lower = windowStart - N * m_QuantumAtCapture;
-        double upper = windowEnd - N * m_QuantumAtCapture;
-        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(lower);
-                        it != m_RealTimeList.upper_bound(upper); it++ )
-            cluster.Add(it->second).AdjustPhase(m_Params.m_Multiplier, phase, globalPhase, N * m_QuantumAtCapture);
+        double t = windowStart;
+        windowStart = windowEnd;
+        windowEnd = t;
     }
 
-//    for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
-//                    it != m_RealTimeList.upper_bound(windowEnd); it++ )
-//    {
-////        Note & n = cluster.Add(it->second);
-////
-////        double phaseOffset = phase - n.Phase();
-////        phaseOffset *= 1.0 / m_Params.m_Multiplier;
-////        n.SetPhase(globalPhase - phaseOffset);
-//        cluster.Add(it->second).AdjustPhase(1.0 / m_Params.m_Multiplier, globalPhase - phase);
-//    }
+    // Step window may overlap either end of the original capture range (m_Params.m_Quantum), or may even
+    // be bigger than the capture window, in which case we need to repeat the captured data at new locations
+    // within the step window for playback. Here, N represents the capture window as it slides over the step
+    // window, starting with the value of N that contains windowStart, ending with the value of N that contains
+    // windowEnd. For each position of N, we grab the relevant events and map them to their playback location in
+    // the playback stream, marked by globalPhase.
 
-    m_InternalBeat += 4.0 / stepValue;
+    for ( int N = ceil(windowStart/m_Params.m_Quantum) - 1; N < ceil(windowEnd/m_Params.m_Quantum); N++ )
+    {
+        double rangeOffset = N * m_Params.m_Quantum - m_Params.m_LoopStart;
+        double lower = windowStart - rangeOffset;
+        double upper = windowEnd - rangeOffset;
 
-    // When phase is zero, window start will be negative, so we also need to
-    // look for notes at the top of the loop that would normally be quantized
-    // up to next beat zero.
+        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(lower);
+                        it != m_RealTimeList.upper_bound(upper); it++ )
+            cluster.Add(it->second).AdjustPhase(m_Params.m_Multiplier, phase, globalPhase, rangeOffset);
+    }
 
-//    if ( windowStart < 0 )
-//    {
-//        windowStart += m_LinkQuantum;
-//        for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(windowStart);
-//                    it != m_RealTimeList.upper_bound(m_LinkQuantum); it++ )
-//            m_Captured.Add(it->second);
-//    }
-
-//    return result;
 
 }

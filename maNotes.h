@@ -252,7 +252,8 @@ struct RealTimeListParams : public CursorKeys
     };
 
     double m_LoopStart = 0.0;
-    double m_LocalQuantum = 0.0;  // Loop length.
+    double m_QuantumAtCapture;
+    double m_Quantum = 0.0;  // Loop length.
     double m_Multiplier = 1.0;
     rtp_window_mode_t m_WindowMode = normal;
 //    bool m_AdjustWindowToStep = true;  // Probably just if multiplier less than 1.
@@ -278,7 +279,7 @@ struct RealTimeListParams : public CursorKeys
 
 struct RealTimeList : public CursorKeys
 {
-    double m_QuantumAtCapture;
+//    double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
 
     double m_InternalBeat = 0;
@@ -291,23 +292,28 @@ struct RealTimeList : public CursorKeys
     void Step2(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
 
     RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
-        m_QuantumAtCapture(quantum),
+//        m_QuantumAtCapture(quantum),
         m_RealTimeList(realTimeList)
     {
+        m_Params.m_Quantum = quantum;
+        m_Params.m_QuantumAtCapture = quantum;
         m_Help = "S-Del: delete note, C-Del: UNDO delete!, Up/Down: move note";
     }
 
     void RaiseQuantumAtCapture( double val )
     {
-        if ( m_QuantumAtCapture < val )
-            m_QuantumAtCapture = val;
+        if ( m_Params.m_QuantumAtCapture < val )
+        {
+            m_Params.m_QuantumAtCapture = val;
+            m_Params.m_Quantum = val;
+        }
     }
 
     void FromString(std::string s);
-    void FromMidiFile(std::string s);
     std::string ToString();
     std::string ToStringForDisplay(int & offset, int & length, int width = 75);
 
+    void SetMultiplier( double val ) { m_Params.m_Multiplier = val; }
     virtual void SetStatus();
     protected:
 

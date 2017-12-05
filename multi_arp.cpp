@@ -255,8 +255,6 @@ void queue_next_step(int queueId)
         if ( true )
         {
             // Calculate adjustment in microseconds.
-            double phase = g_State.Phase();
-            double notePhase = note->Phase();
             double phaseAdjust = note->Phase() - g_State.Phase();
             timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
         }

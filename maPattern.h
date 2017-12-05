@@ -90,7 +90,6 @@ struct Pattern
     void Clear ()
     {
         m_Label.clear();
-//        m_Trigs.clear();
         m_StepListSet.clear();
         ResetPosition();
         m_TranslateTable.Reset();
@@ -140,21 +139,17 @@ struct Pattern
     size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
     std::string Label() { return m_Label; }
     std::string Label(size_t width);
-//    std::string RealTimeListToStringForDisplay(std::vector<int>::size_type n);
-//    std::string ListToString(std::vector<int>::size_type n);
     std::string TrigsToStringForDisplay();
-//    std::string TrigsToString();
     std::string ToString(const char * prefix);
-//    std::string DisplayNonScrolling(std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
     std::string Display(int mode, std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
 
     bool FromString(std::string s, int & updates);
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
     void AddRealTimeListFromMidiFile(std::string s);
+    void SetRealTimeMultipliers(std::vector<std::string> & tokens);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
-//    bool PlayPositionInfo(int & listIndex, int & offset, int & length);
 
     void ReplaceList(StepList & noteList);
     int NewList();

@@ -438,7 +438,6 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
         for (int event = 0; event < midiFile[track].size(); event++ )
         {
             double beat = static_cast<double>(midiFile[track][event].tick)/ppq;
-//            beat = static_cast<double>(lround(beat*100))/100;
             snd_seq_event_t ev = {0};
 
             if ( midiFile[track][event].isNoteOn() )
@@ -455,27 +454,67 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
 
             if ( beat > captureQuantum )
             {
-                captureQuantum = beat;
+                captureQuantum = ceil(beat);
             }
         }
 
         if ( ! builder.RealTimeList().empty() )
         {
-            captureQuantum = ceil(captureQuantum);
-            m_RealTimeSet.emplace_back(builder.RealTimeList(), captureQuantum);
+            m_RealTimeSet.emplace_back(builder.RealTimeList());
             m_PosRealTimeEdit = m_RealTimeSet.size() - 1;
             importedTracks += 1;
         }
     }
 
-    // TODO: This is fine if we're loading a pattern from scratch, but is this
-    //       OK if there were already lists in the pattern?
+    // TODO: This is fine if we're loading a pattern from empty, but is this
+    //       OK if there are already lists in the pattern?
 
     for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList ++ )
-        rtList->RaiseQuantumAtCapture(ceil(captureQuantum));
+        rtList->RaiseQuantumAtCapture(captureQuantum);
 
     if ( importedTracks == 0 )
         throw string("Something went wrong, nothing imported.");
+}
+
+void Pattern::SetRealTimeMultipliers(std::vector<string> & tokens)
+{
+    if ( m_RealTimeSet.empty() )
+        throw string("Pattern::SetRealTimeMultipliers() - No RealTime lists present.");
+
+    // Look for 'base' plus 'step'. ('tokens' may contain two *or* three command
+    // parameters, so we need to scan.)
+
+    auto token = tokens.begin();
+
+    for ( ; token != tokens.end(); token ++ )
+        if ( *token == "rate" )
+            break;
+
+    if ( token == tokens.end() || ++token == tokens.end() )
+        throw string("real time rate \"rate\" [\"step\"]");
+
+    double rate = 1.0;
+    double increment = 0.0;
+
+    try
+    {
+        // Token should now point to rate.
+
+        rate = stod(token->c_str());
+
+        // Now look for optional step increment.
+
+        if ( ++token != tokens.end() )
+            increment = stod(token->c_str());
+
+    }
+    catch (...)
+    {
+        throw string("Pattern::SetRealTimeMultipliers() - There's something wrong with the parameter list.");
+    }
+
+    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++, rate += increment)
+        rtList->SetMultiplier(rate);
 }
 
 int Pattern::NewList()

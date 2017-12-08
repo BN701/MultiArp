@@ -58,7 +58,8 @@
 #define KEY_SPGDOWN 396
 
 #define KEY_TAB     9
-#define KEY_STAB    353
+#define KEY_SHTAB    353 // "KEY_STAB", my preferred name, is already defined in /usr/include/curses.h as "0524", /* set-tab key */"
+
 
 // These are no different to plain PGUP/PGDOWN
 

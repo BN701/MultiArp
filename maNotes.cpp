@@ -1442,7 +1442,7 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
 }
 
 
-void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/)
+void RealTimeList::Step(Cluster & cluster, double phase, double stepValue)
 {
     bool localLoop = lround(m_Params.m_Quantum) > 0;
 
@@ -1510,10 +1510,58 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue /*, do
 
 }
 
-void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue /*, double quantum*/)
+bool RealTimeList::PhazeIsZero()
 {
-    double phase = fmod(m_Params.m_Multiplier * m_InternalBeat, m_Params.m_Quantum);
-    m_InternalBeat += 4.0 / stepValue;
+    return lround(m_LastRequestedPhase * 1000.0) == 0;
+}
+
+unsigned long RealTimeList::PhaseLength()
+{
+    // Lets do this with integers, return the result in thousanths of a beat. (mBeat?)
+    unsigned long adjustedQuantum = lround(1000.0 * m_Params.m_Multiplier * m_Params.m_Quantum);
+    unsigned long quantum = lround(1000.0 * m_Params.m_Quantum);
+
+    // Using lowest common multiple gives us the 'adjusted' result, which would need to be
+    // adjusted back by dividing by multiplier and converting to double along the way. So
+    // use brute force search instead.
+
+    // return lcm(quantum, adjustedQuantum);
+
+    unsigned long temp = 0;
+    unsigned long result = 0;
+
+    do
+    {
+        temp += adjustedQuantum;
+        result += quantum;
+    } while ( temp % quantum != 0 );
+
+    return result;
+
+    // This method is unreliable: fmod() seems to return
+    // a whole value of m_Quantum for some values
+    // of adjustedQuantum, which means we don't find the
+    // lowest multiple. (Rounding errors, I guess.)
+
+//    double t = adjustedQuantum;
+//    int mod = 0;
+//
+//    do
+//    {
+//        t += adjustedQuantum;
+//        mod = lround(1000.0 * fmod(t, m_Params.m_Quantum));
+//    } while ( mod != 0 );
+
+//    return 0.001 * static_cast<double>(t) / m_Params.m_Multiplier;
+}
+
+void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue, double patternBeat)
+{
+//    double altPhase = fmod(m_Params.m_Multiplier * patternBeat, m_Params.m_Quantum);
+
+    long lTemp = lround(1000.0 * m_Params.m_Multiplier * patternBeat);
+    long lPhase = lTemp % lround(1000.0 * m_Params.m_Quantum);
+    double phase = static_cast<double>(lPhase)/1000;
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;

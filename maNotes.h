@@ -279,20 +279,18 @@ struct RealTimeListParams : public CursorKeys
 
 struct RealTimeList : public CursorKeys
 {
-//    double m_QuantumAtCapture;
     std::map<double,Note> m_RealTimeList;
 
-    double m_InternalBeat = 0;
-    void ResetPosition() { m_InternalBeat = 0; }
+//    bool m_Complete = false;
+//    double m_InternalBeat = 0;
 
     double m_LastRequestedStepValue = 4.0;
     double m_LastRequestedPhase = 0.0;
 
-    void Step(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
-    void Step2(Cluster & cluster, double phase, double stepValue /*, double quantum*/);
+    void Step(Cluster & cluster, double phase, double stepValue);
+    void Step2(Cluster & cluster, double phase, double stepValue, double globalBeat);
 
     RealTimeList(std::map<double,Note> realTimeList = {}, double quantum = 4.0):
-//        m_QuantumAtCapture(quantum),
         m_RealTimeList(realTimeList)
     {
         m_Params.m_Quantum = quantum;
@@ -309,11 +307,17 @@ struct RealTimeList : public CursorKeys
         }
     }
 
+//    bool Complete() { return m_Complete; }
+    bool PhazeIsZero();
+
     void FromString(std::string s);
     std::string ToString();
     std::string ToStringForDisplay(int & offset, int & length, int width = 75);
 
     void SetMultiplier( double val ) { m_Params.m_Multiplier = val; }
+    double AdjustedQuantum() { return m_Params.m_Multiplier * m_Params.m_Quantum; }
+    unsigned long PhaseLength();
+    void SetQuantum( double val ) { m_Params.m_Quantum = val; }
     virtual void SetStatus();
     protected:
 

@@ -143,7 +143,10 @@ enum command_t
 
     C_LIST_RT,          // Real time list commands.
     C_LIST_RT_DELETE,
-    C_LIST_RT_RATE,     // Set playback multipliers for all lists
+    C_LIST_RT_RATE,     // Set playback multipliers for real time lists
+    C_LIST_RT_QUANTUM,  // Set quantum for real time lists.
+    C_LIST_RT_START_PHASE,
+
     C_HELP_1,
     C_HELP_2,
     C_HELP_3,
@@ -293,6 +296,13 @@ unordered_map<string, command_t> gCommandList =
     {"rt del", C_LIST_RT_DELETE},
     {"real time rate", C_LIST_RT_RATE},
     {"rt rate", C_LIST_RT_RATE},
+    {"rt r", C_LIST_RT_RATE},
+    {"real time quantum", C_LIST_RT_QUANTUM},
+    {"rt quantum", C_LIST_RT_QUANTUM},
+    {"rt q", C_LIST_RT_QUANTUM},
+    {"real time phase", C_LIST_RT_START_PHASE},
+    {"rt p", C_LIST_RT_START_PHASE},
+
     {"status", C_STATUS},
     {"stat", C_STATUS},
     {"undo", C_UNDO},
@@ -431,7 +441,7 @@ void do_help(string topicName)
 }
 
 
-bool do_command(string/*const char * */ commandString)
+bool do_command(string commandString)
 {
     bool bResult = true;
 
@@ -441,19 +451,18 @@ bool do_command(string/*const char * */ commandString)
         return bResult;
 
     command_t command;
-//    int firstParameter;
 
     // Try for combinations first. Hopefully this makes the following switch
     // statement easier to read (though longer).
 
+    int firstParameter = -1;
     for ( int i = tokens.size(); i >= 0; i-- )
         if ( command = command_from_string(tokens, i), command != C_NONE )
         {
-            // firstParameter = tokens.size() - i;
+            if ( i < tokens.size() )
+                firstParameter = i;
             break;
         }
-
-    // int command = command_from_string(tokens[0]);
 
     try
     {
@@ -929,9 +938,36 @@ bool do_command(string/*const char * */ commandString)
             break;
 
         case C_LIST_RT_RATE:
-            g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens);
-            set_status(STAT_POS_2, "Playback rates set for all Real Time lists in this pattern.");
-            show_status_after_navigation();
+            if ( firstParameter > 0 )
+            {
+                g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens.begin() + firstParameter, tokens.end());
+                set_status(STAT_POS_2, "Pattern %i: Real Time playback rates set.", g_PatternStore.CurrentEditPatternID());
+                show_status_after_navigation();
+            }
+            else
+                set_status(STAT_POS_2, "help: real time rate \"rate\" [\"step\"]");
+            break;
+
+        case C_LIST_RT_QUANTUM:
+            if ( firstParameter > 0 )
+            {
+                g_PatternStore.CurrentEditPattern().SetRealTimeQuantum(tokens.at(firstParameter));
+                set_status(STAT_POS_2, "Pattern %i: loop length (quantum) set for Real Timelists.", g_PatternStore.CurrentEditPatternID());
+                show_status_after_navigation();
+            }
+            else
+                set_status(STAT_POS_2, "help: real time quantum [q]");
+            break;
+
+        case C_LIST_RT_START_PHASE:
+            if ( firstParameter > 0 )
+            {
+                g_PatternStore.CurrentEditPattern().SetRealTimeStartPhase(tokens.at(firstParameter));
+                set_status(STAT_POS_2, "Pattern %i: start phase set for Real Time lists.", g_PatternStore.CurrentEditPatternID());
+                show_status_after_navigation();
+            }
+            else
+                set_status(STAT_POS_2, "help: real time phase [0..99%]");
             break;
 
         case C_HELP :
@@ -985,7 +1021,7 @@ bool do_command(string/*const char * */ commandString)
     }
     catch ( string s )
     {
-        set_status(STAT_POS_2, "%s", s.c_str());
+        set_status(STAT_POS_2, s.c_str());
     }
 
     // Keeping track of all the places I might need to do this

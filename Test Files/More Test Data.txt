@@ -440,3 +440,67 @@ Step List 1  \
     C5:127:0.000:0.000, D5:127:0.000:0.000, E5:127:0.000:0.000, F5:127:0.000:0.000,  \
     G5:127:0.000:0.000, A5:127:0.000:0.000, B5:127:0.000:0.000, C6:127:0.000:0.000
 
+======= Real time list phase pattern chain test, natural completion ==========
+
+<< Global >>
+
+Midi Channel 1
+Link Quantum 4.00
+
+<< Pattern Store >>
+
+Chain 0/0/-1 1/0/-1
+
+Store Pattern Chain Mode 2
+Store Reset on pattern change On
+Store Edit focus follows play Off
+Store Use Pattern Play Data On
+
+<< Pattern Default >>
+
+Default Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Default Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Default Feel Map
+Default Trigs
+
+
+<< Pattern 1 >>
+
+Pattern Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs
+Real Time List 1  Loop 0.000 Quantum 4.000 Multiplier 1.000 Window 'centered', \
+     C5:96:0.000:0.250
+Real Time List 2  Loop 0.000 Quantum 4.000 Multiplier 1.100 Window 'centered', \
+     D5:96:0.500:0.250
+Real Time List 3  Loop 0.000 Quantum 4.000 Multiplier 1.200 Window 'centered', \
+     E5:96:1.000:0.250
+Real Time List 4  Loop 0.000 Quantum 4.000 Multiplier 1.300 Window 'centered', \
+     F5:96:1.500:0.250
+Real Time List 5  Loop 0.000 Quantum 4.000 Multiplier 1.400 Window 'centered', \
+     G5:96:2.000:0.250
+Real Time List 6  Loop 0.000 Quantum 4.000 Multiplier 1.500 Window 'centered', \
+     A5:96:2.500:0.250
+Real Time List 7  Loop 0.000 Quantum 4.000 Multiplier 1.600 Window 'centered', \
+     B5:96:3.000:0.250
+Real Time List 8  Loop 0.000 Quantum 4.000 Multiplier 1.700 Window 'centered', \
+     C6:96:3.500:0.250
+
+<< Pattern 2 >>
+
+Pattern Label "New" Step Value 16.00 Gate 0.50 Hold OFF Vel 64
+Pattern Scale\
+    root 60 chrom 0 shift 0 scale 'Major'\
+    degrees 7 accidentals 'lo+mute' premap 'off'
+Pattern Feel Map
+Pattern Trigs
+Step List 1
+Real Time List 1  Loop 0.000 Quantum 4.000 Multiplier 0.600 Window 'centered', \
+     C5:96:0.000:0.250, D5:96:0.500:0.250, E5:96:1.000:0.250, F5:96:1.500:0.250, \
+     G5:96:2.000:0.250, A5:96:2.500:0.250, B5:96:3.000:0.250, C6:96:3.500:0.250
+

@@ -215,6 +215,15 @@ RealTimeList & PatternStore::CurrentEditRealTimeList()
     return m_Patterns.at(m_PosEdit).m_RealTimeSet.at(pos);
 }
 
+double PatternStore::LastRealTimeBeat()
+{
+    if ( m_Patterns.empty() )
+        return 0;
+    else
+        return m_Patterns.at(m_PosPlay).LastRealTimeBeat();
+}
+
+
 Pattern & PatternStore::CurrentPlayPattern()
 {
     if ( m_Patterns.empty() )
@@ -330,7 +339,7 @@ string PatternStore::PatternOverview()
     return buff;
 }
 
-void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue)
+void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue, double globalBeat)
 {
     /*
         As long as PatternChanged() is called for every step, we
@@ -400,7 +409,7 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
 
     m_PhaseIsZero = false;
 
-    m_Patterns.at(m_PosPlay).Step(cluster, repeater, m_StepValueMultiplier, phase, stepValue);
+    m_Patterns.at(m_PosPlay).Step(cluster, repeater, m_StepValueMultiplier, phase, stepValue, globalBeat);
 }
 
 void PatternStore::UpdatePatternChainFromSimpleString(string s)

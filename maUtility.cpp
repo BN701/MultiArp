@@ -135,4 +135,23 @@ std::string get_clipboard()
 
 }
 
+int64_t gcd(int64_t a, int64_t b)
+{
+    for (;;)
+    {
+        if (a == 0) return b;
+        b %= a;
+        if (b == 0) return a;
+        a %= b;
+    }
+}
+
+int64_t lcm(int64_t a, int64_t b)
+{
+    int temp = gcd(a, b);
+
+    return temp ? (a / temp * b) : 0;
+}
+
+
 

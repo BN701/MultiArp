@@ -144,7 +144,7 @@ struct PatternStore : public CursorKeys
 
     void SetPhaseIsZero() { m_PhaseIsZero = true; }
 
-    void Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue);
+    void Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue, double globalBeat);
     double StepValueMultiplier() { return m_StepValueMultiplier; }
 
     std::string EditPatternToString();
@@ -172,6 +172,8 @@ struct PatternStore : public CursorKeys
     int CurrentPosPlay() { return m_PosPlay; }
     int CurrentEditPatternID() { return m_PosEdit + 1; }
     int CurrentPlayPatternID() { return m_PosPlay + 1; }
+
+    double LastRealTimeBeat();
 
     int AddEmptyPattern()
     {
@@ -367,7 +369,6 @@ struct PatternStore : public CursorKeys
             psf_trig_list,
             num_psf_menu_focus_modes
         };
-
 
         virtual bool HandleKey(key_type_t k);
         pattern_store_menu_focus_t m_PatternStoreFocus;

@@ -30,7 +30,8 @@
 
 using namespace std;
 
-void Pattern::Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue)
+void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
+    double & stepValueMultiplier, double phase, double stepValue, double globalBeat)
 {
     // Add in step based events, if any, and step position.
 
@@ -69,8 +70,6 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater, double & stepValu
             stepValueMultiplier = trigItem->Multiplier();
 
             repeater = trigItem->Repeater();
-//            repeats = trigItem->Repeats();
-//            repeatTime = trigItem->RepeatTime();
 
             for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
             {
@@ -96,76 +95,43 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater, double & stepValu
 
     // Collect any real time events.
 
-    for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
-        it->Step2(cluster, phase, stepValue);
+    if ( ! m_RealTimeSet.empty() )
+    {
+        for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
+            it->Step2(cluster, phase, stepValue, m_RealTimeBeat);
 
+        if ( lround(1000.0 * m_RealTimeBeat) > 0 )
+        {
+            m_RealTimeComplete = true;
+            for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
+                m_RealTimeComplete &= it->PhazeIsZero();
+            if ( m_RealTimeComplete )
+                m_RealTimeBeat = 0;
+        }
+    }
+
+    m_LastRealTimeBeat = m_RealTimeBeat;
+    m_RealTimeBeat += 4.0 / stepValue;
 }
 
 bool Pattern::AllListsComplete()
 {
     bool bResult = true;
 
-    for ( std::vector<StepList>::iterator it = m_StepListSet.begin(); it < m_StepListSet.end(); it++ )
-    {
-        bResult &= (*it).Complete();
-    }
+    if ( ! m_RealTimeComplete && ! m_RealTimeSet.empty() )
+        return false;
+
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        bResult &= it->Complete();
+
 
     return bResult;
 }
-
-//bool Pattern::PlayPositionInfo(int & listIndex, int & offset, int & length)
-//{
-//    if ( m_StepListSet.empty() )
-//        return false;
-//
-//    listIndex = m_LastRequestedPos;
-//
-//    return m_StepListSet.at(m_LastRequestedPos).PlayPositionInfo(offset, length);
-//}
 
 string Pattern::TrigsToStringForDisplay()
 {
     return m_TrigList.ToStringForDisplay();
 }
-
-//string Pattern::TrigsToString()
-//{
-//    return "";
-//}
-
-//string Pattern::ListToString(vector<int>::size_type n)
-//{
-//    if ( n >= m_StepListSet.size() )
-//        return "";
-//
-//    string result;
-//
-//    if ( n == m_PosEdit )
-//        result = " -> ";
-//    else
-//        result = "    ";
-//
-//    result += m_StepListSet.at(n).ToString(false);
-//
-//    return result;
-//}
-//
-//string Pattern::RealTimeListToStringForDisplay(vector<int>::size_type n)
-//{
-//    if ( n >= m_RealTimeSet.size() )
-//        return "";
-//
-//    string result;
-//
-//    if ( n == m_PosRealTimeEdit )
-//        result = " -> ";
-//    else
-//        result = "    ";
-//
-//    int offset, length;
-//    result += m_RealTimeSet.at(n).ToStringForDisplay(offset, length);
-//    return result;
-//}
 
 enum pat_element_names_t
 {
@@ -476,37 +442,24 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
         throw string("Something went wrong, nothing imported.");
 }
 
-void Pattern::SetRealTimeMultipliers(std::vector<string> & tokens)
+void Pattern::SetRealTimeMultipliers(vector<string>::iterator token, vector<string>::iterator end)
 {
     if ( m_RealTimeSet.empty() )
         throw string("Pattern::SetRealTimeMultipliers() - No RealTime lists present.");
-
-    // Look for 'base' plus 'step'. ('tokens' may contain two *or* three command
-    // parameters, so we need to scan.)
-
-    auto token = tokens.begin();
-
-    for ( ; token != tokens.end(); token ++ )
-        if ( *token == "rate" )
-            break;
-
-    if ( token == tokens.end() || ++token == tokens.end() )
-        throw string("real time rate \"rate\" [\"step\"]");
 
     double rate = 1.0;
     double increment = 0.0;
 
     try
     {
-        // Token should now point to rate.
+        // Token should point to rate.
 
         rate = stod(token->c_str());
 
         // Now look for optional step increment.
 
-        if ( ++token != tokens.end() )
+        if ( ++token != end )
             increment = stod(token->c_str());
-
     }
     catch (...)
     {
@@ -515,6 +468,54 @@ void Pattern::SetRealTimeMultipliers(std::vector<string> & tokens)
 
     for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++, rate += increment)
         rtList->SetMultiplier(rate);
+}
+
+void Pattern::SetRealTimeQuantum(string & token)
+{
+    if ( m_RealTimeSet.empty() )
+        throw string("Pattern::SetRealTimeQuantum() - No RealTime lists present.");
+
+    double quantum;
+
+    try
+    {
+        quantum = stod(token.c_str());
+    }
+    catch (...)
+    {
+        throw string("Pattern::SetRealTimeQuantum() - There's something wrong with the parameter list.");
+    }
+
+    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
+        rtList->SetQuantum(quantum);
+}
+
+
+void Pattern::SetRealTimeStartPhase(string & token)
+{
+    if ( m_RealTimeSet.empty() )
+        throw string("Pattern::SetRealTimeStartPhase() - No RealTime lists present.");
+
+    double phase;
+
+    try
+    {
+        phase = stod(token.c_str())/100;
+    }
+    catch (...)
+    {
+        throw string("Pattern::SetRealTimePhase() - There's something wrong with the parameter list.");
+    }
+
+    vector<int64_t> phaseLengths;
+
+    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
+        phaseLengths.push_back(rtList->PhaseLength());
+
+    int64_t patternPhaseLength = std::accumulate(phaseLengths.begin(), phaseLengths.end(), 1, lcm);
+
+    m_RealTimeBeatStart = phase * static_cast<double>(patternPhaseLength)/1000;
+    ResetPosition();
 }
 
 int Pattern::NewList()
@@ -653,78 +654,10 @@ string & Centre(string & line, int centre, int width, int & offset)
 
     if ( line.size() > width )
         line = line.substr(0, width);
-//    else if ( line.size() < width )
     line += '\n';
 
     return line;
 }
-
-//string Pattern::DisplayNonScrolling(vector<PosInfo2> & highlights, int centre, int width, int rows)
-//{
-//    string result;
-//    string line;
-//
-//    int offset = 0, length = 0, row = 1;
-//
-//    // Allow for edit cursors in left hand column.
-//
-//    centre -= 4;
-//    width -= 4;
-//
-//    // Trigs
-//
-//    result = "\n    ";
-//    if ( ! m_TrigList.Empty() )
-//    {
-//        result += m_TrigList.ToStringForDisplay2(offset, length, width);
-//        highlights.push_back(PosInfo2(0, offset + 4, length));
-//        result += '\n';
-//    }
-//    else
-//        result += "Triggers: Auto\n";
-//
-//    result += '\n';
-//    row += 2;
-//
-//    // Step Lists
-//
-//    for ( int i = 0; i < m_StepListSet.size(); i++ )
-//    {
-//        if ( i == m_PosEdit )
-//        {
-//            result += " -> ";
-//            highlights.push_back(PosInfo2(row, 1, 2));
-//        }
-//        else
-//            result += "    ";
-//        highlights.push_back(PosInfo2(row, centre, 4));
-//        line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
-//        result += Centre(line, centre, width, offset);
-//        highlights.push_back(PosInfo2(row++, offset + 4, length));
-//    }
-//
-//    result += '\n';
-//    row += 1;
-//
-//    // Realtime Lists
-//
-//    for ( int i = 0; i < m_RealTimeSet.size(); i++ )
-//    {
-//        if ( i == m_PosRealTimeEdit )
-//        {
-//            result += " -> ";
-//            highlights.push_back(PosInfo2(row, 1, 2));
-//        }
-//        else
-//            result += "    ";
-//        highlights.push_back(PosInfo2(row, 4, 5));
-//        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
-//        result += '\n';
-//        highlights.push_back(PosInfo2(row++, offset + 4, length));
-//    }
-//
-//    return result;
-//}
 
 string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int width, int displayRows)
 {
@@ -738,8 +671,6 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
     width -= 4;     // Allow for edit cursors in left column.
 
     // Trigs
-
-//    result.insert(0, m_TrigList.PlayPostion() + 4, ' ');
 
     result = "\n    ";
     if ( ! m_TrigList.Empty() )

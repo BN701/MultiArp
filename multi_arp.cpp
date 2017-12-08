@@ -94,7 +94,8 @@ void do_UI_updates()
     update_progress_bar();
     set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
                /*g_State.Phase(),*/
-               g_State.Beat(),
+//               g_State.Beat(),
+               g_PatternStore.LastRealTimeBeat(),
                g_Sequencer.ScheduleTimeSeconds(),
                g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 }
@@ -216,7 +217,7 @@ void queue_next_step(int queueId)
 
     if ( g_State.RunState() || gDeferStop-- > 0 )
     {
-        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue());
+        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
         if ( g_ListBuilder.RealTimeRecord() )
             nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     }
@@ -445,7 +446,7 @@ unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
     {KEY_SDELETE, CursorKeys::shift_delete},
     {KEY_CDELETE, CursorKeys::ctrl_delete},
     {KEY_TAB, CursorKeys::tab},
-    {KEY_STAB, CursorKeys::shift_tab},
+    {KEY_SHTAB, CursorKeys::shift_tab},
     {KEY_DOWN, CursorKeys::down},
     {KEY_UP, CursorKeys::up},
     {KEY_LEFT, CursorKeys::left},
@@ -566,7 +567,8 @@ bool key_input_action()
         move(COMMAND_HOME + commandString.size());
         g_Display.NextBigPanelPage(1);
         break;
-    case KEY_STAB:
+
+    case KEY_SHTAB:
         g_Display.NextBigPanelPage(-1);
         break;
 

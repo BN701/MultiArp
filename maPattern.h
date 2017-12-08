@@ -57,6 +57,14 @@ struct Pattern
     int m_DisplayStartStep = 0;
     int m_DisplayStartRealTime = 0;
 
+    double m_RealTimeBeat = 0;  // Tracks beat for real time lists. Can be reset.
+    double m_LastRealTimeBeat = 0;
+    double m_RealTimeBeatStart = 0;
+
+    double LastRealTimeBeat() { return m_LastRealTimeBeat; }
+
+    bool m_RealTimeComplete = false;
+
     void StoreStepValue( double val );
     void StoreGate( double gate);
     void StoreGateHold( bool val );
@@ -125,11 +133,13 @@ struct Pattern
         for ( auto stepList = m_StepListSet.begin(); stepList != m_StepListSet.end(); stepList++ )
             stepList->ResetPosition();
 
-        for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++ )
-            rtList->ResetPosition();
+        m_RealTimeBeat = m_RealTimeBeatStart;
+        m_RealTimeComplete = false;
+//        for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++ )
+//            rtList->ResetPosition();
     }
 
-    void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue);
+    void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue, double globalBeat);
 
     bool LabelEmpty()
     {
@@ -147,7 +157,9 @@ struct Pattern
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
     void AddRealTimeListFromMidiFile(std::string s);
-    void SetRealTimeMultipliers(std::vector<std::string> & tokens);
+    void SetRealTimeMultipliers(std::vector<std::string>::iterator token, std::vector<std::string>::iterator end);
+    void SetRealTimeQuantum(std::string & token);
+    void SetRealTimeStartPhase(std::string & token);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
 

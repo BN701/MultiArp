@@ -1022,15 +1022,13 @@ bool RealTimeListParams::HandleKey(key_type_t k)
         switch ( m_RTParamsFocus )
         {
         case rtp_loop_start:
-            m_LoopStart += inc;
+            m_LoopStart = tidy_3(m_LoopStart + inc);
             break;
         case rtp_local_quantum:
-            m_Quantum += inc;
-            if ( m_Quantum == 0 )
-                m_Quantum += inc;
+            m_Quantum = tidy_3(m_Quantum + inc);
             break;
         case rtp_multiplier:
-            m_Multiplier += inc;
+            m_Multiplier = tidy_3(m_Multiplier + inc);
             break;
         case rtp_window_adjust:
             NextWindowMode(-1);
@@ -1046,16 +1044,15 @@ bool RealTimeListParams::HandleKey(key_type_t k)
         switch ( m_RTParamsFocus )
         {
         case rtp_loop_start:
-            m_LoopStart -= inc;
+            m_LoopStart = tidy_3(m_LoopStart - inc);
             break;
         case rtp_local_quantum:
-            if ( m_Quantum - inc < 0.01 )
+            m_Quantum = tidy_3(m_Quantum - inc);
+            if ( m_Quantum < 0.01 )
                 m_Quantum = 0.01;
-            else
-                m_Quantum -= inc;
             break;
         case rtp_multiplier:
-            m_Multiplier -= inc;
+            m_Multiplier = tidy_3(m_Multiplier - inc);
             break;
         case rtp_window_adjust:
             NextWindowMode(1);
@@ -1521,22 +1518,10 @@ unsigned long RealTimeList::PhaseLength()
     unsigned long adjustedQuantum = lround(1000.0 * m_Params.m_Multiplier * m_Params.m_Quantum);
     unsigned long quantum = lround(1000.0 * m_Params.m_Quantum);
 
-    // Using lowest common multiple gives us the 'adjusted' result, which would need to be
-    // adjusted back by dividing by multiplier and converting to double along the way. So
-    // use brute force search instead.
+    // Using lowest common multiple gives us the 'adjusted' result, which needs to be
+    // adjusted back to pattern time.
 
-    // return lcm(quantum, adjustedQuantum);
-
-    unsigned long temp = 0;
-    unsigned long result = 0;
-
-    do
-    {
-        temp += adjustedQuantum;
-        result += quantum;
-    } while ( temp % quantum != 0 );
-
-    return result;
+    return lcm(quantum, adjustedQuantum)/adjustedQuantum * quantum;
 
     // This method is unreliable: fmod() seems to return
     // a whole value of m_Quantum for some values
@@ -1565,6 +1550,8 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;
+
+    // Window is defined in the list time scale, so use the multiplier.
 
     double window = 4.0 * m_Params.m_Multiplier/stepValue;
     double windowStart, windowEnd;
@@ -1607,9 +1594,34 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
 
     for ( int N = ceil(windowStart/m_Params.m_Quantum) - 1; N < ceil(windowEnd/m_Params.m_Quantum); N++ )
     {
-        double rangeOffset = N * m_Params.m_Quantum - m_Params.m_LoopStart;
-        double lower = windowStart - rangeOffset;
-        double upper = windowEnd - rangeOffset;
+        double rangeOffset = N * m_Params.m_Quantum;
+
+        // Set bounds for the collection window applied to captured data.
+
+        double lower = max(windowStart, rangeOffset) - rangeOffset;
+        double upper = min(windowEnd, rangeOffset + m_Params.m_Quantum) - rangeOffset - 0.001;
+
+        // (Taking off 0.001 makes sure we test against the element at the top of
+        // the collection winow, as upper_bound() "Returns an iterator pointing to
+        // the first element whose key is considered to go *after* k.")
+
+        // Slide the collection window over the captured data. (This doesn't wrap if we slide
+        // over the end of the capture range.)
+
+        lower += m_Params.m_LoopStart;
+        upper += m_Params.m_LoopStart;
+
+//        lower = 0.001 * lround(lower * 1000);
+//        upper = 0.001 * lround(upper * 1000);
+        lower = tidy_3(lower);
+        upper = tidy_3(upper);
+
+        // Protect map from scans where lower > upper. This can happen due to rounding errors
+        // and/or imprecise floating point data. (If lower > upper executing the loop below
+        // seems to produce race conditions and/or stack corruption.)
+
+        if ( lower >= upper )
+            continue;
 
         for ( map<double,Note>::iterator it = m_RealTimeList.lower_bound(lower);
                         it != m_RealTimeList.upper_bound(upper); it++ )

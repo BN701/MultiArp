@@ -19,6 +19,7 @@
 
 #include "maUtility.h"
 
+#include <cmath>
 #include <cstring>
 
 using namespace std;
@@ -154,4 +155,8 @@ int64_t lcm(int64_t a, int64_t b)
 }
 
 
+double tidy_3(double val)
+{
+    return static_cast<double>(lround(1000.0 * val))/1000.0;
+}
 

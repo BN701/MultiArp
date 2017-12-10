@@ -146,6 +146,7 @@ enum command_t
     C_LIST_RT_RATE,     // Set playback multipliers for real time lists
     C_LIST_RT_QUANTUM,  // Set quantum for real time lists.
     C_LIST_RT_START_PHASE,
+    C_LIST_RT_ECHO,     // Create drifting echo of notes in current list.
 
     C_HELP_1,
     C_HELP_2,
@@ -302,6 +303,9 @@ unordered_map<string, command_t> gCommandList =
     {"rt q", C_LIST_RT_QUANTUM},
     {"real time phase", C_LIST_RT_START_PHASE},
     {"rt p", C_LIST_RT_START_PHASE},
+    {"real time echo", C_LIST_RT_ECHO},
+    {"rt echo", C_LIST_RT_ECHO},
+    {"rt e", C_LIST_RT_ECHO},
 
     {"status", C_STATUS},
     {"stat", C_STATUS},
@@ -968,6 +972,17 @@ bool do_command(string commandString)
             }
             else
                 set_status(STAT_POS_2, "help: real time phase [0..99%]");
+            break;
+
+        case C_LIST_RT_ECHO:
+            if ( firstParameter > 0 )
+            {
+                g_PatternStore.CurrentEditPattern().StartRealTimeEcho(tokens.begin() + firstParameter, tokens.end());
+                set_status(STAT_POS_2, "Pattern %i: started echo on current Real Time list.", g_PatternStore.CurrentEditPatternID());
+                show_status_after_navigation();
+            }
+            else
+                set_status(STAT_POS_2, "help: real time echo inc[rement] n.nn int[erval] n t[arget] nn%");
             break;
 
         case C_HELP :

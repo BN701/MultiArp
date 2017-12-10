@@ -1073,6 +1073,45 @@ bool RealTimeListParams::HandleKey(key_type_t k)
     return true;
 }
 
+map<double,Note>::iterator RealTimeList::MoveNote(map<double, Note>::iterator it, double newPhase)
+{
+    // Avoid clashes.
+
+    while ( true )
+    {
+        if ( m_RealTimeList.find(newPhase) == m_RealTimeList.end() )
+            break;
+        newPhase += 0.001;
+    }
+
+    // Make a copy of the note and erase the original.
+
+    auto ret = m_RealTimeList.insert(make_pair(newPhase, it->second));
+    m_RealTimeList.erase(it);
+
+    // Increment phase.
+
+    ret.first->second.SetPhase(newPhase);
+
+    return ret.first;
+}
+
+map<double,Note>::iterator RealTimeList::CopyNote(map<double, Note>::iterator it)
+{
+    double newPhase = it->second.m_Phase + 0.001;
+
+    while ( true )
+    {
+        if ( m_RealTimeList.find(newPhase) == m_RealTimeList.end() )
+            break;
+        newPhase += 0.001;
+    }
+
+    auto ret = m_RealTimeList.insert(make_pair(newPhase, it->second));
+    ret.first->second.SetPhase(newPhase);
+    return ret.first;
+}
+
 
 void RealTimeList::SetStatus()
 {
@@ -1106,12 +1145,11 @@ void RealTimeList::SetStatus()
 
 bool RealTimeList::HandleKey(key_type_t k)
 {
-//    int temp;
     double inc = 0.1;
 
     map<double, Note>::iterator it = m_RealTimeList.begin();
     for ( int i = 0; i < m_RTListFocus - m_SubMenus; i++ )
-        it++;   // There's no + operator on iterators for maps, apparently, so we do move step-by-step.
+        it++;   // There's no + operator on iterators for maps, apparently, so we move step-by-step.
 
     switch ( k )
     {
@@ -1160,38 +1198,17 @@ bool RealTimeList::HandleKey(key_type_t k)
         }
         else if ( m_RTListFocus >= m_SubMenus )   // Update note start time (phase).
         {
-            // Make a copy of the note and erase the original.
-
-            Note n = it->second;
-            m_RealTimeList.erase(it);
-
-            // Increment phase.
-
             if ( k == down || k == shift_down )
                 inc *= -1;
 
-            n.SetPhase(n.Phase() + inc);
+            auto result = MoveNote(it, it->second.Phase() + inc);
 
-            // Get ready to re-insert, avoiding clashes.
+            // We get back an iterator to the new entry. Set menu
+            // focus by counting backwards to start of map.
 
-            while ( true )
-            {
-//                map<double,Note>::iterator it = m_RealTimeList.find(n.Phase());
-                if ( m_RealTimeList.find(n.Phase()) == m_RealTimeList.end() )
-                    break;
-                n.SetPhase(n.Phase() + 0.001);
-            }
-
-            // Insert and reset our cursor position.
-
-            pair<map<double,Note>::iterator, bool> result = m_RealTimeList.insert(make_pair(n.Phase(), n));
-
-            if ( result.second )
-            {
-                m_RTListFocus = m_SubMenus;
-                while ( m_RealTimeList.begin() != result.first-- )
-                    m_RTListFocus += 1;
-            }
+            m_RTListFocus = m_SubMenus;
+            while ( m_RealTimeList.begin() != result-- )
+                m_RTListFocus += 1;
         }
         break;
 
@@ -1318,8 +1335,8 @@ void RealTimeList::FromString(string s)
 
         while ( true )
         {
-            map<double,Note>::iterator it2 = m_RealTimeList.find(note.Phase());
-            if ( it2 == m_RealTimeList.end() )
+//            map<double,Note>::iterator it2 = m_RealTimeList.find(note.Phase());
+            if ( m_RealTimeList.find(note.Phase()) == m_RealTimeList.end() )
                 break;
             note.SetPhase(note.Phase() + 0.0001);
         }
@@ -1507,9 +1524,86 @@ void RealTimeList::Step(Cluster & cluster, double phase, double stepValue)
 
 }
 
-bool RealTimeList::PhazeIsZero()
+
+void RealTimeList::BeginEcho(double inc, double target, int interval)
 {
-    return lround(m_LastRequestedPhase * 1000.0) == 0;
+    // Iterator here is a map pair.
+
+    // Make a set up references to current map members before duplicating
+    // them. Updating the map while we're traversing it leads to confusion!
+
+    vector<map<double,Note>::iterator> notes;
+
+    for ( auto p = m_RealTimeList.begin(); p != m_RealTimeList.end(); p++ )
+        notes.push_back(p);
+
+    for ( auto p = notes.begin(); p != notes.end(); p++ )
+    {
+        double newPhase = (*p)->second.m_Phase + inc;
+        pair<map<double,Note>::iterator,bool> ret = m_RealTimeList.insert(make_pair(newPhase, (*p)->second));
+
+        if ( ret.second )
+        {
+            Note & n = ret.first->second;
+
+            n.SetPhase(newPhase);
+            n.m_Inc = inc;
+            n.m_Target = target;
+            n.m_Interval = interval;
+            n.m_NoteNumber += interval;
+        }
+    }
+}
+
+void RealTimeList::UpdateList()
+{
+    // Build a list of iterators to notes to be changed. (We
+    // shouldn't modify the map whilst traversing it!)
+
+    vector<map<double,Note>::iterator> entries;
+
+    for ( auto p = m_RealTimeList.begin(); p != m_RealTimeList.end(); p++ )
+        if ( !equals_3(p->second.m_Inc, 0))
+            entries.push_back(p);
+
+    for ( auto p = entries.begin(); p != entries.end(); p++ )
+    {
+        Note & note = (*p)->second;
+
+        // Can we trust fmod() here?
+
+        double newPhase = fmod(note.m_Phase + note.m_Inc, m_Params.m_Quantum);
+
+        // Have we reached the target?
+
+        note.m_Moved += note.m_Inc;
+
+        if ( note.m_Moved >= note.m_Target )
+        {
+            // What happens here is up for experimentation.
+
+            Note & newNote = CopyNote(*p)->second;
+
+            newNote.m_Inc = note.m_Inc;
+            newNote.m_Moved = 0;
+            newNote.m_Target = note.m_Target/2;
+            newNote.m_Phase = note.m_Phase + note.m_Inc;
+            newNote.m_NoteNumber = note.m_NoteNumber + note.m_Interval;
+
+            note.m_Inc = 0;
+            // BeginEcho(inc, note.m_Target, note.m_Interval);
+            // continue;
+        }
+
+        // MoveNote() inserts a copy at the new location. The previous
+        // map entry and its note is deleted.
+
+        Note & newNote = MoveNote(*p, newPhase)->second;
+
+        // Do further processing on new note, here.
+
+
+    }
 }
 
 unsigned long RealTimeList::PhaseLength()
@@ -1550,6 +1644,12 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
 
     m_LastRequestedStepValue = stepValue;
     m_LastRequestedPhase = phase;
+    m_LastStepPhaseZero = lPhase == 0;
+
+    if ( m_LastStepPhaseZero )
+    {
+        UpdateList();
+    }
 
     // Window is defined in the list time scale, so use the multiplier.
 

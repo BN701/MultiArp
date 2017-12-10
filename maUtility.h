@@ -36,6 +36,9 @@ int64_t gcd(int64_t a, int64_t b);
 double tidy(double val, int dp = 3);
 double tidy_3(double val);
 
+bool equals(double val1, double val2, int dp = 3);
+bool equals_3(double val1, double val2);
+
 
 
 

@@ -518,6 +518,67 @@ void Pattern::SetRealTimeStartPhase(string & token)
     ResetPosition();
 }
 
+enum rt_echo_parameter_t
+{
+    rte_increment,
+    rte_interval,
+    rte_target,
+    rte_num_parameters
+};
+
+unordered_map<string, rt_echo_parameter_t> rt_echo_parameter_lookup =
+{
+    {"increment", rte_increment},
+    {"inc", rte_increment},
+    {"interval", rte_interval},
+    {"int", rte_interval},
+    {"target", rte_target},
+    {"t", rte_target}
+};
+
+
+void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::iterator last)
+{
+    if ( m_RealTimeSet.empty() )
+        throw string("Pattern::StartRealTimeEcho() - No RealTime lists present.");
+
+    double inc = 0;
+    double target = 0;
+    int interval = 0;
+
+    try
+    {
+        for(; token != last; token++ )
+        {
+            switch(rt_echo_parameter_lookup.at(token->c_str()))
+            {
+            case rte_increment:
+                inc = stod(*(++token));
+                break;
+            case rte_target:
+                target = stod(*(++token));
+                break;
+            case rte_interval:
+                interval = stoi(*(++token));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    catch (...)
+    {
+        throw string("Pattern::StartRealTimeEcho() - There's something wrong with the parameter list.");
+    }
+
+
+
+    auto rtList = m_RealTimeSet.begin() + m_PosEdit;
+
+    if ( rtList != m_RealTimeSet.end() )
+        rtList->BeginEcho(inc, target, interval);
+}
+
 int Pattern::NewList()
 {
     m_StepListSet.emplace_back();

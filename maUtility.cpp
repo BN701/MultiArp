@@ -155,8 +155,29 @@ int64_t lcm(int64_t a, int64_t b)
 }
 
 
+double tidy(double val, int dp)
+{
+    double t = 1;
+    for ( int i = 0; i < dp; i++ )
+        t *= 10;
+    return static_cast<double>(lround(t * val))/t;
+}
+
 double tidy_3(double val)
 {
     return static_cast<double>(lround(1000.0 * val))/1000.0;
+}
+
+bool equals(double val1, double val2, int dp)
+{
+    double t = 1;
+    for ( int i = 0; i < dp; i++ )
+        t *= 10;
+    return lround(t * val1) == lround(t * val2);
+}
+
+bool equals_3(double val1, double val2)
+{
+    return lround(1000.0 * val1) == lround(1000.0 * val2);
 }
 

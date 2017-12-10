@@ -157,9 +157,10 @@ struct Pattern
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
     void AddRealTimeListFromMidiFile(std::string s);
-    void SetRealTimeMultipliers(std::vector<std::string>::iterator token, std::vector<std::string>::iterator end);
+    void SetRealTimeMultipliers(std::vector<std::string>::iterator token, std::vector<std::string>::iterator last);
     void SetRealTimeQuantum(std::string & token);
     void SetRealTimeStartPhase(std::string & token);
+    void StartRealTimeEcho(std::vector<std::string>::iterator token, std::vector<std::string>::iterator last);
     void AddListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
 

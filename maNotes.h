@@ -63,6 +63,13 @@ struct Note : public CursorKeys
     double m_Phase;
     double m_Length;         // Length in beats (or fraction of a beat).
 
+    // Self-modifying list things.
+
+    double m_Inc = 0;
+    double m_Moved = 0;
+    double m_Target = 0;
+    int m_Interval = 0;
+
     Note(int n = -1, int v = -1):
         m_NoteNumber(n),
         m_NoteVelocity(v),
@@ -286,6 +293,7 @@ struct RealTimeList : public CursorKeys
 
     double m_LastRequestedStepValue = 4.0;
     double m_LastRequestedPhase = 0.0;
+    bool m_LastStepPhaseZero = false;
 
     void Step(Cluster & cluster, double phase, double stepValue);
     void Step2(Cluster & cluster, double phase, double stepValue, double globalBeat);
@@ -308,7 +316,7 @@ struct RealTimeList : public CursorKeys
     }
 
 //    bool Complete() { return m_Complete; }
-    bool PhazeIsZero();
+    bool PhazeIsZero() { return m_LastStepPhaseZero; }
 
     void FromString(std::string s);
     std::string ToString();
@@ -318,6 +326,12 @@ struct RealTimeList : public CursorKeys
     double AdjustedQuantum() { return m_Params.m_Multiplier * m_Params.m_Quantum; }
     unsigned long PhaseLength();
     void SetQuantum( double val ) { m_Params.m_Quantum = val; }
+
+    std::map<double,Note>::iterator MoveNote(std::map<double, Note>::iterator, double newPhase);
+    std::map<double,Note>::iterator CopyNote(std::map<double, Note>::iterator);
+    void BeginEcho(double inc, double target, int interval);
+    void UpdateList();
+
     virtual void SetStatus();
     protected:
 

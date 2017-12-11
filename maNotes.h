@@ -70,6 +70,8 @@ struct Note : public CursorKeys
     double m_Target = 0;
     int m_Interval = 0;
 
+    bool IncrementAndCheckTarget();
+
     Note(int n = -1, int v = -1):
         m_NoteNumber(n),
         m_NoteVelocity(v),
@@ -265,6 +267,9 @@ struct RealTimeListParams : public CursorKeys
     rtp_window_mode_t m_WindowMode = normal;
 //    bool m_AdjustWindowToStep = true;  // Probably just if multiplier less than 1.
 
+    bool m_EchoesWrapAtQuantum = false;
+    bool m_EchoesDeleteAtQuantum = true;
+
     void NextWindowMode( int dir );
 
     virtual void SetStatus();
@@ -327,10 +332,11 @@ struct RealTimeList : public CursorKeys
     unsigned long PhaseLength();
     void SetQuantum( double val ) { m_Params.m_Quantum = val; }
 
+    bool NoteTargetAction(std::map<double,Note>::iterator mapEntry, double newPhase);
     std::map<double,Note>::iterator MoveNote(std::map<double, Note>::iterator, double newPhase);
     std::map<double,Note>::iterator CopyNote(std::map<double, Note>::iterator);
     void BeginEcho(double inc, double target, int interval);
-    void UpdateList();
+    void DoEchoes();
 
     virtual void SetStatus();
     protected:

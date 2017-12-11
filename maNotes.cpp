@@ -426,6 +426,17 @@ void Note::AdjustPhase( double multiplier, double phase, double globalPhase, dou
 }
 
 
+bool Note::IncrementAndCheckTarget()
+{
+    if ( equals_3(m_Inc, 0) || equals_3(m_Target, 0) )
+        return false;
+
+    m_Moved += m_Inc;
+
+    return m_Moved >= m_Target;
+}
+
+
 //
 // Cluster
 //
@@ -1548,6 +1559,7 @@ void RealTimeList::BeginEcho(double inc, double target, int interval)
 
             n.SetPhase(newPhase);
             n.m_Inc = inc;
+            n.m_Moved = inc;        // We already added increment to start phase, above.
             n.m_Target = target;
             n.m_Interval = interval;
             n.m_NoteNumber += interval;
@@ -1555,7 +1567,111 @@ void RealTimeList::BeginEcho(double inc, double target, int interval)
     }
 }
 
-void RealTimeList::UpdateList()
+enum rte_target_action_mode_t
+{
+    rteam_delete,
+    rteam_freeze,
+    rteam_echo_all,
+    rteam_echo_all_delete,
+    rteam_echo_all_freeze,
+    rteam_copy,
+    rteam_copy_freeze,
+    rteam_copy_freeze_target_multiplier,
+    num_rte_target_action_modes
+};
+
+bool RealTimeList::NoteTargetAction(map<double,Note>::iterator mapEntry, double newPhase)
+{
+    bool result = false;
+    rte_target_action_mode_t mode = rteam_copy_freeze_target_multiplier;
+
+    switch(mode)
+    {
+    case rteam_delete:
+        m_RealTimeList.erase(mapEntry);
+        return true;
+    default:
+        break;
+    }
+
+    Note * note = & mapEntry->second;
+
+    // Echo tasks ...
+
+    switch(mode)
+    {
+    case rteam_echo_all:
+    case rteam_echo_all_delete:
+    case rteam_echo_all_freeze:
+        BeginEcho(note->m_Inc, note->m_Target, note->m_Interval);
+        break;
+    default:
+        break;
+    }
+
+    // The current note is copied ...
+
+    Note * newNote = NULL;
+
+    switch(mode)
+    {
+    case rteam_copy:
+    case rteam_copy_freeze:
+    case rteam_copy_freeze_target_multiplier:
+        newNote = & CopyNote(mapEntry)->second;
+        break;
+    default:
+        break;
+    }
+
+    // Copied note simple initialisation, including interval transpose.
+
+    switch(mode)
+    {
+    case rteam_copy:
+    case rteam_copy_freeze:
+    case rteam_copy_freeze_target_multiplier:
+        newNote->m_Moved = 0;
+        newNote->m_Phase = note->m_Phase + note->m_Inc;
+        newNote->m_NoteNumber += newNote->m_Interval;
+        break;
+    default:
+        break;
+    }
+
+    double targetMultiplier = 0.5;
+
+    switch(mode)
+    {
+    case rteam_copy_freeze_target_multiplier:
+        newNote->m_Target *= targetMultiplier;
+        break;
+    default:
+        break;
+    }
+    // Delete or freeze the original note?
+
+    switch(mode)
+    {
+    case rteam_echo_all_delete:
+        m_RealTimeList.erase(mapEntry);
+        result = true;
+        break;
+    case rteam_freeze:
+    case rteam_copy_freeze:
+    case rteam_copy_freeze_target_multiplier:
+    case rteam_echo_all_freeze:
+        note->m_Inc = 0;
+        note->m_Moved = 0;
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}
+
+void RealTimeList::DoEchoes()
 {
     // Build a list of iterators to notes to be changed. (We
     // shouldn't modify the map whilst traversing it!)
@@ -1570,37 +1686,31 @@ void RealTimeList::UpdateList()
     {
         Note & note = (*p)->second;
 
-        // Can we trust fmod() here?
+        double newPhase = note.m_Phase + note.m_Inc;
 
-        double newPhase = fmod(note.m_Phase + note.m_Inc, m_Params.m_Quantum);
+        if ( newPhase >= m_Params.m_Quantum )
+        {
+            if ( m_Params.m_EchoesDeleteAtQuantum )
+            {
+                m_RealTimeList.erase(*p);
+                continue;
+            }
+
+            if ( m_Params.m_EchoesWrapAtQuantum )
+                newPhase -= m_Params.m_Quantum;
+        }
 
         // Have we reached the target?
 
-        note.m_Moved += note.m_Inc;
-
-        if ( note.m_Moved >= note.m_Target )
-        {
-            // What happens here is up for experimentation.
-
-            Note & newNote = CopyNote(*p)->second;
-
-            newNote.m_Inc = note.m_Inc;
-            newNote.m_Moved = 0;
-            newNote.m_Target = note.m_Target/2;
-            newNote.m_Phase = note.m_Phase + note.m_Inc;
-            newNote.m_NoteNumber = note.m_NoteNumber + note.m_Interval;
-
-            note.m_Inc = 0;
-            // BeginEcho(inc, note.m_Target, note.m_Interval);
-            // continue;
-        }
+        if ( note.IncrementAndCheckTarget() && NoteTargetAction(*p, newPhase) )
+            continue;
 
         // MoveNote() inserts a copy at the new location. The previous
         // map entry and its note is deleted.
 
         Note & newNote = MoveNote(*p, newPhase)->second;
 
-        // Do further processing on new note, here.
+        // Any further processing on new note? If so, do it here.
 
 
     }
@@ -1647,9 +1757,7 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
     m_LastStepPhaseZero = lPhase == 0;
 
     if ( m_LastStepPhaseZero )
-    {
-        UpdateList();
-    }
+        DoEchoes();
 
     // Window is defined in the list time scale, so use the multiplier.
 

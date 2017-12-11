@@ -571,7 +571,8 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
         throw string("Pattern::StartRealTimeEcho() - There's something wrong with the parameter list.");
     }
 
-
+    if ( equals_3(inc, 0) )
+        throw string("Increment must be set for other parameters to have and effect.");
 
     auto rtList = m_RealTimeSet.begin() + m_PosEdit;
 

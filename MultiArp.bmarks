@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<BrowseTracker_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="maTranslateTable.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="13639" topLine="513" />
+	</File>
+	<File name="maChainLink.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="4531" topLine="186" />
+	</File>
+	<File name="Test Files/Shades of Blue and Yellow, extended.txt" open="0" top="0" tabpos="0">
+		<Cursor position="1353" topLine="51" />
+	</File>
+	<File name="maCommand.h" open="0" top="0" tabpos="13">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="maPatternChain.h" open="0" top="0" tabpos="8">
+		<Cursor position="3353" topLine="62" />
+	</File>
+	<File name="maNotes.cpp" open="1" top="1" tabpos="6">
+		<Cursor position="38342" topLine="1564" />
+		<BrowseMarks positions="24859,36667,37693,37730,37970" />
+		<Book_Marks positions="" />
+	</File>
+	<File name="maState.h" open="0" top="0" tabpos="18">
+		<Cursor position="1376" topLine="32" />
+	</File>
+	<File name="maPattern.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="15847" topLine="484" />
+	</File>
+	<File name="maAlsaSequencerQueue.h" open="0" top="0" tabpos="20">
+		<Cursor position="1417" topLine="6" />
+	</File>
+	<File name="maPattern.h" open="1" top="0" tabpos="4">
+		<Cursor position="5312" topLine="147" />
+	</File>
+	<File name="maPatternStore.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="6119" topLine="212" />
+	</File>
+	<File name="maPatternChain.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="1084" topLine="21" />
+	</File>
+	<File name="maTranslateTable.h" open="0" top="0" tabpos="10">
+		<Cursor position="5683" topLine="177" />
+	</File>
+	<File name="Test Files/Note List Test Data.txt" open="0" top="0" tabpos="2">
+		<Cursor position="2810" topLine="265" />
+	</File>
+	<File name="multi_arp.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="16964" topLine="549" />
+	</File>
+	<File name="maCommand.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="31952" topLine="959" />
+	</File>
+	<File name="maTrigList.h" open="0" top="0" tabpos="7">
+		<Cursor position="1468" topLine="24" />
+	</File>
+	<File name="Test Files/More Test Data.txt" open="1" top="0" tabpos="2">
+		<Cursor position="16101" topLine="473" />
+	</File>
+	<File name="maScreen.h" open="0" top="0" tabpos="6">
+		<Cursor position="1661" topLine="50" />
+	</File>
+	<File name="maAlsaSequencer.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="2375" topLine="66" />
+	</File>
+	<File name="maNotes.h" open="1" top="0" tabpos="7">
+		<Cursor position="8665" topLine="301" />
+	</File>
+	<File name="maCursorKeys.h" open="0" top="0" tabpos="14">
+		<Cursor position="1277" topLine="36" />
+	</File>
+	<File name="maTrigListItem.h" open="0" top="0" tabpos="11">
+		<Cursor position="4578" topLine="150" />
+	</File>
+	<File name="maFeelMap.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="8799" topLine="357" />
+	</File>
+	<File name="maUtility.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="3627" topLine="147" />
+	</File>
+	<File name="maPatternStore.h" open="0" top="0" tabpos="10">
+		<Cursor position="5547" topLine="157" />
+	</File>
+	<File name="maListBuilder.h" open="0" top="0" tabpos="17">
+		<Cursor position="2207" topLine="57" />
+	</File>
+	<File name="maScreen.cpp" open="0" top="0" tabpos="15">
+		<Cursor position="20279" topLine="293" />
+	</File>
+	<File name="notelist.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="866" topLine="0" />
+	</File>
+	<File name="maTrigList.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="5798" topLine="46" />
+	</File>
+	<File name="Test Files/Nice Clips, Autumn 2017.txt" open="0" top="0" tabpos="9">
+		<Cursor position="8732" topLine="236" />
+	</File>
+	<File name="maAlsaSequencerQueue.cpp" open="0" top="0" tabpos="19">
+		<Cursor position="2712" topLine="53" />
+	</File>
+	<File name="maCursorKeys.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="1680" topLine="44" />
+	</File>
+	<File name="maState.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="924" topLine="49" />
+	</File>
+	<File name="maUtility.h" open="1" top="0" tabpos="9">
+		<Cursor position="1403" topLine="9" />
+		<BrowseMarks positions="" />
+		<Book_Marks positions="" />
+	</File>
+	<File name="maChainLink.h" open="0" top="0" tabpos="6">
+		<Cursor position="1347" topLine="32" />
+	</File>
+	<File name="maFeelMap.h" open="0" top="0" tabpos="22">
+		<Cursor position="1151" topLine="26" />
+	</File>
+	<File name="maTrigListItem.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="5414" topLine="681" />
+	</File>
+	<File name="maListBuilder.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="4877" topLine="198" />
+	</File>
+	<File name="maAlsaSequencer.h" open="0" top="0" tabpos="21">
+		<Cursor position="1515" topLine="42" />
+	</File>
+</BrowseTracker_layout_file>

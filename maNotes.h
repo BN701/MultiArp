@@ -140,6 +140,7 @@ struct Cluster : public CursorKeys
     void Clear() { m_Notes.clear(); }
     bool Empty() { return m_Notes.empty(); }
     bool IsRest();
+    void SetPhaseAllNotes(double phase);
 
     void SetStepsTillNextNote( int val )
     {

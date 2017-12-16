@@ -251,14 +251,13 @@ void queue_next_step(int queueId)
 
         unsigned char noteVelocity;
 
-        int64_t timeAdjust = 0;
+        // For real time events, move the note ahead or behind
+        // the phase value of the step itself. (We can't move
+        // too far ahead, obviously, but there's no mechanism
+        // yet for dealing with that situation if it happens.)
 
-        if ( true )
-        {
-            // Calculate adjustment in microseconds.
-            double phaseAdjust = note->Phase() - g_State.Phase();
-            timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
-        }
+        double phaseAdjust = note->Phase() - g_State.Phase();
+        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
 
         int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
 

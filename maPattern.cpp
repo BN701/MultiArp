@@ -73,16 +73,17 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
 
             for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
             {
-                // Just ignore if list doesn't exist.
+                // Just ignore list number if list doesn't exist.
 
                 if ( *it < m_StepListSet.size() )
                 {
                     m_LastRequestedPos = *it;
 
-                    Cluster * result = m_StepListSet[*it].Step();
+                    Cluster * result = m_StepListSet.at(*it).Step();
 
                     if ( result != NULL )
                     {
+                        result->SetPhaseAllNotes(phase);
                         cluster.SetStepsTillNextNote(result->StepsTillNextNote());
                         cluster += *result;
                     }

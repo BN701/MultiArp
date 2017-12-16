@@ -447,11 +447,20 @@ bool Cluster::IsRest()
     if ( Empty() )
         return true;
 
-    for ( vector<int>::size_type i = 0; i < m_Notes.size(); i++ )
-        if ( m_Notes[i].m_NoteNumber >= 0 )
+//    for ( vector<int>::size_type i = 0; i < m_Notes.size(); i++ )
+//        if ( m_Notes[i].m_NoteNumber >= 0 )
+//            return false;
+    for ( auto n = m_Notes.begin(); n != m_Notes.end(); n++ )
+        if ( n->m_NoteNumber >= 0 )
             return false;
 
     return true;
+}
+
+void Cluster::SetPhaseAllNotes(double phase)
+{
+    for ( auto n = m_Notes.begin(); n != m_Notes.end(); n++ )
+        n->SetPhase(phase);
 }
 
 string Cluster::ToString(bool fullFormat)

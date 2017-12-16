@@ -5,10 +5,8 @@
 
 ![](Doc/Screenshot_2017-12-15_22-57-24.png)
 
-Multi Arp, Design Overview
-V 1.00
-BN - Dec 15, 2017
 (I’ve always thought of ‘Multi Arp’ as an interim name, but after several months now I haven’t found anything else and the search must continue.)
+
 What follows is a summary of where things are in the current  implementation.
 
 ## What is it?
@@ -45,15 +43,15 @@ The current UI is a hodgepodge of make do and mend that’s grown as I’ve need
 
 As it stands, the UI is text mode, 80 by 25 characters. This is largely to avoid the use of mouse/touch on a cramped table top or flimsy laptop stand, but also comes from a sense of nostalgia on my part - think *Voyetra Sequencer Plus* on DOS, or even *Fairlight*.
 
-Text most avoids the headache of deciding what a graphical interface would actually be like.
+Text mode also avoids the headache of deciding what a graphical interface would actually be like.
 
-Whilst there is no overall design goal it has already begun to show me what needs to be accessible and visible and what can be left more obscure.
+Whilst there is no overall design goal ad-hoc work on a UI has already begun to show me what needs to be accessible and visible and what can be left more obscure.
 
 A simple horizontal ***menu*** system exists for some functionality. For everything else you have to use the ***command line*** within the app.
 
 ## Midi Note entry
 
-Note entry is via midi keyboard.  There are two step entry modes.
+Note entry is via midi keyboard. There are two step entry modes.
 
 ***Full*** mode requires use of the PC keyboard to enter rests and close a phrase. Chords or single notes are played on the midi keyboard.
 

@@ -19,7 +19,7 @@ The UI is text mode, 80 by 25 characters. This avoids the use of mouse/touch on 
 
 A simple horizontal ***menu*** system exists for some functionality. For everything else you have to use the ***command line*** within the app.
 
-Pattern data is transferred in and out using ***Copy***/***Paste*** key combinations. There is no conventional file open/save mechanism.
+Pattern data is transferred in and out using ***copy***/***paste*** key combinations. There is no conventional file open/save mechanism.
 
 ## Midi Note entry
 

@@ -50,7 +50,7 @@ A simple horizontal ***menu*** system exists for some functionality. For everyth
 
 Note entry is via midi keyboard. There are two step entry modes.
 
-***Full*** mode requires use of the PC keyboard to enter rests and close a phrase. Chords or single notes are played on the midi keyboard.
+***Step*** mode requires use of the PC keyboard to enter rests and close a phrase. Chords or single notes are played on the midi keyboard.
 
 ***Quick*** mode involves holding down a note or notes. On release of the last key, the note set is entered as a monophonic sequence. There is no way to enter chords or rests in this mode.
 

@@ -15,7 +15,7 @@
 
 * A single instance of the app plays one polyphonic pattern on one midi-channel. Run multiple, synchronized instances to play on different channels.
 
-* ***Ableton Link*** is used for synchronization. You do not need to have Ableton Live or any of its components for this to work.
+* ***Ableton Link*** synchronization protocol is used to keep everything playing together. You do not need to have Ableton Live or any of its components for this to work.
 
 ## User Interface
 

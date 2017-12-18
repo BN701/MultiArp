@@ -12,7 +12,7 @@ This is doc expands on the 'readme' file. What follows is a summary of where thi
 
 * A ***step list*** is a series of notes, chords or rests played out with regular timing. Step lists have no predetermined length. The timing of a step list is controlled by ...
 
-* The ***step value*** controls the rate of step list playback and indeed the overall ‘pulse’ of the sequencer. Step value is the conversion rate between the internal the sequencer pulse and Ableton Link’s beat value. A value of 4 is essentially a quarter note, 8 is an eighth-note and so on, and values 3, 7, etc divide a four beat bar as you would expect. Step values (and beat values) can be non-integer.
+* The ***step value*** controls the rate of step list playback and indeed the overall ‘pulse’ of the sequencer. Step value is the conversion rate between the internal sequencer pulse and Ableton Link’s beat value. A value of 4 is essentially a quarter note, 8 is an eighth-note and so on, and values 3, 7, etc divide a four beat bar as you would expect. Step values (and beat values) can be non-integer.
 
 * Multiple step lists within a pattern are either *interleaved* - one step from each list is played in rotation - or played according to a *trig list*.
 
@@ -52,7 +52,7 @@ The top line of the display is a ***status bar*** showing midi channel, step val
 
 Next comes the ***menu bar***, which may be empty. (More on this in the [next section](#more-about-menus).)
 
-Row three contains the ***progress bar***. The bar adapts to the current situation. The overall number of divisions  comes from current Ableton Link quantum value - essentially the loop length - but the size of the cursor is determined by step value. Depending on the extremes of timing settings, it could be anything from a tiny dot travelling across sixty four steps or more steps, to the whole thing flashing on and off once for every beat or bar.
+Row three contains the ***progress bar***. The bar adapts to the current situation. The overall number of divisions  comes from current Ableton Link quantum value - essentially the loop length - but the size of the cursor is determined by step value. Depending on the extremes of timing settings, it could be anything from a tiny dot travelling across sixty four steps or more, to the whole thing flashing on and off once for every beat or bar.
 
 To the right of the progress is the current ***beat value*** within the current quantum. Below beat value on the right is ***pattern beat value***, which may be different to global beat. Below that is ALSA sequencer queue time, though this isn't particularly useful.
 
@@ -62,7 +62,7 @@ Row seven, with the prompt symbol, is the ***command line***. Row six above show
 
 The lower two thirds of the display below the command line can change completely depending on ***display mode*** (changed with tab or shift-tab).
 
-In the first two modes, which are slight variations on the same theme, lines nine two twelve show a scrollable ***pattern list*** on the left, with ***pattern summary*** to the right of the list. (You can see this in the image above.)
+In the first two modes, which are slight variations on the same theme, lines nine to twelve show a scrollable ***pattern list*** on the left, with ***pattern summary*** to the right of the list. (You can see this in the image above.)
 
 Below that, step lists and real time lists are shown, with an arrow cursor to the left showing which of them has ***edit focus***. The list with edit focus is either the subject of the current menu, or will be the target for other commands not supported by the current menu.
 

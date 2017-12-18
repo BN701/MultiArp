@@ -4,6 +4,24 @@
 
 **BN - Dec 17, 2017**
 
+## Using the command line
+
+There's a command prompt on line 7 of the UI. To make anything happen, you have to type at least one ***command***, though some of them will also open up a ***menu***.
+
+The complete set commands appears below. Many of them also have abbreviated forms, and I've listed these too. Most commands have one or more ***parameters***.
+
+Some commands act on a particular pattern, or a particular list within a pattern. The pattern or list which will receive such a command is said to have ***edit focus***. By default, *edit focus* follows the playing pattern, but the *edit focus* can be set to a different pattern than the one that is playing.
+
+## Changing the playing pattern
+
+When the sequencer is running, type the number of the pattern that you want to play and the pattern will change when the beat reaches the end of the current Ableton Link *quantum*.
+
+If  ***pattern chain*** mode is active, the number will be interpreted as a stage in the pattern chain, and new stage will become active when the beat reaches the end of the current *quantum*. This overrides the stage that would otherwise play and is useful, for instance, when you want to jump away from a chain stage that is marked for indefinite repeat.
+
+This is the one case where you use the command line without typing a command..
+
+---
+
 ## **label**
 
 Synonyms: ***name***, ***n***

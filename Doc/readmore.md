@@ -4,17 +4,11 @@
 
 **BN - Dec 16, 2017**
 
-This is basically the expanded 'readme' file. What follows is a summary of where things are in the current implementation.
-
-## What is it?
-
-* ***Non-linear pattern sequencer*** with the focus on live exploration, improvisation and (sooner or later) performance.
-
-* A single instance of the app plays one polyphonic pattern at a time on one midi-channel. ***Ableton Link*** is used for synchronisation and timing between multiple instances of the sequencer and, of course, other apps on the current IP LAN segment that support Link. (Thankfully, you do not need to have Ableton Live running or even licensed for this to work.)
+This is doc expands on the 'readme' file. What follows is a summary of where things are in the current implementation.
 
 ## Concepts
 
-* A ***pattern*** contains one or more step lists and/or real time lists. There is no predetermined limit to the number of lists of either kind within a pattern.
+* A ***pattern*** contains one or more *step lists* and/or *real time lists*. There is no predetermined limit to the number of lists of either kind within a pattern.
 
 * A ***step list*** is a series of notes, chords or rests played out with regular timing. Step lists have no predetermined length. The timing of a step list is controlled by ...
 
@@ -34,18 +28,6 @@ This is basically the expanded 'readme' file. What follows is a summary of where
 
 * Pattern ***chains*** allow patterns to be played in any order. Patterns can be switched on bar boundaries as defined by Ableton Link, or can be switched naturally when their own internal cycles come to completion. Steps in the pattern chain will play in succession or a ‘goto next’ value can be set. Chain steps can be repeated a number of times before switching or set to repeat indefinitely.
 
-## User Interface
-
-The current UI is a hodgepodge of make do and mend that’s grown as I’ve needed it.
-
-As it stands, the UI is text mode, 80 by 25 characters. This is largely to avoid the use of mouse/touch on a cramped table top or flimsy laptop stand, but also comes from a sense of nostalgia on my part - think *Voyetra Sequencer Plus* on DOS, or even *Fairlight*.
-
-Text mode also avoids the headache of deciding what a graphical interface would actually be like.
-
-Whilst there is no overall design goal ad-hoc work on a UI has already begun to show me what needs to be accessible and visible and what can be left more obscure.
-
-A simple horizontal ***menu*** system exists for some functionality. For everything else you have to use the ***command line*** within the app.
-
 ## Midi Note entry
 
 Note entry is via midi keyboard. There are two step entry modes.
@@ -58,40 +40,12 @@ There is also a ***real time*** entry mode which operates as a standard midi loo
 
 Creation and editing of all note data is possible from within the app, but this is only intended for small additions or minor tweaks.
 
-## Saving and loading patterns
+## User Interface
 
-There is no conventional file open/save mechanism. Pattern data is transferred in and out using ***Copy***/***Paste*** key combinations. Single patterns or all patterns can be copied out, but there’s a much finer level of control about what can be pasted back.
+The current UI is a hodgepodge of make do and mend that’s grown as I’ve needed it. As it stands, the UI is text mode, 80 by 25 characters.
 
-The data format is plain text and the intention is to use your favourite text editor to manage things and of course, transferring data between instances is just as simple.
+A simple horizontal ***menu*** system exists for some functionality. For everything else you have to use the ***command line*** within the app.
 
-## Architecture
-
-Within the app everything runs from the UI thread using a timed render loop. Linux’ ALSA Sequencer is used for timing and event scheduling, including a callback to trigger each step of the sequencer. Ableton Link is interrogated to determine when events should be scheduled.
-
-The UI thread polls for keyboard or midi input and processes one character or one event at a time. Midi input is processed immediately. This includes the step callback. If keyboard input is a special key that triggers an action it is processed immediately. Other characters are accumulated into a command string to be processed when Enter is received.
-
-With each iteration of the render loop event data is gathered and calculated, and scheduled to be played out by ALSA during the next step window. This includes scheduling a callback to trigger processing for the following step as the current step plays out. In this way processing for each step always begins one whole step ahead of the actual schedule time of those events.
-
-## Platform Requirements
-
-* Written in C++ with a few bits that look like plain old C.
-
-* Built with gcc for Linux 64 bit (C++14, by default).
-Heavy use of the C++ Standard Library, in particular string, vector and map.
-
-* The IDE used for this source tree is CodeBlocks.
-
-* Double precision floating point maths for Ableton Link and other parts of the sequencer (though this is problematic in areas where consistent conditional branching is required and a switch to integers in these places would be useful).
-
-* UI uses NCurses library.
-
-* ALSA sequencer for internal timing and midi event scheduling, receipt and delivery.
-
-* Ableton Link for synchronization with other instances of itself, and of course other apps using Link on the current IP LAN segment.
-
-* Linux utility xclip is used for copy/paste.
-
-## More about the User interface
 ![](Screenshot_2017-12-15_23-12-52.png)
 
 The top line of the display is a ***status bar*** showing midi channel, step value, quantum value and Run/Stop/Record state. The background colour for the status bar changes to orange if one of the two step input modes is active, and red for real time record.
@@ -129,5 +83,20 @@ With all menus, use the ***left***/***right*** arrow keys to navigate - there's 
 Menus are also used to display lists of parameter values. If the list itself can be edited, ***shift-left***/***shift-right*** will insert a new entry to the left or right of the cursor. In some cases, ***ctrl-left***/***ctrl-right*** will copy an entry and ***shift-delete*** will delete it. (In a couple of places ***ctrl-delete*** will undo a deletion.)
 
 If a parameter is has decimal places, ctrl and shift with up/down will change in tenths and hundredths, respectively.
+
+## Saving and loading patterns
+
+There is no conventional file open/save mechanism. Pattern data is transferred in and out using ***Copy***/***Paste*** key combinations. Single patterns or all patterns can be copied out, but there’s a much finer level of control about what can be pasted back.
+
+The data format is plain text and the intention is to use your favourite text editor to manage things and of course, transferring data between instances is just as simple.
+
+## Architecture
+
+Within the app everything runs from the UI thread using a timed render loop. Linux’ ALSA Sequencer is used for timing and event scheduling, including a callback to trigger each step of the sequencer. Ableton Link is interrogated to determine when events should be scheduled.
+
+The UI thread polls for keyboard or midi input and processes one character or one event at a time. Midi input is processed immediately. This includes the step callback. If keyboard input is a special key that triggers an action it is processed immediately. Other characters are accumulated into a command string to be processed when Enter is received.
+
+With each iteration of the render loop event data is gathered and calculated, and scheduled to be played out by ALSA during the next step window. This includes scheduling a callback to trigger processing for the following step as the current step plays out. In this way processing for each step always begins one whole step ahead of the actual schedule time of those events.
+
 
 BN

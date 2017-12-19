@@ -1,4 +1,4 @@
-# Multi Arp Command and Menu Reference: Misc
+# Multi Arp Command and Menu Reference: General Commands
 
 
 **BN - Dec 17, 2017**

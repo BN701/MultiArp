@@ -8,20 +8,90 @@
 
 * [**Changing the playing pattern**](#changing-the-playing-pattern)
 
-* [**Misc Commands**](command_ref_misc.md)
+* [**General Commands**](command_ref_misc.md)
 
- * [autoreset](command_ref_misc.md#autoreset)
- * [label](command_ref_misc.md#label)
- * [midi](command_ref_misc.md#midi)
- * [page](command_ref_misc.md#page)
- * [quantum](command_ref_misc.md#quantum)
- * [quit](command_ref_misc.md#quit)
- * [reset](command_ref_misc.md#reset)
- * [run, stop](command_ref_misc.md#run-stop)
- * [status](command_ref_misc.md#status)
- * [step](command_ref_misc.md#step)
- * [velocity, gate](command_ref_misc.md#velocity-gate)
+  * [autoreset](command_ref_misc.md#autoreset)
+  * [label](command_ref_misc.md#label)
+  * [midi](command_ref_misc.md#midi)
+  * [page](command_ref_misc.md#page)
+  * [quantum](command_ref_misc.md#quantum)
+  * [quit](command_ref_misc.md#quit)
+  * [reset](command_ref_misc.md#reset)
+  * [run, stop](command_ref_misc.md#run-stop)
+  * [status](command_ref_misc.md#status)
+  * [step](command_ref_misc.md#step)
+  * [velocity, gate](command_ref_misc.md#velocity-gate)
 
+
+* [**Pattern Commands**](command_ref_pattern.md)
+
+  * [edit](command_ref_pattern.md#edit)
+  * [play](command_ref_pattern.md#play)
+  * [new](command_ref_pattern.md#new)
+  * [copy](command_ref_pattern.md#copy)
+  * [clear](command_ref_pattern.md#clear)
+  * [delete, undo](command_ref_pattern.md#delete-undo)
+  * [lock, unlock](command_ref_pattern.md#lock-unlock)
+
+
+* [**Pattern Chains**](command_ref_chain.md)
+
+  * [chain](command_ref_chain.md#chain)
+  * [chain quantum, natural, off](command_ref_chain.md#chain-quantum-natural-off)
+  * [chain clear](command_ref_chain.md#chain-clear)
+  * [chain new](command_ref_chain.md#chain-new)
+  * [chain delete](command_ref_chain.md#chain-delete)
+  * [chain jump](command_ref_chain.md#chain-jump)
+
+
+* [**Step List**](command_ref_step_list.md)
+
+  * [list](command_ref_step_list.md#list)
+
+
+
+* [**Real Time List**](command_ref_realtime_list.md)
+
+  * [import](command_ref_realtime_list.md#import)
+  * [real time](command_ref_realtime_list.md#real-time)
+  * [real time delete](command_ref_realtime_list.md#real-time-delete)
+  * [real time rate](command_ref_realtime_list.md#real-time-rate)
+  * [real time quantum](command_ref_realtime_list.md#real-time-quantum)
+  * [real time phase](command_ref_realtime_list.md#real-time-phase)
+  * [real time echo](command_ref_realtime_list.md#real-time-echo)
+
+
+* [**Triggers**](command_ref_trigs.md)
+
+  * [trigs](#trigs)
+  * [trigs arp](#trigs-arp)
+
+
+
+* [**Scale and Transpose**](command_ref_scale.md)
+
+  * [root](command_ref_scale.md#root)
+  * [scale](command_ref_scale.md#scale)
+  * [scale from list](command_ref_scale.md#scale-from-list)
+  * [scale show](command_ref_scale.md#scale-show)
+  * [scale controls](command_ref_scale.md#scale-controls)
+  * [transpose](command_ref_scale.md#transpose)
+
+* [**Feel and Swing**](command_ref_feel.md)
+
+  * [feel](command_ref_feel.md#feel)
+  * [feel on, off](command_ref_feel.md#feel-on-off)
+  * [feel new](command_ref_feel.md#feel-new)
+  * [feel add](command_ref_feel.md#feel-add)
+  * [feel remove](command_ref_feel.md#feel-remove)
+  * [feel respace](command_ref_feel.md#feel-respace)
+
+
+* [**Global Settings**](command_ref_use)
+
+  * [load](command_ref_use#load)
+  * [store](command_ref_use#store)
+  * [use](command_ref_use#use)
 
 
 ## Using the command line
@@ -51,122 +121,6 @@ This is the one case where you use the command line without typing a command.
 
 
 
-{"edit", C_EDIT},
-{"e", C_EDIT},
-{"cue", C_CUE},
-{"play", C_CUE},
-{"new", C_NEW},
-{"copy", C_COPY},
-{"delete", C_DELETE},
-{"del", C_DELETE},
-{"clear", C_CLEAR},
-{"undo", C_UNDO},
-
-{"lock", C_EDIT_CURSOR_LOCK},
-{"unlock", C_EDIT_CURSOR_UNLOCK},
-
-{"list", C_LIST},
-{"l", C_LIST},
-
-{"import", C_LIST_IMPORT},
-{"i", C_LIST_IMPORT},
-{"real time", C_LIST_RT},
-{"rt", C_LIST_RT},
-{"real time delete", C_LIST_RT_DELETE},
-{"rt delete", C_LIST_RT_DELETE},
-{"rt del", C_LIST_RT_DELETE},
-{"real time rate", C_LIST_RT_RATE},
-{"rt rate", C_LIST_RT_RATE},
-{"rt r", C_LIST_RT_RATE},
-{"real time quantum", C_LIST_RT_QUANTUM},
-{"rt quantum", C_LIST_RT_QUANTUM},
-{"rt q", C_LIST_RT_QUANTUM},
-{"real time phase", C_LIST_RT_START_PHASE},
-{"rt p", C_LIST_RT_START_PHASE},
-{"real time echo", C_LIST_RT_ECHO},
-{"rt echo", C_LIST_RT_ECHO},
-{"rt e", C_LIST_RT_ECHO},
-
-{"trigs", C_TRIGS},
-{"t", C_TRIGS},
-{"trigs arp", C_TRIGS_ARPEGGIO},
-{"t arp", C_TRIGS_ARPEGGIO},
-
-{"scale", C_SCALE},
-{"s", C_SCALE},
-{"scale from list", C_SCALE_FROM_LIST},
-{"scale show", C_SCALE_SHOW},
-{"scale help", C_SCALE_HELP},
-{"help scale", C_SCALE_HELP},
-{"scale controls", C_SCALE_CONTROLS},
-{"scale c", C_SCALE_CONTROLS},
-{"scale k", C_SCALE_CONTROLS},
-{"root", C_SETROOT},
-
-{"tran", C_TRANSPOSE},
-{"transpose", C_TRANSPOSE},
-
-{"feel", C_FEEL},
-{"f", C_FEEL},
-{"feel help", C_FEEL_HELP},
-{"f help", C_FEEL_HELP},
-{"help feel", C_FEEL_HELP},
-{"feel on", C_FEEL_ON},
-{"f on", C_FEEL_ON},
-{"feel off", C_FEEL_OFF},
-{"f off", C_FEEL_OFF},
-{"feel new", C_FEEL_NEW},
-{"f new", C_FEEL_NEW},
-{"feel add", C_FEEL_ADD},
-{"f add", C_FEEL_ADD},
-{"feel remove", C_FEEL_REMOVE},
-{"f remove", C_FEEL_REMOVE},
-{"feel new", C_FEEL_NEW},
-{"f new", C_FEEL_NEW},
-{"feel respace", C_FEEL_RESPACE},
-{"f respace", C_FEEL_RESPACE},
-
-
-{"chain", C_PATTERN_CHAIN},
-{"c", C_PATTERN_CHAIN},
-{"chain:", C_PATTERN_CHAIN},
-{"chain off", C_PATTERN_CHAIN_OFF},
-{"chain natural", C_PATTERN_CHAIN_NATURAL},
-{"chain n", C_PATTERN_CHAIN_NATURAL},
-{"c n", C_PATTERN_CHAIN_NATURAL},
-{"chain quantum", C_PATTERN_CHAIN_QUANTUM},
-{"chain q", C_PATTERN_CHAIN_QUANTUM},
-{"c q", C_PATTERN_CHAIN_QUANTUM},
-{"chain clear", C_PATTERN_CHAIN_CLEAR},
-{"chain new", C_PATTERN_CHAIN_NEW},
-{"chain delete", C_PATTERN_CHAIN_DELETE},
-{"chain jump", C_PATTERN_CHAIN_JUMP},
-{"chain help", C_PATTERN_CHAIN_HELP},
-
-{"store", C_STORE},
-{"store step", C_STORE_STEP},
-{"store gate", C_STORE_GATE},
-{"store vel", C_STORE_VELOCITY},
-{"store scale", C_STORE_SCALE},
-{"store all", C_STORE_ALL},
-{"store help", C_STORE_HELP},
-{"help store", C_STORE_HELP},
-{"load help", C_STORE_HELP},
-{"help load", C_STORE_HELP},
-{"load", C_LOAD},
-{"load step", C_LOAD_STEP},
-{"load gate", C_LOAD_GATE},
-{"load vel", C_LOAD_VELOCITY},
-{"load scale", C_LOAD_SCALE},
-{"load all", C_LOAD_ALL},
-
-{"use", C_USE},
-{"use globals", C_USE_GLOBAL_PLAYDATA},
-{"use g", C_USE_GLOBAL_PLAYDATA},
-{"use pattern", C_USE_PATTERN_PLAYDATA},
-{"use p", C_USE_PATTERN_PLAYDATA},
-{"use help", C_USE_HELP},
-{"help use", C_USE_HELP},
 
 {"misc", C_HELP_1},
 {"pattern", C_HELP_3},

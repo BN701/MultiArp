@@ -34,9 +34,9 @@ This is an attempt to document things **as they are** right now. A snapshot of a
   * [new](command_ref_pattern.md#new)
   * [copy](command_ref_pattern.md#copy)
   * [clear](command_ref_pattern.md#clear)
-  * [**delete**](command_ref_pattern.md#delete)
-  * [**undo**](command_ref_pattern.md#undo)
-  * [**lock**](command_ref_pattern.md#lock)
+  * [delete](command_ref_pattern.md#delete)
+  * [undo](command_ref_pattern.md#undo)
+  * [lock](command_ref_pattern.md#lock)
 
 * [**Pattern Chains**](command_ref_chain.md)
 

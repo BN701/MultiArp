@@ -714,7 +714,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
     if ( tokens.size() == 2 )
     {
         m_Patterns.at(m_PosEdit).SetEditPos(index);
-        string temp = "L " + tokens.at(1) + " -" + m_Patterns.at(m_PosEdit).m_StepListSet.at(index).ToString();
+        string temp = "L " + tokens.at(1) + " - " + m_Patterns.at(m_PosEdit).m_StepListSet.at(index).ToString(false);
         if ( temp.size() > 60 )
         {
             temp.resize(57);

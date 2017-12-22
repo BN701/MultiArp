@@ -36,7 +36,7 @@ If step lists and real time lists are shown on the main display, an arrow symbol
 ||Action|
 |:|:|
 |**up/down**| Change *list edit focus*.|
-|**enter**  | Open the [Step List Menu](menu_ref_step_list.md) for the current list.|
+|**enter**  | Open the [Step List Menu](menu_ref_step_list.md) for the current list. |
 
 ---
 ## Real Time List
@@ -46,9 +46,9 @@ Keys: **up/down**, **enter**
 Sets *real time list focus* to a particular real time list in the pattern that has *edit focus*.
 
 ||Action|
-|:|:|
+|:---|:---|
 |**up/down**| Change *real time list edit focus*.|
-|**enter**  | Open the [Real Time List Menu](menu_ref_realtime_list.md) for the current list.|
+|**enter**  | Open the [Real Time List Menu](menu_ref_realtime_list.md) for the current list. |
 
 ---
 ## Trig List
@@ -58,5 +58,5 @@ Keys: **enter**
 A pattern has just one *Trig List*, his option opens the menu for editing it.
 
 ||Action|
-|:|:|
-|**enter**  | Open the [Trig List Menu](menu_ref_trig_list.md) for the current list.|
+|:---|:---|
+|**enter**  | Open the [Trig List Menu](menu_ref_trig_list.md) for the current list. |

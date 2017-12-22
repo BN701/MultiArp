@@ -38,6 +38,7 @@ This is an attempt to document things **as they are** right now. A snapshot of a
   * [undo](command_ref_pattern.md#undo)
   * [lock](command_ref_pattern.md#lock)
 
+
 * [**Pattern Chains**](command_ref_chain.md)
 
   * [chain](command_ref_chain.md#chain)
@@ -50,7 +51,10 @@ This is an attempt to document things **as they are** right now. A snapshot of a
 
 * [**Step List**](command_ref_step_list.md)
 
-  * [list](command_ref_step_list.md#list)
+  * [list *nn*](#list-nn)
+  * [list new](#list-new)
+  * [list delete](#list-delete)
+  * [list *nn* clear](#list-nn-clear)
 
 
 

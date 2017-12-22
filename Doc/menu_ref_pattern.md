@@ -34,7 +34,7 @@ Sets  *list edit focus* to a particular step list in the pattern that has *edit 
 If step lists and real time lists are shown on the main display, an arrow symbol in the left most column will point to the list which has *edit focus*.
 
 ||Action|
-|:|:|
+|:---|:---|
 |**up/down**| Change *list edit focus*.|
 |**enter**  | Open the [Step List Menu](menu_ref_step_list.md) for the current list. |
 

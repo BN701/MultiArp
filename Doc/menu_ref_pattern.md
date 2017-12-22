@@ -20,8 +20,8 @@ Keys: **up/down**
 
 Shows and pattern with *edit focus*.
 
-|     | Action     |
-| :------------- | :------------- |
+|| Action|
+| :--- | :--- |
 | **up/down** |Change *edit focus*.|
 
 ---

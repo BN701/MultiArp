@@ -758,6 +758,9 @@ const char * TranslateTable::AccidentalsModeName()
 
 const char * TranslateTable::ShiftName()
 {
+    if ( m_ScaleDegrees == 0 )
+        return tt_numerals[0];
+
     int i = m_DegreeShift;
     while ( i < 0 )
         i += m_ScaleDegrees;
@@ -878,6 +881,9 @@ int TranslateTable::TranslateUsingTable(int root, int scale, int translation, in
 int TranslateTable::ShiftSum(int start, int degreeShift)
 {
     int shift = 0;
+
+    if ( m_ScaleDegrees == 0 )
+        return shift;
 
     for ( int i = start; i < start + degreeShift; i++ )
         shift += m_Intervals[i % m_ScaleDegrees];

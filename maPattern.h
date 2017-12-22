@@ -95,12 +95,14 @@ struct Pattern
         // NewList();
     }
 
-    void Clear ()
+    void Clear()
     {
         m_Label.clear();
         m_StepListSet.clear();
+        m_RealTimeSet.clear();
         ResetPosition();
         m_TranslateTable.Reset();
+        m_TrigList.Clear();
         m_StepValue = 4.0;
         m_Gate = 0.5;
         m_GateHold = false;
@@ -124,7 +126,7 @@ struct Pattern
     void SetStepValue( double val ) { m_StepValue = val; }
     int StepListCount() { return m_StepListSet.size(); }
     int RealTimeListCount() { return m_RealTimeSet.size(); }
-
+    int TrigListCount() { return m_TrigList.Size(); }
     void ResetPosition()
     {
         m_Pos = 0;

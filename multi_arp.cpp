@@ -522,7 +522,7 @@ bool key_input_action()
         {
             set_status(STAT_POS_2, "%s", errorMessage.c_str());
         }
-        set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+        update_pattern_status_panel();
         update_edit_panels();
         update_pattern_panel();
         break;
@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
     int queueIndex = g_Sequencer.CreateQueue();
     int queueId = g_Sequencer.Queue(queueIndex).GetQueueId();
 
-    set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+    update_pattern_status_panel();
 
     // Start the queue.
 

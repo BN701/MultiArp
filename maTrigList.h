@@ -38,6 +38,13 @@ class TrigList : public CursorKeys
 
         TrigListItem * Step();
 
+        void Clear()
+        {
+            m_TrigItems.clear();
+            m_Pos = 0;
+            m_PosEdit = 0;
+        }
+
         std::string ToString(const char * prefix);
         void FromString(std::string s);
         void FromSimpleString(std::string s);
@@ -48,6 +55,7 @@ class TrigList : public CursorKeys
         std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
 
         virtual void SetStatus();
+
     protected:
         virtual bool HandleKey(key_type_t k);
 

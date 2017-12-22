@@ -287,6 +287,11 @@ void update_progress_bar()
 
 }
 
+// If Pattern Chains active, show pattern chain status. Otherwise
+// show pattern store status summary.
+// Called from queue_next_step() when phase zero to catch pattern chain updates.
+// Called from update_edit_panels() to catch any pattern store changes.
+
 void update_pattern_status_panel()
 {
     wmove(g_Display.SmallPanel(), 1, 0);
@@ -294,16 +299,18 @@ void update_pattern_status_panel()
     wmove(g_Display.SmallPanel(), 2, 0);
     wclrtoeol(g_Display.SmallPanel());
 
+    set_status_w(STAT_POS_PATTERN_EDIT, g_PatternStore.PatternStatusEdit().c_str());
+
     if ( g_PatternStore.PatternChainMode() == PatternChain::off ||
          g_PatternStore.Empty() ||
          g_PatternStore.PatternChainEmpty() )
     {
-        set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+        set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatusPlay().c_str());
         return;
     }
 
     static int firstRow = 0;
-    const int rows = 2;
+    const int rows = 1;
 
     int selection = g_PatternStore.CurrentPosPatternChain();
 
@@ -328,6 +335,8 @@ void update_pattern_status_panel()
 
 void update_edit_panels(bool refreshList)
 {
+    update_pattern_status_panel();
+
     switch ( g_Display.BigPanelPage() )
     {
     case Display::one:
@@ -377,7 +386,7 @@ void update_edit_panels(bool refreshList)
     Pattern & p = g_PatternStore.CurrentEditPattern();
 
     wmove(g_Display.EditSummaryPanel(), 0, 1);
-    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i", p.StepListCount(), p.RealTimeListCount());
+    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
 
     wmove(g_Display.EditSummaryPanel(), 1, 1);
     wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),

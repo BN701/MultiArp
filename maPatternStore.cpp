@@ -273,13 +273,13 @@ string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
 
 }
 
-string PatternStore::PatternStatus()
+string PatternStore::PatternStatusPlay()
 {
-    string result;
 
     if ( m_Patterns.empty() )
         return "No patterns loaded.\n";
 
+    string result;
     char buf[80];
 
     sprintf(buf, "Play: %lu", m_PosPlay + 1);
@@ -304,8 +304,19 @@ string PatternStore::PatternStatus()
 
     result += buf;
 
+    return result;
+}
 
-    sprintf(buf, "\nEdit: %lu", m_PosEdit + 1);
+
+string PatternStore::PatternStatusEdit()
+{
+    if ( m_Patterns.empty() )
+        return "";
+
+    string result;
+    char buf[80];
+
+    sprintf(buf, "Edit: %lu", m_PosEdit + 1);
     result += buf;
 
     if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
@@ -320,6 +331,9 @@ string PatternStore::PatternStatus()
             result += buf;
         }
     }
+
+    if ( m_EditPosFollowsPlay )
+        result += ", following play pos";
 
     return result;
 }

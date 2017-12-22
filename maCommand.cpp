@@ -102,6 +102,7 @@ enum command_t
     C_EDIT,             // Set focus for copy/paste
     C_EDIT_CURSOR_LOCK,
     C_EDIT_CURSOR_UNLOCK,
+    C_EDIT_CURSOR_LOCK_STATUS,
     C_NEW,              // Create new (empty) pattern.
     C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
     C_DELETE,           // Delete pattern and reduce size of pattern list.
@@ -283,8 +284,9 @@ unordered_map<string, command_t> gCommandList =
     {"chain jump", C_PATTERN_CHAIN_JUMP},
     {"chain help", C_PATTERN_CHAIN_HELP},
 
-    {"lock", C_EDIT_CURSOR_LOCK},
-    {"unlock", C_EDIT_CURSOR_UNLOCK},
+    {"lock on", C_EDIT_CURSOR_LOCK},
+    {"lock off", C_EDIT_CURSOR_UNLOCK},
+    {"lock", C_EDIT_CURSOR_LOCK_STATUS},
 
     {"list", C_LIST},
     {"l", C_LIST},
@@ -515,6 +517,15 @@ bool do_command(string commandString)
 
 
         case C_CUE  :
+            if ( tokens.size() < 2 )
+                throw string("hint: play nn, where 'nn' is pattern number.");
+            iTemp = stoi(tokens[1].c_str()) - 1;
+            if ( ! g_PatternStore.ValidPosition(iTemp) )
+                throw string("Requested pattern number out of range at the moment.");
+            set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
+            g_PatternStore.SetNewPatternPending(iTemp);
+            break;
+
         case C_EDIT :
             if ( tokens.size() < 2 )
             {
@@ -527,45 +538,36 @@ bool do_command(string commandString)
                 iTemp = stoi(tokens[1].c_str()) - 1;
                 if ( ! g_PatternStore.ValidPosition(iTemp) )
                     throw string("Requested pattern number out of range at the moment.");
-                switch ( command )
-                {
-                case C_CUE :
-                    set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
-                    g_PatternStore.SetNewPatternPending(iTemp);
-                    // newPattern = iTemp;
-                    break;
-                case C_EDIT :
-                    set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
-                    g_PatternStore.SetEditPos(iTemp);
-                    set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
-                    break;
-                default:
-                    break;
-                }
+                set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
+                g_PatternStore.SetEditPos(iTemp);
+                update_pattern_status_panel();
             }
             break;
 
         case C_EDIT_CURSOR_LOCK:
             g_PatternStore.SetEditFocusFollowsPlay(true);
             set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
-            set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+            update_pattern_status_panel();
             break;
         case C_EDIT_CURSOR_UNLOCK:
             g_PatternStore.SetEditFocusFollowsPlay(false);
             set_status(STAT_POS_2, "Edit focus unlocked.");
             break;
+        case C_EDIT_CURSOR_LOCK_STATUS:
+            set_status(STAT_POS_2, "Edit focus %s.", g_PatternStore.EditFocusFollowsPlay() ? "locked" : "unlocked");
+            break;
 
         case C_NEW :
-            g_PatternStore.AddEmptyPattern();
+            g_PatternStore.AddEmptyPattern(tokens.begin() + 1, tokens.end());
             // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
             set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
-            set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+            update_pattern_status_panel();
             break;
 
         case C_COPY :
             g_PatternStore.CopyCurrentPattern();
             set_status(STAT_POS_2, "Current pattern copied at position %i.", g_PatternStore.m_Patterns.size());
-            set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+            update_pattern_status_panel();
             break;
 
         case C_DELETE :
@@ -581,13 +583,13 @@ bool do_command(string commandString)
                 g_PatternStore.DeleteCurrentPattern();
                 set_status(STAT_POS_2, "Current pattern deleted. (\'Undo\' puts it at the end of the list.)");
             }
-            set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+            update_pattern_status_panel();
             break;
 
         case C_UNDO :
             g_PatternStore.PopDeletedPattern();
             set_status(STAT_POS_2, "Pattern restored at position %i.", g_PatternStore.m_Patterns.size());
-            set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatus().c_str());
+            update_pattern_status_panel();
             break;
 
         case C_CLEAR :
@@ -996,6 +998,25 @@ bool do_command(string commandString)
             show_status();
             break;
 
+
+        case C_TRIGS:
+            if ( tokens.size() > 1 )
+            {
+                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
+            }
+            g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
+            g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
+            show_status_after_navigation();
+            break;
+
+        case C_TRIGS_ARPEGGIO:
+            g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(commandString);
+            g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
+            g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
+            show_status_after_navigation();
+            break;
+
+#if 0
         case C_TRIGS:
             if ( tokens.size() > 1 )
             {
@@ -1012,6 +1033,7 @@ bool do_command(string commandString)
             g_PatternStore.CurrentPlayPattern().PatternTrigList().SetFocus();
             show_status_after_navigation();
             break;
+#endif
 
         case C_EXIT :
             bResult = false;

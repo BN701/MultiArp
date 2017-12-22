@@ -1,6 +1,10 @@
 # Multi Arp Command and Menu Reference: Home
 
-**BN - Dec 17, 2017**
+**BN - Dec 22, 2017**
+
+This is an attempt to document things **as they are** right now. A snapshot of a rambling work in progress, with all its inconsistent design choices and unplanned thoughts sprawling across the weeks and months like a garden full of weeds. As much as anything I'm using this exercise as a chance to review things as a whole. Please do not judge me on what you may find here!
+
+*22-Dec-17*
 
 #### Sections
 
@@ -30,9 +34,9 @@
   * [new](command_ref_pattern.md#new)
   * [copy](command_ref_pattern.md#copy)
   * [clear](command_ref_pattern.md#clear)
-  * [delete, undo](command_ref_pattern.md#delete-undo)
-  * [lock, unlock](command_ref_pattern.md#lock-unlock)
-
+  * [**delete**](command_ref_pattern.md#delete)
+  * [**undo**](command_ref_pattern.md#undo)
+  * [**lock**](command_ref_pattern.md#lock)
 
 * [**Pattern Chains**](command_ref_chain.md)
 

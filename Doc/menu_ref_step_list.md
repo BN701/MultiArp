@@ -70,4 +70,4 @@ The ID of the current note appears on the left of the menu but, unlike the previ
 | :--- | :--- |
 |**Note**|Note name and octave. A single hyphen indicates and empty note, which acts as a rest. You can use **ctrl-up/down** to change octave without changing note name.|
 |**Vel**| Midi note velocity, which has the range 1..127. If set to ***off***, the setting below '1', then the pattern's default velocity, or the sequencer's default velocity will be used when playing the note.|
-|**Len**| Note gate length in beats and fractions of a beat.|
+|**Len**| Note length in beats and fractions of a beat. If set to ***off***, the pattern's or sequencer's default *gatelength* will be used to calculate note duration. |

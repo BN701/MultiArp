@@ -508,12 +508,16 @@ void Pattern::SetRealTimeStartPhase(string & token)
         throw string("Pattern::SetRealTimePhase() - There's something wrong with the parameter list.");
     }
 
+    // Calculate an overall pattern phase length using current list phaselengths.
+
     vector<int64_t> phaseLengths;
 
     for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
         phaseLengths.push_back(rtList->PhaseLength());
 
     int64_t patternPhaseLength = std::accumulate(phaseLengths.begin(), phaseLengths.end(), 1, lcm);
+
+    // Convert to a start beat value and reset all positions. Subsequent resets will also use this value.
 
     m_RealTimeBeatStart = phase * static_cast<double>(patternPhaseLength)/1000;
     ResetPosition();

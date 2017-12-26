@@ -304,6 +304,7 @@ unordered_map<string, command_t> gCommandList =
     {"rt quantum", C_LIST_RT_QUANTUM},
     {"rt q", C_LIST_RT_QUANTUM},
     {"real time phase", C_LIST_RT_START_PHASE},
+    {"rt phase", C_LIST_RT_START_PHASE},
     {"rt p", C_LIST_RT_START_PHASE},
     {"real time echo", C_LIST_RT_ECHO},
     {"rt echo", C_LIST_RT_ECHO},

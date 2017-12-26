@@ -1777,6 +1777,8 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
     {
     case RealTimeListParams::normal:
     case RealTimeListParams::small:
+
+        // This doesn't make sense: window becomes 4 * mul-squared/stepValue.
         if ( m_Params.m_WindowMode == RealTimeListParams::small && abs(m_Params.m_Multiplier) < 1.0 )
             window *= m_Params.m_Multiplier;
 

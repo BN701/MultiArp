@@ -83,7 +83,6 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
 
                     if ( result != NULL )
                     {
-                        result->SetPhaseAllNotes(phase);
                         cluster.SetStepsTillNextNote(result->StepsTillNextNote());
                         cluster += *result;
                     }
@@ -93,6 +92,11 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
             break;
         }
     }
+
+    // All notes collected so far are from step lists, so they won't have any
+    // phase start times set. Fix that now ...
+
+    cluster.SetPhaseAllNotes(phase);
 
     // Collect any real time events.
 

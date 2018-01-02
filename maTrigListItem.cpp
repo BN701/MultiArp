@@ -126,16 +126,28 @@ void TrigRepeater::Reset(/*int noteNumber,*/ int noteVelocity)
 
 bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & noteVelocity)
 {
+    // This bit enables unlimited modes even when no repeats have been set.
+    // Did I really want this? We still get unlimited repeats by not decrementing
+    // the step count. On reflection I think I do want this.
+
+#if 1
     switch ( m_DecayMode )
     {
     case exponential_unlimited:
     case linear_unlimited:
+        // Kill unlimited repeats if they're getting louder.
+        if ( m_VelocityDecay > 0.9999 )
+            return false;
         break;
     default:
         if ( m_Steps == 0 )
             return false;
         break;
     }
+#else
+    if ( m_Steps == 0 )
+        return false;
+#endif
 
     queue_delta += m_RepeatTimeMicroSecs;
 
@@ -145,14 +157,14 @@ bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & n
         m_Steps -= 1;
     case exponential_unlimited:
         m_NoteVelocity *= m_VelocityDecay;
-        noteVelocity = m_NoteVelocity;
+        noteVelocity = lround(m_NoteVelocity);
         break;
     case linear:
         m_Steps -= 1;
     case linear_unlimited:
         m_NoteVelocity -= m_VelocityDecrement;
         if ( m_NoteVelocity > 0 )
-            noteVelocity = m_NoteVelocity;
+            noteVelocity = lround(m_NoteVelocity);
         else
             noteVelocity = 0;
         break;
@@ -543,6 +555,7 @@ bool TrigListItem::HandleKey(key_type_t k)
     double inc = 0.1;
 
     vector<ArpeggioStage> & arp = m_Repeater.Arpeggio();
+    int arpIndex = m_TrigListItemFocus - num_tlif_types;
 
     switch ( k )
     {
@@ -565,19 +578,18 @@ bool TrigListItem::HandleKey(key_type_t k)
     case shift_left:
         if ( arp.empty() )
         {
-            arp.emplace_back();
+            arp.push_back(*(new ArpeggioStage(1,1)));
             m_TrigListItemFocus = num_tlif_types;
         }
-        else
-            arp.insert(arp.begin() + m_TrigListItemFocus - num_tlif_types, *(new ArpeggioStage(1,1)));
+        else if ( arpIndex >= 0 )
+            arp.insert(arp.begin() + arpIndex, *(new ArpeggioStage(1,1)));
         break;
 
     case shift_delete:
-        if ( !arp.empty() )
+        if ( arpIndex >= 0 )
         {
-            int index = m_TrigListItemFocus - num_tlif_types;
-            arp.erase(arp.begin() + index);
-            if ( index == arp.size() )
+            arp.erase(arp.begin() + arpIndex);
+            if ( arpIndex == arp.size() )
                 m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus - 1);
         }
         break;
@@ -585,15 +597,16 @@ bool TrigListItem::HandleKey(key_type_t k)
     case shift_right:
         if ( arp.empty() )
         {
-            arp.emplace_back();
+            arp.push_back(*(new ArpeggioStage(1,1)));
             m_TrigListItemFocus = num_tlif_types;
         }
-        else
+        else if ( arpIndex >= 0 )
         {
-            arp.insert(arp.begin() + m_TrigListItemFocus - num_tlif_types + 1, *(new ArpeggioStage(1,1)));
+            arp.insert(arp.begin() + arpIndex + 1, *(new ArpeggioStage(1,1)));
             m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus + 1);
         }
         break;
+
 
     case shift_up:
         shift = true;

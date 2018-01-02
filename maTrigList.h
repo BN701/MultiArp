@@ -47,9 +47,10 @@ class TrigList : public CursorKeys
 
         std::string ToString(const char * prefix);
         void FromString(std::string s);
-        void FromSimpleString(std::string s);
+//        void FromSimpleString(std::string s);
+        void FromSimpleString(std::vector<std::string>::iterator token, std::vector<std::string>::iterator finish);
 
-        void AddArpeggio(std::string s);
+        void AddArpeggio(std::vector<std::string>::iterator token, std::vector<std::string>::iterator finish);
 
         std::string ToStringForDisplay();
         std::string ToStringForDisplay2(int & offset, int & length, int width = 80);

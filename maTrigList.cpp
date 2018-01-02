@@ -189,13 +189,13 @@ void TrigList::FromString(string s)
     }
 }
 
-void TrigList::AddArpeggio(string s)
+void TrigList::AddArpeggio(vector<string>::iterator token, vector<string>::iterator finish)
 {
-    vector<string> tokens = split(s.c_str(), ' ');
+//    vector<string> tokens = split(s.c_str(), ' ');
 
     // TODO: Currently just a aplaceholder to set up some test data.
 
-    if ( m_TrigItems.empty() )
+//    if ( m_TrigItems.empty() )
         return;
 
     m_TrigItems.front().Repeater().AddArpStage(2, 16);
@@ -204,19 +204,19 @@ void TrigList::AddArpeggio(string s)
 }
 
 
-void TrigList::FromSimpleString(string s)
+void TrigList::FromSimpleString(vector<string>::iterator token, vector<string>::iterator finish)
 {
-    vector<string> tokens = split(s.c_str(), ' ');
+//    vector<string> tokens = split(s.c_str(), ' ');
 
-    if ( tokens.size() <= 1 )
-        throw string("TrigList::FromSimpleString() - Nothing found.");
+//    if ( tokens.size() <= 1 )
+//        throw string("TrigList::FromSimpleString() - Nothing found.");
 
     m_TrigItems.clear();
 
-    for ( auto it = tokens.begin() + 1; it != tokens.end(); it++ )
+    for ( ; token != finish; token++ )
     {
         m_TrigItems.emplace_back();
-        m_TrigItems.back().FromSimpleString(*it);
+        m_TrigItems.back().FromSimpleString(*token);
     }
 }
 

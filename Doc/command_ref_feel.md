@@ -4,17 +4,17 @@
 
 A *feel map* takes any steps that fall between whole beats and moves them to create simple (and not so simple) swing effects.
 
-A *feel map* has one or more entries, which divide the incoming beat time into two or more *windows*. Incoming windows are evenly spaced, equally sized. Outgoing windows are stretched according to the values in the *feel map*. Times will be adjusted according to the relationship between incoming and outgoing windows.
+A *feel map* has one or more entries which divide the incoming beat time into two or more *windows*. Incoming windows are evenly spaced, equally sized. Outgoing windows are stretched according to the values in the *feel map*. Times will be adjusted according to where fall in the incoming window and the relationship between incoming and outgoing windows.
 
 A map with one entry will look like this:
 ```
 0.00 0.50 1.00
 ```
-When the sequencer step value is eight, adjusting the value of the middle entry will create simple 'jazzy' swing effect. However, if step value is sixteen, the timing of second *and* third steps in each beat will be stretched, but the fourth will be shortened.
+When the sequencer step value is eight, increasing the value of the middle entry will create a simple 'jazzy' swing effect. However, if step value is sixteen the timing of second *and* third steps in each beat will be stretched, but the fourth will be shortened.
 
-If you set up a *feel map* with four entries, you can move the swing of all four sixteenth notes. And if you set up with three entries and a step value of twelve you can play with 12/8 swing found in some West African rhythms.
+If you set up a *feel map* with four entries, you can move the swing of all four sixteenth notes. And if you set up with three entries and a step value of twelve you can play with the kinds of 12/8 swing found in some West African rhythms.
 
-You can add as many entries as you like, though you'll have to run the sequencer at a very slow tempo to make sense of swing effects with notes less than a sixteenth.
+You can add as many entries as you like to the *feel map*, though you'll have to run the sequencer at a very slow tempo to make sense of swing effects with notes smaller than a sixteenth note.
 
 
 

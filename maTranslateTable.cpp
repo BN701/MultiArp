@@ -953,9 +953,9 @@ int TranslateTable::PreMapScale(int note)
 
         // Dimished fifth/augmented fourth
         case 6:
-            if ( m_NoteMap[6] != 0 && m_NoteMap[7] != 0 )
+            if ( m_NoteMap[5] == 0 && m_NoteMap[6] != 0 && m_NoteMap[7] != 0 ) // Lydian.
                 return 7;
-            else if ( m_NoteMap[5] != 0 && m_NoteMap[6] != 0 )
+            else if ( m_NoteMap[5] != 0 && m_NoteMap[6] != 0 && m_NoteMap[7] == 0 ) // Locrian.
                 return 5;
             else
                 switch ( m_PremapMode )

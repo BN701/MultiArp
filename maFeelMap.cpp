@@ -353,12 +353,16 @@ double FeelMap::Adjust( double beat )
 
     int wholeBeats = lround(1000 * beat)/1000; // Round to 3 DP.
 
+    // 't' is current fraction of of current beat.
+
     double t = beat - wholeBeats;
 
     int milliBeats = lround(1000 * t); // For safe comparisons.
 
     if ( milliBeats == 0 )
         return beat;
+
+    // 'n' is nearest stretch point.
 
     int n = lround(t * m_Points);
 

@@ -95,11 +95,11 @@ This is an attempt to document things **as they are** right now. A snapshot of a
   * [feel respace](command_ref_feel.md#feel-respace)
 
 
-* [**Global Settings**](command_ref_use)
+* [**Global Settings**](command_ref_use.md)
 
-  * [load](command_ref_use#load)
-  * [store](command_ref_use#store)
-  * [use](command_ref_use#use)
+  * [load](command_ref_use.md#load)
+  * [store](command_ref_use.md#store)
+  * [use](command_ref_use.md#use)
 
 
 ## Using the command line

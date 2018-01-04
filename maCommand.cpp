@@ -855,19 +855,19 @@ bool do_command(string commandString)
             break;
 
         case C_STORE_STEP:
-            g_PatternStore.StorePatternPlayData(PLAY_DATA_STEP );
+            g_PatternStore.StorePatternPlayData(PLAY_DATA_STEP);
             set_status(STAT_POS_2, "Step Value stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_GATE:
-            g_PatternStore.StorePatternPlayData(PLAY_DATA_GATE );
+            g_PatternStore.StorePatternPlayData(PLAY_DATA_GATE);
             set_status(STAT_POS_2, "Gate Length stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_VELOCITY:
-            g_PatternStore.StorePatternPlayData(PLAY_DATA_VELO );
-            set_status(STAT_POS_2, "Velociry stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
+            g_PatternStore.StorePatternPlayData(PLAY_DATA_VELO);
+            set_status(STAT_POS_2, "Velocity stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_SCALE:
-            g_PatternStore.StorePatternPlayData(PLAY_DATA_SCALE );
+            g_PatternStore.StorePatternPlayData(PLAY_DATA_SCALE);
             set_status(STAT_POS_2, "Scale settings stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_ALL:
@@ -1001,9 +1001,10 @@ bool do_command(string commandString)
 
 
         case C_TRIGS:
-            if ( tokens.size() > 1 )
+            if ( firstParameter > 0 )
             {
-                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
+//                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
+                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(tokens.begin() + firstParameter, tokens.end());
             }
             g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
             g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
@@ -1011,7 +1012,10 @@ bool do_command(string commandString)
             break;
 
         case C_TRIGS_ARPEGGIO:
-            g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(commandString);
+            if ( firstParameter > 0 )
+            {
+                g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(tokens.begin() + firstParameter, tokens.end());
+            }
             g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
             g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
             show_status_after_navigation();

@@ -16,7 +16,7 @@ Key combinations:
 
 |     | Action     |
 | :--- | :--- |
-| **up/down** | Changes the value of the entry in steps of 0.1. A value cannot be moved beyond those of its neighbours.|
+| **up/down** | Changes the value of the entry in steps of 0.1. A value cannot be increased or decreased beyond those of its nearest neighbours.|
 | **shift-up/down** | Changes the value of an entry in steps of 0.01.|
 | **shift-left/right** | Insert a new entry to the left or right of the currently highlighted entry.|
 | **shift-delete** | Delete the current entry. There is no *undo* for this operation.|

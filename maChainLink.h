@@ -42,7 +42,7 @@ class ChainLink : public CursorKeys
         void SetJump(int val) { m_Jump = val; }
 
         std::string ToString();
-        std::string ToStringForDisplay(bool forMenu = false, int width = 12);
+        std::string ToStringForDisplay(bool forMenu = false, unsigned width = 12);
         void FromString(std::string & s);
 
         void SetParent( PatternChain * val ) { m_Parent = val; }

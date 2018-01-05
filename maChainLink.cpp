@@ -49,7 +49,7 @@ int ChainLink::Remaining()
     return m_Remaining--;
 }
 
-string ChainLink::ToStringForDisplay(bool forMenu, int width)
+string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
 {
     string result;
 

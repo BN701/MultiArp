@@ -396,14 +396,14 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
             if ( next < 0 )
                 next = m_PatternChain.PosPlay() + 1;
 
-            if ( next >= m_PatternChain.size() )
+            if ( static_cast<unsigned>(next) >= m_PatternChain.size() )
                 next = 0;
 
             m_PatternChain.SetPosPlay(next);
 
             // Don't change play pointer if new pattern out of range.
 
-            int pos = m_PatternChain.at(m_PatternChain.PosPlay()).Pattern();
+            unsigned pos = m_PatternChain.at(m_PatternChain.PosPlay()).Pattern();
 
             if ( pos < m_Patterns.size() )
             {
@@ -450,7 +450,7 @@ string PatternStore::EditPatternToString()
     return m_Patterns.at(m_PosEdit).ToString("Pattern");
 }
 
-string PatternStore::PatternSelectionList(int start, int rows)
+string PatternStore::PatternSelectionList(unsigned start, unsigned rows)
 {
     string result;
 
@@ -536,7 +536,7 @@ string PatternStore::ToString()
     result += m_DefaultPattern.ToString("Default");
     result += "\n\n";
 
-    for ( int i = 0; i < m_Patterns.size(); i++ )
+    for ( unsigned i = 0; i < m_Patterns.size(); i++ )
     {
         sprintf(buff, "<< Pattern %i >>\n\n", i + 1);
         result += buff;
@@ -978,7 +978,7 @@ string PatternStore::SetNewPatternOrJump( int val )
 {
     if ( m_PatternChain.Mode() == PatternChain::off )
     {
-        if ( val >= 0 && val < m_Patterns.size() )
+        if ( val >= 0 && static_cast<unsigned>(val) < m_Patterns.size() )
         {
             SetNewPatternPending(val);
             return "Cueing pattern %i";
@@ -988,7 +988,7 @@ string PatternStore::SetNewPatternOrJump( int val )
     }
     else
     {
-        if ( val >= 0 && val < m_PatternChain.size() )
+        if ( val >= 0 && static_cast<unsigned>(val) < m_PatternChain.size() )
         {
             m_PatternChain.at(m_PatternChain.PosPlay()).ClearRemaining();
             m_PatternChain.SetJumpOverride(val);

@@ -37,7 +37,7 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
 
     if ( ! m_StepListSet.empty() )
     {
-        int loopCheck = 0;
+        unsigned loopCheck = 0;
 
         if ( m_TrigList.Empty() )
         {
@@ -75,7 +75,7 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
             {
                 // Just ignore list number if list doesn't exist.
 
-                if ( *it < m_StepListSet.size() )
+                if ( static_cast<unsigned>(*it) < m_StepListSet.size() )
                 {
                     m_LastRequestedPos = *it;
 
@@ -705,7 +705,7 @@ void Pattern::StoreTranslateTable( TranslateTable & table )
     m_TranslateTable = table;
 }
 
-string & Centre(string & line, int centre, int width, int & offset)
+string & Centre(string & line, unsigned centre, unsigned width, int & offset)
 {
     size_t p = line.find('|');
 
@@ -782,7 +782,7 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
     while ( m_DisplayStartStep + limitStep <= m_PosEdit )
         m_DisplayStartStep += 1;
 
-    for ( int i = m_DisplayStartStep; i < m_DisplayStartStep + limitStep; i++ )
+    for ( unsigned i = m_DisplayStartStep; i < m_DisplayStartStep + limitStep; i++ )
     {
         if ( i == m_PosEdit )
         {
@@ -826,7 +826,7 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
     while ( m_DisplayStartRealTime + limitRealTime <= m_PosRealTimeEdit )
         m_DisplayStartRealTime += 1;
 
-    for ( int i = m_DisplayStartRealTime; i < m_DisplayStartRealTime + limitRealTime; i++ )
+    for ( unsigned i = m_DisplayStartRealTime; i < m_DisplayStartRealTime + limitRealTime; i++ )
     {
         if ( i == m_PosRealTimeEdit )
         {

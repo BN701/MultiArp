@@ -466,7 +466,7 @@ bool do_command(string commandString)
     for ( int i = tokens.size(); i >= 0; i-- )
         if ( command = command_from_string(tokens, i), command != C_NONE )
         {
-            if ( i < tokens.size() )
+            if ( static_cast<unsigned>(i) < tokens.size() )
                 firstParameter = i;
             break;
         }

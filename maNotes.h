@@ -239,7 +239,7 @@ struct StepList : public CursorKeys
 
     std::string ToString(bool fullFormat = true);
     std::string ToStringForDisplay(int & offset, int & length);
-    std::string ToStringForDisplay2(int & offset, int & length, int width = 80);
+    std::string ToStringForDisplay2(int & offset, int & length, unsigned width = 80);
     void FromString(std::string s);
 
 //    bool PlayPositionInfo(int & offset,  int & length);
@@ -326,7 +326,7 @@ struct RealTimeList : public CursorKeys
 
     void FromString(std::string s);
     std::string ToString();
-    std::string ToStringForDisplay(int & offset, int & length, int width = 75);
+    std::string ToStringForDisplay(int & offset, int & length, unsigned width = 75);
 
     void SetMultiplier( double val ) { m_Params.m_Multiplier = val; }
     double AdjustedQuantum() { return m_Params.m_Multiplier * m_Params.m_Quantum; }

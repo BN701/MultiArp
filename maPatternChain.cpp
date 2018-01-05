@@ -37,14 +37,14 @@ PatternChain::~PatternChain()
     //dtor
 }
 
-string PatternChain::ToStringForDisplay(int firstRow, int rows)
+string PatternChain::ToStringForDisplay(unsigned firstRow, unsigned rows)
 {
     if ( m_Chain.empty() )
         return "Pattern Chain is empty.";
 
     string result;
 
-    for ( int row = firstRow; row < firstRow + rows; row++ )
+    for ( unsigned row = firstRow; row < firstRow + rows; row++ )
     {
         if ( 4 * row >= m_Chain.size() )
             break;
@@ -56,9 +56,9 @@ string PatternChain::ToStringForDisplay(int firstRow, int rows)
         sprintf(buff, "%02i - ", 4 * row + 1);
         result += buff;
 
-        for ( int i = 0; i < 4; i++ )
+        for ( unsigned i = 0; i < 4; i++ )
         {
-            int pos = 4 * row + i;
+            unsigned pos = 4 * row + i;
             if ( pos >= m_Chain.size() )
                 break;
             result += m_Chain.at(pos).ToStringForDisplay();
@@ -258,7 +258,7 @@ void PatternChain::SetStatus()
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
 
-    for ( int i = 0; i < m_Chain.size(); i++ )
+    for ( unsigned i = 0; i < m_Chain.size(); i++ )
     {
         m_Status += " ";
         pos = m_Status.size();

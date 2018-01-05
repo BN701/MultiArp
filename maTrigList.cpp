@@ -44,12 +44,14 @@ void TrigList::SetStatus()
 
     m_Status = "[Trig List] ";
 
-    for ( int i = 0; i < m_TrigItems.size(); i++ )
+//    for ( int i = 0; i < m_TrigItems.size(); i++ )
+    for ( auto it = m_TrigItems.begin(); it < m_TrigItems.end(); it++ )
     {
-        if ( i > 0 )
+        if ( it > m_TrigItems.begin() )
             m_Status += ' ';
         pos = m_Status.size();
-        m_Status += m_TrigItems.at(i).MenuString();
+//        m_Status += m_TrigItems.at(i).MenuString();
+        m_Status += it->MenuString();
         m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
     }
 
@@ -227,13 +229,13 @@ string TrigList::ToStringForDisplay()
 
     char buff[50];
 
-    for ( int i = 0; i < m_TrigItems.size(); i++ )
+    for ( unsigned i = 0; i < m_TrigItems.size(); i++ )
     {
 //        if ( i > 0 )
 //            result += ' ';
         if ( i == m_Pos )
         {
-            sprintf(buff, "%3i| ", m_Pos + 1);
+            sprintf(buff, "%3lu| ", m_Pos + 1);
             result += buff;
         }
         result += m_TrigItems.at(i).MenuString(9);
@@ -242,19 +244,19 @@ string TrigList::ToStringForDisplay()
     return result;
 }
 
-string TrigList::ToStringForDisplay2(int & offset, int & length, int displayWidth)
+string TrigList::ToStringForDisplay2(int & offset, int & length, unsigned displayWidth)
 {
     string result;
 
-    int itemWidth = 9;
-    int itemsPerRow = displayWidth/itemWidth;
+    unsigned itemWidth = 9;
+    unsigned itemsPerRow = displayWidth/itemWidth;
 
 //    char buff[50];
 
     offset = 0;
     length = 0;
 
-    for ( int i = 0; i < m_TrigItems.size(); i++ )
+    for ( unsigned i = 0; i < m_TrigItems.size(); i++ )
     {
         if ( i == m_Pos )
             offset = result.size();
@@ -267,7 +269,7 @@ string TrigList::ToStringForDisplay2(int & offset, int & length, int displayWidt
 
     // Scroll left if highlight is beyond displayWidth.
 
-    while ( offset + length > displayWidth )
+    while ( static_cast<unsigned>(offset + length) > displayWidth )
     {
         int scroll = itemsPerRow * itemWidth;
         result.erase(0, scroll);

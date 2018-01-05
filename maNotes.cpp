@@ -559,7 +559,7 @@ void Cluster::SetStatus()
     sprintf(buff, "[Cluster %i] ", m_ItemID);
     m_Status = buff;
 
-    for ( int i = 0; i < m_Notes.size(); i++ )
+    for ( unsigned i = 0; i < m_Notes.size(); i++ )
     {
         if ( i > 0 )
             m_Status += '/';
@@ -705,7 +705,7 @@ string StepList::ToStringForDisplay(int & offset, int & length)
     offset = 0;
     length = 0;
 
-    for ( int i = 0; i < m_Clusters.size(); i++ )
+    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
     {
         if ( i > 0 )
             result += ' ';
@@ -726,14 +726,14 @@ string StepList::ToStringForDisplay(int & offset, int & length)
     return result;
 }
 
-string StepList::ToStringForDisplay2(int & offset, int & length, int width)
+string StepList::ToStringForDisplay2(int & offset, int & length, unsigned width)
 {
     string result;
 
     offset = 0;
     length = 0;
 
-    for ( int i = 0; i < m_Clusters.size(); i++ )
+    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
     {
         if ( i > 0 )
             result += ' ';
@@ -750,7 +750,7 @@ string StepList::ToStringForDisplay2(int & offset, int & length, int width)
 
     // Scroll left if highlight is beyond width.
 
-    while ( offset + length > width )
+    while ( static_cast<unsigned>(offset + length) > width )
     {
         int scroll = 3 * width / 4;
         result.erase(0, scroll + 3);
@@ -798,7 +798,7 @@ void StepList::SetStatus()
     m_Status = buff;
 
 
-    for ( int i = 0; i < m_Clusters.size(); i++ )
+    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
     {
         if ( i > 0 )
             m_Status += ", ";
@@ -1201,7 +1201,7 @@ bool RealTimeList::HandleKey(key_type_t k)
         break;
 
     case right:
-        if ( m_RTListFocus < m_FieldPositions.size() - 1 )
+        if ( static_cast<unsigned>(m_RTListFocus) < m_FieldPositions.size() - 1 )
             m_RTListFocus += 1;
         break;
 
@@ -1237,7 +1237,7 @@ bool RealTimeList::HandleKey(key_type_t k)
         {
             m_UndoList.push_back(it->second);
             m_RealTimeList.erase(it);
-            if ( m_RTListFocus - m_SubMenus >= m_RealTimeList.size() )
+            if ( m_RTListFocus - m_SubMenus >= static_cast<int>(m_RealTimeList.size()) )
                 m_RTListFocus -= 1;
         }
         break;
@@ -1393,7 +1393,7 @@ string RealTimeList::ToString()
 
 // Less efficient (probably) but easier to read (possibly) ...
 
-string RealTimeList::ToStringForDisplay(int & offset, int & length, int width)
+string RealTimeList::ToStringForDisplay(int & offset, int & length, unsigned width)
 {
     offset = 0;
     length = 0;
@@ -1717,7 +1717,7 @@ void RealTimeList::DoEchoes()
         // MoveNote() inserts a copy at the new location. The previous
         // map entry and its note is deleted.
 
-        Note & newNote = MoveNote(*p, newPhase)->second;
+        /*Note & newNote =*/ MoveNote(*p, newPhase)->second;
 
         // Any further processing on new note? If so, do it here.
 

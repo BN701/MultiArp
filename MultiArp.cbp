@@ -33,7 +33,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
-			<Add directory="../rtmidi-2.1.1" />
 			<Add directory="../github/link/include" />
 			<Add directory="../github/link/modules/asio-standalone/asio/include" />
 			<Add directory="../midifile/include/" />
@@ -42,8 +41,7 @@
 			<Add option="-pthread" />
 			<Add option="-lncurses" />
 			<Add option="-lpanel" />
-			<Add library="../rtmidi-2.1.1/.libs/librtmidi.so" />
-			<Add library="libasound.a" />
+			<Add option="-lasound" />
 			<Add library="../midifile/lib/libmidifile.a" />
 		</Linker>
 		<Unit filename="Test Files/More Test Data.txt" />

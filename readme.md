@@ -56,6 +56,10 @@ Heavy use of the C++ Standard Library, in particular string, vector and map.
 
 * Linux utility *xclip* is used for copy/paste.
 
+## Build Instructions
+
+Build instructions are [here](Doc/build_me.md). Good luck!
+
 ## More information
 
 You can read a more detailed overview of things [here](Doc/readmore.md). The beginnings of a command reference is [here](Doc/command_ref.md).

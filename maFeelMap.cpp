@@ -94,7 +94,7 @@ void FeelMap::New(vector<string> & tokens)
 
     if ( tokens.size() > 2 )
     {
-        for ( int i = 2; i < tokens.size(); i++ )
+        for ( unsigned i = 2; i < tokens.size(); i++ )
         {
             try
             {
@@ -184,7 +184,7 @@ string FeelMap::ToString(const char * prefix)
 
     result += "Feel Map";
     if ( m_StretchPoints.size() > 2 )
-        for ( int i = 1; i < m_StretchPoints.size() - 1; i++ )
+        for ( unsigned i = 1; i < m_StretchPoints.size() - 1; i++ )
         {
             result += " ";
             sprintf(buff, "%.3f", m_StretchPoints.at(i));
@@ -226,7 +226,7 @@ void FeelMap::SetStatus()
 
     int pos = 0;
 
-    for ( int i = 0; i < m_StretchPoints.size(); i++ )
+    for ( unsigned i = 0; i < m_StretchPoints.size(); i++ )
     {
         pos = m_Status.size();
         sprintf(buff, " %.2f", m_StretchPoints.at(i));
@@ -280,7 +280,7 @@ bool FeelMap::HandleKey(key_type_t k)
             m_EditPoint -= 1;
         break;
     case right:
-        if ( m_EditPoint < m_StretchPoints.size() - 2 )
+        if ( static_cast<unsigned>(m_EditPoint) < m_StretchPoints.size() - 2 )
             m_EditPoint += 1;
         break;
 

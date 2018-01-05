@@ -51,7 +51,7 @@ class PatternChain : public CursorKeys
         void SetPosPlay( int val ) { m_PosPlay = static_cast<std::vector<ChainLink>::size_type>(val); }
         void ResetPosPlay() { m_PosPlay = 0; }
 
-        std::string ToStringForDisplay(int firstRow, int rows);
+        std::string ToStringForDisplay(unsigned firstRow, unsigned rows);
         std::string ToString();
         void FromString(std::string s);
         void FromSimpleString(std::string s);

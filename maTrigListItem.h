@@ -156,7 +156,7 @@ class TrigListItem : public CursorKeys
         void TrigsFromMask(unsigned long trigMask);
         unsigned long MaskFromTrigs();
 
-        std::string MenuString(int width = 0);
+        std::string MenuString(unsigned width = 0);
 
     virtual void SetStatus();
     protected:

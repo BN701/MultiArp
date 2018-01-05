@@ -54,8 +54,8 @@ struct Pattern
     TranslateTable m_TranslateTable;
     TrigList m_TrigList;
 
-    int m_DisplayStartStep = 0;
-    int m_DisplayStartRealTime = 0;
+    unsigned m_DisplayStartStep = 0;
+    unsigned m_DisplayStartRealTime = 0;
 
     double m_RealTimeBeat = 0;  // Tracks beat for real time lists. Can be reset.
     double m_LastRealTimeBeat = 0;

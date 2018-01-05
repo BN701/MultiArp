@@ -235,7 +235,7 @@ string TrigListItem::ToString()
 
     string result;
 
-    sprintf(buff, "%s %i %s %.3f %s '%s' %s '%s' %s %i %s %.3f \\\n",
+    sprintf(buff, "%s %lu %s %.3f %s '%s' %s '%s' %s %i %s %.3f \\\n",
             tli_element_names.at(tli_trig_mask), m_TrigMask,
             tli_element_names.at(tli_multiplier), m_Multiplier,
             tli_element_names.at(tli_skip), m_Skip ? "On" : "Off",
@@ -366,7 +366,7 @@ void TrigListItem::TrigsFromMask(unsigned long trigMask)
     unsigned long mask = 1;
     m_Trigs.clear();
 
-    for ( int i = 0; i < CHAR_BIT * sizeof(mask); i++ )
+    for ( unsigned i = 0; i < CHAR_BIT * sizeof(mask); i++ )
     {
         if ( (trigMask & mask) > 0 )
             m_Trigs.push_back(i);
@@ -401,7 +401,7 @@ string TrigListItem::TrigMaskToString()
         bool addSpacer = false;
         unsigned long mask = 1;
 
-        for ( int i = 0; i < CHAR_BIT * sizeof(mask); i++ )
+        for ( unsigned i = 0; i < CHAR_BIT * sizeof(mask); i++ )
         {
             if ( (m_TrigMask & mask) > 0 )
             {
@@ -416,7 +416,7 @@ string TrigListItem::TrigMaskToString()
     }
 }
 
-string TrigListItem::MenuString(int width)
+string TrigListItem::MenuString(unsigned width)
 {
     char buff[200];
     string result = TrigMaskToString();
@@ -589,7 +589,7 @@ bool TrigListItem::HandleKey(key_type_t k)
         if ( arpIndex >= 0 )
         {
             arp.erase(arp.begin() + arpIndex);
-            if ( arpIndex == arp.size() )
+            if ( static_cast<unsigned>(arpIndex) == arp.size() )
                 m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus - 1);
         }
         break;

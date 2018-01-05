@@ -593,7 +593,7 @@ void TranslateTable::SetupScaleMaps()
     vector<string> tokens = split(tt_scale_strings.at(m_Scale), ',', true);
 
     int totalIntervals = 0;
-    for ( int i = 0; i < tokens.size(); i++ )
+    for ( unsigned i = 0; i < tokens.size(); i++ )
     {
         try
         {

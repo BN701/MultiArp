@@ -5,6 +5,7 @@ bin/
 *.depend
 *.layout
 *.log
+*.bmarks
 
 # Prerequisites
 *.d

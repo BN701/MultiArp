@@ -150,7 +150,7 @@ struct PatternStore : public CursorKeys
 
     std::string EditPatternToString();
 
-    std::string PatternSelectionList(int start, int rows);
+    std::string PatternSelectionList(unsigned start, unsigned rows);
 
     std::string PatternChainToString();
     std::string PatternChainToStringForDisplay(int firstRow, int rows);

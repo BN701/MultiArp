@@ -89,47 +89,52 @@ Display::Display()
 {
     // Set up NCurses.
 
-    initscr();
+    WINDOW * initWin = initscr();
     raw();
     keypad(stdscr, true);
 
-    start_color();
 
-    init_color(COLOUR_GREEN, 0, 400, 0);
-    init_color(COLOUR_BRIGHT_GREEN, 400, 750, 400);
-    init_color(COLOUR_YELLOW, 750, 500, 0);
-    init_color(COLOUR_RED, 750, 0, 0);
-    init_color(COLOUR_REDDISH, 750, 300, 200);
-    init_color(COLOUR_BLUE, 250, 750, 900);
-    init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
-    init_color(COLOUR_GREY, 750, 750, 750);
-    init_color(COLOUR_DARK_GREY, 500, 500, 500);
-    init_color(COLOUR_DARKER_GREY, 250, 250, 250);
+    bool hasColour = has_colors();
+    bool canChangeColour = can_change_color();
+    int result = start_color();
 
-    init_color(COLOUR_WHITE, 1000, 1000, 1000);
-    init_color(COLOUR_BLACK, 0, 0, 0);
+    set_status(STAT_POS_2, "Has colours: %s, can change colours: %s, last result %i.", hasColour ? "Y" : "n", canChangeColour ? "Y" : "n", result);
 
-	init_pair(CP_MAIN, COLOUR_WHITE, COLOUR_BLACK);
-	init_pair(CP_RUNNING, COLOUR_WHITE, COLOUR_BRIGHT_GREEN);
-	init_pair(CP_REALTIME, COLOUR_WHITE, COLOUR_RED);
-	init_pair(CP_RECORD, COLOUR_WHITE, COLOUR_YELLOW);
-	init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
+    result = init_color(COLOUR_GREEN, 0, 400, 0);
+    result = init_color(COLOUR_BRIGHT_GREEN, 400, 750, 400);
+    result = init_color(COLOUR_YELLOW, 750, 500, 0);
+    result = init_color(COLOUR_RED, 750, 0, 0);
+    result = init_color(COLOUR_REDDISH, 750, 300, 200);
+    result = init_color(COLOUR_BLUE, 250, 750, 900);
+    result = init_color(COLOUR_BRIGHT_RED, 1000, 0, 0);
+    result = init_color(COLOUR_GREY, 750, 750, 750);
+    result = init_color(COLOUR_DARK_GREY, 500, 500, 500);
+    result = init_color(COLOUR_DARKER_GREY, 250, 250, 250);
 
-	init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
-	init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, COLOUR_BRIGHT_GREEN, COLOUR_DARKER_GREY);
+    result = init_color(COLOUR_WHITE, 1000, 1000, 1000);
+    result = init_color(COLOUR_BLACK, 0, 0, 0);
 
-	init_pair(CP_PIANO_WHITE_KEY, COLOUR_GREY, COLOUR_DARKER_GREY);
-	init_pair(CP_PIANO_BLACK_KEY, COLOUR_GREY, COLOUR_BLACK);
+	result = init_pair(CP_MAIN, COLOUR_WHITE, COLOUR_BLACK);
+	result = init_pair(CP_RUNNING, COLOUR_WHITE, COLOUR_BRIGHT_GREEN);
+	result = init_pair(CP_REALTIME, COLOUR_WHITE, COLOUR_RED);
+	result = init_pair(CP_RECORD, COLOUR_WHITE, COLOUR_YELLOW);
+	result = init_pair(CP_MENU_HIGHLIGHT, COLOUR_WHITE, COLOUR_REDDISH);
 
-    init_pair(CP_LIST_PANEL_BKGND, COLOUR_GREY, COLOUR_BLACK);
-    init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
-    init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
-    init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOUR_BLACK);
-    init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOR_YELLOW, COLOUR_DARKER_GREY);
+	result = init_pair(CP_PATTERN_LIST_PANEL, COLOUR_BRIGHT_GREEN, COLOUR_BLACK);
+	result = init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
+	result = init_pair(CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, COLOUR_BRIGHT_GREEN, COLOUR_DARKER_GREY);
 
-    init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOUR_BLACK);
-    init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
+	result = init_pair(CP_PIANO_WHITE_KEY, COLOUR_GREY, COLOUR_DARKER_GREY);
+	result = init_pair(CP_PIANO_BLACK_KEY, COLOUR_GREY, COLOUR_BLACK);
+
+    result = init_pair(CP_LIST_PANEL_BKGND, COLOUR_GREY, COLOUR_BLACK);
+    result = init_pair(CP_SUMMARY_PANEL_BKGND, COLOUR_GREY, COLOR_BLACK);
+    result = init_pair(CP_SMALL_PANEL_BKGND, COLOR_YELLOW, COLOUR_BLACK);
+    result = init_pair(CP_SMALL_PANEL_2_BKGND, COLOUR_GREY, COLOUR_BLACK);
+    result = init_pair(CP_PATTERN_CHAIN_HIGHLIGHT, COLOR_YELLOW, COLOUR_DARKER_GREY);
+
+    result = init_pair(CP_PROGRESS_BAR_BKGND, COLOUR_GREY, COLOUR_BLACK);
+    result = init_pair(CP_PROGRESS_BAR_HIGHLIGHT, COLOUR_WHITE, COLOUR_BLACK);
 
     mvprintw(6, 1, "=> ");
 

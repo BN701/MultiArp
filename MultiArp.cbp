@@ -31,10 +31,11 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wno-multichar" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
-			<Add directory="../github/link/include" />
-			<Add directory="../github/link/modules/asio-standalone/asio/include" />
+			<Add directory="../link/include" />
+			<Add directory="../link/modules/asio-standalone/asio/include" />
 			<Add directory="../midifile/include/" />
 		</Compiler>
 		<Linker>

@@ -1792,6 +1792,8 @@ void RealTimeList::Step2(Cluster & cluster, double globalPhase, double stepValue
         break;
 
     default:
+        windowStart = phase - window/2;
+        windowEnd = phase + window/2;
         break;
     }
 

@@ -40,6 +40,7 @@ class CursorKeys
 
         enum key_type_t
         {
+            no_key,
             enter,
             back_space,
             escape,

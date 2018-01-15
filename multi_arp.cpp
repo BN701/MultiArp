@@ -34,6 +34,14 @@
 #include <ableton/Link.hpp>
 #include <csignal>
 //#include <unordered_map>
+#include <xcb/xcb.h>
+#include <xcb/xcb_keysyms.h>
+
+#define XK_MISCELLANY
+#define XK_XKB_KEYS
+#define XK_LATIN1
+#include <X11/keysymdef.h>  // XK_ Unicode key name defines
+
 
 #include "maAlsaSequencer.h"
 #include "maAlsaSequencerQueue.h"
@@ -60,6 +68,8 @@ ListBuilder g_ListBuilder(&g_Link);
 PatternStore g_PatternStore;
 AlsaSequencer g_Sequencer;
 State g_State;
+
+xcb_key_symbols_t * g_xcbKeySymbols = NULL;
 
 
 extern Display g_Display;
@@ -438,57 +448,319 @@ void load_from_string(string s, int & created, int & updated )
 
 }
 
-unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
+//unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
+//{
+//    {KEY_INSERT, CursorKeys::ins},
+//    {KEY_DELETE, CursorKeys::del},
+//    {KEY_SDELETE, CursorKeys::shift_delete},
+//    {KEY_CDELETE, CursorKeys::ctrl_delete},
+//    {KEY_TAB, CursorKeys::tab},
+//    {KEY_SHTAB, CursorKeys::shift_tab},
+//    {KEY_DOWN, CursorKeys::down},
+//    {KEY_UP, CursorKeys::up},
+//    {KEY_LEFT, CursorKeys::left},
+//    {KEY_RIGHT, CursorKeys::right},
+//    {KEY_SPGUP, CursorKeys::shift_page_up},
+//    {KEY_SPGDOWN, CursorKeys::shift_page_down},
+//    {KEY_APGUP, CursorKeys::alt_page_up},
+//    {KEY_APGDOWN, CursorKeys::alt_page_down},
+//    {KEY_CDOWN, CursorKeys::ctrl_down},
+//    {KEY_CUP, CursorKeys::ctrl_up},
+//    {KEY_CLEFT, CursorKeys::ctrl_left},
+//    {KEY_CRIGHT, CursorKeys::ctrl_right},
+//    {KEY_SDOWN, CursorKeys::shift_down},
+//    {KEY_SUP, CursorKeys::shift_up},
+//    {KEY_SLEFT, CursorKeys::shift_left},
+//    {KEY_SRIGHT, CursorKeys::shift_right},
+//    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
+//    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
+//    {KEY_CSUP, CursorKeys::ctrl_shift_up},
+//    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
+//};
+
+
+//bool key_input_action_ncurses()
+//{
+//    bool result = true;
+//
+//    static string commandString;
+//
+//    int c = getch();
+////    const char * key = getkey();
+//
+//    switch (c)
+//    {
+//    case 1: // Ctrl-A
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+//        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+//        set_status(STAT_POS_2, "All Data copied to clipboard ...");
+//        break;
+//        break;
+//    case 3:  // Ctrl-C, Copy
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+//        copy_clipboard(g_PatternStore.EditPatternToString());
+//        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
+//        break;
+//
+//        // After using Alt-Enter, we seem to get additional Enter - char(10) - messages
+//        // on the next keypress, regardless of what that key press actually is. Disabling
+//        // this bit of code (probably) doesn't prevent that peculiar behaviour, but will
+//        // at least discourage using Alt-Enter or Esc all round.
+//
+////    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
+////        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
+////        {
+////            show_status_after_navigation();
+////        }
+////        break;
+//
+//    case 22: // Ctrl-V, Paste
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+//        try
+//        {
+//            int created, updates;
+//            load_from_string(get_clipboard(), created, updates);
+//            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
+//        }
+//        catch (string errorMessage)
+//        {
+//            set_status(STAT_POS_2, "%s", errorMessage.c_str());
+//        }
+//        update_pattern_status_panel();
+//        update_edit_panels();
+//        update_pattern_panel();
+//        break;
+//
+//    case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
+//        if ( !commandString.empty() )
+//        {
+//            result = do_command(commandString/*.c_str()*/);
+//            commandString.clear();
+//        }
+//        else if ( g_ListBuilder.HandleKeybInput(c) )
+//        {
+//            if ( g_ListBuilder.RealTimeRecord() )
+//                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+//            else
+//                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+//            g_ListBuilder.Clear();
+//            update_pattern_panel();
+//            set_status(STAT_POS_2, "");
+//        }
+//        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+//        {
+//            show_status_after_navigation();
+//        }
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        break;
+//
+//    case 32: // Space bar.
+//        if ( commandString.empty() )
+//        {
+//            if ( g_ListBuilder.HandleKeybInput(c) )
+//                show_listbuilder_status();
+//            move(COMMAND_HOME);
+//        }
+//        else
+//            commandString += c;
+//        break;
+//
+//    case KEY_TAB:
+//        move(COMMAND_HOME + commandString.size());
+//        g_Display.NextBigPanelPage(1);
+//        break;
+//
+//    case KEY_SHTAB:
+//        g_Display.NextBigPanelPage(-1);
+//        break;
+//
+//    case KEY_SPGUP:
+//    case KEY_SPGDOWN:
+//    case KEY_APGUP:
+//    case KEY_APGDOWN:
+//    case KEY_CDOWN:
+//    case KEY_CUP:
+//    case KEY_CLEFT:
+//    case KEY_CRIGHT:
+//    case KEY_SDOWN:
+//    case KEY_SUP:
+//    case KEY_SLEFT:
+//    case KEY_SRIGHT:
+//    case KEY_CSLEFT:
+//    case KEY_CSRIGHT:
+//    case KEY_CSUP:
+//    case KEY_CSDOWN:
+//    case KEY_DOWN:
+//    case KEY_UP:
+//    case KEY_LEFT:
+//    case KEY_RIGHT:
+//    case KEY_INSERT:
+//    case KEY_DELETE:
+//    case KEY_SDELETE:
+//    case KEY_CDELETE:
+//        g_CursorKeys.RouteKey(g_CursorKeyMap.at(c));
+//        show_status_after_navigation();
+//        update_edit_panels();
+//        break;
+//
+//    case KEY_BACKSPACE: // 263
+//        if ( commandString.size() > 0 )
+//            commandString.pop_back();
+//        else if ( g_ListBuilder.HandleKeybInput(c) )
+//            show_listbuilder_status();
+//        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+//            show_status_after_navigation();
+//        move(COMMAND_HOME + commandString.size());
+//        clrtoeol(); // Assuming the cursor has been put back to correct location.
+//        break;
+//
+//    default:
+//        if ( true )
+//        {
+//            set_status(STAT_POS_2, "Key: %i", c);
+//        }
+//        else if ( commandString.size() == 0 )
+//        {
+//            set_status(STAT_POS_2, "");
+//        }
+//        if ( c > 31 && c < 127 )
+//            commandString += c;
+//        break;
+//    }
+//
+//    refresh();
+//
+//    return result;
+//}
+
+// Use these two maps to search for X Unicode symbols and raw state/keycode combinations
+// that are used purely for menu navigation.
+
+unordered_map<int, CursorKeys::key_type_t> g_xcbSymbolToCursorKey =
 {
-    {KEY_INSERT, CursorKeys::ins},
-    {KEY_DELETE, CursorKeys::del},
-    {KEY_SDELETE, CursorKeys::shift_delete},
-    {KEY_CDELETE, CursorKeys::ctrl_delete},
-    {KEY_TAB, CursorKeys::tab},
-    {KEY_SHTAB, CursorKeys::shift_tab},
-    {KEY_DOWN, CursorKeys::down},
-    {KEY_UP, CursorKeys::up},
-    {KEY_LEFT, CursorKeys::left},
-    {KEY_RIGHT, CursorKeys::right},
-    {KEY_SPGUP, CursorKeys::shift_page_up},
-    {KEY_SPGDOWN, CursorKeys::shift_page_down},
-    {KEY_APGUP, CursorKeys::alt_page_up},
-    {KEY_APGDOWN, CursorKeys::alt_page_down},
-    {KEY_CDOWN, CursorKeys::ctrl_down},
-    {KEY_CUP, CursorKeys::ctrl_up},
-    {KEY_CLEFT, CursorKeys::ctrl_left},
-    {KEY_CRIGHT, CursorKeys::ctrl_right},
-    {KEY_SDOWN, CursorKeys::shift_down},
-    {KEY_SUP, CursorKeys::shift_up},
-    {KEY_SLEFT, CursorKeys::shift_left},
-    {KEY_SRIGHT, CursorKeys::shift_right},
-    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
-    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
-    {KEY_CSUP, CursorKeys::ctrl_shift_up},
-    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
+    {XK_Insert, CursorKeys::ins},
+    {XK_Delete, CursorKeys::del},
+    {XK_Down, CursorKeys::down},
+    {XK_Up, CursorKeys::up},
+    {XK_Left, CursorKeys::left},
+    {XK_Right, CursorKeys::right},
+    {XK_Escape, CursorKeys::escape}
 };
 
+// Key values are constructed from (state << 8) + keycode
+unordered_map<int, CursorKeys::key_type_t> g_xcbKeycodeToCursorKey =
+{
+    {0x0170, CursorKeys::shift_page_up},
+    {0x0175, CursorKeys::shift_page_down},
+    {0x0870, CursorKeys::alt_page_up},
+    {0x0875, CursorKeys::alt_page_down},
+    {0x0474, CursorKeys::ctrl_down},
+    {0x046F, CursorKeys::ctrl_up},
+    {0x0471, CursorKeys::ctrl_left},
+    {0x0472, CursorKeys::ctrl_right},
+    {0x0174, CursorKeys::shift_down},
+    {0x016F, CursorKeys::shift_up},
+    {0x0171, CursorKeys::shift_left},
+    {0x0172, CursorKeys::shift_right},
+    {0x0571, CursorKeys::ctrl_shift_left},
+    {0x0572, CursorKeys::ctrl_shift_right},
+    {0x056F, CursorKeys::ctrl_shift_up},
+    {0x0574, CursorKeys::ctrl_shift_down},
+    {0x0177, CursorKeys::shift_delete},
+    {0x0477, CursorKeys::ctrl_delete}
+};
 
-bool key_input_action()
+// Utility for diagnostics.
+
+string show_modifiers (uint32_t mask)
+{
+    const char *MODIFIERS[] = {
+            "Shift", "Lock", "Ctrl", "Alt",
+            "Mod2", "Mod3", "Mod4", "Mod5",
+            "Button1", "Button2", "Button3", "Button4", "Button5"
+    };
+
+    string result;
+    for (const char **modifier = MODIFIERS ; mask; mask >>= 1, ++modifier) {
+        if (mask & 1) {
+            if ( ! result.empty() )
+                 result += '+';
+             result += *modifier;
+        }
+    }
+    return result;
+}
+
+
+bool key_input_action_xcb(xcb_key_release_event_t *kr)
 {
     bool result = true;
 
     static string commandString;
 
-    int c = getch();
-//    const char * key = getkey();
+    xcb_keysym_t sym = xcb_key_symbols_get_keysym(g_xcbKeySymbols, kr->detail, kr->state);
 
-    switch (c)
+    // Convert to the character IDs we've been using with ncurses. We may drop this at some point.
+
+    CursorKeys::key_type_t curKey = CursorKeys::no_key;
+
+    if ( sym != 0 )
     {
-    case 1: // Ctrl-A
+        // Look for symbols that are used purely for CursorKey navigation.
+        // (Ins, Del, Up, Down, Left, Right, Esc).
+
+        try
+        {
+            curKey = g_xcbSymbolToCursorKey.at(sym);
+        }
+        catch(...)
+        {
+            // Nothing found, so just fall through to check specific symbols below.
+        }
+    }
+    else
+    {
+        // Look for raw decodes that map to CursorKeys.
+
+        try
+        {
+            // unsigned int lookup = (kr->state << 8) + kr->detail;
+            curKey = g_xcbKeycodeToCursorKey.at( (kr->state << 8) + kr->detail);
+        }
+        catch(...)
+        {
+            // There's nothing here for us, so show some diagnostics and return.
+            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", kr->detail, kr->state, show_modifiers(kr->state).c_str());
+            return true;
+        }
+    }
+
+    if ( curKey != CursorKeys::no_key )
+    {
+        g_CursorKeys.RouteKey(curKey);
+        show_status_after_navigation();
+        update_edit_panels();
+        return true;
+    }
+
+    switch (sym)
+    {
+    case 0xE6: // Ctrl-A
         move(COMMAND_HOME);
         clrtoeol();
         refresh();
         copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
         break;
-        break;
-    case 3:  // Ctrl-C, Copy
+
+    case 0xA2:  // Ctrl-C, Copy
         move(COMMAND_HOME);
         clrtoeol();
         refresh();
@@ -496,19 +768,7 @@ bool key_input_action()
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         break;
 
-        // After using Alt-Enter, we seem to get additional Enter - char(10) - messages
-        // on the next keypress, regardless of what that key press actually is. Disabling
-        // this bit of code (probably) doesn't prevent that peculiar behaviour, but will
-        // at least discourage using Alt-Enter or Esc all round.
-
-//    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
-//        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
-//        {
-//            show_status_after_navigation();
-//        }
-//        break;
-
-    case 22: // Ctrl-V, Paste
+    case 0xAD2: // Ctrl-V, Paste
         move(COMMAND_HOME);
         clrtoeol();
         refresh();
@@ -527,13 +787,13 @@ bool key_input_action()
         update_pattern_panel();
         break;
 
-    case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
+    case XK_Return: // Enter
         if ( !commandString.empty() )
         {
-            result = do_command(commandString/*.c_str()*/);
+            result = do_command(commandString);
             commandString.clear();
         }
-        else if ( g_ListBuilder.HandleKeybInput(c) )
+        else if ( g_ListBuilder.HandleKeybInput(10) )
         {
             if ( g_ListBuilder.RealTimeRecord() )
                 g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
@@ -551,59 +811,33 @@ bool key_input_action()
         clrtoeol();
         break;
 
-    case 32: // Space bar.
+    case XK_space: // Space bar.
         if ( commandString.empty() )
         {
-            if ( g_ListBuilder.HandleKeybInput(c) )
+            if ( g_ListBuilder.HandleKeybInput(XK_space) )
                 show_listbuilder_status();
-            move(COMMAND_HOME);
         }
         else
-            commandString += c;
+        {
+            commandString += sym;
+            set_status(COMMAND_HOME, commandString.c_str());
+            move(COMMAND_HOME + commandString.size());
+        }
         break;
 
-    case KEY_TAB:
+    case XK_Tab:
         move(COMMAND_HOME + commandString.size());
         g_Display.NextBigPanelPage(1);
         break;
 
-    case KEY_SHTAB:
+    case XK_ISO_Left_Tab:   // Shift-Tab
         g_Display.NextBigPanelPage(-1);
         break;
 
-    case KEY_SPGUP:
-    case KEY_SPGDOWN:
-    case KEY_APGUP:
-    case KEY_APGDOWN:
-    case KEY_CDOWN:
-    case KEY_CUP:
-    case KEY_CLEFT:
-    case KEY_CRIGHT:
-    case KEY_SDOWN:
-    case KEY_SUP:
-    case KEY_SLEFT:
-    case KEY_SRIGHT:
-    case KEY_CSLEFT:
-    case KEY_CSRIGHT:
-    case KEY_CSUP:
-    case KEY_CSDOWN:
-    case KEY_DOWN:
-    case KEY_UP:
-    case KEY_LEFT:
-    case KEY_RIGHT:
-    case KEY_INSERT:
-    case KEY_DELETE:
-    case KEY_SDELETE:
-    case KEY_CDELETE:
-        g_CursorKeys.RouteKey(g_CursorKeyMap.at(c));
-        show_status_after_navigation();
-        update_edit_panels();
-        break;
-
-    case KEY_BACKSPACE: // 263
+    case XK_BackSpace:
         if ( commandString.size() > 0 )
             commandString.pop_back();
-        else if ( g_ListBuilder.HandleKeybInput(c) )
+        else if ( g_ListBuilder.HandleKeybInput(KEY_BACKSPACE) )
             show_listbuilder_status();
         else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
             show_status_after_navigation();
@@ -612,16 +846,50 @@ bool key_input_action()
         break;
 
     default:
-        if ( true )
+
+        if ( sym > 31 && sym < 127 )
         {
-            set_status(STAT_POS_2, "Key: %i", c);
+            commandString += sym;
+            set_status(COMMAND_HOME, commandString.c_str());
+            move(COMMAND_HOME + commandString.size());
         }
-        else if ( commandString.size() == 0 )
+        else if ( true )
         {
-            set_status(STAT_POS_2, "");
+            // We haven't used the symbol, so what was it?
+
+            string symbol = "X symbol: ";
+            char buff[20];
+            sprintf(buff, "%#x - ", sym);
+            symbol += buff;
+
+            if ( static_cast<unsigned char>(sym) < 32 )
+            {
+                sprintf(buff, "%i", static_cast<unsigned char>(sym));
+                symbol += buff;
+            }
+            else
+                symbol += static_cast<unsigned char>(sym);
+
+            symbol += " Cat:";
+
+            if ( xcb_is_keypad_key(sym) )
+                symbol += " keypad";
+            if ( xcb_is_private_keypad_key(sym) )
+                symbol += " private keypad";
+            if ( xcb_is_cursor_key(sym) )
+                symbol += " cursor";
+            if ( xcb_is_pf_key(sym) )
+                symbol += " pf";
+            if ( xcb_is_function_key(sym) )
+                symbol += " function";
+            if ( xcb_is_misc_function_key(sym) )
+                symbol += " misc function";
+            if ( xcb_is_modifier_key(sym) )
+                symbol += " modifier";
+
+            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), kr->detail, kr->state, show_modifiers(kr->state).c_str());
+
         }
-        if ( c > 31 && c < 127 )
-            commandString += c;
         break;
     }
 
@@ -635,6 +903,98 @@ void sigterm_exit(int sig)
 
     endwin();
     exit(0);
+}
+
+
+bool xcbPollEvents(xcb_connection_t * connection)
+{
+    bool result = true;
+
+    xcb_generic_event_t *event;
+    while ( (event = xcb_poll_for_event (connection)) ) {
+        switch (event->response_type & ~0x80) {
+        case XCB_EXPOSE: {
+//            xcb_expose_event_t *expose = (xcb_expose_event_t *)event;
+//
+//            printf ("Window %" PRIu32 " exposed. Region to be redrawn at location (%" PRIu16 ",%" PRIu16 "), with dimension (%" PRIu16 ",%" PRIu16 ")\n",
+//                    expose->window, expose->x, expose->y, expose->width, expose->height );
+            break;
+        }
+//        case XCB_BUTTON_PRESS: {
+//            xcb_button_press_event_t *bp = (xcb_button_press_event_t *)event;
+//            print_modifiers (bp->state);
+//
+//            switch (bp->detail) {
+//            case 4:
+//                printf ("Wheel Button up in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                        bp->event, bp->event_x, bp->event_y );
+//                break;
+//            case 5:
+//                printf ("Wheel Button down in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                        bp->event, bp->event_x, bp->event_y );
+//                break;
+//            default:
+//                printf ("Button %" PRIu8 " pressed in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                        bp->detail, bp->event, bp->event_x, bp->event_y );
+//                break;
+//            }
+//            break;
+//        }
+//        case XCB_BUTTON_RELEASE: {
+//            xcb_button_release_event_t *br = (xcb_button_release_event_t *)event;
+//            print_modifiers(br->state);
+//
+//            printf ("Button %" PRIu8 " released in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                    br->detail, br->event, br->event_x, br->event_y );
+//            break;
+//        }
+//        case XCB_MOTION_NOTIFY: {
+//            xcb_motion_notify_event_t *motion = (xcb_motion_notify_event_t *)event;
+//
+//            printf ("Mouse moved in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                    motion->event, motion->event_x, motion->event_y );
+//            break;
+//        }
+//        case XCB_ENTER_NOTIFY: {
+//            xcb_enter_notify_event_t *enter = (xcb_enter_notify_event_t *)event;
+//
+//            printf ("Mouse entered window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                    enter->event, enter->event_x, enter->event_y );
+//            break;
+//        }
+//        case XCB_LEAVE_NOTIFY: {
+//            xcb_leave_notify_event_t *leave = (xcb_leave_notify_event_t *)event;
+//
+//            printf ("Mouse left window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+//                    leave->event, leave->event_x, leave->event_y );
+//            break;
+//        }
+//        case XCB_KEY_PRESS: {
+//            xcb_key_press_event_t *kp = (xcb_key_press_event_t *)event;
+//            print_modifiers(kp->state);
+//
+//            printf ("Key pressed in window %" PRIu32 "\n",
+//                    kp->event);
+//            break;
+//        }
+        case XCB_KEY_RELEASE:
+            xcb_key_release_event_t *kr = (xcb_key_release_event_t *) event;
+            result = key_input_action_xcb(kr);
+
+            break;
+
+//        default:
+//            /* Unknown event type, ignore it */
+//            printf ("Unknown event: %" PRIu8 "\n",
+//                    event->response_type);
+//            break;
+        }
+
+        free (event);
+    }
+
+    return result;
+
 }
 
 
@@ -663,6 +1023,42 @@ int main(int argc, char *argv[])
     signal(SIGINT, sigterm_exit);
     signal(SIGTERM, sigterm_exit);
 
+    /* Open the connection to the X server */
+    xcb_connection_t *connection = xcb_connect (NULL, NULL);
+
+    /* Get the first screen */
+    xcb_screen_t *screen = xcb_setup_roots_iterator (xcb_get_setup (connection)).data;
+
+    /* Create the window */
+    xcb_window_t window    = xcb_generate_id (connection);
+
+    uint32_t     mask      = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t     values[2] = {screen->white_pixel,
+                                XCB_EVENT_MASK_EXPOSURE       | XCB_EVENT_MASK_BUTTON_PRESS   |
+                                XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
+                                XCB_EVENT_MASK_ENTER_WINDOW   | XCB_EVENT_MASK_LEAVE_WINDOW   |
+                                XCB_EVENT_MASK_KEY_PRESS      | XCB_EVENT_MASK_KEY_RELEASE };
+
+    xcb_create_window (connection,
+                       0,                             /* depth               */
+                       window,
+                       screen->root,                  /* parent window       */
+                       0, 0,                          /* x, y                */
+                       150, 150,                      /* width, height       */
+                       10,                            /* border_width        */
+                       XCB_WINDOW_CLASS_INPUT_OUTPUT, /* class               */
+                       screen->root_visual,           /* visual              */
+                       mask, values );                /* masks */
+
+    /* Map the window on the screen */
+    xcb_map_window (connection, window);
+
+    xcb_flush (connection);
+
+//    typedef struct _XCBKeySymbols xcb_key_symbols_t;
+//    xcb_key_symbols_get_keysym(connection);
+    g_xcbKeySymbols = xcb_key_symbols_alloc(connection);
+
     /*
     * Set up polling ...
     *
@@ -674,7 +1070,7 @@ int main(int argc, char *argv[])
 
     int npfd = g_Sequencer.GetFileDescriptorCount();
     struct pollfd *pfd = (struct pollfd *)alloca((npfd + 1) * sizeof(struct pollfd));
-    pfd[0].fd = 0;
+    pfd[0].fd = xcb_get_file_descriptor(connection);
     pfd[0].events = POLLIN;
     g_Sequencer.GetFileDescriptors(pfd + 1, npfd);
 
@@ -686,18 +1082,19 @@ int main(int argc, char *argv[])
 
     bool keep_going = true;
 
-    while (keep_going)
+    while ( keep_going )
     {
-        if (poll(pfd, npfd + 1, 10000) > 0)
+        if ( poll(pfd, npfd + 1, 10000) > 0 )
         {
-            if (pfd[0].revents & POLLIN)
-                keep_going = key_input_action();
-            for (int i = 1; i < npfd + 1; i++)
+            if ( pfd[0].revents & POLLIN )
+                keep_going = xcbPollEvents(connection);
+            for ( int i = 1; i < npfd + 1; i++ )
             {
-                if (pfd[i].revents > 0)
+                if ( pfd[i].revents > 0 )
                     midi_action(queueId);
             }
         }
     }
 
+    xcb_key_symbols_free(g_xcbKeySymbols);
 }

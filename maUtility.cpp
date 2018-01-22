@@ -24,6 +24,71 @@
 
 using namespace std;
 
+// PangoLayout* layout = pango_cairo_create_layout(cairo_t);
+
+#if 0
+
+/*
+    Pango needs glib, which makes the build dependencies much more complicated.
+
+    So far I've added these to compiler search:
+
+    /usr/include/pango-1.0
+    /usr/include/glib-2.0
+    /usr/lib/x86_64-linux-gnu/glib-2.0/include
+
+    This to linker search:
+
+    /usr/lib/x86_64-linux-gnu
+
+    These to linker options:
+
+    -lpango-1.0
+    -lpangocairo-1.0
+
+     ... and I'm still stuck here:
+
+    /usr/bin/ld: obj/Debug/maUtility.o||undefined reference to symbol 'g_type_check_instance_is_a'
+
+    I tried adding -lglib-2.0 and a load of other vaguely related things but couldn't get past this.
+*/
+//#include "cairot.h"   // Don't know what this is ...
+#include <cairo/cairo.h>
+#include <pango/pangocairo.h>
+
+void dump_stuff(PangoLayout* layout) {
+   PangoContext* context = pango_layout_get_context(layout);
+   PangoFontFamily** families; int n;
+   pango_context_list_families(context, &families, &n);
+   printf("%d families:\n", n);
+   for (int i=0; i < n; i++) {
+     PangoFontFamily* family = families[i];
+     if (!PANGO_IS_FONT_FAMILY(family)) {
+       printf("a %s\n", G_OBJECT_TYPE_NAME(family));
+       continue;
+     }
+     printf("%s\n", pango_font_family_get_name(family));
+     PangoFontFace** faces; int m;
+     pango_font_family_list_faces(family, &faces, &m);
+     for (int j = 0; j < m; j++) {
+       PangoFontFace* face = faces[j];
+       printf("  %s", pango_font_face_get_face_name(face));
+       int* sizes; int nsizes;
+       pango_font_face_list_sizes(face, &sizes, &nsizes);
+       if (sizes) {
+	for (int k = 0; k < nsizes; ++k) printf(" %d", sizes[k]);
+	g_free(sizes);
+       }
+       if (pango_font_face_is_synthesized(face)) printf(" *");
+       printf("\n");
+     }
+     g_free(faces);
+   }
+   g_free(families);
+}
+
+#endif
+
 // This came from here: https://stackoverflow.com/questions/53849/how-do-i-tokenize-a-string-in-c
 
 vector<string> split(const char *str, char c, bool wantEmptyTokens)

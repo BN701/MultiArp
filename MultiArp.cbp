@@ -37,6 +37,10 @@
 			<Add directory="../link/include" />
 			<Add directory="../link/modules/asio-standalone/asio/include" />
 			<Add directory="../midifile/include/" />
+			<Add directory="/usr/include/cairo" />
+			<Add directory="/usr/include/pango-1.0" />
+			<Add directory="/usr/include/glib-2.0" />
+			<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include" />
 		</Compiler>
 		<Linker>
 			<Add option="-pthread" />
@@ -45,7 +49,12 @@
 			<Add option="-lasound" />
 			<Add option="-lxcb" />
 			<Add option="-lxcb-keysyms" />
+			<Add option="-lcairo" />
+			<Add option="-lpango-1.0" />
+			<Add option="-lpangocairo-1.0" />
+			<Add option="`$(pkg-config --libs gtk+3.0)`" />
 			<Add library="../midifile/lib/libmidifile.a" />
+			<Add directory="/usr/lib/x86_64-linux-gnu" />
 		</Linker>
 		<Unit filename="Test Files/More Test Data.txt" />
 		<Unit filename="Test Files/Nice Clips, Autumn 2017.txt" />

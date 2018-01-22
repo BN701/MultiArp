@@ -40,6 +40,8 @@ extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
 extern State g_State;
 
+TextUI g_TextUI;
+
 // Additional colours beyond the basic eight that are defined
 // in ncurses.h. (Note the UK spelling to distinguish them from
 // the defaults, which aren't changed.)
@@ -85,7 +87,7 @@ enum colour_pairs
 };
 
 
-Display::Display()
+TextUI::TextUI()
 {
     // Set up NCurses.
 
@@ -150,14 +152,14 @@ Display::Display()
 }
 
 
-Display::~Display()
+TextUI::~TextUI()
 {
     delwin(m_SmallPanel);
     delwin(m_BigPanel);
     endwin();			/* End curses mode		  */
 }
 
-void Display::NextBigPanelPage( int direction )
+void TextUI::NextBigPanelPage( int direction )
 {
     if ( direction > 0 )
     {
@@ -173,7 +175,88 @@ void Display::NextBigPanelPage( int direction )
     }
 }
 
-Display g_Display;
+void TextUI::Text(window_area_t area, int row, int col, const char * text, int attribute)
+{
+    WINDOW * window = stdscr;
+
+    switch (area)
+    {
+        case big_panel:
+            window = m_BigPanel;
+            break;
+        case small_panel:
+            window = m_SmallPanel;
+            break;
+        case progress_panel:
+            window = m_ProgressPanel;
+            break;
+        case edit_list_panel:
+            window = m_EditListPanel;
+            break;
+        case edit_summary_panel:
+            window = m_EditSummaryPanel;
+            break;
+        case big_panel_extra:
+            window = m_BigPanelExtra;
+            break;
+        default:
+            break;
+    }
+
+    int scr_x, scr_y;
+    attron(attribute);
+    getyx(stdscr, scr_y, scr_x);
+
+    int result = mvwprintw(window, row, col, text);
+
+    clrtoeol();
+    move(scr_y, scr_x);
+    refresh();
+    attroff(attribute);
+}
+
+void set_status(int y, int x, const char *format, ...)
+{
+    char text[100];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(text, 100, format, args);
+    va_end(args);
+
+    g_TextUI.Text(TextUI::whole_window, y, x, text, A_BOLD);
+
+//    int scr_x, scr_y;
+//    attron(A_BOLD);			/* bold on */
+//    getyx(stdscr, scr_y, scr_x);
+//
+//    mvprintw(y, x, text);
+//
+//    clrtoeol();
+//    move(scr_y, scr_x);
+//    refresh();
+//    attroff(A_BOLD);			/* bold on */
+}
+
+//void set_status_w(WINDOW * w, int y, int x, const char *format, ...)
+void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, ...)
+{
+    char text[100];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(text, 100, format, args);
+    va_end(args);
+
+    g_TextUI.Text(area, y, x, text);
+
+//    int scr_x, scr_y;
+//    getyx(stdscr, scr_y, scr_x);
+//    mvwprintw(w,y, x, text);
+//    wclrtoeol(w);
+//    wmove(stdscr, scr_y, scr_x);
+//    wrefresh(w);
+//    refresh();
+}
+
 
 void highlight(int base_row, int base_col, int ofs, int len, int attr, int colour)
 {
@@ -294,10 +377,10 @@ void update_progress_bar()
 
 void update_pattern_status_panel()
 {
-    wmove(g_Display.SmallPanel(), 1, 0);
-    wclrtoeol(g_Display.SmallPanel());
-    wmove(g_Display.SmallPanel(), 2, 0);
-    wclrtoeol(g_Display.SmallPanel());
+    wmove(g_TextUI.SmallPanel(), 1, 0);
+    wclrtoeol(g_TextUI.SmallPanel());
+    wmove(g_TextUI.SmallPanel(), 2, 0);
+    wclrtoeol(g_TextUI.SmallPanel());
 
     set_status_w(STAT_POS_PATTERN_EDIT, g_PatternStore.PatternStatusEdit().c_str());
 
@@ -325,10 +408,10 @@ void update_pattern_status_panel()
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
 
-    mvwprintw(g_Display.SmallPanel(), 1, 0, g_PatternStore.PatternChainToStringForDisplay(firstRow, rows).c_str());
-    mvwchgat(g_Display.SmallPanel(), 1 + rowSelect, 5 + 12 * (selection % 4), 12, 0, CP_PATTERN_CHAIN_HIGHLIGHT, NULL);
+    mvwprintw(g_TextUI.SmallPanel(), 1, 0, g_PatternStore.PatternChainToStringForDisplay(firstRow, rows).c_str());
+    mvwchgat(g_TextUI.SmallPanel(), 1 + rowSelect, 5 + 12 * (selection % 4), 12, 0, CP_PATTERN_CHAIN_HIGHLIGHT, NULL);
 
-    wrefresh(g_Display.SmallPanel());
+    wrefresh(g_TextUI.SmallPanel());
     move(scr_y, scr_x);
     refresh();
 }
@@ -337,10 +420,10 @@ void update_edit_panels(bool refreshList)
 {
     update_pattern_status_panel();
 
-    switch ( g_Display.BigPanelPage() )
+    switch ( g_TextUI.BigPanelPage() )
     {
-    case Display::one:
-    case Display::two:
+    case TextUI::one:
+    case TextUI::two:
         break;
     default:
         return;
@@ -348,12 +431,12 @@ void update_edit_panels(bool refreshList)
 
     if ( g_PatternStore.Empty() )
     {
-        wmove(g_Display.EditListPanel(), 0, 0);
-        wclrtobot(g_Display.EditListPanel());
-        wrefresh(g_Display.EditListPanel());
-        wmove(g_Display.EditSummaryPanel(), 0, 0);
-        wclrtobot(g_Display.EditSummaryPanel());
-        wrefresh(g_Display.EditSummaryPanel());
+        wmove(g_TextUI.EditListPanel(), 0, 0);
+        wclrtobot(g_TextUI.EditListPanel());
+        wrefresh(g_TextUI.EditListPanel());
+        wmove(g_TextUI.EditSummaryPanel(), 0, 0);
+        wclrtobot(g_TextUI.EditSummaryPanel());
+        wrefresh(g_TextUI.EditSummaryPanel());
         return;
     }
 
@@ -370,50 +453,50 @@ void update_edit_panels(bool refreshList)
     while ( selection < listStart )
         listStart -= 1;
 
-    wmove(g_Display.EditListPanel(), 0, 0);
-    wclrtobot(g_Display.EditListPanel());
+    wmove(g_TextUI.EditListPanel(), 0, 0);
+    wclrtobot(g_TextUI.EditListPanel());
 
-    wprintw(g_Display.EditListPanel(), g_PatternStore.PatternSelectionList(listStart, rows).c_str());
-    mvwchgat(g_Display.EditListPanel(), selection - listStart, 0, 20, 0, CP_SUMMARY_PANEL_BKGND, NULL);
+    wprintw(g_TextUI.EditListPanel(), g_PatternStore.PatternSelectionList(listStart, rows).c_str());
+    mvwchgat(g_TextUI.EditListPanel(), selection - listStart, 0, 20, 0, CP_SUMMARY_PANEL_BKGND, NULL);
 
-    wrefresh(g_Display.EditListPanel());
+    wrefresh(g_TextUI.EditListPanel());
 
     // Summary Panel
 
-    wmove(g_Display.EditSummaryPanel(), 0, 0);
-    wclrtobot(g_Display.EditSummaryPanel());
+    wmove(g_TextUI.EditSummaryPanel(), 0, 0);
+    wclrtobot(g_TextUI.EditSummaryPanel());
 
     Pattern & p = g_PatternStore.CurrentEditPattern();
 
-    wmove(g_Display.EditSummaryPanel(), 0, 1);
-    wprintw(g_Display.EditSummaryPanel(), "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
+    wmove(g_TextUI.EditSummaryPanel(), 0, 1);
+    wprintw(g_TextUI.EditSummaryPanel(), "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
 
-    wmove(g_Display.EditSummaryPanel(), 1, 1);
-    wprintw(g_Display.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
+    wmove(g_TextUI.EditSummaryPanel(), 1, 1);
+    wprintw(g_TextUI.EditSummaryPanel(), "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
         p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
 
     TranslateTable & table = p.PatternTranslateTable();
 
-    wmove(g_Display.EditSummaryPanel(), 2, 1);
-    wprintw(g_Display.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
+    wmove(g_TextUI.EditSummaryPanel(), 2, 1);
+    wprintw(g_TextUI.EditSummaryPanel(), "Chromatic %i, Tonal %i (%s), %s-%s",
             table.Transpose(),
             table.DegreeShift(),
             table.ShiftName(),
             table.RootName().c_str(),
             table.ScaleName());
 
-    wmove(g_Display.EditSummaryPanel(), 3, 1);
-    wprintw(g_Display.EditSummaryPanel(), "Premap %s, Accidentals %s",
+    wmove(g_TextUI.EditSummaryPanel(), 3, 1);
+    wprintw(g_TextUI.EditSummaryPanel(), "Premap %s, Accidentals %s",
             table.PremapModeName(),
             table.AccidentalsModeName());
 
-    wrefresh(g_Display.EditSummaryPanel());
+    wrefresh(g_TextUI.EditSummaryPanel());
 }
 
 void layout_pattern_extra_panel(vector<InOutPair> & pairs)
 {
     const int kbdStart = 29;
-    WINDOW *panel = g_Display.BigPanelExtra();
+    WINDOW *panel = g_TextUI.BigPanelExtra();
     wmove(panel, 0, 0);
     wclrtobot(panel);
 
@@ -546,7 +629,7 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
 
 void layout_pattern_extra_panel_test()
 {
-    WINDOW *panel = g_Display.BigPanelExtra();
+    WINDOW *panel = g_TextUI.BigPanelExtra();
     wmove(panel, 0, 0);
     wclrtobot(panel);
 
@@ -587,53 +670,53 @@ void update_pattern_panel()
 {
 //    int scr_x, scr_y;
 
-    if ( g_Display.BigPanelHold() )
+    if ( g_TextUI.BigPanelHold() )
         return;
 
-    wmove(g_Display.BigPanel(), 0, 0);
+    wmove(g_TextUI.BigPanel(), 0, 0);
 
     try
     {
         bool showTrigProgress = false;
         static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
 
-        switch ( g_Display.BigPanelPage() )
+        switch ( g_TextUI.BigPanelPage() )
         {
-        case Display::one:
-            wclrtobot(g_Display.BigPanel());
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79).c_str());
+        case TextUI::one:
+            wclrtobot(g_TextUI.BigPanel());
+            wprintw(g_TextUI.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79).c_str());
             showTrigProgress = true;
             break;
-        case Display::two:
-            wclrtobot(g_Display.BigPanel());
-            wprintw(g_Display.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
+        case TextUI::two:
+            wclrtobot(g_TextUI.BigPanel());
+            wprintw(g_TextUI.BigPanel(), g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
             showTrigProgress = true;
             break;
-        case Display::three:
+        case TextUI::three:
 //            layout_pattern_extra_panel_test();
             layout_pattern_extra_panel(g_PatternStore.TranslateTableForPlay().Diags().InOutPairs());
-            wprintw(g_Display.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log(highlights).c_str());
+            wprintw(g_TextUI.BigPanel(), g_PatternStore.TranslateTableForPlay().Diags().Log(highlights).c_str());
             break;
         default:
             break;
         }
 
-        switch ( g_Display.BigPanelPage() )
+        switch ( g_TextUI.BigPanelPage() )
         {
-        case Display::one:
-        case Display::two:
+        case TextUI::one:
+        case TextUI::two:
             for ( auto it = highlights.begin(); it < highlights.end(); it++ )
             {
-                mvwchgat(g_Display.BigPanel(), it->row, it->offset, it->length, 0,
+                mvwchgat(g_TextUI.BigPanel(), it->row, it->offset, it->length, 0,
                     it->row < 2 ? CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG : CP_PATTERN_LIST_PANEL_HIGHLIGHT,
                     NULL);
             }
             highlights.clear(); // Clear highlights here in case page switches before next update.
             break;
-        case Display::three:
+        case TextUI::three:
             // Row highlighting here depends on the current row position inserted at the front of the list.
-            mvwchgat(g_Display.BigPanel(), highlights.back().row, highlights.back().offset, highlights.back().length, 0, CP_PATTERN_LIST_PANEL, NULL);
-            mvwchgat(g_Display.BigPanel(), highlights.front().row, highlights.front().offset, highlights.front().length, 0, CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, NULL);
+            mvwchgat(g_TextUI.BigPanel(), highlights.back().row, highlights.back().offset, highlights.back().length, 0, CP_PATTERN_LIST_PANEL, NULL);
+            mvwchgat(g_TextUI.BigPanel(), highlights.front().row, highlights.front().offset, highlights.front().length, 0, CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG, NULL);
             if ( highlights.size() > 1 )
                 highlights.pop_back();
             break;
@@ -644,15 +727,15 @@ void update_pattern_panel()
         // Kludge to show overall trig position.
 
         if ( showTrigProgress )
-            mvwchgat(g_Display.BigPanel(), 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
+            mvwchgat(g_TextUI.BigPanel(), 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
                 A_UNDERLINE, CP_PATTERN_LIST_PANEL, NULL);
     }
     catch (... /*string s*/)
     {
-        // wprintw(g_Display.BigPanel(), s.c_str());
+        // wprintw(g_TextUI.BigPanel(), s.c_str());
     }
 
-    wrefresh(g_Display.BigPanel());
+    wrefresh(g_TextUI.BigPanel());
 
 }
 

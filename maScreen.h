@@ -73,17 +73,31 @@
 
 #define COMMAND_HOME 6,4
 #define STAT_POS_TOPLINE 0,0
-#define STAT_POS_STEP g_Display.ProgressPanel(), 0,0
-#define STAT_POS_PATTERN g_Display.SmallPanel(), 1,0
-#define STAT_POS_PATTERN_EDIT g_Display.SmallPanel(), 2,0
+//#define STAT_POS_STEP g_TextUI.ProgressPanel(), 0,0
+#define STAT_POS_STEP TextUI::progress_panel, 0,0
+//#define STAT_POS_PATTERN g_TextUI.SmallPanel(), 1,0
+#define STAT_POS_PATTERN TextUI::small_panel, 1,0
+//#define STAT_POS_PATTERN_EDIT g_TextUI.SmallPanel(), 2,0
+#define STAT_POS_PATTERN_EDIT TextUI::small_panel, 2,0
 #define STAT_POS_2 5,4
 #define STAT_POS_MENU 1,4
 
 
 
-class Display
+class TextUI
 {
 public:
+    enum window_area_t
+    {
+        whole_window,          // Position relative to whole screen.
+        big_panel,             // Botton half of screen, used for all sorts.
+        small_panel,           // Pattern Status, or pattern chain. Under progress bar, to the left.
+        progress_panel,        // Extra progress panel, to the right of Pattern Status
+        edit_list_panel,       // Pattern List, under command line.
+        edit_summary_panel,    // Pattern Summary, under command line to the right of Pattern List
+        big_panel_extra        // Overwrites pattern list and summary when in Big Panel is in Page 3 mode.
+   };
+
     enum big_panel_page_t
     {
         one,
@@ -92,8 +106,10 @@ public:
         num_big_panel_pages
     };
 
-    Display();
-    ~Display();
+    TextUI();
+    ~TextUI();
+
+    void Text(window_area_t area, int row, int col, const char * text, int attribute = A_NORMAL);
 
     void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
     void NextBigPanelPage( int direction );
@@ -109,13 +125,12 @@ public:
     WINDOW *EditSummaryPanel() { return m_EditSummaryPanel; }
 
 private:
-    WINDOW * m_BigPanel = NULL;
-    WINDOW * m_SmallPanel = NULL;
-    WINDOW * m_ProgressPanel = NULL;
-    WINDOW * m_EditListPanel = NULL;
-    WINDOW * m_EditSummaryPanel = NULL;
-    WINDOW * m_BigPanelExtra = NULL;
-
+    WINDOW * m_BigPanel = NULL;             // Botton half of screen, used for all sorts.
+    WINDOW * m_SmallPanel = NULL;           // Pattern Status, or pattern chain. Under progress bar, to the left.
+    WINDOW * m_ProgressPanel = NULL;        // Extra progress panel, to the right of Pattern Status
+    WINDOW * m_EditListPanel = NULL;        // Pattern List, under command line.
+    WINDOW * m_EditSummaryPanel = NULL;     // Pattern Summary, under command line to the right of Pattern List
+    WINDOW * m_BigPanelExtra = NULL;        // Overwrites pattern list and summary when in Big Panel is in Page 3 mode.
 
     big_panel_page_t m_BigPanelPage = one;
     bool m_BigPanelHold = false;
@@ -139,30 +154,35 @@ private:
     https://stackoverflow.com/questions/10632251/undefined-reference-to-template-function
  */
 
-template<typename ... Args>
-void set_status(int y, int x, const char *format, Args ... args)
-{
-    int scr_x, scr_y;
-    attron(A_BOLD);			/* bold on */
-    getyx(stdscr, scr_y, scr_x);
-    mvprintw(y, x, format, args ...);
-    clrtoeol();
-    move(scr_y, scr_x);
-    refresh();
-    attroff(A_BOLD);			/* bold on */
-}
+void set_status(int y, int x, const char *format, ... );
+//void set_status_w(WINDOW * w, int y, int x, const char *format, ...);
+void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, ...);
 
-template<typename ... Args>
-void set_status_w(WINDOW * w, int y, int x, const char *format, Args ... args)
-{
-    int scr_x, scr_y;
-    getyx(stdscr, scr_y, scr_x);
-    mvwprintw(w,y, x, format, args ...);
-    wclrtoeol(w);
-    wmove(stdscr, scr_y, scr_x);
-    wrefresh(w);
-    refresh();
-}
+//template<typename ... Args>
+//void set_status(int y, int x, const char *format, Args ... args)
+//{
+//    int scr_x, scr_y;
+//    attron(A_BOLD);			/* bold on */
+//    getyx(stdscr, scr_y, scr_x);
+//    mvprintw(y, x, format, args ...);
+//    clrtoeol();
+//    move(scr_y, scr_x);
+//    refresh();
+//    attroff(A_BOLD);			/* bold on */
+//}
+//
+
+//template<typename ... Args>
+//void set_status_w(WINDOW * w, int y, int x, const char *format, Args ... args)
+//{
+//    int scr_x, scr_y;
+//    getyx(stdscr, scr_y, scr_x);
+//    mvwprintw(w,y, x, format, args ...);
+//    wclrtoeol(w);
+//    wmove(stdscr, scr_y, scr_x);
+//    wrefresh(w);
+//    refresh();
+//}
 
 void highlight_pattern_panel();
 

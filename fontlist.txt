@@ -1,0 +1,1528 @@
+-adobe-courier-bold-i-normal--0-0-0-0-m-0-iso8859-1
+-adobe-courier-bold-i-normal--0-0-0-0-m-0-iso8859-2
+-adobe-courier-bold-i-normal--0-0-0-0-m-0-iso8859-3
+-adobe-courier-bold-i-normal--0-0-0-0-m-0-iso8859-9
+-adobe-courier-bold-r-normal--0-0-0-0-m-0-iso8859-1
+-adobe-courier-bold-r-normal--0-0-0-0-m-0-iso8859-2
+-adobe-courier-bold-r-normal--0-0-0-0-m-0-iso8859-3
+-adobe-courier-bold-r-normal--0-0-0-0-m-0-iso8859-9
+-adobe-courier-medium-i-normal--0-0-0-0-m-0-iso8859-1
+-adobe-courier-medium-i-normal--0-0-0-0-m-0-iso8859-2
+-adobe-courier-medium-i-normal--0-0-0-0-m-0-iso8859-3
+-adobe-courier-medium-i-normal--0-0-0-0-m-0-iso8859-9
+-adobe-courier-medium-r-normal--0-0-0-0-m-0-iso8859-1
+-adobe-courier-medium-r-normal--0-0-0-0-m-0-iso8859-2
+-adobe-courier-medium-r-normal--0-0-0-0-m-0-iso8859-3
+-adobe-courier-medium-r-normal--0-0-0-0-m-0-iso8859-9
+-arabic-newspaper-medium-r-normal--0-0-100-100-p-0-iso10646-1
+-arabic-newspaper-medium-r-normal--32-246-100-100-p-137-iso10646-1
+-b&h-luxi_mono-bold-i-normal--0-0-0-0-m-0-adobe-standard
+-b&h-luxi_mono-bold-i-normal--0-0-0-0-m-0-iso8859-1
+-b&h-luxi_mono-bold-i-normal--0-0-0-0-m-0-iso8859-15
+-b&h-luxi_mono-bold-i-normal--0-0-0-0-m-0-iso8859-2
+-b&h-luxi_mono-bold-i-normal--0-0-0-0-m-0-iso8859-9
+-b&h-luxi_mono-bold-r-normal--0-0-0-0-m-0-adobe-standard
+-b&h-luxi_mono-bold-r-normal--0-0-0-0-m-0-iso8859-1
+-b&h-luxi_mono-bold-r-normal--0-0-0-0-m-0-iso8859-15
+-b&h-luxi_mono-bold-r-normal--0-0-0-0-m-0-iso8859-2
+-b&h-luxi_mono-bold-r-normal--0-0-0-0-m-0-iso8859-9
+-b&h-luxi_mono-medium-i-normal--0-0-0-0-m-0-adobe-standard
+-b&h-luxi_mono-medium-i-normal--0-0-0-0-m-0-iso8859-1
+-b&h-luxi_mono-medium-i-normal--0-0-0-0-m-0-iso8859-15
+-b&h-luxi_mono-medium-i-normal--0-0-0-0-m-0-iso8859-2
+-b&h-luxi_mono-medium-i-normal--0-0-0-0-m-0-iso8859-9
+-b&h-luxi_mono-medium-r-normal--0-0-0-0-m-0-adobe-standard
+-b&h-luxi_mono-medium-r-normal--0-0-0-0-m-0-iso8859-1
+-b&h-luxi_mono-medium-r-normal--0-0-0-0-m-0-iso8859-15
+-b&h-luxi_mono-medium-r-normal--0-0-0-0-m-0-iso8859-2
+-b&h-luxi_mono-medium-r-normal--0-0-0-0-m-0-iso8859-9
+-b&h-luxi_sans-bold-i-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_sans-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_sans-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_sans-bold-i-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_sans-bold-i-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_sans-bold-r-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_sans-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_sans-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_sans-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_sans-bold-r-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_sans-medium-i-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_sans-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_sans-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_sans-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_sans-medium-i-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_sans-medium-r-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_sans-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_sans-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_sans-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_sans-medium-r-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_serif-bold-i-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_serif-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_serif-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_serif-bold-i-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_serif-bold-i-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_serif-bold-r-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_serif-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_serif-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_serif-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_serif-bold-r-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_serif-medium-i-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_serif-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_serif-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_serif-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_serif-medium-i-normal--0-0-0-0-p-0-iso8859-9
+-b&h-luxi_serif-medium-r-normal--0-0-0-0-p-0-adobe-standard
+-b&h-luxi_serif-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-b&h-luxi_serif-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-b&h-luxi_serif-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-b&h-luxi_serif-medium-r-normal--0-0-0-0-p-0-iso8859-9
+-bitstream-bitstream charter-bold-i-normal--0-0-0-0-p-0-adobe-standard
+-bitstream-bitstream charter-bold-i-normal--0-0-0-0-p-0-ascii-0
+-bitstream-bitstream charter-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-bitstream-bitstream charter-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-bitstream-bitstream charter-bold-r-normal--0-0-0-0-p-0-adobe-standard
+-bitstream-bitstream charter-bold-r-normal--0-0-0-0-p-0-ascii-0
+-bitstream-bitstream charter-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-bitstream-bitstream charter-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-bitstream-bitstream charter-medium-i-normal--0-0-0-0-p-0-adobe-standard
+-bitstream-bitstream charter-medium-i-normal--0-0-0-0-p-0-ascii-0
+-bitstream-bitstream charter-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-bitstream-bitstream charter-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-bitstream-bitstream charter-medium-r-normal--0-0-0-0-p-0-adobe-standard
+-bitstream-bitstream charter-medium-r-normal--0-0-0-0-p-0-ascii-0
+-bitstream-bitstream charter-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-bitstream-bitstream charter-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-bitstream-courier 10 pitch-bold-i-normal--0-0-0-0-m-0-adobe-standard
+-bitstream-courier 10 pitch-bold-i-normal--0-0-0-0-m-0-ascii-0
+-bitstream-courier 10 pitch-bold-i-normal--0-0-0-0-m-0-iso10646-1
+-bitstream-courier 10 pitch-bold-i-normal--0-0-0-0-m-0-iso8859-1
+-bitstream-courier 10 pitch-bold-r-normal--0-0-0-0-m-0-adobe-standard
+-bitstream-courier 10 pitch-bold-r-normal--0-0-0-0-m-0-ascii-0
+-bitstream-courier 10 pitch-bold-r-normal--0-0-0-0-m-0-iso10646-1
+-bitstream-courier 10 pitch-bold-r-normal--0-0-0-0-m-0-iso8859-1
+-bitstream-courier 10 pitch-medium-i-normal--0-0-0-0-m-0-adobe-standard
+-bitstream-courier 10 pitch-medium-i-normal--0-0-0-0-m-0-ascii-0
+-bitstream-courier 10 pitch-medium-i-normal--0-0-0-0-m-0-iso10646-1
+-bitstream-courier 10 pitch-medium-i-normal--0-0-0-0-m-0-iso8859-1
+-bitstream-courier 10 pitch-medium-r-normal--0-0-0-0-m-0-adobe-standard
+-bitstream-courier 10 pitch-medium-r-normal--0-0-0-0-m-0-ascii-0
+-bitstream-courier 10 pitch-medium-r-normal--0-0-0-0-m-0-iso10646-1
+-bitstream-courier 10 pitch-medium-r-normal--0-0-0-0-m-0-iso8859-1
+-cronyx-courier-bold-o-normal--0-0-0-0-m-0-iso10646-1
+-cronyx-courier-bold-o-normal--0-0-0-0-m-0-iso8859-5
+-cronyx-courier-bold-o-normal--0-0-0-0-m-0-koi8-r
+-cronyx-courier-bold-o-normal--0-0-0-0-m-0-koi8-u
+-cronyx-courier-bold-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-cronyx-courier-bold-r-normal--0-0-0-0-m-0-iso10646-1
+-cronyx-courier-bold-r-normal--0-0-0-0-m-0-iso8859-5
+-cronyx-courier-bold-r-normal--0-0-0-0-m-0-koi8-r
+-cronyx-courier-bold-r-normal--0-0-0-0-m-0-koi8-u
+-cronyx-courier-bold-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-cronyx-courier-medium-o-normal--0-0-0-0-m-0-iso10646-1
+-cronyx-courier-medium-o-normal--0-0-0-0-m-0-iso8859-5
+-cronyx-courier-medium-o-normal--0-0-0-0-m-0-koi8-r
+-cronyx-courier-medium-o-normal--0-0-0-0-m-0-koi8-u
+-cronyx-courier-medium-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-cronyx-courier-medium-r-normal--0-0-0-0-m-0-iso10646-1
+-cronyx-courier-medium-r-normal--0-0-0-0-m-0-iso8859-5
+-cronyx-courier-medium-r-normal--0-0-0-0-m-0-koi8-r
+-cronyx-courier-medium-r-normal--0-0-0-0-m-0-koi8-u
+-cronyx-courier-medium-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-cronyx-helvetica-bold-o-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-helvetica-bold-o-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-helvetica-bold-o-normal--0-0-0-0-p-0-koi8-r
+-cronyx-helvetica-bold-o-normal--0-0-0-0-p-0-koi8-u
+-cronyx-helvetica-bold-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-helvetica-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-helvetica-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-helvetica-bold-r-normal--0-0-0-0-p-0-koi8-r
+-cronyx-helvetica-bold-r-normal--0-0-0-0-p-0-koi8-u
+-cronyx-helvetica-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-helvetica-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-helvetica-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-helvetica-medium-o-normal--0-0-0-0-p-0-koi8-r
+-cronyx-helvetica-medium-o-normal--0-0-0-0-p-0-koi8-u
+-cronyx-helvetica-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-helvetica-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-helvetica-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-helvetica-medium-r-normal--0-0-0-0-p-0-koi8-r
+-cronyx-helvetica-medium-r-normal--0-0-0-0-p-0-koi8-u
+-cronyx-helvetica-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-times-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-times-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-times-bold-i-normal--0-0-0-0-p-0-koi8-r
+-cronyx-times-bold-i-normal--0-0-0-0-p-0-koi8-u
+-cronyx-times-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-times-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-times-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-times-bold-r-normal--0-0-0-0-p-0-koi8-r
+-cronyx-times-bold-r-normal--0-0-0-0-p-0-koi8-u
+-cronyx-times-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-times-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-times-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-times-medium-i-normal--0-0-0-0-p-0-koi8-r
+-cronyx-times-medium-i-normal--0-0-0-0-p-0-koi8-u
+-cronyx-times-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-cronyx-times-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-cronyx-times-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-cronyx-times-medium-r-normal--0-0-0-0-p-0-koi8-r
+-cronyx-times-medium-r-normal--0-0-0-0-p-0-koi8-u
+-cronyx-times-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-daewoo-gothic-medium-r-normal--0-0-100-100-c-0-ksc5601.1987-0
+-daewoo-gothic-medium-r-normal--16-120-100-100-c-160-ksc5601.1987-0
+-daewoo-mincho-medium-r-normal--0-0-100-100-c-0-ksc5601.1987-0
+-daewoo-mincho-medium-r-normal--16-120-100-100-c-160-ksc5601.1987-0
+-daewoo-mincho-medium-r-normal--24-170-100-100-c-240-ksc5601.1987-0
+-isas-fangsong ti-medium-r-normal--0-0-72-72-c-0-gb2312.1980-0
+-isas-fangsong ti-medium-r-normal--16-160-72-72-c-160-gb2312.1980-0
+-isas-song ti-medium-r-normal--0-0-72-72-c-0-gb2312.1980-0
+-isas-song ti-medium-r-normal--16-160-72-72-c-160-gb2312.1980-0
+-isas-song ti-medium-r-normal--24-240-72-72-c-240-gb2312.1980-0
+-jis-fixed-medium-r-normal--0-0-75-75-c-0-jisx0208.1983-0
+-jis-fixed-medium-r-normal--16-110-100-100-c-160-jisx0208.1983-0
+-jis-fixed-medium-r-normal--16-150-75-75-c-160-jisx0208.1983-0
+-jis-fixed-medium-r-normal--24-170-100-100-c-240-jisx0208.1983-0
+-jis-fixed-medium-r-normal--24-230-75-75-c-240-jisx0208.1983-0
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern bright-bold-r-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-adobe-standard
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-ascii-0
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-iso10646-1
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-iso10646-5
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-iso8859-1
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-iso8859-15
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-iso8859-9
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-koi8-r
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-koi8-ru
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-koi8-u
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-misc-computer modern bright-light-o-normal--0-0-0-0-m-0-microsoft-cp1252
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-adobe-standard
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-ascii-0
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-iso10646-1
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-iso8859-1
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-iso8859-15
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-iso8859-5
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-iso8859-9
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-koi8-r
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-koi8-ru
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-koi8-u
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-misc-computer modern bright-light-r-normal--0-0-0-0-m-0-microsoft-cp1252
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern bright-medium-o-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern bright-medium-r-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern concrete-medium-i-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern concrete-medium-o-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-adobe-fontspecific
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern concrete-medium-r-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-bold-i-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-adobe-fontspecific
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-bold-o-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-adobe-fontspecific
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-bold-r-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-adobe-standard
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-ascii-0
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-iso10646-1
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-iso8859-1
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-iso8859-15
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-iso8859-5
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-iso8859-9
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-koi8-r
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-koi8-ru
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-koi8-u
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-microsoft-cp1251
+-misc-computer modern-medium-i-normal--0-0-0-0-m-0-microsoft-cp1252
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-medium-i-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-adobe-standard
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-ascii-0
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-iso10646-1
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-iso8859-1
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-iso8859-15
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-iso8859-5
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-iso8859-9
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-koi8-r
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-koi8-ru
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-koi8-u
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-misc-computer modern-medium-o-normal--0-0-0-0-m-0-microsoft-cp1252
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-adobe-fontspecific
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-medium-o-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-ascii-0
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-koi8-r
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-koi8-u
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-medium-r-condensed--0-0-0-0-p-0-microsoft-cp1252
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-adobe-fontspecific
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-adobe-standard
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-ascii-0
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-iso10646-1
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-iso8859-1
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-iso8859-15
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-iso8859-5
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-iso8859-9
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-koi8-r
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-koi8-ru
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-koi8-u
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-misc-computer modern-medium-r-normal--0-0-0-0-m-0-microsoft-cp1252
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-adobe-fontspecific
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-adobe-standard
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-ascii-0
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-iso8859-9
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-koi8-r
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-koi8-ru
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-koi8-u
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-misc-computer modern-medium-r-normal--0-0-0-0-p-0-microsoft-cp1252
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso10646-1
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-1
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-10
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-13
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-14
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-15
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-16
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-2
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-3
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-4
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-5
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-7
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-8
+-misc-fixed-bold-r-normal--0-0-100-100-c-0-iso8859-9
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso10646-1
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-1
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-10
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-11
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-13
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-14
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-15
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-16
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-2
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-3
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-4
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-5
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-7
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-8
+-misc-fixed-bold-r-normal--0-0-75-75-c-0-iso8859-9
+-misc-fixed-bold-r-normal--13-100-100-100-c-70-iso8859-1
+-misc-fixed-bold-r-normal--13-100-100-100-c-80-iso8859-1
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso10646-1
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-1
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-10
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-11
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-13
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-14
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-15
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-16
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-2
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-3
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-4
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-5
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-7
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-8
+-misc-fixed-bold-r-normal--13-120-75-75-c-70-iso8859-9
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso10646-1
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-1
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-10
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-13
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-14
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-15
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-16
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-2
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-3
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-4
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-5
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-7
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-8
+-misc-fixed-bold-r-normal--13-120-75-75-c-80-iso8859-9
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso10646-1
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-1
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-10
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-11
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-13
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-14
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-15
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-16
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-2
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-3
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-4
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-5
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-7
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-8
+-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-9
+-misc-fixed-bold-r-normal--15-120-100-100-c-90-iso8859-1
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-1
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-10
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-11
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-13
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-14
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-15
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-16
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-2
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-3
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-4
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-5
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-7
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-8
+-misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-9
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso10646-1
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-1
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-10
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-13
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-14
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-15
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-16
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-2
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-3
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-4
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-5
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-7
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-8
+-misc-fixed-bold-r-normal--18-120-100-100-c-90-iso8859-9
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso10646-1
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-1
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-10
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-13
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-14
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-15
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-16
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-2
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-3
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-4
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-5
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-7
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-8
+-misc-fixed-bold-r-semicondensed--0-0-75-75-c-0-iso8859-9
+-misc-fixed-bold-r-semicondensed--13-100-100-100-c-60-iso8859-1
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso10646-1
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-1
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-10
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-13
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-14
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-15
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-16
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-2
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-3
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-4
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-5
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-7
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-8
+-misc-fixed-bold-r-semicondensed--13-120-75-75-c-60-iso8859-9
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso10646-1
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-1
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-10
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-11
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-13
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-14
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-15
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-16
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-2
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-3
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-4
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-5
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-7
+-misc-fixed-medium-o-normal--0-0-75-75-c-0-iso8859-9
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso10646-1
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-1
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-10
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-11
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-13
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-14
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-15
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-16
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-2
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-3
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-4
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-5
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-7
+-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-9
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso10646-1
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-1
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-10
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-13
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-14
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-15
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-16
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-2
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-3
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-4
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-5
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-7
+-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-9
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso10646-1
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-1
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-10
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-13
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-14
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-15
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-16
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-2
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-3
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-4
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-5
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-7
+-misc-fixed-medium-o-semicondensed--0-0-75-75-c-0-iso8859-9
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso10646-1
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-1
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-10
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-13
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-14
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-15
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-16
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-2
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-3
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-4
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-5
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-7
+-misc-fixed-medium-o-semicondensed--13-120-75-75-c-60-iso8859-9
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso10646-1
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-1
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-10
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-11
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-13
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-14
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-15
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-16
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-2
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-3
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-4
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-5
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-7
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-8
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-9
+-misc-fixed-medium-r-normal--0-0-100-100-c-0-koi8-r
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso10646-1
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-1
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-10
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-11
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-13
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-14
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-15
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-16
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-2
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-3
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-4
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-5
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-7
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-8
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-iso8859-9
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-jisx0201.1976-0
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-jisx0208.1983-0
+-misc-fixed-medium-r-normal--0-0-75-75-c-0-koi8-r
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso10646-1
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-1
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-10
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-13
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-14
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-15
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-16
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-2
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-3
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-4
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-5
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-7
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-8
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-9
+-misc-fixed-medium-r-normal--10-100-75-75-c-60-koi8-r
+-misc-fixed-medium-r-normal--10-70-100-100-c-60-iso8859-1
+-misc-fixed-medium-r-normal--13-100-100-100-c-70-iso8859-1
+-misc-fixed-medium-r-normal--13-100-100-100-c-80-iso8859-1
+-misc-fixed-medium-r-normal--13-100-100-100-c-80-iso8859-8
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso10646-1
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-1
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-10
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-11
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-13
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-14
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-15
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-16
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-2
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-3
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-4
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-5
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-7
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-8
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-9
+-misc-fixed-medium-r-normal--13-120-75-75-c-70-koi8-r
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso10646-1
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-1
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-10
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-13
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-14
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-15
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-16
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-2
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-3
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-4
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-5
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-7
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-8
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-iso8859-9
+-misc-fixed-medium-r-normal--13-120-75-75-c-80-koi8-r
+-misc-fixed-medium-r-normal--14-110-100-100-c-70-iso8859-1
+-misc-fixed-medium-r-normal--14-130-75-75-c-140-jisx0208.1983-0
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-1
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-10
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-11
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-13
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-14
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-15
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-16
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-2
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-3
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-4
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-5
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-7
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-8
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-9
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-jisx0201.1976-0
+-misc-fixed-medium-r-normal--14-130-75-75-c-70-koi8-r
+-misc-fixed-medium-r-normal--15-120-100-100-c-90-iso8859-1
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-1
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-10
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-11
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-13
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-14
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-15
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-16
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-2
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-3
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-4
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-5
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-7
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-8
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-9
+-misc-fixed-medium-r-normal--15-140-75-75-c-90-koi8-r
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso10646-1
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-1
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-10
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-11
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-13
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-14
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-15
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-16
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-2
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-3
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-4
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-5
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-7
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-8
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-9
+-misc-fixed-medium-r-normal--18-120-100-100-c-90-koi8-r
+-misc-fixed-medium-r-normal--20-140-100-100-c-100-iso8859-1
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso10646-1
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-1
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-10
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-11
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-13
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-14
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-15
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-16
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-2
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-3
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-4
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-5
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-7
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-8
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-9
+-misc-fixed-medium-r-normal--20-200-75-75-c-100-koi8-r
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso10646-1
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-1
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-10
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-13
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-14
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-15
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-16
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-2
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-3
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-4
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-5
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-7
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-8
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-iso8859-9
+-misc-fixed-medium-r-normal--6-60-75-75-c-40-koi8-r
+-misc-fixed-medium-r-normal--7-50-100-100-c-50-iso8859-1
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso10646-1
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-1
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-10
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-13
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-14
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-15
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-16
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-2
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-3
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-4
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-5
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-7
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-8
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-9
+-misc-fixed-medium-r-normal--7-70-75-75-c-50-koi8-r
+-misc-fixed-medium-r-normal--8-60-100-100-c-50-iso8859-1
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso10646-1
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-10
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-13
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-14
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-15
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-16
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-2
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-3
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-4
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-5
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-7
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-8
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-9
+-misc-fixed-medium-r-normal--8-80-75-75-c-50-koi8-r
+-misc-fixed-medium-r-normal--9-80-100-100-c-60-iso8859-1
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso10646-1
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-1
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-10
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-13
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-14
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-15
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-16
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-2
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-3
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-4
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-5
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-7
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-8
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-iso8859-9
+-misc-fixed-medium-r-normal--9-90-75-75-c-60-koi8-r
+-misc-fixed-medium-r-normal-ja-0-0-100-100-c-0-iso10646-1
+-misc-fixed-medium-r-normal-ja-0-0-75-75-c-0-iso10646-1
+-misc-fixed-medium-r-normal-ja-13-120-75-75-c-120-iso10646-1
+-misc-fixed-medium-r-normal-ja-18-120-100-100-c-180-iso10646-1
+-misc-fixed-medium-r-normal-ko-0-0-100-100-c-0-iso10646-1
+-misc-fixed-medium-r-normal-ko-18-120-100-100-c-180-iso10646-1
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso10646-1
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-1
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-1
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-10
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-11
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-13
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-14
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-15
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-16
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-2
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-3
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-4
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-5
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-7
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-8
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-iso8859-9
+-misc-fixed-medium-r-semicondensed--0-0-75-75-c-0-koi8-r
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso10646-1
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-1
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-10
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-13
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-14
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-15
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-16
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-2
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-3
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-4
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-5
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-7
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-8
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-iso8859-9
+-misc-fixed-medium-r-semicondensed--12-110-75-75-c-60-koi8-r
+-misc-fixed-medium-r-semicondensed--12-90-100-100-c-60-iso8859-1
+-misc-fixed-medium-r-semicondensed--13-100-100-100-c-60-iso8859-1
+-misc-fixed-medium-r-semicondensed--13-100-100-100-c-60-iso8859-1
+-misc-fixed-medium-r-semicondensed--13-100-100-100-c-60-iso8859-8
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-1
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-1
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-10
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-11
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-13
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-14
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-15
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-16
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-2
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-3
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-4
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-5
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-7
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-8
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-9
+-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-koi8-r
+-misc-nil-medium-r-normal--0-0-75-75-c-0-misc-fontspecific
+-misc-nil-medium-r-normal--2-20-75-75-c-10-misc-fontspecific
+-mutt-clearlyu alternate glyphs-medium-r-normal--0-0-100-100-p-0-iso10646-1
+-mutt-clearlyu alternate glyphs-medium-r-normal--17-120-100-100-p-122-iso10646-1
+-mutt-clearlyu arabic extra-medium-r-normal--0-0-100-100-p-0-fontspecific-0
+-mutt-clearlyu arabic extra-medium-r-normal--17-120-100-100-p-101-fontspecific-0
+-mutt-clearlyu arabic-medium-r-normal--0-0-100-100-p-0-iso10646-1
+-mutt-clearlyu arabic-medium-r-normal--17-120-100-100-p-93-iso10646-1
+-mutt-clearlyu devanagari-medium-r-normal--0-0-90-90-p-0-fontspecific-0
+-mutt-clearlyu devanagari-medium-r-normal--15-120-90-90-p-104-fontspecific-0
+-mutt-clearlyu devangari extra-medium-r-normal--0-0-100-100-p-0-fontspecific-0
+-mutt-clearlyu devangari extra-medium-r-normal--17-120-100-100-p-105-fontspecific-0
+-mutt-clearlyu ligature-medium-r-normal--0-0-100-100-p-0-fontspecific-0
+-mutt-clearlyu ligature-medium-r-normal--17-120-100-100-p-141-fontspecific-0
+-mutt-clearlyu pua-medium-r-normal--0-0-100-100-p-0-iso10646-1
+-mutt-clearlyu pua-medium-r-normal--17-120-100-100-p-110-iso10646-1
+-mutt-clearlyu-medium-r-normal--0-0-100-100-p-0-iso10646-1
+-mutt-clearlyu-medium-r-normal--17-120-100-100-p-123-iso10646-1
+-rfx-courier-bold-o-normal--0-0-0-0-m-0-iso10646-1
+-rfx-courier-bold-o-normal--0-0-0-0-m-0-iso8859-5
+-rfx-courier-bold-o-normal--0-0-0-0-m-0-koi8-r
+-rfx-courier-bold-o-normal--0-0-0-0-m-0-koi8-u
+-rfx-courier-bold-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-rfx-courier-bold-r-normal--0-0-0-0-m-0-iso10646-1
+-rfx-courier-bold-r-normal--0-0-0-0-m-0-iso8859-5
+-rfx-courier-bold-r-normal--0-0-0-0-m-0-koi8-r
+-rfx-courier-bold-r-normal--0-0-0-0-m-0-koi8-u
+-rfx-courier-bold-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-rfx-courier-medium-o-normal--0-0-0-0-m-0-iso10646-1
+-rfx-courier-medium-o-normal--0-0-0-0-m-0-iso8859-5
+-rfx-courier-medium-o-normal--0-0-0-0-m-0-koi8-r
+-rfx-courier-medium-o-normal--0-0-0-0-m-0-koi8-u
+-rfx-courier-medium-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-rfx-courier-medium-r-normal--0-0-0-0-m-0-iso10646-1
+-rfx-courier-medium-r-normal--0-0-0-0-m-0-iso8859-5
+-rfx-courier-medium-r-normal--0-0-0-0-m-0-koi8-r
+-rfx-courier-medium-r-normal--0-0-0-0-m-0-koi8-u
+-rfx-courier-medium-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-rfx-helvetica-bold-o-normal--0-0-0-0-p-0-iso10646-1
+-rfx-helvetica-bold-o-normal--0-0-0-0-p-0-iso8859-5
+-rfx-helvetica-bold-o-normal--0-0-0-0-p-0-koi8-r
+-rfx-helvetica-bold-o-normal--0-0-0-0-p-0-koi8-u
+-rfx-helvetica-bold-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-helvetica-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-rfx-helvetica-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-rfx-helvetica-bold-r-normal--0-0-0-0-p-0-koi8-r
+-rfx-helvetica-bold-r-normal--0-0-0-0-p-0-koi8-u
+-rfx-helvetica-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-helvetica-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-rfx-helvetica-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-rfx-helvetica-medium-o-normal--0-0-0-0-p-0-koi8-r
+-rfx-helvetica-medium-o-normal--0-0-0-0-p-0-koi8-u
+-rfx-helvetica-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-helvetica-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-rfx-helvetica-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-rfx-helvetica-medium-r-normal--0-0-0-0-p-0-koi8-r
+-rfx-helvetica-medium-r-normal--0-0-0-0-p-0-koi8-u
+-rfx-helvetica-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-times-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-rfx-times-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-rfx-times-bold-i-normal--0-0-0-0-p-0-koi8-r
+-rfx-times-bold-i-normal--0-0-0-0-p-0-koi8-u
+-rfx-times-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-times-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-rfx-times-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-rfx-times-bold-r-normal--0-0-0-0-p-0-koi8-r
+-rfx-times-bold-r-normal--0-0-0-0-p-0-koi8-u
+-rfx-times-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-times-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-rfx-times-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-rfx-times-medium-i-normal--0-0-0-0-p-0-koi8-r
+-rfx-times-medium-i-normal--0-0-0-0-p-0-koi8-u
+-rfx-times-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-rfx-times-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-rfx-times-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-rfx-times-medium-r-normal--0-0-0-0-p-0-koi8-r
+-rfx-times-medium-r-normal--0-0-0-0-p-0-koi8-u
+-rfx-times-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-schumacher-clean-bold-r-normal--0-0-75-75-c-0-iso646.1991-irv
+-schumacher-clean-bold-r-normal--10-100-75-75-c-60-iso646.1991-irv
+-schumacher-clean-bold-r-normal--10-100-75-75-c-80-iso646.1991-irv
+-schumacher-clean-bold-r-normal--12-120-75-75-c-60-iso646.1991-irv
+-schumacher-clean-bold-r-normal--12-120-75-75-c-80-iso646.1991-irv
+-schumacher-clean-bold-r-normal--13-130-75-75-c-80-iso646.1991-irv
+-schumacher-clean-bold-r-normal--14-140-75-75-c-80-iso646.1991-irv
+-schumacher-clean-bold-r-normal--15-150-75-75-c-90-iso646.1991-irv
+-schumacher-clean-bold-r-normal--16-160-75-75-c-80-iso646.1991-irv
+-schumacher-clean-bold-r-normal--8-80-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-i-normal--0-0-75-75-c-0-iso646.1991-irv
+-schumacher-clean-medium-i-normal--12-120-75-75-c-60-iso646.1991-irv
+-schumacher-clean-medium-i-normal--8-80-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso10646-1
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso646.1991-irv
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-1
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-10
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-13
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-14
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-15
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-16
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-2
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-3
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-4
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-5
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-7
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-8
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-iso8859-9
+-schumacher-clean-medium-r-normal--0-0-75-75-c-0-koi8-r
+-schumacher-clean-medium-r-normal--10-100-75-75-c-50-iso646.1991-irv
+-schumacher-clean-medium-r-normal--10-100-75-75-c-60-iso646.1991-irv
+-schumacher-clean-medium-r-normal--10-100-75-75-c-70-iso646.1991-irv
+-schumacher-clean-medium-r-normal--10-100-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso10646-1
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-1
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-10
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-13
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-14
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-15
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-16
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-2
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-3
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-4
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-5
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-7
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-8
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-iso8859-9
+-schumacher-clean-medium-r-normal--12-120-75-75-c-60-koi8-r
+-schumacher-clean-medium-r-normal--12-120-75-75-c-70-iso646.1991-irv
+-schumacher-clean-medium-r-normal--12-120-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-r-normal--13-130-75-75-c-60-iso646.1991-irv
+-schumacher-clean-medium-r-normal--13-130-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-r-normal--14-140-75-75-c-70-iso646.1991-irv
+-schumacher-clean-medium-r-normal--14-140-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-r-normal--15-150-75-75-c-90-iso646.1991-irv
+-schumacher-clean-medium-r-normal--16-160-75-75-c-80-iso646.1991-irv
+-schumacher-clean-medium-r-normal--6-60-75-75-c-40-iso646.1991-irv
+-schumacher-clean-medium-r-normal--6-60-75-75-c-50-iso646.1991-irv
+-schumacher-clean-medium-r-normal--6-60-75-75-c-60-iso646.1991-irv
+-schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso646.1991-irv
+-schumacher-clean-medium-r-normal--8-80-75-75-c-60-iso646.1991-irv
+-schumacher-clean-medium-r-normal--8-80-75-75-c-70-iso646.1991-irv
+-schumacher-clean-medium-r-normal--8-80-75-75-c-80-iso646.1991-irv
+-sony-fixed-medium-r-normal--0-0-100-100-c-0-iso8859-1
+-sony-fixed-medium-r-normal--0-0-100-100-c-0-jisx0201.1976-0
+-sony-fixed-medium-r-normal--16-120-100-100-c-80-iso8859-1
+-sony-fixed-medium-r-normal--16-120-100-100-c-80-jisx0201.1976-0
+-sony-fixed-medium-r-normal--16-150-75-75-c-80-iso8859-1
+-sony-fixed-medium-r-normal--16-150-75-75-c-80-jisx0201.1976-0
+-sony-fixed-medium-r-normal--24-170-100-100-c-120-iso8859-1
+-sony-fixed-medium-r-normal--24-170-100-100-c-120-jisx0201.1976-0
+-sony-fixed-medium-r-normal--24-230-75-75-c-120-iso8859-1
+-sony-fixed-medium-r-normal--24-230-75-75-c-120-jisx0201.1976-0
+-sun-open look cursor-----0-0-75-75-p-0-sunolcursor-1
+-sun-open look cursor-----12-120-75-75-p-160-sunolcursor-1
+-sun-open look glyph-----0-0-75-75-p-0-sunolglyph-1
+-sun-open look glyph-----10-100-75-75-p-101-sunolglyph-1
+-sun-open look glyph-----12-120-75-75-p-113-sunolglyph-1
+-sun-open look glyph-----14-140-75-75-p-128-sunolglyph-1
+-sun-open look glyph-----19-190-75-75-p-154-sunolglyph-1
+-topteam-teams-bold-o-normal--0-0-0-0-p-0-iso10646-1
+-topteam-teams-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-topteam-teams-bold-o-normal--0-0-0-0-p-0-iso8859-5
+-topteam-teams-bold-o-normal--0-0-0-0-p-0-koi8-r
+-topteam-teams-bold-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-topteam-teams-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-topteam-teams-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-topteam-teams-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-topteam-teams-bold-r-normal--0-0-0-0-p-0-koi8-r
+-topteam-teams-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-topteam-teams-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-topteam-teams-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-topteam-teams-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-topteam-teams-medium-o-normal--0-0-0-0-p-0-koi8-r
+-topteam-teams-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-topteam-teams-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-topteam-teams-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-topteam-teams-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-topteam-teams-medium-r-normal--0-0-0-0-p-0-koi8-r
+-topteam-teams-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-unregistered-latin modern roman-bold-i-expanded--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-bold-i-expanded--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-bold-o-expanded--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-bold-o-expanded--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-bold-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-bold-r-expanded--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-bold-r-expanded--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-o-normal-dunhill-0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-o-normal-dunhill-0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-o-normal-small caps-0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-o-normal-small caps-0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-r-normal-dunhill-0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-r-normal-dunhill-0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-r-normal-small caps-0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-r-normal-small caps-0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern roman-medium-r-normal-unslanted-0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern roman-medium-r-normal-unslanted-0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sans-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sans-bold-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sans-bold-r-expanded--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sans-bold-r-expanded--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sans-demi bold-o-condensed--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sans-demi bold-o-condensed--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sans-demi bold-r-condensed--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sans-demi bold-r-condensed--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sans-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sans-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sans-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sans-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sansquotation-bold-o-expanded--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sansquotation-bold-o-expanded--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sansquotation-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sansquotation-bold-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sansquotation-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sansquotation-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern sansquotation-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern sansquotation-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter variable width-dark-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern typewriter variable width-dark-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter variable width-dark-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern typewriter variable width-dark-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter variable width-light-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern typewriter variable width-light-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter variable width-light-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern typewriter variable width-light-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter variable width-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern typewriter variable width-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter variable width-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-latin modern typewriter variable width-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-latin modern typewriter-dark-o-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-dark-o-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-dark-r-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-dark-r-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-light-o-condensed--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-light-o-condensed--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-light-o-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-light-o-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-light-r-condensed--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-light-r-condensed--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-light-r-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-light-r-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-medium-i-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-medium-i-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-medium-o-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-medium-o-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-medium-o-normal-small caps-0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-medium-o-normal-small caps-0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-medium-r-normal--0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-medium-r-normal--0-0-0-0-c-0-iso8859-15
+-unregistered-latin modern typewriter-medium-r-normal-small caps-0-0-0-0-c-0-iso8859-1
+-unregistered-latin modern typewriter-medium-r-normal-small caps-0-0-0-0-c-0-iso8859-15
+-unregistered-texgyreadventor-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreadventor-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreadventor-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreadventor-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreadventor-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreadventor-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreadventor-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreadventor-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrebonum-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrebonum-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrebonum-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrebonum-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrebonum-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrebonum-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrebonum-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrebonum-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrechorus-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrechorus-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrecursor-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrecursor-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrecursor-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrecursor-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrecursor-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrecursor-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrecursor-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrecursor-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-bold-i-normal-condensed-0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-bold-i-normal-condensed-0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-bold-r-normal-condensed-0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-bold-r-normal-condensed-0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-medium-i-normal-condensed-0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-medium-i-normal-condensed-0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreheros-medium-r-normal-condensed-0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreheros-medium-r-normal-condensed-0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrepagella-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrepagella-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrepagella-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrepagella-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrepagella-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrepagella-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyrepagella-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyrepagella-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreschola-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreschola-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreschola-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreschola-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreschola-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreschola-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyreschola-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyreschola-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyretermes-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyretermes-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyretermes-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyretermes-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyretermes-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyretermes-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-unregistered-texgyretermes-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-unregistered-texgyretermes-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-iso10646-1
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-iso8859-15
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-iso8859-2
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-iso8859-5
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-koi8-r
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-koi8-u
+-val-free avant garde-bold-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-koi8-r
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-koi8-u
+-val-free avant garde-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-iso8859-2
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-koi8-r
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-koi8-u
+-val-free avant garde-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-koi8-u
+-val-free avant garde-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-koi8-r
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-koi8-u
+-val-free bookman-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-koi8-r
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-koi8-u
+-val-free bookman-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-koi8-r
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-koi8-u
+-val-free bookman-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-koi8-u
+-val-free bookman-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free chancery-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free chancery-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free chancery-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free chancery-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free chancery-medium-i-normal--0-0-0-0-p-0-koi8-r
+-val-free chancery-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free courier-bold-o-normal--0-0-0-0-m-0-iso10646-1
+-val-free courier-bold-o-normal--0-0-0-0-m-0-iso8859-1
+-val-free courier-bold-o-normal--0-0-0-0-m-0-iso8859-15
+-val-free courier-bold-o-normal--0-0-0-0-m-0-iso8859-2
+-val-free courier-bold-o-normal--0-0-0-0-m-0-iso8859-5
+-val-free courier-bold-o-normal--0-0-0-0-m-0-koi8-r
+-val-free courier-bold-o-normal--0-0-0-0-m-0-koi8-u
+-val-free courier-bold-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-val-free courier-bold-r-normal--0-0-0-0-m-0-iso10646-1
+-val-free courier-bold-r-normal--0-0-0-0-m-0-iso8859-1
+-val-free courier-bold-r-normal--0-0-0-0-m-0-iso8859-15
+-val-free courier-bold-r-normal--0-0-0-0-m-0-iso8859-2
+-val-free courier-bold-r-normal--0-0-0-0-m-0-iso8859-5
+-val-free courier-bold-r-normal--0-0-0-0-m-0-koi8-r
+-val-free courier-bold-r-normal--0-0-0-0-m-0-koi8-u
+-val-free courier-bold-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-val-free courier-medium-o-normal--0-0-0-0-m-0-iso10646-1
+-val-free courier-medium-o-normal--0-0-0-0-m-0-iso8859-1
+-val-free courier-medium-o-normal--0-0-0-0-m-0-iso8859-15
+-val-free courier-medium-o-normal--0-0-0-0-m-0-iso8859-2
+-val-free courier-medium-o-normal--0-0-0-0-m-0-iso8859-5
+-val-free courier-medium-o-normal--0-0-0-0-m-0-koi8-r
+-val-free courier-medium-o-normal--0-0-0-0-m-0-koi8-u
+-val-free courier-medium-o-normal--0-0-0-0-m-0-microsoft-cp1251
+-val-free courier-medium-r-normal--0-0-0-0-m-0-iso10646-1
+-val-free courier-medium-r-normal--0-0-0-0-m-0-iso8859-1
+-val-free courier-medium-r-normal--0-0-0-0-m-0-iso8859-15
+-val-free courier-medium-r-normal--0-0-0-0-m-0-iso8859-2
+-val-free courier-medium-r-normal--0-0-0-0-m-0-iso8859-5
+-val-free courier-medium-r-normal--0-0-0-0-m-0-koi8-r
+-val-free courier-medium-r-normal--0-0-0-0-m-0-koi8-u
+-val-free courier-medium-r-normal--0-0-0-0-m-0-microsoft-cp1251
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-iso10646-1
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-iso8859-1
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-iso8859-15
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-iso8859-2
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-iso8859-5
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-koi8-r
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-koi8-u
+-val-free helvetian condensed-bold-o-condensed--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-iso10646-1
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-iso8859-1
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-iso8859-15
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-iso8859-2
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-iso8859-5
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-koi8-r
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-koi8-u
+-val-free helvetian condensed-bold-r-condensed--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-iso10646-1
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-iso8859-1
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-iso8859-15
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-iso8859-2
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-iso8859-5
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-koi8-r
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-koi8-u
+-val-free helvetian condensed-medium-o-condensed--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-iso10646-1
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-iso8859-1
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-iso8859-15
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-iso8859-2
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-iso8859-5
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-koi8-r
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-koi8-u
+-val-free helvetian condensed-medium-r-condensed--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-iso10646-1
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-iso8859-1
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-iso8859-15
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-iso8859-2
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-iso8859-5
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-koi8-r
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-koi8-u
+-val-free helvetian-bold-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-koi8-r
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-koi8-u
+-val-free helvetian-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-iso10646-1
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-iso8859-1
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-iso8859-15
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-iso8859-2
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-iso8859-5
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-koi8-r
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-koi8-u
+-val-free helvetian-medium-o-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-koi8-u
+-val-free helvetian-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-koi8-r
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-koi8-u
+-val-free paladin-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-koi8-r
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-koi8-u
+-val-free paladin-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-koi8-r
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-koi8-u
+-val-free paladin-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-koi8-u
+-val-free paladin-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-koi8-r
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-koi8-u
+-val-free schoolbook-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-koi8-r
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-koi8-u
+-val-free schoolbook-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-koi8-r
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-koi8-u
+-val-free schoolbook-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-koi8-u
+-val-free schoolbook-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free times-bold-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free times-bold-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free times-bold-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free times-bold-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free times-bold-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free times-bold-i-normal--0-0-0-0-p-0-koi8-r
+-val-free times-bold-i-normal--0-0-0-0-p-0-koi8-u
+-val-free times-bold-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free times-bold-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free times-bold-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free times-bold-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free times-bold-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free times-bold-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free times-bold-r-normal--0-0-0-0-p-0-koi8-r
+-val-free times-bold-r-normal--0-0-0-0-p-0-koi8-u
+-val-free times-bold-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free times-medium-i-normal--0-0-0-0-p-0-iso10646-1
+-val-free times-medium-i-normal--0-0-0-0-p-0-iso8859-1
+-val-free times-medium-i-normal--0-0-0-0-p-0-iso8859-15
+-val-free times-medium-i-normal--0-0-0-0-p-0-iso8859-2
+-val-free times-medium-i-normal--0-0-0-0-p-0-iso8859-5
+-val-free times-medium-i-normal--0-0-0-0-p-0-koi8-r
+-val-free times-medium-i-normal--0-0-0-0-p-0-koi8-u
+-val-free times-medium-i-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-free times-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-free times-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-free times-medium-r-normal--0-0-0-0-p-0-iso8859-15
+-val-free times-medium-r-normal--0-0-0-0-p-0-iso8859-2
+-val-free times-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-free times-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-free times-medium-r-normal--0-0-0-0-p-0-koi8-u
+-val-free times-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+-val-oldslavic-medium-r-normal--0-0-0-0-p-0-iso10646-1
+-val-oldslavic-medium-r-normal--0-0-0-0-p-0-iso8859-1
+-val-oldslavic-medium-r-normal--0-0-0-0-p-0-iso8859-5
+-val-oldslavic-medium-r-normal--0-0-0-0-p-0-koi8-r
+-val-oldslavic-medium-r-normal--0-0-0-0-p-0-microsoft-cp1251
+10x20
+12x24
+12x24kana
+12x24romankana
+5x7
+5x8
+6x10
+6x12
+6x13
+6x13
+6x13bold
+6x9
+7x13
+7x13bold
+7x13euro
+7x13eurobold
+7x14
+7x14bold
+8x13
+8x13bold
+8x16
+8x16kana
+8x16romankana
+9x15
+9x15bold
+a14
+cursor
+cursor
+decw$cursor
+decw$session
+fixed
+fixed
+hanzigb16fs
+hanzigb16st
+hanzigb24st
+heb6x13
+heb8x13
+k14
+kana14
+kanji16
+kanji24
+micro
+nil2
+olcursor
+olglyph-10
+olglyph-12
+olglyph-14
+olglyph-19
+r14
+r16
+r24
+rk14
+rk16
+rk24

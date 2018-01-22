@@ -41,7 +41,7 @@ extern AlsaSequencer g_Sequencer;
 extern CursorKeys g_CursorKeys;
 extern State g_State;
 extern PatternStore g_PatternStore;
-extern Display g_Display;
+extern TextUI g_TextUI;
 extern ListBuilder g_ListBuilder;
 //extern TranslateTable * pTranslateTable;
 
@@ -504,16 +504,16 @@ bool do_command(string commandString)
             break;
 
         case C_PAGE_ONE:
-            g_Display.SetBigPanelPage(Display::one);
+            g_TextUI.SetBigPanelPage(TextUI::one);
             break;
         case C_PAGE_TWO:
-            g_Display.SetBigPanelPage(Display::two);
+            g_TextUI.SetBigPanelPage(TextUI::two);
             break;
         case C_PAGE_THREE:
-            g_Display.SetBigPanelPage(Display::three);
+            g_TextUI.SetBigPanelPage(TextUI::three);
             break;
         case C_PAGE_HOLD:
-            g_Display.ToggleBigPanelHold();
+            g_TextUI.ToggleBigPanelHold();
             break;
 
 

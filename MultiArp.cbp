@@ -14,6 +14,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
+					<Add directory="./" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -24,6 +25,7 @@
 				<Option parameters="This is -midi=6 the -step=4 title -midi=nonsense -midi=-7 -step=4.05 -step= -midi= -step=nonsense -step=0" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -66,6 +68,10 @@
 		<Unit filename="maAlsaSequencer.h" />
 		<Unit filename="maAlsaSequencerQueue.cpp" />
 		<Unit filename="maAlsaSequencerQueue.h" />
+		<Unit filename="maBaseUI.cpp" />
+		<Unit filename="maBaseUI.h" />
+		<Unit filename="maCairoUI.cpp" />
+		<Unit filename="maCairoUI.h" />
 		<Unit filename="maChainLink.cpp" />
 		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
@@ -88,6 +94,8 @@
 		<Unit filename="maScreen.h" />
 		<Unit filename="maState.cpp" />
 		<Unit filename="maState.h" />
+		<Unit filename="maTextUI.cpp" />
+		<Unit filename="maTextUI.h" />
 		<Unit filename="maTranslateTable.cpp" />
 		<Unit filename="maTranslateTable.h" />
 		<Unit filename="maTrigList.cpp" />

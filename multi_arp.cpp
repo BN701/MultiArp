@@ -34,9 +34,10 @@
 #include <ableton/Link.hpp>
 #include <csignal>
 //#include <unordered_map>
-#include <xcb/xcb.h>
-#include <xcb/xcb_keysyms.h>
-#include <cairo-xcb.h>
+
+//#include <xcb/xcb.h>
+//#include <xcb/xcb_keysyms.h>
+//#include <cairo-xcb.h>
 
 #define XK_MISCELLANY
 #define XK_XKB_KEYS
@@ -58,20 +59,20 @@
 using namespace std;
 
 
-typedef struct {
-    int width, height;
-    int scrno;
-    xcb_screen_t *screen;
-    xcb_connection_t *connection;
-    xcb_drawable_t window;
-    unsigned int white;
-    xcb_visualtype_t *visual;
+//typedef struct {
+//    int width, height;
+//    int scrno;
+//    xcb_screen_t *screen;
+//    xcb_connection_t *connection;
+//    xcb_drawable_t window;
+//    unsigned int white;
+//    xcb_visualtype_t *visual;
+//
+//    cairo_surface_t *surface;
+//    cairo_t *cr;
+//} xcb_Cairo_Window;
 
-    cairo_surface_t *surface;
-    cairo_t *cr;
-} xcb_Cairo_Window;
-
-xcb_Cairo_Window xcWindow;
+//xcb_Cairo_Window xcWindow;
 
 // Global Link instance.
 
@@ -86,103 +87,104 @@ PatternStore g_PatternStore;
 AlsaSequencer g_Sequencer;
 State g_State;
 
-xcb_key_symbols_t * g_xcbKeySymbols = NULL;
+//xcb_key_symbols_t * g_xcbKeySymbols = NULL;
 
 
 extern TextUI g_TextUI;
+extern CairoUI g_CairoUI;
 
-int gDeferStop = 0;
-#define ROWHEIGHT 0.04
-#define FONTHEIGHT 0.03
+int g_DeferStop = 0;
+//#define ROWHEIGHT 0.04
+//#define FONTHEIGHT 0.03
 
-vector<string> fontNames = { "Just Checking", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
-
-bool HasMonoFont(cairo_t * cr)
-{
-    cairo_text_extents_t te1, te2;
-
-    cairo_text_extents (cr, "....", &te1);
-    cairo_text_extents (cr, "WWWW", &te2);
-
-    return te2.x_advance - te1.x_advance < 0.000001;
-}
-
-bool FindMonoFont(cairo_t * cr)
-{
-    for ( auto name = fontNames.begin(); name != fontNames.end(); name++ )
-    {
-        cairo_select_font_face (cr, name->c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-        if ( HasMonoFont(cr) )
-            return true;
-    }
-    return false;
-}
-
-void drawUI_TextRow(xcb_connection_t *connection, cairo_surface_t *surface, int row, const char * text)
-{
-    cairo_t *cr = cairo_create(surface);
-
-	double x, y /*, px, ux=1, uy=1, dashlength */;
-
-	cairo_font_extents_t fe;
-//	cairo_text_extents_t te;
-
-	/* Example is in 26.0 x 1.0 coordinate space */
-	cairo_scale (cr, 500, 500);
-	cairo_set_font_size (cr, FONTHEIGHT);
-
-	FindMonoFont(cr);
-
-	/* Fill (clear) background rectangle */
-    cairo_set_source_rgb(cr, 1, 1, 0.9);
-	cairo_rectangle (cr, 0, row * ROWHEIGHT, 1.6, ROWHEIGHT);
-	cairo_fill (cr);
-
-//	/* Drawing code goes here */
-//	cairo_select_font_face (cr, "gobbledegook", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-//    status = cairo_status(cr);
+//vector<string> fontNames = { "Just Checking", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
 //
-//    cairo_font_face_t * toyFace = cairo_toy_font_face_create ("Inconsolate", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-//    cairo_font_face_t * fontFace = cairo_get_font_face (cr);
-//    cairo_scaled_font_t * scaledFace = cairo_get_scaled_font (cr);
+//bool HasMonoFont(cairo_t * cr)
+//{
+//    cairo_text_extents_t te1, te2;
 //
-//    cairo_set_font_face (cr,toyFace);
-//    cairo_font_type_t fontType = cairo_font_face_get_type (fontFace);
-//    cairo_status_t fontStatus = cairo_font_face_status (fontFace);
+//    cairo_text_extents (cr, "....", &te1);
+//    cairo_text_extents (cr, "WWWW", &te2);
 //
-//    const char * fontFamily = cairo_toy_font_face_get_family (fontFace); // Just returns the string we supplied via cairo_select_font_face();
-//    const char * toyFamily = cairo_toy_font_face_get_family (toyFace); // Just returns the string we supplied via cairo_select_font_face();
+//    return te2.x_advance - te1.x_advance < 0.000001;
+//}
 //
-//	cairo_font_extents (cr, &fe);
-
-//	cairo_device_to_user_distance (cr, &ux, &uy);
-//	if (ux > uy)
-//		px = ux;
-//	else
-//		px = uy;
-	cairo_font_extents (cr, &fe);
-//	cairo_text_extents (cr, text, &te);
-	x = 0.1; // - te.x_bearing - te.width / 2;
-	y = (1 + row) * ROWHEIGHT - fe.descent; // + fe.height / 2);
-
-	/* extents: width & height */
-//	cairo_set_source_rgba (cr, 1, 1, 0.9, 0);
-//	cairo_set_line_width (cr, px);
-//	dashlength = 3*px;
-//	cairo_set_dash (cr, &dashlength, 1, 0);
-//	cairo_rectangle (cr, x + te.x_bearing, y + te.y_bearing, te.width, te.height);
+//bool FindMonoFont(cairo_t * cr)
+//{
+//    for ( auto name = fontNames.begin(); name != fontNames.end(); name++ )
+//    {
+//        cairo_select_font_face (cr, name->c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+//        if ( HasMonoFont(cr) )
+//            return true;
+//    }
+//    return false;
+//}
+//
+//void drawUI_TextRow(xcb_connection_t *connection, cairo_surface_t *surface, int row, const char * text)
+//{
+//    cairo_t *cr = cairo_create(surface);
+//
+//	double x, y /*, px, ux=1, uy=1, dashlength */;
+//
+//	cairo_font_extents_t fe;
+////	cairo_text_extents_t te;
+//
+//	/* Example is in 26.0 x 1.0 coordinate space */
+//	cairo_scale (cr, 500, 500);
+//	cairo_set_font_size (cr, FONTHEIGHT);
+//
+//	FindMonoFont(cr);
+//
+//	/* Fill (clear) background rectangle */
+//    cairo_set_source_rgb(cr, 1, 1, 0.9);
+//	cairo_rectangle (cr, 0, row * ROWHEIGHT, 1.6, ROWHEIGHT);
 //	cairo_fill (cr);
-
-	/* text */
-	cairo_move_to (cr, x, y);
-	cairo_set_source_rgb (cr, 1, 0, 0);
-	cairo_show_text (cr, text);
-
-    cairo_surface_flush(surface);
-    cairo_destroy(cr);
-    xcb_flush(connection);
-}
-
+//
+////	/* Drawing code goes here */
+////	cairo_select_font_face (cr, "gobbledegook", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+////    status = cairo_status(cr);
+////
+////    cairo_font_face_t * toyFace = cairo_toy_font_face_create ("Inconsolate", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+////    cairo_font_face_t * fontFace = cairo_get_font_face (cr);
+////    cairo_scaled_font_t * scaledFace = cairo_get_scaled_font (cr);
+////
+////    cairo_set_font_face (cr,toyFace);
+////    cairo_font_type_t fontType = cairo_font_face_get_type (fontFace);
+////    cairo_status_t fontStatus = cairo_font_face_status (fontFace);
+////
+////    const char * fontFamily = cairo_toy_font_face_get_family (fontFace); // Just returns the string we supplied via cairo_select_font_face();
+////    const char * toyFamily = cairo_toy_font_face_get_family (toyFace); // Just returns the string we supplied via cairo_select_font_face();
+////
+////	cairo_font_extents (cr, &fe);
+//
+////	cairo_device_to_user_distance (cr, &ux, &uy);
+////	if (ux > uy)
+////		px = ux;
+////	else
+////		px = uy;
+//	cairo_font_extents (cr, &fe);
+////	cairo_text_extents (cr, text, &te);
+//	x = 0.1; // - te.x_bearing - te.width / 2;
+//	y = (1 + row) * ROWHEIGHT - fe.descent; // + fe.height / 2);
+//
+//	/* extents: width & height */
+////	cairo_set_source_rgba (cr, 1, 1, 0.9, 0);
+////	cairo_set_line_width (cr, px);
+////	dashlength = 3*px;
+////	cairo_set_dash (cr, &dashlength, 1, 0);
+////	cairo_rectangle (cr, x + te.x_bearing, y + te.y_bearing, te.width, te.height);
+////	cairo_fill (cr);
+//
+//	/* text */
+//	cairo_move_to (cr, x, y);
+//	cairo_set_source_rgb (cr, 1, 0, 0);
+//	cairo_show_text (cr, text);
+//
+//    cairo_surface_flush(surface);
+//    cairo_destroy(cr);
+//    xcb_flush(connection);
+//}
+//
 
 void do_UI_updates()
 {
@@ -218,7 +220,7 @@ void do_UI_updates()
                g_Sequencer.ScheduleTimeSeconds(),
                g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 
-    drawUI_TextRow(xcWindow.connection, xcWindow.surface, 5, text);
+//    drawUI_TextRow(xcWindow.connection, xcWindow.surface, 5, text);
 
     set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
                /*g_State.Phase(),*/
@@ -253,7 +255,7 @@ void do_phase0_updates()
     {
         if ( g_State.RunState() )
             g_PatternStore.ResetAllPatterns();
-        gDeferStop = g_State.DeferStop();
+        g_DeferStop = g_State.DeferStop();
     }
 
     if ( g_State.PatternReset() != RESET_NONE )
@@ -343,7 +345,7 @@ void queue_next_step(int queueId)
     TrigRepeater repeater;
     TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
 
-    if ( g_State.RunState() || gDeferStop-- > 0 )
+    if ( g_State.RunState() || g_DeferStop-- > 0 )
     {
         g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
         if ( g_ListBuilder.RealTimeRecord() )
@@ -817,17 +819,18 @@ string show_modifiers (uint32_t mask)
 }
 
 
-bool key_input_action_xcb(xcb_key_release_event_t *kr)
+bool key_input_action_xcb(uint8_t & keycode, uint16_t & state)
 {
     bool result = true;
 
     static string commandString;
 
-    xcb_keysym_t sym = xcb_key_symbols_get_keysym(g_xcbKeySymbols, kr->detail, kr->state);
-
     // Convert to the character IDs we've been using with ncurses. We may drop this at some point.
 
     CursorKeys::key_type_t curKey = CursorKeys::no_key;
+
+//    xcb_keysym_t sym = xcb_key_symbols_get_keysym(g_xcbKeySymbols, kr->detail, kr->state);
+    xcb_keysym_t sym = g_CairoUI.GetKeysym(keycode, state);
 
     if ( sym != 0 )
     {
@@ -850,12 +853,12 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
         try
         {
             // unsigned int lookup = (kr->state << 8) + kr->detail;
-            curKey = g_xcbKeycodeToCursorKey.at( (kr->state << 8) + kr->detail);
+            curKey = g_xcbKeycodeToCursorKey.at( (state << 8) + keycode);
         }
         catch(...)
         {
             // There's nothing here for us, so show some diagnostics and return.
-            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", kr->detail, kr->state, show_modifiers(kr->state).c_str());
+            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", keycode, state, show_modifiers(state).c_str());
             return true;
         }
     }
@@ -871,25 +874,28 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
     switch (sym)
     {
     case 0xE6: // Ctrl-A
-        move(COMMAND_HOME);
-        clrtoeol();
-        refresh();
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
         copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
+        set_status(COMMAND_HOME, "");
         break;
 
     case 0xA2:  // Ctrl-C, Copy
-        move(COMMAND_HOME);
-        clrtoeol();
-        refresh();
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
         copy_clipboard(g_PatternStore.EditPatternToString());
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
+        set_status(COMMAND_HOME, "");
         break;
 
     case 0xAD2: // Ctrl-V, Paste
-        move(COMMAND_HOME);
-        clrtoeol();
-        refresh();
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+        set_status(COMMAND_HOME, "");
         try
         {
             int created, updates;
@@ -910,7 +916,7 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
         {
             result = do_command(commandString);
             commandString.clear();
-            drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
+//            drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
         }
         else if ( g_ListBuilder.HandleKeybInput(10) )
         {
@@ -926,8 +932,9 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
         {
             show_status_after_navigation();
         }
-        move(COMMAND_HOME);
-        clrtoeol();
+//        move(COMMAND_HOME);
+//        clrtoeol();
+        set_status(COMMAND_HOME, "");
         break;
 
     case XK_space: // Space bar.
@@ -940,13 +947,13 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
         {
             commandString += sym;
             set_status(COMMAND_HOME, commandString.c_str());
-            move(COMMAND_HOME + commandString.size());
-            drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
+            place_cursor(COMMAND_HOME + commandString.size());
+//            drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
         }
         break;
 
     case XK_Tab:
-        move(COMMAND_HOME + commandString.size());
+        place_cursor(COMMAND_HOME + commandString.size());
         g_TextUI.NextBigPanelPage(1);
         break;
 
@@ -957,13 +964,13 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
     case XK_BackSpace:
         if ( commandString.size() > 0 )
             commandString.pop_back();
-        else if ( g_ListBuilder.HandleKeybInput(KEY_BACKSPACE) )
+        else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )
             show_listbuilder_status();
         else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
             show_status_after_navigation();
-        move(COMMAND_HOME + commandString.size());
-        clrtoeol(); // Assuming the cursor has been put back to correct location.
-        drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
+        set_status(COMMAND_HOME, commandString.c_str());
+        place_cursor(COMMAND_HOME + commandString.size());
+//        drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
         break;
 
     default:
@@ -972,8 +979,8 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
         {
             commandString += sym;
             set_status(COMMAND_HOME, commandString.c_str());
-            move(COMMAND_HOME + commandString.size());
-            drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
+            place_cursor(COMMAND_HOME + commandString.size());
+//            drawUI_TextRow(xcWindow.connection, xcWindow.surface, 2, commandString.c_str());
         }
         else if ( true )
         {
@@ -1009,13 +1016,13 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
             if ( xcb_is_modifier_key(sym) )
                 symbol += " modifier";
 
-            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), kr->detail, kr->state, show_modifiers(kr->state).c_str());
+            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), keycode, state, show_modifiers(state).c_str());
 
         }
         break;
     }
 
-    refresh();
+//    refresh();
 
     return result;
 }
@@ -1023,26 +1030,26 @@ bool key_input_action_xcb(xcb_key_release_event_t *kr)
 void sigterm_exit(int sig)
 {
 
-    endwin();
+//    endwin();
     exit(0);
 }
 
-static xcb_visualtype_t *find_visual(xcb_connection_t *c, xcb_visualid_t visual)
-{
-    xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator(xcb_get_setup(c));
-
-    for (; screen_iter.rem; xcb_screen_next(&screen_iter)) {
-        xcb_depth_iterator_t depth_iter = xcb_screen_allowed_depths_iterator(screen_iter.data);
-        for (; depth_iter.rem; xcb_depth_next(&depth_iter)) {
-            xcb_visualtype_iterator_t visual_iter = xcb_depth_visuals_iterator(depth_iter.data);
-            for (; visual_iter.rem; xcb_visualtype_next(&visual_iter))
-                if (visual == visual_iter.data->visual_id)
-                    return visual_iter.data;
-        }
-    }
-
-    return NULL;
-}
+//static xcb_visualtype_t *find_visual(xcb_connection_t *c, xcb_visualid_t visual)
+//{
+//    xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator(xcb_get_setup(c));
+//
+//    for (; screen_iter.rem; xcb_screen_next(&screen_iter)) {
+//        xcb_depth_iterator_t depth_iter = xcb_screen_allowed_depths_iterator(screen_iter.data);
+//        for (; depth_iter.rem; xcb_depth_next(&depth_iter)) {
+//            xcb_visualtype_iterator_t visual_iter = xcb_depth_visuals_iterator(depth_iter.data);
+//            for (; visual_iter.rem; xcb_visualtype_next(&visual_iter))
+//                if (visual == visual_iter.data->visual_id)
+//                    return visual_iter.data;
+//        }
+//    }
+//
+//    return NULL;
+//}
 
 void draw_something(cairo_surface_t *surface, cairo_t *cr)
 {
@@ -1144,114 +1151,115 @@ void draw_something(cairo_surface_t *surface, cairo_t *cr)
     cairo_surface_flush(surface);
 }
 
-bool xcbPollEvents(xcb_connection_t * connection, cairo_surface_t *surface, cairo_t *cr)
-{
-    bool result = true;
-
-    xcb_generic_event_t *event;
-    while ( (event = xcb_poll_for_event (connection)) ) {
-        char text[80];
-        sprintf(text, "X event: %i (Raw: %#0x)", event->response_type & ~0x80, event->response_type);
-        set_status(STAT_POS_2, text);
-        drawUI_TextRow(connection, surface, 3, text);
-        switch (event->response_type & ~0x80) {
-
-        case XCB_EXPOSE: {
-//            xcb_expose_event_t *expose = (xcb_expose_event_t *)event;
+//bool xcbPollEvents(xcb_connection_t * connection)
+//{
+//    bool result = true;
 //
-//            printf ("Window %" PRIu32 " exposed. Region to be redrawn at location (%" PRIu16 ",%" PRIu16 "), with dimension (%" PRIu16 ",%" PRIu16 ")\n",
-//                    expose->window, expose->x, expose->y, expose->width, expose->height );
-             /* Avoid extra redraws by checking if this is
-             * the last expose event in the sequence
-             */
-            if (((xcb_expose_event_t *) event)->count != 0)
-                break;
-
-//            drawUI(connection, surface, cr);
-//            draw_something(surface, cr);
-//            xcb_flush(connection);
-
-            break;
-        }
-//        case XCB_BUTTON_PRESS: {
-//            xcb_button_press_event_t *bp = (xcb_button_press_event_t *)event;
-//            print_modifiers (bp->state);
+//    xcb_generic_event_t *event;
+//    while ( (event = xcb_poll_for_event (connection)) ) {
+//        char text[80];
+//        snprintf(text, 80, "X event: %i (Raw: %#0x)", event->response_type & ~0x80, event->response_type);
+////        set_status(STAT_POS_2, text);
+////        drawUI_TextRow(connection, surface, 3, text);
+//        g_CairoUI.Text(BaseUI::whole_screen, 25, 0, text);
+//        switch (event->response_type & ~0x80) {
 //
-//            switch (bp->detail) {
-//            case 4:
-//                printf ("Wheel Button up in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                        bp->event, bp->event_x, bp->event_y );
+//        case XCB_EXPOSE: {
+////            xcb_expose_event_t *expose = (xcb_expose_event_t *)event;
+////
+////            printf ("Window %" PRIu32 " exposed. Region to be redrawn at location (%" PRIu16 ",%" PRIu16 "), with dimension (%" PRIu16 ",%" PRIu16 ")\n",
+////                    expose->window, expose->x, expose->y, expose->width, expose->height );
+//             /* Avoid extra redraws by checking if this is
+//             * the last expose event in the sequence
+//             */
+//            if (((xcb_expose_event_t *) event)->count != 0)
 //                break;
-//            case 5:
-//                printf ("Wheel Button down in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                        bp->event, bp->event_x, bp->event_y );
-//                break;
-//            default:
-//                printf ("Button %" PRIu8 " pressed in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                        bp->detail, bp->event, bp->event_x, bp->event_y );
-//                break;
+//
+////            drawUI(connection, surface, cr);
+////            draw_something(surface, cr);
+////            xcb_flush(connection);
+//
+//            break;
+//        }
+////        case XCB_BUTTON_PRESS: {
+////            xcb_button_press_event_t *bp = (xcb_button_press_event_t *)event;
+////            print_modifiers (bp->state);
+////
+////            switch (bp->detail) {
+////            case 4:
+////                printf ("Wheel Button up in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                        bp->event, bp->event_x, bp->event_y );
+////                break;
+////            case 5:
+////                printf ("Wheel Button down in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                        bp->event, bp->event_x, bp->event_y );
+////                break;
+////            default:
+////                printf ("Button %" PRIu8 " pressed in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                        bp->detail, bp->event, bp->event_x, bp->event_y );
+////                break;
+////            }
+////            break;
+////        }
+////        case XCB_BUTTON_RELEASE: {
+////            xcb_button_release_event_t *br = (xcb_button_release_event_t *)event;
+////            print_modifiers(br->state);
+////
+////            printf ("Button %" PRIu8 " released in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                    br->detail, br->event, br->event_x, br->event_y );
+////            break;
+////        }
+////        case XCB_MOTION_NOTIFY: {
+////            xcb_motion_notify_event_t *motion = (xcb_motion_notify_event_t *)event;
+////
+////            printf ("Mouse moved in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                    motion->event, motion->event_x, motion->event_y );
+////            break;
+////        }
+////        case XCB_ENTER_NOTIFY: {
+////            xcb_enter_notify_event_t *enter = (xcb_enter_notify_event_t *)event;
+////
+////            printf ("Mouse entered window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                    enter->event, enter->event_x, enter->event_y );
+////            break;
+////        }
+////        case XCB_LEAVE_NOTIFY: {
+////            xcb_leave_notify_event_t *leave = (xcb_leave_notify_event_t *)event;
+////
+////            printf ("Mouse left window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+////                    leave->event, leave->event_x, leave->event_y );
+////            break;
+////        }
+////        case XCB_KEY_PRESS: {
+////            xcb_key_press_event_t *kp = (xcb_key_press_event_t *)event;
+////            print_modifiers(kp->state);
+////
+////            printf ("Key pressed in window %" PRIu32 "\n",
+////                    kp->event);
+////            break;
+////        }
+////        case XCB_KEY_RELEASE:
+//        case XCB_KEY_PRESS:
+//            {
+//                xcb_key_release_event_t *kr = (xcb_key_release_event_t *) event;
+//                result = key_input_action_xcb(kr);
 //            }
 //            break;
-//        }
-//        case XCB_BUTTON_RELEASE: {
-//            xcb_button_release_event_t *br = (xcb_button_release_event_t *)event;
-//            print_modifiers(br->state);
 //
-//            printf ("Button %" PRIu8 " released in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    br->detail, br->event, br->event_x, br->event_y );
+//        default:
+////            /* Unknown event type, ignore it */
+////            printf ("Unknown event: %" PRIu8 "\n",
+////                    event->response_type);
+////            drawUI(connection, surface, cr);
 //            break;
 //        }
-//        case XCB_MOTION_NOTIFY: {
-//            xcb_motion_notify_event_t *motion = (xcb_motion_notify_event_t *)event;
 //
-//            printf ("Mouse moved in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    motion->event, motion->event_x, motion->event_y );
-//            break;
-//        }
-//        case XCB_ENTER_NOTIFY: {
-//            xcb_enter_notify_event_t *enter = (xcb_enter_notify_event_t *)event;
+//        free (event);
+//    }
 //
-//            printf ("Mouse entered window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    enter->event, enter->event_x, enter->event_y );
-//            break;
-//        }
-//        case XCB_LEAVE_NOTIFY: {
-//            xcb_leave_notify_event_t *leave = (xcb_leave_notify_event_t *)event;
+//    return result;
 //
-//            printf ("Mouse left window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    leave->event, leave->event_x, leave->event_y );
-//            break;
-//        }
-//        case XCB_KEY_PRESS: {
-//            xcb_key_press_event_t *kp = (xcb_key_press_event_t *)event;
-//            print_modifiers(kp->state);
-//
-//            printf ("Key pressed in window %" PRIu32 "\n",
-//                    kp->event);
-//            break;
-//        }
-//        case XCB_KEY_RELEASE:
-        case XCB_KEY_PRESS:
-            {
-                xcb_key_release_event_t *kr = (xcb_key_release_event_t *) event;
-                result = key_input_action_xcb(kr);
-            }
-            break;
-
-        default:
-//            /* Unknown event type, ignore it */
-//            printf ("Unknown event: %" PRIu8 "\n",
-//                    event->response_type);
-//            drawUI(connection, surface, cr);
-            break;
-        }
-
-        free (event);
-    }
-
-    return result;
-
-}
+//}
 
 //int windowHeight = 500;
 //int windowWidth = 800;
@@ -1287,80 +1295,80 @@ int main(int argc, char *argv[])
 //    cairo_t *cr;
 
     // Open the connection to the X server
-    xcWindow.connection = xcb_connect (NULL, &xcWindow.scrno);
-
-
-    // Get the first screen
-    const xcb_setup_t *setup = xcb_get_setup (xcWindow.connection);
-    xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator (setup);
-    xcWindow.screen = screen_iter.data;
-
-    xcWindow.width = 800;
-    xcWindow.height = 500;
-
-    /*
-        If we actually want to iterate through the screens, we do something like:
-
-        while ( screen_iter.rem > 0 )   // I guess 'rem' is remaining.
-        {
-            ... ;
-            xcb_screen_next(&screen_iter));
-        }
-     */
-
-    // Create the window
-    xcWindow.window    = xcb_generate_id (xcWindow.connection);
-
-    uint32_t     mask      = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    uint32_t     values[2] = {xcWindow.screen->white_pixel,
-                                XCB_EVENT_MASK_EXPOSURE       |
-                                XCB_EVENT_MASK_VISIBILITY_CHANGE |
-                                XCB_EVENT_MASK_FOCUS_CHANGE      |
-                                // XCB_EVENT_MASK_BUTTON_PRESS   |
-                                // XCB_EVENT_MASK_BUTTON_RELEASE |
-                                // XCB_EVENT_MASK_POINTER_MOTION |
-                                // XCB_EVENT_MASK_ENTER_WINDOW   |
-                                // XCB_EVENT_MASK_LEAVE_WINDOW   |
-                                XCB_EVENT_MASK_KEY_PRESS      |
-                                XCB_EVENT_MASK_KEY_RELEASE };
-
-    xcb_create_window (xcWindow.connection,
-//                       0,                             /* depth               */
-                       XCB_COPY_FROM_PARENT,                             /* depth               */
-                       xcWindow.window,
-                       xcWindow.screen->root,                  /* parent window       */
-                       20, 40,                          /* x, y                */
-                       xcWindow.width, xcWindow.height,     /* width, height       */
-                       10,                            /* border_width        */
-                       XCB_WINDOW_CLASS_INPUT_OUTPUT, /* class               */
-//                       xcWindow.screen->root_visual,           /* visual              */
-                       XCB_COPY_FROM_PARENT,           /* visual              */
-                       mask, values );                /* masks */
-
-    // Map the window on the screen
-    xcb_map_window (xcWindow.connection, xcWindow.window);
-
-    // Attach the Cairo surface to the Window.
-
-    xcWindow.visual = find_visual(xcWindow.connection, xcWindow.screen->root_visual);
-    if ( xcWindow.visual == NULL) {
-        fprintf(stderr, "Some weird internal error...?!");
-        xcb_disconnect(xcWindow.connection);
-        return 1;
-    }
-
-
-    // Flush ...
-
-    xcb_flush (xcWindow.connection);
-
-    xcWindow.surface = cairo_xcb_surface_create(xcWindow.connection, xcWindow.window, xcWindow.visual, xcWindow.width, xcWindow.height);
-    xcWindow.cr = cairo_create(xcWindow.surface);
-
-
+//    xcWindow.connection = xcb_connect (NULL, &xcWindow.scrno);
+//
+//
+//    // Get the first screen
+//    const xcb_setup_t *setup = xcb_get_setup (xcWindow.connection);
+//    xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator (setup);
+//    xcWindow.screen = screen_iter.data;
+//
+//    xcWindow.width = 800;
+//    xcWindow.height = 500;
+//
+//    /*
+//        If we actually want to iterate through the screens, we do something like:
+//
+//        while ( screen_iter.rem > 0 )   // I guess 'rem' is remaining.
+//        {
+//            ... ;
+//            xcb_screen_next(&screen_iter));
+//        }
+//     */
+//
+//    // Create the window
+//    xcWindow.window    = xcb_generate_id (xcWindow.connection);
+//
+//    uint32_t     mask      = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+//    uint32_t     values[2] = {xcWindow.screen->white_pixel,
+//                                XCB_EVENT_MASK_EXPOSURE       |
+//                                XCB_EVENT_MASK_VISIBILITY_CHANGE |
+//                                XCB_EVENT_MASK_FOCUS_CHANGE      |
+//                                // XCB_EVENT_MASK_BUTTON_PRESS   |
+//                                // XCB_EVENT_MASK_BUTTON_RELEASE |
+//                                // XCB_EVENT_MASK_POINTER_MOTION |
+//                                // XCB_EVENT_MASK_ENTER_WINDOW   |
+//                                // XCB_EVENT_MASK_LEAVE_WINDOW   |
+//                                XCB_EVENT_MASK_KEY_PRESS      |
+//                                XCB_EVENT_MASK_KEY_RELEASE };
+//
+//    xcb_create_window (xcWindow.connection,
+////                       0,                             /* depth               */
+//                       XCB_COPY_FROM_PARENT,                             /* depth               */
+//                       xcWindow.window,
+//                       xcWindow.screen->root,                  /* parent window       */
+//                       20, 40,                          /* x, y                */
+//                       xcWindow.width, xcWindow.height,     /* width, height       */
+//                       10,                            /* border_width        */
+//                       XCB_WINDOW_CLASS_INPUT_OUTPUT, /* class               */
+////                       xcWindow.screen->root_visual,           /* visual              */
+//                       XCB_COPY_FROM_PARENT,           /* visual              */
+//                       mask, values );                /* masks */
+//
+//    // Map the window on the screen
+//    xcb_map_window (xcWindow.connection, xcWindow.window);
+//
+//    // Attach the Cairo surface to the Window.
+//
+//    xcWindow.visual = find_visual(xcWindow.connection, xcWindow.screen->root_visual);
+//    if ( xcWindow.visual == NULL) {
+//        fprintf(stderr, "Some weird internal error...?!");
+//        xcb_disconnect(xcWindow.connection);
+//        return 1;
+//    }
+//
+//
+//    // Flush ...
+//
+//    xcb_flush (xcWindow.connection);
+//
+//    xcWindow.surface = cairo_xcb_surface_create(xcWindow.connection, xcWindow.window, xcWindow.visual, xcWindow.width, xcWindow.height);
+//    xcWindow.cr = cairo_create(xcWindow.surface);
+//
+//
 //    typedef struct _XCBKeySymbols xcb_key_symbols_t;
 //    xcb_key_symbols_get_keysym(connection);
-    g_xcbKeySymbols = xcb_key_symbols_alloc(xcWindow.connection);
+//    g_xcbKeySymbols = xcb_key_symbols_alloc(xcWindow.connection);
 
     /*
     * Set up polling ...
@@ -1373,7 +1381,7 @@ int main(int argc, char *argv[])
 
     int npfd = g_Sequencer.GetFileDescriptorCount();
     struct pollfd *pfd = (struct pollfd *)alloca((npfd + 1) * sizeof(struct pollfd));
-    pfd[0].fd = xcb_get_file_descriptor(xcWindow.connection);
+    pfd[0].fd = g_CairoUI.GetFileDescriptor();
     pfd[0].events = POLLIN;
     g_Sequencer.GetFileDescriptors(pfd + 1, npfd);
 
@@ -1390,7 +1398,14 @@ int main(int argc, char *argv[])
         if ( poll(pfd, npfd + 1, 10000) > 0 )
         {
             if ( pfd[0].revents & POLLIN )
-                keep_going = xcbPollEvents(xcWindow.connection, xcWindow.surface, xcWindow.cr);
+            {
+                uint8_t keycode;
+                uint16_t state;
+                bool keyDataValid = false;
+                keep_going = g_CairoUI.PollEvents(keyDataValid, keycode, state);
+                if ( keep_going && keyDataValid )
+                    keep_going = key_input_action_xcb(keycode, state);
+            }
             for ( int i = 1; i < npfd + 1; i++ )
             {
                 if ( pfd[i].revents > 0 )
@@ -1399,5 +1414,5 @@ int main(int argc, char *argv[])
         }
     }
 
-    xcb_key_symbols_free(g_xcbKeySymbols);
+//    xcb_key_symbols_free(g_xcbKeySymbols);
 }

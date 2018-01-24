@@ -26,20 +26,6 @@
 
 #include "maBaseUI.h"
 
-// Screen locations
-
-//#define COMMAND_HOME 6,4
-//#define STAT_POS_TOPLINE 0,0
-////#define STAT_POS_STEP g_TextUI.ProgressPanel(), 0,0
-//#define STAT_POS_STEP TextUI::progress_panel, 0,0
-////#define STAT_POS_PATTERN g_TextUI.SmallPanel(), 1,0
-//#define STAT_POS_PATTERN TextUI::small_panel, 1,0
-////#define STAT_POS_PATTERN_EDIT g_TextUI.SmallPanel(), 2,0
-//#define STAT_POS_PATTERN_EDIT TextUI::small_panel, 2,0
-//#define STAT_POS_2 5,4
-//#define STAT_POS_MENU 1,4
-
-
 class CairoUI : public BaseUI
 {
 public:

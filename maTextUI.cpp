@@ -26,33 +26,7 @@
 #include "maTextUI.h"
 #include "maTranslateTable.h"
 
-//#include "maAlsaSequencer.h"
-//#include "maAlsaSequencerQueue.h"
-//#include "maListBuilder.h"
-//#include "maPatternStore.h"
-//#include "maState.h"
-//#include "maTranslateTable.h"
-//#include "maUtility.h"
-
 using namespace std;
-
-//// Global ALSA Sequencer instance.
-//
-//extern AlsaSequencer g_Sequencer;
-//extern CursorKeys g_CursorKeys;
-//extern ListBuilder g_ListBuilder;
-//extern PatternStore g_PatternStore;
-//extern State g_State;
-//
-//TextUI g_TextUI;
-//
-// Additional colours beyond the basic eight that are defined
-// in ncurses.h. (Note the UK spelling to distinguish them from
-// the defaults, which aren't changed.)
-
-// (I haven't found documentation that says it's safe to use colour
-// definition numbers beyond the first 0..7. It just works, so I'm
-// using them for now.)
 
 #define COLOUR_GREEN        8
 #define COLOUR_RED          9
@@ -67,29 +41,6 @@ using namespace std;
 #define COLOUR_WHITE        19
 #define COLOUR_BLACK        20
 
-//// Color Pair uses
-//
-//enum colour_pairs
-//{
-//    CP_MAIN = 1,
-//    CP_PATTERN_LIST_PANEL,
-//    CP_PATTERN_LIST_PANEL_HIGHLIGHT,
-//    CP_PATTERN_LIST_PANEL_HIGHLIGHT_TRIG,
-//    CP_PIANO_WHITE_KEY,
-//    CP_PIANO_BLACK_KEY,
-//    CP_PROGRESS_BAR_HIGHLIGHT,
-//    CP_PROGRESS_BAR_BKGND,
-//    CP_SMALL_PANEL_BKGND,
-//    CP_SMALL_PANEL_2_BKGND,
-//    CP_PATTERN_CHAIN_HIGHLIGHT,
-//    CP_LIST_PANEL_BKGND,
-//    CP_SUMMARY_PANEL_BKGND,
-//    CP_MENU_HIGHLIGHT,
-//    CP_RUNNING,
-//    CP_RECORD,
-//    CP_REALTIME
-//};
-//
 
 TextUI::TextUI()
 {
@@ -289,8 +240,6 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
         attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
         mvprintw(row, col, barline.c_str());
         attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
-//        mvaddch(row, col + n, ACS_RARROW);
-//        mvaddch(row, col + n, '>');
         mvprintw(row, col + n, marker.c_str());
         break;
     case 2:
@@ -300,8 +249,6 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
         mvprintw(row, col + n, marker.c_str());
         break;
     default:
-//        move(row, col);
-//        clrtoeol();
         attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
         mvprintw(row, col, barline.c_str());
         attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));

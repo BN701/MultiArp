@@ -22,170 +22,24 @@
 
 #include "maTextUI.h"
 #include "maCairoUI.h"
-//#include <ncurses.h>
 
-//// Extra keys that aren't in ncurses.h
-//
-//#define KEY_INSERT  331
-//#define KEY_DELETE  330
-//#define KEY_SDELETE 383
-//#define KEY_CDELETE 519
-//#define KEY_CLEFT   545
-//#define KEY_CRIGHT  560
-//#define KEY_CUP     525
-//#define KEY_CDOWN   566
-//
-//#define KEY_CSLEFT   546
-//#define KEY_CSRIGHT  561
-//#define KEY_CSUP     567
-//#define KEY_CSDOWN   526
-//
-//#define KEY_ARIGHT  558
-//#define KEY_ALEFT   543
-//#define KEY_AUP     564
-//#define KEY_ADOWN   523
-//
-//#define KEY_ASRIGHT  559
-//#define KEY_ASLEFT   544
-//#define KEY_ASUP     565
-//#define KEY_ASDOWN   524
-//
-//#define KEY_SUP     337
-//#define KEY_SDOWN   336
-//
-//#define KEY_PGUP    339
-//#define KEY_PGDOWN  338
-//
-//#define KEY_SPGUP   398
-//#define KEY_SPGDOWN 396
-//
-//#define KEY_TAB     9
-//#define KEY_SHTAB    353 // "KEY_STAB", my preferred name, is already defined in /usr/include/curses.h as "0524", /* set-tab key */"
-//
-//
-//// These are no different to plain PGUP/PGDOWN
-//
-//#define KEY_CPGUP
-//#define KEY_CPGDOWN
-//
-//#define KEY_APGUP   553
-//#define KEY_APGDOWN 548
-//
 // Screen locations
 
-//#define COMMAND_HOME 6,4
-//#define STAT_POS_TOPLINE 0,0
-////#define STAT_POS_STEP g_TextUI.ProgressPanel(), 0,0
-//#define STAT_POS_STEP TextUI::progress_panel, 0,0
-////#define STAT_POS_PATTERN g_TextUI.SmallPanel(), 1,0
-//#define STAT_POS_PATTERN TextUI::small_panel, 1,0
-////#define STAT_POS_PATTERN_EDIT g_TextUI.SmallPanel(), 2,0
-//#define STAT_POS_PATTERN_EDIT TextUI::small_panel, 2,0
-//#define STAT_POS_2 5,4
-//#define STAT_POS_MENU 1,4
+// At the moment these are common to text and cairo UIs, so
+// maybe they should stay here.
 
-
-
-//class TextUI
-//{
-//public:
-//    enum window_area_t
-//    {
-//        whole_screen,          // Position relative to whole screen.
-//        big_panel,             // Botton half of screen, used for all sorts.
-//        small_panel,           // Pattern Status, or pattern chain. Under progress bar, to the left.
-//        progress_panel,        // Extra progress panel, to the right of Pattern Status
-//        edit_list_panel,       // Pattern List, under command line.
-//        edit_summary_panel,    // Pattern Summary, under command line to the right of Pattern List
-//        big_panel_extra        // Overwrites pattern list and summary when in Big Panel is in Page 3 mode.
-//   };
-//
-//    enum big_panel_page_t
-//    {
-//        one,
-//        two,
-//        three,
-//        num_big_panel_pages
-//    };
-//
-//    TextUI();
-//    ~TextUI();
-//
-//    void Text(window_area_t area, int row, int col, const char * text, int attribute = A_NORMAL);
-//
-//    void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
-//    void NextBigPanelPage( int direction );
-//    big_panel_page_t BigPanelPage() { return m_BigPanelPage; }
-//    void ToggleBigPanelHold() { m_BigPanelHold = ! m_BigPanelHold; }
-//    bool BigPanelHold() { return m_BigPanelHold; }
-//
-//    WINDOW *BigPanel() { return m_BigPanel; }
-//    WINDOW *BigPanelExtra() { return m_BigPanelExtra; }
-//    WINDOW *SmallPanel() { return m_SmallPanel; }
-//    WINDOW *ProgressPanel() { return m_ProgressPanel; }
-//    WINDOW *EditListPanel() { return m_EditListPanel; }
-//    WINDOW *EditSummaryPanel() { return m_EditSummaryPanel; }
-//
-//private:
-//    WINDOW * m_BigPanel = NULL;             // Botton half of screen, used for all sorts.
-//    WINDOW * m_SmallPanel = NULL;           // Pattern Status, or pattern chain. Under progress bar, to the left.
-//    WINDOW * m_ProgressPanel = NULL;        // Extra progress panel, to the right of Pattern Status
-//    WINDOW * m_EditListPanel = NULL;        // Pattern List, under command line.
-//    WINDOW * m_EditSummaryPanel = NULL;     // Pattern Summary, under command line to the right of Pattern List
-//    WINDOW * m_BigPanelExtra = NULL;        // Overwrites pattern list and summary when in Big Panel is in Page 3 mode.
-//
-//    big_panel_page_t m_BigPanelPage = one;
-//    bool m_BigPanelHold = false;
-//};
-//
-
-/*
-    This whole new variable args list thing is
-    apparently C++11. I've no idea how the template
-    statement works, it may as well be magic.
-
-    I found it here in one of the less popular answers, here:
-    https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
-
-    This page explicitly states that variadic templates are *not* magic (it's recursion):
-    https://eli.thegreenplace.net/2014/variadic-templates-in-c/
-
-    I get linker errors unless I define the body of the function here
-    in the header.
-
-    https://stackoverflow.com/questions/10632251/undefined-reference-to-template-function
- */
+#define COMMAND_HOME 6,4
+#define STAT_POS_TOPLINE 0,0
+#define STAT_POS_STEP TextUI::progress_panel, 0,0
+#define STAT_POS_PATTERN TextUI::small_panel, 1,0
+#define STAT_POS_PATTERN_EDIT TextUI::small_panel, 2,0
+#define STAT_POS_2 5,4
+#define STAT_POS_MENU 1,4
 
 void set_status(int y, int x, const char *format, ... );
 void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, ...);
 
 void place_cursor(int row, int col);
-
-//template<typename ... Args>
-//void set_status(int y, int x, const char *format, Args ... args)
-//{
-//    int scr_x, scr_y;
-//    attron(A_BOLD);			/* bold on */
-//    getyx(stdscr, scr_y, scr_x);
-//    mvprintw(y, x, format, args ...);
-//    clrtoeol();
-//    move(scr_y, scr_x);
-//    refresh();
-//    attroff(A_BOLD);			/* bold on */
-//}
-//
-
-//template<typename ... Args>
-//void set_status_w(WINDOW * w, int y, int x, const char *format, Args ... args)
-//{
-//    int scr_x, scr_y;
-//    getyx(stdscr, scr_y, scr_x);
-//    mvwprintw(w,y, x, format, args ...);
-//    wclrtoeol(w);
-//    wmove(stdscr, scr_y, scr_x);
-//    wrefresh(w);
-//    refresh();
-//}
 
 void highlight_pattern_panel();
 
@@ -201,8 +55,5 @@ void update_pattern_panel();
 void update_pattern_panel_2();
 void update_pattern_status_panel();
 void update_progress_bar();
-
-//void highlight(int base_row, int base_col, int ofs, int len, int attr, int colour = 0);
-
 
 #endif // MASCREEN_H_INCLUDED

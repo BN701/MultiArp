@@ -1,6 +1,6 @@
 //
 //    MultiArp - Another step in the Great Midi Adventure!
-//    Copyright (C) 2017  Barry Neilsen
+//    Copyright (C) 2017, 2018  Barry Neilsen
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ class TextUI : public BaseUI
         WINDOW * AreaToWindow(window_area_t area);
         int CursesAttribute(text_attribute_t attribute);
 
-        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = attr_normal );
+        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = attr_normal);
         void Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr = attr_normal);
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);

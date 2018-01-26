@@ -1,6 +1,6 @@
 //
 //    MultiArp - Another step in the Great Midi Adventure!
-//    Copyright (C) 2017  Barry Neilsen
+//    Copyright (C) 2017, 2018  Barry Neilsen
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class CairoUI : public BaseUI
 
         bool PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state);
 
-        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = BaseUI::attr_normal);
+        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = BaseUI::attr_normal, double scale = 1.0);
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
         virtual void Progress(double progress, double stepWidth, double beat, int pattern_progress);
 
@@ -47,11 +47,17 @@ class CairoUI : public BaseUI
         void Refresh(Rectangle & r, bool useDouble = false);
 
     private:
-        int m_Width = 800;
+        int m_Width = 800;          // These could be FP and we calculate pixel values on the fly.
         int m_Height = 500;
 
+        double m_Scale = 500;       // Cairo drawing uses FP maths, and a convention I picked up from
+                                    // one of the examples uses drawing area height = 1.0. We may end
+                                    // up with a different scale value for each UI element.
+
+        cairo_font_face_t * m_FontFace = NULL;
         double m_FontHeight = 0.03;
         double m_RowHeight = 0.04;
+        double m_CellWidth = 0.02;  // This gets reset when we find our font.
 
         xcb_connection_t * m_Connection;
         xcb_screen_t * m_Screen;

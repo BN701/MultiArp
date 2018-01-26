@@ -1,6 +1,6 @@
 //
 //    MultiArp - Another step in the Great Midi Adventure!
-//    Copyright (C) 2017  Barry Neilsen
+//    Copyright (C) 2017, 2018  Barry Neilsen
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 
 enum midi_input_modes_t
 {
-    MIDI_INPUT_OFF,
+    MIDI_INPUT_OFF = 0,
     MIDI_INPUT_QUICK,
     MIDI_INPUT_STEP,
     MIDI_INPUT_REAL_TIME,

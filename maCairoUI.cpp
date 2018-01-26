@@ -1,6 +1,6 @@
 //
 //    MultiArp - Another step in the Great Midi Adventure!
-//    Copyright (C) 2017  Barry Neilsen
+//    Copyright (C) 2017, 2018  Barry Neilsen
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -45,10 +45,32 @@ xcb_visualtype_t *find_visual(xcb_connection_t *c, xcb_visualid_t visual)
 }
 
 
+
+bool HasMonoFont(cairo_t * cr)
+{
+    cairo_text_extents_t te1, te2;
+
+    cairo_text_extents (cr, "....", &te1);
+    cairo_text_extents (cr, "WWWW", &te2);
+
+    return te2.x_advance - te1.x_advance < 0.000001;
+}
+vector<string> fontNames = { "Just Checking", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
+
+bool FindMonoFont(cairo_t * cr)
+{
+    for ( auto name = fontNames.begin(); name != fontNames.end(); name++ )
+    {
+        cairo_select_font_face (cr, name->c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+        if ( HasMonoFont(cr) )
+            return true;
+    }
+    return false;
+}
+
 CairoUI::CairoUI()
 {
     m_Connection = xcb_connect (NULL, &m_ScreenNo);
-
 
     // Get the first screen
 
@@ -104,16 +126,6 @@ CairoUI::CairoUI()
                                 // XCB_EVENT_MASK_PROPERTY_CHANGE |
                                 // XCB_EVENT_MASK_COLOR_MAP_CHANGE |
                                 // XCB_EVENT_MASK_OWNER_GRAB_BUTTON
-//                                XCB_EVENT_MASK_EXPOSURE       |
-//                                XCB_EVENT_MASK_VISIBILITY_CHANGE |
-//                                XCB_EVENT_MASK_FOCUS_CHANGE      |
-//                                // XCB_EVENT_MASK_BUTTON_PRESS   |
-//                                // XCB_EVENT_MASK_BUTTON_RELEASE |
-//                                // XCB_EVENT_MASK_POINTER_MOTION |
-//                                // XCB_EVENT_MASK_ENTER_WINDOW   |
-//                                // XCB_EVENT_MASK_LEAVE_WINDOW   |
-//                                XCB_EVENT_MASK_KEY_PRESS      |
-//                                XCB_EVENT_MASK_KEY_RELEASE
                              };
 
     xcb_create_window (m_Connection,
@@ -152,20 +164,47 @@ CairoUI::CairoUI()
 
     m_Visual = find_visual(m_Connection, m_Screen->root_visual);
     if ( m_Visual == NULL) {
-//        fprintf(stderr, "Some weird internal error...?!");
         xcb_disconnect(m_Connection);
         return;
     }
-
 
     // Flush ...
 
     xcb_flush (m_Connection);
 
     m_Surface = cairo_xcb_surface_create(m_Connection, m_Pixmap, m_Visual, m_Width, m_Height);
-//    xcWindow.cr = cairo_create(xcWindow.surface);
 
+    // Set up a general purpose monospace font for the UI, then we can set a base unit cell width and height.
+    // Perhaps, in a ideal world, we'd create the window using dimensions calculated from the font. However,
+    // we're only using Cairo 'toy fonts' we can't font extents until we have a context, which means we must
+    // already have a surface, which needs a window or a pixmap (which needs a window, anyway). Perhaps we
+    // can resize the window and pixmap after this and defer map_window() until the end.
 
+    vector<string> fontNames = { "Just Checking", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
+
+    cairo_t *cr = cairo_create(m_Surface);  // Although the context is "created with a ref count
+                                            // of one", it seems it won't persist indefinitely.
+                                            // Maybe I should try increasing the ref count so I can
+                                            // store the context in the class, here.
+
+    for ( auto name = fontNames.begin(); name != fontNames.end(); name++ )
+    {
+        m_FontFace = cairo_toy_font_face_create (name->c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+        cairo_set_font_face (cr, m_FontFace);
+        if ( HasMonoFont(cr) )
+        {
+            // Get cell dimensions, here.
+            cairo_set_font_size (cr, m_FontHeight);
+            cairo_font_extents_t fe;
+            cairo_font_extents (cr, &fe);
+            m_CellWidth = fe.max_x_advance;
+            break;
+        }
+        cairo_font_face_destroy (m_FontFace);
+        m_FontFace = NULL;
+    }
+
+    cairo_destroy(cr);
 
     m_KeySymbols = xcb_key_symbols_alloc(m_Connection);
 
@@ -248,142 +287,110 @@ bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
     gotKeyData = false;
 
     xcb_generic_event_t *event;
-    while ( (event = xcb_poll_for_event (m_Connection)) ) {
-        char text[80];
-        try
+    while ( (event = xcb_poll_for_event (m_Connection)) )
+    {
+        switch (event->response_type & ~0x80)
         {
-            snprintf(text, 80, "X event: %s (Raw: %#0x)", event_names.at(event->response_type & ~0x80), event->response_type);
-        }
-        catch( ... )
-        {
-            snprintf(text, 80, "X event: %i (Raw: %#0x)", event->response_type & ~0x80, event->response_type);
-        }
-//        Text(whole_screen, 20, 0, text);
-        switch (event->response_type & ~0x80) {
 
-        case XCB_EXPOSE: {
-//
-//            printf ("Window %" PRIu32 " exposed. Region to be redrawn at location (%" PRIu16 ",%" PRIu16 "), with dimension (%" PRIu16 ",%" PRIu16 ")\n",
-//                    expose->window, expose->x, expose->y, expose->width, expose->height );
-             /* Avoid extra redraws by checking if this is
-             * the last expose event in the sequence
-             */
+            case XCB_EXPOSE:
+            {
+                xcb_expose_event_t *ex = (xcb_expose_event_t *) event;
 
-            xcb_expose_event_t *ex = (xcb_expose_event_t *) event;
+                // Avoid extra redraws by checking if this is the last expose event in the sequence.
 
-            static int i = 1;
-            snprintf(text, 80, "X expose [%i]: x, y = %i, %i (%i x %i) ", i++, ex->x, ex->y, ex->width, ex->height);
-//            Text(whole_screen, 22, 0, text);
+                if (ex->count != 0)
+                    break;
 
-            if (ex->count != 0)
+                //  static int i = 1;
+                //  snprintf(text, 80, "X expose [%i]: x, y = %i, %i (%i x %i) ", i++, ex->x, ex->y, ex->width, ex->height);
+                //  Text(whole_screen, 22, 0, text);
+
+                Refresh(ex->x, ex->y, ex->width, ex->height);
+
                 break;
-
-            Refresh(ex->x, ex->y, ex->width, ex->height);
-
-//            drawUI(connection, surface, cr);
-//            draw_something(surface, cr);
-//            xcb_flush(connection);
-
-            break;
-        }
-//        case XCB_BUTTON_PRESS: {
-//            xcb_button_press_event_t *bp = (xcb_button_press_event_t *)event;
-//            print_modifiers (bp->state);
-//
-//            switch (bp->detail) {
-//            case 4:
-//                printf ("Wheel Button up in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                        bp->event, bp->event_x, bp->event_y );
-//                break;
-//            case 5:
-//                printf ("Wheel Button down in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                        bp->event, bp->event_x, bp->event_y );
-//                break;
-//            default:
-//                printf ("Button %" PRIu8 " pressed in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                        bp->detail, bp->event, bp->event_x, bp->event_y );
-//                break;
-//            }
-//            break;
-//        }
-//        case XCB_BUTTON_RELEASE: {
-//            xcb_button_release_event_t *br = (xcb_button_release_event_t *)event;
-//            print_modifiers(br->state);
-//
-//            printf ("Button %" PRIu8 " released in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    br->detail, br->event, br->event_x, br->event_y );
-//            break;
-//        }
-//        case XCB_MOTION_NOTIFY: {
-//            xcb_motion_notify_event_t *motion = (xcb_motion_notify_event_t *)event;
-//
-//            printf ("Mouse moved in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    motion->event, motion->event_x, motion->event_y );
-//            break;
-//        }
-//        case XCB_ENTER_NOTIFY: {
-//            xcb_enter_notify_event_t *enter = (xcb_enter_notify_event_t *)event;
-//
-//            printf ("Mouse entered window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    enter->event, enter->event_x, enter->event_y );
-//            break;
-//        }
-//        case XCB_LEAVE_NOTIFY: {
-//            xcb_leave_notify_event_t *leave = (xcb_leave_notify_event_t *)event;
-//
-//            printf ("Mouse left window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
-//                    leave->event, leave->event_x, leave->event_y );
-//            break;
-//        }
-//        case XCB_KEY_PRESS: {
-//            xcb_key_press_event_t *kp = (xcb_key_press_event_t *)event;
-//            print_modifiers(kp->state);
-//
-//            printf ("Key pressed in window %" PRIu32 "\n",
-//                    kp->event);
-//            break;
-//        }
-//        case XCB_KEY_RELEASE:
-        case XCB_KEY_PRESS:
+            }
+            //  case XCB_BUTTON_PRESS: {
+            //      xcb_button_press_event_t *bp = (xcb_button_press_event_t *)event;
+            //      print_modifiers (bp->state);
+            //
+            //      switch (bp->detail) {
+            //      case 4:
+            //          printf ("Wheel Button up in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //                  bp->event, bp->event_x, bp->event_y );
+            //          break;
+            //      case 5:
+            //          printf ("Wheel Button down in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //                  bp->event, bp->event_x, bp->event_y );
+            //          break;
+            //      default:
+            //          printf ("Button %" PRIu8 " pressed in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //                  bp->detail, bp->event, bp->event_x, bp->event_y );
+            //          break;
+            //      }
+            //      break;
+            //  }
+            //  case XCB_BUTTON_RELEASE: {
+            //      xcb_button_release_event_t *br = (xcb_button_release_event_t *)event;
+            //      print_modifiers(br->state);
+            //
+            //      printf ("Button %" PRIu8 " released in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //              br->detail, br->event, br->event_x, br->event_y );
+            //      break;
+            //  }
+            //  case XCB_MOTION_NOTIFY: {
+            //      xcb_motion_notify_event_t *motion = (xcb_motion_notify_event_t *)event;
+            //
+            //      printf ("Mouse moved in window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //              motion->event, motion->event_x, motion->event_y );
+            //      break;
+            //  }
+            //  case XCB_ENTER_NOTIFY: {
+            //      xcb_enter_notify_event_t *enter = (xcb_enter_notify_event_t *)event;
+            //
+            //      printf ("Mouse entered window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //              enter->event, enter->event_x, enter->event_y );
+            //      break;
+            //  }
+            //  case XCB_LEAVE_NOTIFY: {
+            //      xcb_leave_notify_event_t *leave = (xcb_leave_notify_event_t *)event;
+            //
+            //      printf ("Mouse left window %" PRIu32 ", at coordinates (%" PRIi16 ",%" PRIi16 ")\n",
+            //              leave->event, leave->event_x, leave->event_y );
+            //      break;
+            //  }
+            case XCB_KEY_PRESS:
             {
                 xcb_key_release_event_t *kr = (xcb_key_release_event_t *) event;
-//                result = key_input_action_xcb(kr);
                 gotKeyData = true;
                 keycode = kr->detail;
                 state = kr->state;
+                break;
             }
-            break;
 
-        case XCB_PROPERTY_NOTIFY:
+            case XCB_KEY_RELEASE:
+                break;
+
+            case XCB_NO_EXPOSURE:
+                // I can't find docs for this one, but we get a lot of them, seemingly
+                // after a text update, even though aren't registered to receive them.
+                // Trap them here so we can leave other event reporting turned on in
+                // the default block.
+                break;
+
+            default:
             {
-                xcb_property_notify_event_t *pn = (xcb_property_notify_event_t *) event;
-                snprintf(text, 80, "X property - atom: %i (%#0x), state: %i (%#0x)", pn->atom, pn->atom, pn->state, pn->state);
-//                try
-//                {
-//                    snprintf(text, 80, "X property: %s (Raw: %#0x)", event_names.at(event->response_type & ~0x80), event->response_type);
-//                }
-//                catch( ... )
-//                {
-//                    snprintf(text, 80, "X property: %i (Raw: %#0x)", pn->atom, pn->atom);
-//                }
-//                Text(whole_screen, 21, 0, text);
-                switch ( pn->atom)
+                char text[80];
+                try
                 {
-                    case 316:
-                        break;
-                    case 403:
-                        break;
-                    default:
-                        break;
+                    snprintf(text, 80, "X event: %s (Raw: %#0x)", event_names.at(event->response_type & ~0x80), event->response_type);
                 }
+                catch( ... )
+                {
+                    snprintf(text, 80, "X event: %i (Raw: %#0x)", event->response_type & ~0x80, event->response_type);
+                }
+                Text(whole_screen, 20, 0, text);
+                break;
             }
-            break;
-        default:
-//            /* Unknown event type, ignore it */
-//            printf ("Unknown event: %" PRIu8 "\n",
-//                    event->response_type);
-//            drawUI(connection, surface, cr);
-            break;
         }
 
         free (event);
@@ -393,31 +400,7 @@ bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
 }
 
 
-vector<string> fontNames = { "Just Checking", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
-
-bool HasMonoFont(cairo_t * cr)
-{
-    cairo_text_extents_t te1, te2;
-
-    cairo_text_extents (cr, "....", &te1);
-    cairo_text_extents (cr, "WWWW", &te2);
-
-    return te2.x_advance - te1.x_advance < 0.000001;
-}
-
-bool FindMonoFont(cairo_t * cr)
-{
-    for ( auto name = fontNames.begin(); name != fontNames.end(); name++ )
-    {
-        cairo_select_font_face (cr, name->c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-        if ( HasMonoFont(cr) )
-            return true;
-    }
-    return false;
-}
-
-void CairoUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
-//void drawUI_TextRow(xcb_connection_t *connection, cairo_surface_t *surface, int row, const char * text)
+void CairoUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute, double scale)
 {
 
     cairo_t *cr = cairo_create(m_Surface);
@@ -431,14 +414,16 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 	cairo_scale (cr, 500, 500);
 	cairo_set_font_size (cr, m_FontHeight);
 
-	FindMonoFont(cr);
+//	FindMonoFont(cr);
+
+    cairo_set_font_face(cr, m_FontFace);
 
 	Rectangle r(0.0, row * m_RowHeight, 1.6, m_RowHeight);
 
 	/* Fill (clear) background rectangle */
-    cairo_set_source_rgb(cr, 1, 1, 0.9);
-	cairo_rectangle (cr, r.m_dX, r.m_dY, r.m_dWidth, r.m_dHeight );
-	cairo_fill (cr);
+    cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
+    cairo_rectangle (cr, r.m_dX, r.m_dY, r.m_dWidth, r.m_dHeight );
+    cairo_fill (cr);
 
 //	/* Drawing code goes here */
 //	cairo_select_font_face (cr, "gobbledegook", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
@@ -477,7 +462,7 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 
 	/* text */
 	cairo_move_to (cr, x, y);
-	cairo_set_source_rgb (cr, 1, 0, 0);
+	cairo_set_source_rgb (cr, 0, 0.5, 1);
 	cairo_show_text (cr, text);
 
     cairo_surface_flush(m_Surface);
@@ -488,27 +473,82 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
     Refresh(r);
 }
 
-void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode)
+void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
 {
+    cairo_t *cr = cairo_create(m_Surface);
+
+
+	cairo_scale (cr, m_Scale, m_Scale);
+    cairo_set_font_face(cr, m_FontFace);
+	cairo_set_font_size (cr, m_FontHeight);
+
+    cairo_font_extents_t fe;
+	cairo_font_extents (cr, &fe);
+
+	Rectangle rAll(0.0, 0.0, 1.6, 2 * m_RowHeight);
+
+	// Fill (clear) background rectangle
+
+	switch ( midiInputMode )
+	{
+        case 1: // Quick
+        case 2: // Full
+            cairo_set_source_rgb(cr, 0.75, 0.3, 0.2);
+            break;
+        case 3: // Real time
+            cairo_set_source_rgb(cr, 0.75, 0, 0);
+            break;
+        default:
+            cairo_set_source_rgb(cr, 0.4, 0.4, 0.4);
+            break;
+    }
+
+    cairo_rectangle (cr, rAll.m_dX, rAll.m_dY, rAll.m_dWidth, rAll.m_dHeight );
+    cairo_fill (cr);
+
+    // Run state highlight
+
+    if ( runState != 0 )
+    {
+        cairo_set_source_rgb(cr, 0, 0.75, 0);
+        cairo_rectangle (cr, 61 * fe.max_x_advance, 0, 5 * fe.max_x_advance, m_RowHeight);
+        cairo_fill (cr);
+    }
+
+	double x, y /*, px, ux=1, uy=1, dashlength */;
+	x = 0; // - te.x_bearing - te.width / 2;
+	y = m_RowHeight; // + fe.height / 2);
+
+	cairo_set_source_rgb (cr, 1, 1, 1);
+
+	// Small row ..
     char text[100];
-    snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
+    snprintf(text, 100, " Midi      Step            Link Quantum           ",
+               //midiChannel,
+               stepValue,
+               quantum);
+	cairo_move_to (cr, x, y);
+	cairo_show_text (cr, text);
+
+    snprintf(text, 100, "   %02i   %5.2f       %5.2f  %s",
                midiChannel,
                stepValue,
                quantum,
-               runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
+               runState != 0 ? "RUN" : "Stop");
 
-    Text(BaseUI::whole_screen, 0, 0, text, BaseUI::attr_normal);
+	cairo_set_font_size (cr, 2 * m_FontHeight);
+	// cairo_font_extents (cr, &fe);
+	y = m_RowHeight + m_FontHeight - fe.descent;
+	cairo_move_to (cr, x, y);
+	cairo_show_text (cr, text);
 
-#if 0
-    vector<int> midiInputColour = {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME};
-    Highlight(BaseUI::whole_screen, 0, 0, 80,
-        midiInputColour.at(midiInputMode),  // Hmm ...
-        BaseUI::attr_bold);
+    cairo_surface_flush(m_Surface);
 
-    Highlight(BaseUI::whole_screen, 0, 60, 5,
-        runState != 0 ? CP_RUNNING : CP_MAIN,
-        BaseUI::attr_bold);
-#endif
+
+    cairo_destroy(cr);
+    rAll.ScaleD2I(m_Scale);
+    Refresh(rAll);
+
 }
 
 void CairoUI::Progress(double progress, double stepWidth, double beat, int pattern_progress)

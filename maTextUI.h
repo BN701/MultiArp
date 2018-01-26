@@ -115,6 +115,8 @@ class TextUI : public BaseUI
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
 
+        void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
+
         virtual void Progress(double progress, double stepWidth, double beat, int pattern_progress);
         void ShowNoteTransforms(std::vector<InOutPair> & pairs);
 

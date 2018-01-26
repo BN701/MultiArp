@@ -1,5 +1,15 @@
 #include "maBaseUI.h"
 
+#include <cmath>
+
+void Rectangle::ScaleD2I(double scale)
+{
+    m_iX = floor(m_dX * scale);
+    m_iY = floor(m_dY * scale);
+    m_iWidth = ceil(m_dWidth * scale);
+    m_iHeight = ceil(m_dHeight * scale);
+}
+
 BaseUI::BaseUI()
 {
     //ctor

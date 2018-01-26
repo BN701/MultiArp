@@ -28,38 +28,45 @@
 
 class CairoUI : public BaseUI
 {
-public:
-    CairoUI();
-    ~CairoUI();
+    public:
+        CairoUI();
+        ~CairoUI();
 
-    xcb_connection_t * Connection() { return m_Connection; }
+        xcb_connection_t * Connection() { return m_Connection; }
 
-    bool PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state);
+        bool PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state);
 
-    virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = BaseUI::attr_normal);
-    virtual void Progress(double progress, double stepWidth, double beat, int pattern_progress);
+        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = BaseUI::attr_normal);
+        void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
+        virtual void Progress(double progress, double stepWidth, double beat, int pattern_progress);
 
-    xcb_keysym_t GetKeysym(int detail, int state);
-    int GetFileDescriptor();
+        xcb_keysym_t GetKeysym(int detail, int state);
+        int GetFileDescriptor();
 
-private:
-    int m_Width = 800;
-    int m_Height = 500;
+        void Refresh(int x, int y, int width, int height);
+        void Refresh(Rectangle & r, bool useDouble = false);
 
-    double m_FontHeight = 0.03;
-    double m_RowHeight = 0.04;
+    private:
+        int m_Width = 800;
+        int m_Height = 500;
 
-    xcb_connection_t * m_Connection;
-    xcb_screen_t * m_Screen;
-    int m_ScreenNo;
-    xcb_drawable_t m_Window;
-    xcb_visualtype_t * m_Visual;
+        double m_FontHeight = 0.03;
+        double m_RowHeight = 0.04;
 
-    xcb_key_symbols_t * m_KeySymbols;
+        xcb_connection_t * m_Connection;
+        xcb_screen_t * m_Screen;
+        int m_ScreenNo;
+        xcb_drawable_t m_Window;
+        xcb_visualtype_t * m_Visual;
 
-    // Cairo surface.
+        xcb_gcontext_t m_gcPixmap;
+        xcb_pixmap_t m_Pixmap;
 
-    cairo_surface_t * m_Surface;
+        xcb_key_symbols_t * m_KeySymbols;
+
+        // Cairo surface.
+
+        cairo_surface_t * m_Surface;
 };
 
 #endif // MACAIROUI_H_INCLUDED

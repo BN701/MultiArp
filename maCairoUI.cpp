@@ -20,7 +20,9 @@
 
 #include "maCairoUI.h"
 
+#include <cmath>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
@@ -64,21 +66,55 @@ CairoUI::CairoUI()
         }
      */
 
-    // Create the window
+    // Create the IDs
+
+    m_gcPixmap = xcb_generate_id(m_Connection);
+    m_Pixmap = xcb_generate_id(m_Connection);
+
     m_Window    = xcb_generate_id (m_Connection);
 
-    uint32_t     mask      = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    uint32_t     values[2] = {m_Screen->white_pixel,
-                                XCB_EVENT_MASK_EXPOSURE       |
-                                XCB_EVENT_MASK_VISIBILITY_CHANGE |
-                                XCB_EVENT_MASK_FOCUS_CHANGE      |
-                                // XCB_EVENT_MASK_BUTTON_PRESS   |
+    // Create the window
+
+    uint32_t     mask      =    XCB_CW_BACK_PIXEL |
+                                XCB_CW_EVENT_MASK;
+    uint32_t     values[2] = {  m_Screen->white_pixel,                  // Back pixel
+                                // XCB_EVENT_MASK_NO_EVENT |
+                                XCB_EVENT_MASK_KEY_PRESS |
+                                // XCB_EVENT_MASK_KEY_RELEASE |
                                 // XCB_EVENT_MASK_BUTTON_RELEASE |
+                                // XCB_EVENT_MASK_BUTTON_PRESS |
+                                // XCB_EVENT_MASK_ENTER_WINDOW |
+                                // XCB_EVENT_MASK_LEAVE_WINDOW |
                                 // XCB_EVENT_MASK_POINTER_MOTION |
-                                // XCB_EVENT_MASK_ENTER_WINDOW   |
-                                // XCB_EVENT_MASK_LEAVE_WINDOW   |
-                                XCB_EVENT_MASK_KEY_PRESS      |
-                                XCB_EVENT_MASK_KEY_RELEASE };
+                                // XCB_EVENT_MASK_POINTER_MOTION_HINT |
+                                // XCB_EVENT_MASK_BUTTON_1_MOTION |
+                                // XCB_EVENT_MASK_BUTTON_2_MOTION |
+                                // XCB_EVENT_MASK_BUTTON_3_MOTION |
+                                // XCB_EVENT_MASK_BUTTON_4_MOTION |
+                                // XCB_EVENT_MASK_BUTTON_5_MOTION |
+                                // XCB_EVENT_MASK_BUTTON_MOTION |
+                                XCB_EVENT_MASK_KEYMAP_STATE |
+                                XCB_EVENT_MASK_EXPOSURE
+                                // XCB_EVENT_MASK_VISIBILITY_CHANGE |
+                                // XCB_EVENT_MASK_STRUCTURE_NOTIFY |
+                                // XCB_EVENT_MASK_RESIZE_REDIRECT |
+                                // XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                                // XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT |
+                                // XCB_EVENT_MASK_FOCUS_CHANGE |
+                                // XCB_EVENT_MASK_PROPERTY_CHANGE |
+                                // XCB_EVENT_MASK_COLOR_MAP_CHANGE |
+                                // XCB_EVENT_MASK_OWNER_GRAB_BUTTON
+//                                XCB_EVENT_MASK_EXPOSURE       |
+//                                XCB_EVENT_MASK_VISIBILITY_CHANGE |
+//                                XCB_EVENT_MASK_FOCUS_CHANGE      |
+//                                // XCB_EVENT_MASK_BUTTON_PRESS   |
+//                                // XCB_EVENT_MASK_BUTTON_RELEASE |
+//                                // XCB_EVENT_MASK_POINTER_MOTION |
+//                                // XCB_EVENT_MASK_ENTER_WINDOW   |
+//                                // XCB_EVENT_MASK_LEAVE_WINDOW   |
+//                                XCB_EVENT_MASK_KEY_PRESS      |
+//                                XCB_EVENT_MASK_KEY_RELEASE
+                             };
 
     xcb_create_window (m_Connection,
 //                       0,                             /* depth               */
@@ -92,6 +128,22 @@ CairoUI::CairoUI()
 //                       xcWindow.screen->root_visual,           /* visual              */
                        XCB_COPY_FROM_PARENT,           /* visual              */
                        mask, values );                /* masks */
+
+    // Create the offscreen buffer that we draw everything to.
+    xcb_create_pixmap(m_Connection, m_Screen->root_depth, m_Pixmap, m_Window, m_Width, m_Height);
+
+    // Create a graphics context for it (and XCB one, not a Cairo one).
+
+    uint32_t gcMask = XCB_GC_FOREGROUND | XCB_GC_BACKGROUND;
+    uint32_t gcValues[2];
+    gcValues[0] = m_Screen->white_pixel;
+    gcValues[1] = m_Screen->white_pixel;
+    xcb_create_gc(m_Connection, m_gcPixmap, m_Pixmap, gcMask, gcValues);
+
+    // Fill the screen.
+
+    xcb_rectangle_t rects[] = {{ 0, 0, (uint16_t) m_Width, (uint16_t) m_Height}};
+    xcb_poly_fill_rectangle(m_Connection, m_Pixmap, m_gcPixmap, 1, rects);
 
     // Map the window on the screen
     xcb_map_window (m_Connection, m_Window);
@@ -110,7 +162,7 @@ CairoUI::CairoUI()
 
     xcb_flush (m_Connection);
 
-    m_Surface = cairo_xcb_surface_create(m_Connection, m_Window, m_Visual, m_Width, m_Height);
+    m_Surface = cairo_xcb_surface_create(m_Connection, m_Pixmap, m_Visual, m_Width, m_Height);
 //    xcWindow.cr = cairo_create(xcWindow.surface);
 
 
@@ -123,6 +175,7 @@ CairoUI::CairoUI()
 CairoUI::~CairoUI()
 {
     xcb_key_symbols_free(m_KeySymbols);
+    xcb_free_pixmap(m_Connection, m_Pixmap);
     xcb_disconnect(m_Connection);
 }
 
@@ -136,6 +189,59 @@ int CairoUI::GetFileDescriptor()
     return xcb_get_file_descriptor(m_Connection);
 }
 
+void CairoUI::Refresh(int x, int y, int width, int height)
+{
+    xcb_copy_area(m_Connection, m_Pixmap, m_Window, m_gcPixmap, x, y, x, y, width, height);
+    xcb_flush(m_Connection);
+}
+
+void CairoUI::Refresh(Rectangle & r, bool useDouble)
+{
+    if ( !useDouble && (r.m_iWidth != 0 || r.m_iHeight != 0) )
+        Refresh(r.m_iX, r.m_iY, r.m_iWidth, r.m_iHeight);
+    else
+        Refresh(floor(r.m_dX), floor(r.m_dY), ceil(r.m_dWidth), ceil(r.m_dHeight));
+
+};
+
+unordered_map<int, const char *> event_names =
+{
+    {XCB_KEY_PRESS, "XCB_KEY_PRESS"},
+    {XCB_KEY_RELEASE, "XCB_KEY_RELEASE"},
+    {XCB_BUTTON_PRESS, "XCB_BUTTON_PRESS"},
+    {XCB_BUTTON_RELEASE, "XCB_BUTTON_RELEASE"},
+    {XCB_MOTION_NOTIFY, "XCB_MOTION_NOTIFY"},
+    {XCB_ENTER_NOTIFY, "XCB_ENTER_NOTIFY"},
+    {XCB_LEAVE_NOTIFY, "XCB_LEAVE_NOTIFY"},
+    {XCB_FOCUS_IN, "XCB_FOCUS_IN"},
+    {XCB_FOCUS_OUT, "XCB_FOCUS_OUT"},
+    {XCB_KEYMAP_NOTIFY, "XCB_KEYMAP_NOTIFY"},
+    {XCB_EXPOSE, "XCB_EXPOSE"},
+    {XCB_GRAPHICS_EXPOSURE, "XCB_GRAPHICS_EXPOSURE"},
+    {XCB_NO_EXPOSURE, "XCB_NO_EXPOSURE"},
+    {XCB_VISIBILITY_NOTIFY, "XCB_VISIBILITY_NOTIFY"},
+    {XCB_CREATE_NOTIFY, "XCB_CREATE_NOTIFY"},
+    {XCB_DESTROY_NOTIFY, "XCB_DESTROY_NOTIFY"},
+    {XCB_UNMAP_NOTIFY, "XCB_UNMAP_NOTIFY"},
+    {XCB_MAP_NOTIFY, "XCB_MAP_NOTIFY"},
+    {XCB_MAP_REQUEST, "XCB_MAP_REQUEST"},
+    {XCB_REPARENT_NOTIFY, "XCB_REPARENT_NOTIFY"},
+    {XCB_CONFIGURE_NOTIFY, "XCB_CONFIGURE_NOTIFY"},
+    {XCB_CONFIGURE_REQUEST, "XCB_CONFIGURE_REQUEST"},
+    {XCB_GRAVITY_NOTIFY, "XCB_GRAVITY_NOTIFY"},
+    {XCB_RESIZE_REQUEST, "XCB_RESIZE_REQUEST"},
+    {XCB_CIRCULATE_NOTIFY, "XCB_CIRCULATE_NOTIFY"},
+    {XCB_CIRCULATE_REQUEST, "XCB_CIRCULATE_REQUEST"},
+    {XCB_PROPERTY_NOTIFY, "XCB_PROPERTY_NOTIFY"},
+    {XCB_SELECTION_CLEAR, "XCB_SELECTION_CLEAR"},
+    {XCB_SELECTION_REQUEST, "XCB_SELECTION_REQUEST"},
+    {XCB_SELECTION_NOTIFY, "XCB_SELECTION_NOTIFY"},
+    {XCB_COLORMAP_NOTIFY, "XCB_COLORMAP_NOTIFY"},
+    {XCB_CLIENT_MESSAGE, "XCB_CLIENT_MESSAGE"},
+    {XCB_MAPPING_NOTIFY, "XCB_MAPPING_NOTIFY"},
+    {XCB_GE_GENERIC, "XCB_GE_GENERIC"}
+};
+
 bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
 {
     bool result = true;
@@ -144,22 +250,35 @@ bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
     xcb_generic_event_t *event;
     while ( (event = xcb_poll_for_event (m_Connection)) ) {
         char text[80];
-        snprintf(text, 80, "X event: %i (Raw: %#0x)", event->response_type & ~0x80, event->response_type);
-//        set_status(STAT_POS_2, text);
-//        drawUI_TextRow(connection, surface, 3, text);
-        Text(whole_screen, 25, 0, text);
+        try
+        {
+            snprintf(text, 80, "X event: %s (Raw: %#0x)", event_names.at(event->response_type & ~0x80), event->response_type);
+        }
+        catch( ... )
+        {
+            snprintf(text, 80, "X event: %i (Raw: %#0x)", event->response_type & ~0x80, event->response_type);
+        }
+//        Text(whole_screen, 20, 0, text);
         switch (event->response_type & ~0x80) {
 
         case XCB_EXPOSE: {
-//            xcb_expose_event_t *expose = (xcb_expose_event_t *)event;
 //
 //            printf ("Window %" PRIu32 " exposed. Region to be redrawn at location (%" PRIu16 ",%" PRIu16 "), with dimension (%" PRIu16 ",%" PRIu16 ")\n",
 //                    expose->window, expose->x, expose->y, expose->width, expose->height );
              /* Avoid extra redraws by checking if this is
              * the last expose event in the sequence
              */
-            if (((xcb_expose_event_t *) event)->count != 0)
+
+            xcb_expose_event_t *ex = (xcb_expose_event_t *) event;
+
+            static int i = 1;
+            snprintf(text, 80, "X expose [%i]: x, y = %i, %i (%i x %i) ", i++, ex->x, ex->y, ex->width, ex->height);
+//            Text(whole_screen, 22, 0, text);
+
+            if (ex->count != 0)
                 break;
+
+            Refresh(ex->x, ex->y, ex->width, ex->height);
 
 //            drawUI(connection, surface, cr);
 //            draw_something(surface, cr);
@@ -235,6 +354,30 @@ bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
             }
             break;
 
+        case XCB_PROPERTY_NOTIFY:
+            {
+                xcb_property_notify_event_t *pn = (xcb_property_notify_event_t *) event;
+                snprintf(text, 80, "X property - atom: %i (%#0x), state: %i (%#0x)", pn->atom, pn->atom, pn->state, pn->state);
+//                try
+//                {
+//                    snprintf(text, 80, "X property: %s (Raw: %#0x)", event_names.at(event->response_type & ~0x80), event->response_type);
+//                }
+//                catch( ... )
+//                {
+//                    snprintf(text, 80, "X property: %i (Raw: %#0x)", pn->atom, pn->atom);
+//                }
+//                Text(whole_screen, 21, 0, text);
+                switch ( pn->atom)
+                {
+                    case 316:
+                        break;
+                    case 403:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
         default:
 //            /* Unknown event type, ignore it */
 //            printf ("Unknown event: %" PRIu8 "\n",
@@ -276,6 +419,7 @@ bool FindMonoFont(cairo_t * cr)
 void CairoUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
 //void drawUI_TextRow(xcb_connection_t *connection, cairo_surface_t *surface, int row, const char * text)
 {
+
     cairo_t *cr = cairo_create(m_Surface);
 
 	double x, y /*, px, ux=1, uy=1, dashlength */;
@@ -289,9 +433,11 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 
 	FindMonoFont(cr);
 
+	Rectangle r(0.0, row * m_RowHeight, 1.6, m_RowHeight);
+
 	/* Fill (clear) background rectangle */
     cairo_set_source_rgb(cr, 1, 1, 0.9);
-	cairo_rectangle (cr, 0, row * m_RowHeight, 1.6, m_RowHeight);
+	cairo_rectangle (cr, r.m_dX, r.m_dY, r.m_dWidth, r.m_dHeight );
 	cairo_fill (cr);
 
 //	/* Drawing code goes here */
@@ -335,10 +481,35 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 	cairo_show_text (cr, text);
 
     cairo_surface_flush(m_Surface);
+
     cairo_destroy(cr);
-    xcb_flush(m_Connection);
+//    xcb_flush(m_Connection);
+    r.ScaleD2I(500);
+    Refresh(r);
 }
 
+void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode)
+{
+    char text[100];
+    snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
+               midiChannel,
+               stepValue,
+               quantum,
+               runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
+
+    Text(BaseUI::whole_screen, 0, 0, text, BaseUI::attr_normal);
+
+#if 0
+    vector<int> midiInputColour = {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME};
+    Highlight(BaseUI::whole_screen, 0, 0, 80,
+        midiInputColour.at(midiInputMode),  // Hmm ...
+        BaseUI::attr_bold);
+
+    Highlight(BaseUI::whole_screen, 0, 60, 5,
+        runState != 0 ? CP_RUNNING : CP_MAIN,
+        BaseUI::attr_bold);
+#endif
+}
 
 void CairoUI::Progress(double progress, double stepWidth, double beat, int pattern_progress)
 {

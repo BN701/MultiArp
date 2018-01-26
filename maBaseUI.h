@@ -1,8 +1,39 @@
 #ifndef BASEUI_H
 #define BASEUI_H
 
+//#include "maListBuilder.h"
+
 struct InOutPair;
 
+class Rectangle
+{
+    public:
+        int m_iX = 0;
+        int m_iY = 0;
+        int m_iWidth = 0;
+        int m_iHeight = 0;
+
+        double m_dX = 0;
+        double m_dY = 0;
+        double m_dWidth = 0;
+        double m_dHeight = 0;
+
+    Rectangle(int x, int y, int width, int height):
+        m_iX(x),
+        m_iY(y),
+        m_iWidth(width),
+        m_iHeight(height)
+    {};
+
+    Rectangle(double x, double y, double width, double height):
+        m_dX(x),
+        m_dY(y),
+        m_dWidth(width),
+        m_dHeight(height)
+    {};
+
+    void ScaleD2I(double scale = 1.0);
+};
 
 class BaseUI
 {
@@ -40,6 +71,7 @@ class BaseUI
 
         virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute) = 0;
 
+        virtual void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode) = 0;
         virtual void Progress(double progress, double width, double beat, int pattern_progress) = 0;
 
         void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }

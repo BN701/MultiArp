@@ -77,18 +77,31 @@ void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, 
 
 void set_top_line()
 {
-    set_status(STAT_POS_TOPLINE, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
-               g_Sequencer.MidiChannel() + 1,
-               g_State.CurrentStepValue(),
-               g_State.Quantum(),
-               g_State.RunState() ? "<<   RUN   >>" : "<<   ---   >>");
+    g_TextUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
+                        g_State.CurrentStepValue(),
+                        g_State.Quantum(),
+                        g_State.RunState(),
+                        g_ListBuilder.MidiInputMode() );
 
-    g_TextUI.Highlight(BaseUI::whole_screen, 0, 0, 80,
-        g_ListBuilder.MidiInputModeAsColour(vector<int> {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME}),  // Hmm ...
-        BaseUI::attr_bold);
-    g_TextUI.Highlight(BaseUI::whole_screen, 0, 60, 5,
-        g_State.RunState() ? CP_RUNNING : CP_MAIN,
-        BaseUI::attr_bold);
+    g_CairoUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
+                        g_State.CurrentStepValue(),
+                        g_State.Quantum(),
+                        g_State.RunState(),
+                        g_ListBuilder.MidiInputMode() );
+
+//    set_status(STAT_POS_TOPLINE, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
+//               g_Sequencer.MidiChannel() + 1,
+//               g_State.CurrentStepValue(),
+//               g_State.Quantum(),
+//               g_State.RunState() ? "<<   RUN   >>" : "<<   ---   >>");
+//
+//    g_TextUI.Highlight(BaseUI::whole_screen, 0, 0, 80,
+//        g_ListBuilder.MidiInputModeAsColour(vector<int> {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME}),  // Hmm ...
+//        BaseUI::attr_bold);
+//
+//    g_TextUI.Highlight(BaseUI::whole_screen, 0, 60, 5,
+//        g_State.RunState() ? CP_RUNNING : CP_MAIN,
+//        BaseUI::attr_bold);
 }
 
 void update_progress_bar()

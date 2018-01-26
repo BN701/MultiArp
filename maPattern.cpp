@@ -17,13 +17,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "maListBuilder.h"
+#include "maListBuilder.h"  // Listbuilder is used for midi file import.
 #include "maPattern.h"
 
 #include "MidiFile.h"
 
-
+#include <cmath>
 #include <cstring>
+#include <numeric>
 #include <unordered_map>
 
 #include "maUtility.h"

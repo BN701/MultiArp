@@ -402,3 +402,27 @@ void TextUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 
     wrefresh(panel);
 }
+
+
+void TextUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
+{
+    char text[100];
+    snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
+               midiChannel,
+               stepValue,
+               quantum,
+               runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
+
+    Text(BaseUI::whole_screen, 0, 0, text, BaseUI::attr_normal);
+
+    vector<int> midiInputColour = {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME};
+    Highlight(BaseUI::whole_screen, 0, 0, 80,
+        midiInputColour.at(midiInputMode),  // Hmm ...
+        BaseUI::attr_bold);
+
+    Highlight(BaseUI::whole_screen, 0, 60, 5,
+        runState != 0 ? CP_RUNNING : CP_MAIN,
+        BaseUI::attr_bold);
+
+}
+

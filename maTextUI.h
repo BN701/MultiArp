@@ -117,7 +117,8 @@ class TextUI : public BaseUI
 
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
 
-        virtual void Progress(double progress, double stepWidth, double beat, int pattern_progress);
+        virtual void Progress(double progress, double stepWidth, double beat,
+                int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano);
         void ShowNoteTransforms(std::vector<InOutPair> & pairs);
 
     private:

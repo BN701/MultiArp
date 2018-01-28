@@ -72,7 +72,8 @@ class BaseUI
 //        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute, double scale) = 0;
 
         virtual void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode) = 0;
-        virtual void Progress(double progress, double width, double beat, int pattern_progress) = 0;
+        virtual void Progress(double progress, double stepWidth, double beat,
+            int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano) = 0;
 
         void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
         void NextBigPanelPage( int direction );

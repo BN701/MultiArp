@@ -180,24 +180,26 @@ CairoUI::CairoUI()
     // already have a surface, which needs a window or a pixmap (which needs a window, anyway). Perhaps we
     // can resize the window and pixmap after this and defer map_window() until the end.
 
-    vector<string> fontNames = { "Just Checking", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
+    vector<string> fontNames = { "sans", "Noto Mono", "Inconsolata", "Dejavu Sans Mono", "Ubuntu Mono", "monospace", "" };
 
     cairo_t *cr = cairo_create(m_Surface);  // Although the context is "created with a ref count
                                             // of one", it seems it won't persist indefinitely.
                                             // Maybe I should try increasing the ref count so I can
                                             // store the context in the class, here.
 
+    cairo_scale (cr, m_Scale, m_Scale);
+
     for ( auto name = fontNames.begin(); name != fontNames.end(); name++ )
     {
         m_FontFace = cairo_toy_font_face_create (name->c_str(), CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
         cairo_set_font_face (cr, m_FontFace);
-        if ( HasMonoFont(cr) )
+        if ( true || HasMonoFont(cr) )
         {
             // Get cell dimensions, here.
-            cairo_set_font_size (cr, m_FontHeight);
-            cairo_font_extents_t fe;
-            cairo_font_extents (cr, &fe);
-            m_CellWidth = fe.max_x_advance;
+//            cairo_set_font_size (cr, m_FontHeight);
+//            cairo_font_extents_t fe;
+//            cairo_font_extents (cr, &fe);
+//            m_CellWidth = fe.max_x_advance;
             break;
         }
         cairo_font_face_destroy (m_FontFace);
@@ -418,7 +420,7 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 
     cairo_set_font_face(cr, m_FontFace);
 
-	Rectangle r(0.0, row * m_RowHeight, 1.6, m_RowHeight);
+	Rectangle r(0.0, row * m_GridSize, 26 * m_GridSize, m_GridSize);
 
 	/* Fill (clear) background rectangle */
     cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
@@ -450,7 +452,7 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 	cairo_font_extents (cr, &fe);
 //	cairo_text_extents (cr, text, &te);
 	x = 0.1; // - te.x_bearing - te.width / 2;
-	y = (1 + row) * m_RowHeight - fe.descent; // + fe.height / 2);
+	y = (1 + row) * m_GridSize - fe.descent; // + fe.height / 2);
 
 	/* extents: width & height */
 //	cairo_set_source_rgba (cr, 1, 1, 0.9, 0);
@@ -475,8 +477,9 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 
 void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
 {
-    cairo_t *cr = cairo_create(m_Surface);
+	Rectangle rUpdate(0.0, 0.0, m_GridSize * 27, 2 * m_GridSize);
 
+    cairo_t *cr = cairo_create(m_Surface);
 
 	cairo_scale (cr, m_Scale, m_Scale);
     cairo_set_font_face(cr, m_FontFace);
@@ -485,7 +488,6 @@ void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int 
     cairo_font_extents_t fe;
 	cairo_font_extents (cr, &fe);
 
-	Rectangle rAll(0.0, 0.0, 1.6, 2 * m_RowHeight);
 
 	// Fill (clear) background rectangle
 
@@ -503,55 +505,226 @@ void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int 
             break;
     }
 
-    cairo_rectangle (cr, rAll.m_dX, rAll.m_dY, rAll.m_dWidth, rAll.m_dHeight );
+    cairo_rectangle (cr, rUpdate.m_dX, rUpdate.m_dY, rUpdate.m_dWidth, rUpdate.m_dHeight );
     cairo_fill (cr);
 
     // Run state highlight
 
     if ( runState != 0 )
-    {
         cairo_set_source_rgb(cr, 0, 0.75, 0);
-        cairo_rectangle (cr, 61 * fe.max_x_advance, 0, 5 * fe.max_x_advance, m_RowHeight);
-        cairo_fill (cr);
-    }
+    else
+        cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);
+    cairo_rectangle (cr, 23 * m_GridSize, 0, 3 * m_GridSize, 2 * m_GridSize);
+    cairo_fill (cr);
 
-	double x, y /*, px, ux=1, uy=1, dashlength */;
-	x = 0; // - te.x_bearing - te.width / 2;
-	y = m_RowHeight; // + fe.height / 2);
-
+    cairo_text_extents_t te;
 	cairo_set_source_rgb (cr, 1, 1, 1);
 
-	// Small row ..
-    char text[100];
-    snprintf(text, 100, " Midi      Step            Link Quantum           ",
-               //midiChannel,
-               stepValue,
-               quantum);
-	cairo_move_to (cr, x, y);
-	cairo_show_text (cr, text);
+	double x, y;
 
-    snprintf(text, 100, "   %02i   %5.2f       %5.2f  %s",
-               midiChannel,
-               stepValue,
-               quantum,
-               runState != 0 ? "RUN" : "Stop");
+	// Draw labels.
 
-	cairo_set_font_size (cr, 2 * m_FontHeight);
-	// cairo_font_extents (cr, &fe);
-	y = m_RowHeight + m_FontHeight - fe.descent;
-	cairo_move_to (cr, x, y);
-	cairo_show_text (cr, text);
+//	y = m_GridSize/2 + fe.ascent;
+	y = m_GridSize + fe.ascent - fe.height/2;
+
+	vector<const char*> labels = {"Midi", "Step", "Link Quantum"};
+	vector<double> widths = {3, 5, 10, 5};
+
+	double xBase = 0;
+	auto w = widths.begin();
+	for ( auto label = labels.begin(); label != labels.end(); label++, w++ )
+	{
+        cairo_text_extents (cr, *label, &te);
+        xBase += *w;
+        x = xBase * m_GridSize - te.x_advance;
+        cairo_move_to (cr, x, y);
+        cairo_show_text (cr, *label);
+    }
+
+
+	// Draw values ...
+
+	cairo_set_font_size (cr, 1.5 * m_FontHeight);
+	cairo_font_extents (cr, &fe);
+	y = m_GridSize + fe.ascent - fe.height/2;
+
+    char value[10];
+    int i;
+
+    for (i = 0, xBase = 0, w = widths.begin(); w != widths.end(); i++, w++ )
+    {
+        switch (i)
+        {
+            case 0:
+                snprintf(value, 10, "%02i", midiChannel);
+                break;
+            case 1:
+                snprintf(value, 10, "%5.2f", stepValue);
+                break;
+            case 2:
+                snprintf(value, 10, "%5.2f", quantum);
+                break;
+            case 3:
+                snprintf(value, 10, "%s", "Run");
+                // cairo_set_font_size (cr, 1.5 * m_FontHeight);
+                // y -= m_FontHeight/4;
+                if ( runState == 0 )
+                    cairo_set_source_rgb (cr, 0.5, 0.5, 0.5);
+                break;
+        }
+        xBase += *w;
+        x = xBase * m_GridSize + m_GridSize/3;
+        cairo_move_to (cr, x, y);
+        cairo_show_text (cr, value);
+    }
 
     cairo_surface_flush(m_Surface);
 
-
     cairo_destroy(cr);
-    rAll.ScaleD2I(m_Scale);
-    Refresh(rAll);
+    rUpdate.ScaleD2I(m_Scale);
+    Refresh(rUpdate);
 
 }
 
-void CairoUI::Progress(double progress, double stepWidth, double beat, int pattern_progress)
+void CairoUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
+                            double rtBeat, unsigned int queueSecs, unsigned int queueNano)
 {
+	double x, y;
+    char text[80];
+	cairo_font_extents_t fe;
+    cairo_t *cr = cairo_create(m_Surface);
+
+    //
+    // Scratch area.
+#if 0
+
+    cairo_save(cr);
+
+    cairo_translate(cr, 150, 300);
+    cairo_set_source_rgb(cr, 0.6, 0.6, 0.6);
+    cairo_rectangle(cr, -40, -25, 80, 50);
+
+    cairo_rotate(cr, M_PI/2);
+
+    cairo_set_source_rgb(cr, 0.6, 0.6, 0.6);
+    cairo_rectangle(cr, -40, -25, 80, 50);
+    cairo_stroke(cr);
+
+    cairo_restore(cr);
+#endif
+
+	cairo_scale (cr, m_Scale, m_Scale);
+    cairo_set_font_face(cr, m_FontFace);
+
+    //
+    // Progress.
+
+	Rectangle rUpdate(26 * m_GridSize, 2 * m_GridSize, 13 * m_GridSize, 8 * m_GridSize);
+    rUpdate.ScaleD2I(m_Scale);
+
+    cairo_set_source_rgb(cr, 1, 1, 1);
+    cairo_rectangle (cr, rUpdate.m_dX, rUpdate.m_dY, rUpdate.m_dWidth, rUpdate.m_dHeight );
+    cairo_fill(cr);
+
+    double ux=1, uy=1;
+    cairo_device_to_user_distance (cr, &ux, &uy);
+    if (ux < uy)
+        ux = uy;
+    cairo_set_source_rgb(cr, 0, 0.25, 0.5);
+    cairo_set_line_width (cr, 2*ux);
+
+    cairo_save (cr);
+
+    cairo_translate(cr, rUpdate.m_dX + rUpdate.m_dWidth/2, rUpdate.m_dY + rUpdate.m_dHeight/2);
+
+    // Draw circle and first tick.
+
+    cairo_arc(cr, 0, 0, rUpdate.m_dWidth/4 + 10 * ux, 0,  2 * M_PI);
+
+    // Draw tick(s)
+
+    cairo_move_to(cr, - rUpdate.m_dWidth/4 - 10 * ux, 0 );
+    cairo_rel_line_to(cr, 20 * ux, 0);
+
+    cairo_stroke(cr);
+
+    // Draw rest of the ticks.
+
+    cairo_save(cr);
+
+    cairo_set_source_rgb(cr, 0.7, 0.7, 0.9);
+    cairo_set_line_width (cr, ux);
+
+    int step = 0;
+    double angle = 0;
+    double inc = stepWidth * 2.0 * M_PI;
+    while ( true )
+    {
+        step ++;
+        angle += inc;
+        if ( abs(angle - 2 * M_PI) < 0.0001 )
+            break;
+        if ( angle >= 2.0 * M_PI )
+            angle -= 2.0 * M_PI;
+        cairo_rotate(cr, inc);
+        cairo_move_to(cr, - rUpdate.m_dWidth/4 - 10 * ux, 0 );
+        cairo_rel_line_to(cr, 15 * ux, 0);
+    }
+
+    cairo_stroke(cr);
+    cairo_restore (cr);
+
+    // Draw progress indicator.
+
+//    cairo_set_source_rgb(cr, 0, 0.25, 0.5);
+    cairo_set_line_width (cr, 20 * ux);
+    cairo_arc(cr, 0, 0, rUpdate.m_dWidth/4, 2.0 * M_PI * (progress + 0.5),  2.0 * M_PI * (progress + stepWidth + 0.5) );
+    cairo_stroke(cr);
+
+    //
+    // Beat within quantum.
+
+	cairo_set_font_size (cr, 2 * m_FontHeight);
+	cairo_font_extents (cr, &fe);
+
+	y = fe.ascent - fe.height/2;
+
+    snprintf(text, 80, "%05.2f", beat);
+    cairo_text_extents_t te;
+	cairo_text_extents (cr, text, &te);
+	x = - te.x_advance/2;
+
+//    cairo_set_source_rgb(cr, 0, 0.5, 1.0);
+    cairo_move_to (cr, x, y);
+    cairo_show_text (cr, text);
+
+    cairo_restore(cr);
+    Refresh(rUpdate);
+
+    //
+    // Real time beat, queue time.
+
+	rUpdate = Rectangle(27 * m_GridSize, 0.0, 13 * m_GridSize, 2 * m_GridSize);
+    rUpdate.ScaleD2I(m_Scale);
+
+	cairo_set_font_size (cr, m_FontHeight);
+	cairo_font_extents (cr, &fe);
+
+	x = rUpdate.m_dX;
+//	y = m_GridSize + fe.ascent - fe.height/2;
+	y = rUpdate.m_dY + rUpdate.m_dHeight/2 + fe.ascent - fe.height/2;
+
+    cairo_set_source_rgb(cr, 0.4, 0.4, 0.4);
+    cairo_rectangle (cr, rUpdate.m_dX, rUpdate.m_dY, rUpdate.m_dWidth, rUpdate.m_dHeight );
+    cairo_fill (cr);
+
+    snprintf(text, 80, "Beat %9.2f (Sec %6u.%u)", rtBeat, queueSecs, queueNano);
+    cairo_set_source_rgb(cr, 1, 1, 1);
+    cairo_move_to (cr, x, y);
+    cairo_show_text (cr, text);
+
+    Refresh(rUpdate);
+
+    cairo_destroy(cr);
 }
 

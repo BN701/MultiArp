@@ -185,7 +185,8 @@ void TextUI::Text(window_area_t area, int row, int col, const char * text, text_
     wmove(stdscr, scr_y, scr_x);
 }
 
-void TextUI::Progress(double progress, double stepWidth, double beat, int pattern_progress)
+void TextUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
+                        double rtBeat, unsigned int queueSecs, unsigned int queueNano)
 {
     int row = 2;
     int col = 4;
@@ -263,8 +264,13 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
     mvchgat(2, 4, pattern_progress /* g_PatternStore.CurrentPosPatternChain() + 1 */,
             A_UNDERLINE, CP_PROGRESS_BAR_BKGND, NULL);
 
+
     move(scr_y, scr_x);
     refresh();
+
+    char text[80];
+    snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
+    Text(progress_panel, 0, 0, text);
 
 }
 

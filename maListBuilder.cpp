@@ -22,8 +22,6 @@
 
 
 #include <alsa/asoundlib.h>
-#include <fstream>
-#include <iostream>
 
 using namespace std;
 
@@ -31,7 +29,7 @@ using namespace std;
 
 #define KEY_BACKSPACE	0407		/* backspace key */
 
-#define LOG_ON 1
+#define LOG_ON 0
 
 #if LOG_ON
 ofstream fLog;

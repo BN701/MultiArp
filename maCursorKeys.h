@@ -20,7 +20,6 @@
 #ifndef CURSORKEYS_H
 #define CURSORKEYS_H
 
-#include <memory>
 #include <string>
 #include <vector>
 

@@ -655,12 +655,10 @@ void CairoUI::Progress(double progress, double stepWidth, double beat, int patte
     cairo_set_source_rgb(cr, 0.7, 0.7, 0.9);
     cairo_set_line_width (cr, ux);
 
-    int step = 0;
     double angle = 0;
     double inc = stepWidth * 2.0 * M_PI;
     while ( true )
     {
-        step ++;
         angle += inc;
         if ( abs(angle - 2 * M_PI) < 0.0001 )
             break;

@@ -23,7 +23,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <memory>
 
 #include "maChainLink.h"
 #include "maCursorKeys.h"

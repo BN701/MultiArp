@@ -22,9 +22,6 @@
 
 #include "MidiFile.h"
 
-#include <cmath>
-#include <cstring>
-#include <numeric>
 #include <unordered_map>
 
 #include "maUtility.h"

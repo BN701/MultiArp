@@ -32,8 +32,6 @@
 
 #define LINK_PLATFORM_LINUX
 #include <ableton/Link.hpp>
-#include <csignal>
-//#include <unordered_map>
 
 // Todo: move X key code dependency and set up our own codes.
 

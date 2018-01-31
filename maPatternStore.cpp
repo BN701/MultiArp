@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <cstring>
-#include <stdexcept>
 #include <unordered_map>
 
 #include "maUtility.h"

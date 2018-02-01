@@ -32,6 +32,11 @@
 #include "maPattern.h"
 #include "maPatternChain.h"
 
+// Reset modes.
+
+#define RESET_NONE 0
+#define RESET_ALL 1
+#define RESET_CURRENT 2
 
 // Patternchain modes
 

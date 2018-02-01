@@ -77,6 +77,8 @@
 		<Unit filename="maScreen.h" />
 		<Unit filename="maState.cpp" />
 		<Unit filename="maState.h" />
+		<Unit filename="maStep.cpp" />
+		<Unit filename="maStep.h" />
 		<Unit filename="maTranslateTable.cpp" />
 		<Unit filename="maTranslateTable.h" />
 		<Unit filename="maTrigList.cpp" />

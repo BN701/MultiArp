@@ -470,7 +470,7 @@ unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
     {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
 };
 
-void TextUI::KeyInput(CursorKeys::key_type_t & curKey, uint32_t & sym)
+void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
 {
     int c = getch();
 

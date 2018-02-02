@@ -21,6 +21,7 @@
 #define STEP_H
 
 void queue_next_step(int queueId);
+void midi_action(int queueId);
 
 
 #endif

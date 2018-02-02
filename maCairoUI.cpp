@@ -452,7 +452,7 @@ unordered_map<int, const char *> event_names =
 };
 
 //bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
-bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, uint32_t & sym)
+bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
 {
     bool result = true;
     gotKeyData = false;

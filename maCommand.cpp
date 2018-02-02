@@ -24,6 +24,7 @@
 #include<cmath>
 #include<unordered_map>
 
+
 #include "maAlsaSequencer.h"
 #include "maAlsaSequencerQueue.h"
 #include "maListBuilder.h"
@@ -1119,3 +1120,263 @@ void do_command_line(int argc, char *argv[])
 
 
 }
+
+enum global_element_names_t
+{
+     global_heading,
+     global_name_midi_channel,
+     global_name_link_quantum,
+     num_global_element_names
+};
+
+
+unordered_map<global_element_names_t, const char *> global_element_names = {
+    {global_heading, "Global"},
+    {global_name_midi_channel, "Midi Channel"},
+    {global_name_link_quantum, "Link Quantum"},
+
+};
+
+string globals_to_string()
+{
+    string result = "<< ";
+    result += global_element_names.at(global_heading);
+    result += " >>\n\n";
+
+    char buff[200];
+
+    sprintf(buff, "%s %i\n", global_element_names.at(global_name_midi_channel), g_Sequencer.MidiChannel() + 1);
+    result += buff;
+    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
+    result += buff;
+
+    result += '\n';
+
+    return result;
+}
+
+
+void load_from_string(string s, int & created, int & updated )
+{
+    created = 0;
+    updated = 0;
+
+    vector<string> errors;
+    vector<string> rows = split(s.c_str(), '\n');
+
+    // paste_target_t target = paste_pattern;
+    // g_PatternStore.SetPasteTargetPatterns();
+
+    for ( vector<string>::iterator i = rows.begin(); i != rows.end(); i++ )
+    {
+        try
+        {
+            if ( g_PatternStore.FromString(*i, created, updated) ) // Give Pattern Store a chance to see the header.
+                continue;
+
+            // Handle global fields here (for the time being).
+
+            for ( global_element_names_t e = static_cast<global_element_names_t>(1);
+                  e < num_global_element_names;
+                  e = static_cast<global_element_names_t>(static_cast<int>(e) + 1) )
+            {
+                string token = find_token(*i, global_element_names.at(e));
+
+                if ( token.empty() )
+                    continue;
+
+                transform(token.begin(), token.end(), token.begin(), ::tolower);
+
+                try
+                {
+                    switch (e)
+                    {
+                    case global_name_midi_channel:
+                        g_Sequencer.SetMidiChannel(stoi(token) - 1);
+                        break;
+                    case global_name_link_quantum:
+                        g_State.SetNewQuantumPending(stod(token));
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                catch(invalid_argument ex)
+                {
+
+                }
+                catch(out_of_range ex)
+                {
+                }
+            }
+        }
+        catch (invalid_argument e)
+        {
+        }
+        catch (string error )
+        {
+            errors.push_back(error);
+        }
+    }
+
+    if ( !errors.empty() )
+        throw string("Pattern parse error: At least one row contained errors.");
+
+}
+
+bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
+{
+    bool result = true;
+
+    if ( curKey != CursorKeys::no_key )
+    {
+        g_CursorKeys.RouteKey(curKey);
+        show_status_after_navigation();
+        update_edit_panels();
+        return true;
+    }
+
+    static string commandString;
+
+    switch (sym)
+    {
+    case 0xE6: // Ctrl-A
+        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+        set_status(STAT_POS_2, "All Data copied to clipboard ...");
+        set_status(COMMAND_HOME, "");
+        break;
+
+    case 0xA2:  // Ctrl-C, Copy
+        copy_clipboard(g_PatternStore.EditPatternToString());
+        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
+        set_status(COMMAND_HOME, "");
+        break;
+
+    case 0xAD2: // Ctrl-V, Paste
+        set_status(COMMAND_HOME, "");
+        try
+        {
+            int created, updates;
+            load_from_string(get_clipboard(), created, updates);
+            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
+        }
+        catch (string errorMessage)
+        {
+            set_status(STAT_POS_2, "%s", errorMessage.c_str());
+        }
+        update_pattern_status_panel();
+        update_edit_panels();
+        update_pattern_panel();
+        break;
+
+    case XK_Return: // Enter
+        if ( !commandString.empty() )
+        {
+            result = do_command(commandString);
+            commandString.clear();
+        }
+        else if ( g_ListBuilder.HandleKeybInput(10) )
+        {
+            if ( g_ListBuilder.RealTimeRecord() )
+                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+            else
+                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+            g_ListBuilder.Clear();
+            update_pattern_panel();
+            set_status(STAT_POS_2, "");
+        }
+        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+        {
+            show_status_after_navigation();
+        }
+        place_cursor(COMMAND_HOME);
+        set_status(COMMAND_HOME, "");
+        break;
+
+    case XK_space: // Space bar.
+        if ( commandString.empty() )
+        {
+            if ( g_ListBuilder.HandleKeybInput(XK_space) )
+                show_listbuilder_status();
+        }
+        else
+        {
+            commandString += sym;
+            place_cursor(COMMAND_HOME + commandString.size());
+            set_status(COMMAND_HOME, commandString.c_str());
+        }
+        break;
+
+    case XK_Tab:
+        place_cursor(COMMAND_HOME + commandString.size());
+        g_TextUI.NextBigPanelPage(1);
+        break;
+
+    case XK_ISO_Left_Tab:   // Shift-Tab
+        g_TextUI.NextBigPanelPage(-1);
+        break;
+
+    case XK_BackSpace:
+        if ( commandString.size() > 0 )
+            commandString.pop_back();
+        else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )
+            show_listbuilder_status();
+        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+            show_status_after_navigation();
+        place_cursor(COMMAND_HOME + commandString.size());
+        set_status(COMMAND_HOME, commandString.c_str());
+        break;
+
+    default:
+
+        if ( sym > 31 && sym < 127 )
+        {
+            commandString += sym;
+            place_cursor(COMMAND_HOME + commandString.size());
+            set_status(COMMAND_HOME, commandString.c_str());
+        }
+#if 0
+        else if ( true )
+        {
+            // We haven't used the symbol, so what was it?
+
+            string symbol = "X symbol: ";
+            char buff[20];
+            sprintf(buff, "%#x - ", sym);
+            symbol += buff;
+
+            if ( static_cast<unsigned char>(sym) < 32 )
+            {
+                sprintf(buff, "%i", static_cast<unsigned char>(sym));
+                symbol += buff;
+            }
+            else
+                symbol += static_cast<unsigned char>(sym);
+
+            symbol += " Cat:";
+
+            if ( xcb_is_keypad_key(sym) )
+                symbol += " keypad";
+            if ( xcb_is_private_keypad_key(sym) )
+                symbol += " private keypad";
+            if ( xcb_is_cursor_key(sym) )
+                symbol += " cursor";
+            if ( xcb_is_pf_key(sym) )
+                symbol += " pf";
+            if ( xcb_is_function_key(sym) )
+                symbol += " function";
+            if ( xcb_is_misc_function_key(sym) )
+                symbol += " misc function";
+            if ( xcb_is_modifier_key(sym) )
+                symbol += " modifier";
+
+            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), keycode, state, show_modifiers(state).c_str());
+
+        }
+#endif
+        break;
+    }
+
+    return result;
+}
+

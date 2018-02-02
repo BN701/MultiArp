@@ -274,3 +274,50 @@ void queue_next_step(int queueId)
     }
 
 }
+
+void midi_action(int queueId)
+{
+    snd_seq_event_t *ev;
+
+    // static ListBuilder listBuilder;
+
+    static int otherEvents = 0; // Just for interest.
+
+    do
+    {
+        g_Sequencer.EventInput(&ev);
+        switch (ev->type)
+        {
+        case SND_SEQ_EVENT_ECHO:
+            // This is our 'tick', so schedule everything
+            // that should happen next, including the
+            // next tick.
+            queue_next_step(queueId);
+            break;
+
+        case SND_SEQ_EVENT_NOTEON:
+        case SND_SEQ_EVENT_NOTEOFF:
+            if ( g_ListBuilder.HandleMidi(ev) )
+            {
+                // HandleMidi() only returns true in QUICK entry
+                // mode, where midi input alone is used to manage
+                // notelist updates.
+
+                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+                g_ListBuilder.Clear();
+                set_status(STAT_POS_2, "");
+                update_pattern_panel();
+            }
+            else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
+            {
+                show_listbuilder_status();
+            }
+            break;
+            default:
+                otherEvents += 1;
+                break;
+        }
+        snd_seq_free_event(ev);
+    }
+    while ( g_Sequencer.EventInputPending() );
+}

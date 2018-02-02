@@ -21,6 +21,7 @@
 #define MATEXTUI_H_INCLUDED
 
 #include <vector>
+#include <xcb/xcb.h>
 
 #include "maBaseUI.h"
 #include "maCursorKeys.h"
@@ -101,6 +102,7 @@ enum colour_pairs
 struct WINDOW;
 #endif
 
+
 class TextUI : public BaseUI
 {
     public:
@@ -116,7 +118,7 @@ class TextUI : public BaseUI
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
 
-        void KeyInput(CursorKeys::key_type_t & curKey, uint32_t & sym);
+        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
 
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
 

@@ -21,9 +21,23 @@
 #define MACOMMAND_H_INCLUDED
 
 #include <string>
+#include <xcb/xcb.h>
+
+// Todo: move X key code dependency and set up our own codes.
+
+#define XK_MISCELLANY
+#define XK_XKB_KEYS
+#define XK_LATIN1
+#include <X11/keysymdef.h>  // XK_ Unicode key name defines
+
+
+#include "maCursorKeys.h"
+
 
 void do_command_line(int argc, char *argv[]);
 bool do_command(std::string commandList);
+
+bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym);
 
 //#define RESET_NONE 0
 //#define RESET_ALL 1

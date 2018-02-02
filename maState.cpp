@@ -19,6 +19,9 @@
 
 #include "maState.h"
 
+State g_State;  // Global State instance.
+
+
 State::State():
     m_CurrentStepValue(16.0),
     m_Quantum(16.0),

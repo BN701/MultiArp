@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "maBaseUI.h"
+#include "maCursorKeys.h"
 
 //#include <ncurses.h>
 
@@ -114,6 +115,8 @@ class TextUI : public BaseUI
         void Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr = attr_normal);
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
+
+        void KeyInput(CursorKeys::key_type_t & curKey, uint32_t & sym);
 
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
 

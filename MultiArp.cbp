@@ -38,6 +38,8 @@
 			<Add option="-fexceptions" />
 			<Add directory="../link/include" />
 			<Add directory="../link/modules/asio-standalone/asio/include" />
+			<Add directory="../github/link/include" />
+			<Add directory="../github/link/modules/asio-standalone/asio/include" />
 			<Add directory="../midifile/include/" />
 			<Add directory="/usr/include/cairo" />
 			<Add directory="/usr/include/pango-1.0" />
@@ -94,6 +96,8 @@
 		<Unit filename="maScreen.h" />
 		<Unit filename="maState.cpp" />
 		<Unit filename="maState.h" />
+		<Unit filename="maStep.cpp" />
+		<Unit filename="maStep.h" />
 		<Unit filename="maTextUI.cpp" />
 		<Unit filename="maTextUI.h" />
 		<Unit filename="maTranslateTable.cpp" />

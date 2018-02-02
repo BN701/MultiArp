@@ -40,6 +40,7 @@
 #define XK_LATIN1
 #include <X11/keysymdef.h>  // XK_ Unicode key name defines
 
+//#include <csignal>
 
 #include "maAlsaSequencer.h"
 #include "maAlsaSequencerQueue.h"
@@ -50,6 +51,7 @@
 #include "maPatternStore.h"
 #include "maScreen.h"
 #include "maState.h"
+#include "maStep.h"
 #include "maUtility.h"
 
 using namespace std;
@@ -67,7 +69,6 @@ PatternStore g_PatternStore;
 AlsaSequencer g_Sequencer;
 State g_State;
 
-//xcb_key_symbols_t * g_xcbKeySymbols = NULL;
 
 
 extern TextUI g_TextUI;
@@ -75,235 +76,230 @@ extern CairoUI g_CairoUI;
 
 int g_DeferStop = 0;
 
-void do_UI_updates()
-{
-
-    // If pattern changed last step ...
-
-    if ( g_PatternStore.PatternChanged(true) )
-    {
-        set_top_line();
-        update_edit_panels();
-        set_status(STAT_POS_2, "Pattern changed ...");
-    }
-
-    // If phase zero last step ...
-
-    if ( g_State.PhaseIsZero() )
-    {
-        update_pattern_status_panel();
-    }
-
-    // Every step ...
-
-//    update_pattern_panel();     // TODO: Revert to updating this when updates are actually made.
-//    highlight_pattern_panel();  // Moves note highlight.
-    update_pattern_panel();
-//    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
-
-    update_progress_bar();
-
-//    char text[80];
-//    sprintf(text, "Beat%9.2f (Sec%6i:%i)",
-//               g_PatternStore.LastRealTimeBeat(),
-//               g_Sequencer.ScheduleTimeSeconds(),
-//               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
+//void do_UI_updates()
+//{
 //
-//    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
-//               /*g_State.Phase(),*/
-////               g_State.Beat(),
-//               g_PatternStore.LastRealTimeBeat(),
-//               g_Sequencer.ScheduleTimeSeconds(),
-//               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
-}
+//    // If pattern changed last step ...
+//
+//    if ( g_PatternStore.PatternChanged(true) )
+//    {
+//        set_top_line();
+//        update_edit_panels();
+//        set_status(STAT_POS_2, "Pattern changed ...");
+//    }
+//
+//    // If phase zero last step ...
+//
+//    if ( g_State.PhaseIsZero() )
+//    {
+//        update_pattern_status_panel();
+//    }
+//
+//    // Every step ...
+//
+//    update_progress_bar();
+//
+////    char text[80];
+////    sprintf(text, "Beat%9.2f (Sec%6i:%i)",
+////               g_PatternStore.LastRealTimeBeat(),
+////               g_Sequencer.ScheduleTimeSeconds(),
+////               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
+////
+////    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
+////               /*g_State.Phase(),*/
+//////               g_State.Beat(),
+////               g_PatternStore.LastRealTimeBeat(),
+////               g_Sequencer.ScheduleTimeSeconds(),
+////               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
+//}
 
-void do_phase0_updates()
-{
-    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
+//void do_phase0_updates()
+//{
+//    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
+//
+//    g_State.SetCurrentStepValue(g_PatternStore.StepValue());
+//
+//    if ( g_State.NewQuantumPending() )
+//    {
+//        set_status(STAT_POS_2, "New quantum value set.");
+//    }
+//
+//    if ( g_PatternStore.TranslateTableForPlay().NewTransposePending() )
+//    {
+//        set_status(STAT_POS_2, "Transpose set.");
+//    }
+//
+//    if ( g_PatternStore.NewPatternPending() )
+//    {
+//        set_status(STAT_POS_2, "Pattern changed.");
+//    }
+//
+//    if ( g_State.NewRunStatePending() )
+//    {
+//        if ( g_State.RunState() )
+//            g_PatternStore.ResetAllPatterns();
+//        g_DeferStop = g_State.DeferStop();
+//    }
+//
+//    if ( g_State.PatternReset() != RESET_NONE )
+//    {
+//        switch ( g_State.PatternReset() )
+//        {
+//            case RESET_ALL :
+//                g_PatternStore.ResetAllPatterns();
+//                set_status(STAT_POS_2, "All patterns were reset.");
+//                break;
+//            case RESET_CURRENT :
+//                g_PatternStore.ResetCurrentPattern();
+//                set_status(STAT_POS_2, "Current pattern was reset.");
+//                break;
+//        }
+//        g_State.SetPatternReset(RESET_NONE);
+//    }
+//
+//    set_top_line();
+//}
 
-    g_State.SetCurrentStepValue(g_PatternStore.StepValue());
 
-    if ( g_State.NewQuantumPending() )
-    {
-        set_status(STAT_POS_2, "New quantum value set.");
-    }
-
-    if ( g_PatternStore.TranslateTableForPlay().NewTransposePending() )
-    {
-        set_status(STAT_POS_2, "Transpose set.");
-    }
-
-    if ( g_PatternStore.NewPatternPending() )
-    {
-        set_status(STAT_POS_2, "Pattern changed.");
-    }
-
-    if ( g_State.NewRunStatePending() )
-    {
-        if ( g_State.RunState() )
-            g_PatternStore.ResetAllPatterns();
-        g_DeferStop = g_State.DeferStop();
-    }
-
-    if ( g_State.PatternReset() != RESET_NONE )
-    {
-        switch ( g_State.PatternReset() )
-        {
-            case RESET_ALL :
-                g_PatternStore.ResetAllPatterns();
-                set_status(STAT_POS_2, "All patterns were reset.");
-                break;
-            case RESET_CURRENT :
-                g_PatternStore.ResetCurrentPattern();
-                set_status(STAT_POS_2, "Current pattern was reset.");
-                break;
-        }
-        g_State.SetPatternReset(RESET_NONE);
-    }
-
-    set_top_line();
-}
-
-
-void queue_next_step(int queueId)
-{
-    // We're called when ALSA has played the events we scheduled last time we were here,
-    // so updating position info at this point should reflect what we are hearing.
-
-    do_UI_updates();
-
-    // Now incrememt the step/beat and get on with scheduling the next events.
-
-    g_State.Step(g_PatternStore.StepValueMultiplier());
-
-    // Get time of next step from Link.
-
-    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-
-    double nextBeat = g_State.Beat();
-
-    nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
-    chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
-
-    g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
-
-    if ( g_State.PhaseIsZero() )
-    {
-        do_phase0_updates();
-        g_PatternStore.SetPhaseIsZero();
-        g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
-    }
-
-    // Set next schedule time on the queue
-
-    int64_t queue_time_usec;
-    if ( g_LinkStartTime.count() < 0 )
-    {
-        g_LinkStartTime = t_next_usec;
-        queue_time_usec = 0;
-    }
-    else
-    {
-        queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
-    }
-
-    if ( queue_time_usec < 0 )
-    {
-        // Sometimes at start up link appears to go backwards, especially if
-        // there's another instance of the app running. For now, just keep
-        // reschedule and hope things settle down.
-//        raise(SIGINT);
-        queue_time_usec = 0;
-    }
-
-    g_Sequencer.SetScheduleTime(queue_time_usec);
-
-    // Schedule an event to be fired back to our own app which prompts another
-    // arpeggio to be placed in the queue.
-
-    // TODO: We used to do this after scheduling all midi events. Have there
-    //       been any noticable effects of doing it first.
-
-    g_Sequencer.ScheduleEcho(queueId);
-
-    // Step the Pattern Store
-
-    Cluster nextCluster;
-    TrigRepeater repeater;
-    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
-
-    if ( g_State.RunState() || g_DeferStop-- > 0 )
-    {
-        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
-        if ( g_ListBuilder.RealTimeRecord() )
-            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
-    }
-
-    if ( nextCluster.Empty() )
-        return;
-
-    double tempo = timeline.tempo();
-
-    /*
-          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
-          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
-
-          Steps per beat, v = V/4.
-          Steps per minute = Tv = TV/4
-          Steps per second = TV/240
-          Step length in mSec = 1000*240/TV
-     */
-
-    double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
-    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
-
-    repeater.Init(tempo, stepLengthMilliSecs);
-
-    for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
-    {
-        int noteNumber = note->m_NoteNumber;
-
-        if ( noteNumber < 0 )
-            continue;
-
-        unsigned char noteVelocity;
-
-        // For real time events, move the note ahead or behind
-        // the phase value of the step itself. (We can't move
-        // too far ahead, obviously, but there's no mechanism
-        // yet for dealing with that situation if it happens.)
-
-        double phaseAdjust = note->Phase() - g_State.Phase();
-        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
-
-        int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
-
-        if ( note->m_NoteVelocity > 0 )
-            noteVelocity = note->m_NoteVelocity;
-        else
-            noteVelocity = g_PatternStore.NoteVelocity();
-
-        double noteLength = note->Length();
-        if ( lround(noteLength * 100) > 0 )
-        {
-            // Note length here is in beats. Convert to milliseconds.
-            duration = lround(60000.0 * noteLength / tempo);
-        }
-
-        int64_t queue_time_delta = 0;
-        int interval = 0;
-        repeater.Reset(noteVelocity);
-
-        do
-        {
-            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
-            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-            g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
-        }
-        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
-    }
-
-}
+//void queue_next_step(int queueId)
+//{
+//    // We're called when ALSA has played the events we scheduled last time we were here,
+//    // so updating position info at this point should reflect what we are hearing.
+//
+//    do_UI_updates();
+//
+//    // Now incrememt the step/beat and get on with scheduling the next events.
+//
+//    g_State.Step(g_PatternStore.StepValueMultiplier());
+//
+//    // Get time of next step from Link.
+//
+//    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+//
+//    double nextBeat = g_State.Beat();
+//
+//    nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
+//    chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
+//
+//    g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
+//
+//    if ( g_State.PhaseIsZero() )
+//    {
+//        do_phase0_updates();
+//        g_PatternStore.SetPhaseIsZero();
+//        g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
+//    }
+//
+//    // Set next schedule time on the queue
+//
+//    int64_t queue_time_usec;
+//    if ( g_LinkStartTime.count() < 0 )
+//    {
+//        g_LinkStartTime = t_next_usec;
+//        queue_time_usec = 0;
+//    }
+//    else
+//    {
+//        queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
+//    }
+//
+//    if ( queue_time_usec < 0 )
+//    {
+//        // Sometimes at start up link appears to go backwards, especially if
+//        // there's another instance of the app running. For now, just keep
+//        // reschedule and hope things settle down.
+////        raise(SIGINT);
+//        queue_time_usec = 0;
+//    }
+//
+//    g_Sequencer.SetScheduleTime(queue_time_usec);
+//
+//    // Schedule an event to be fired back to our own app which prompts another
+//    // arpeggio to be placed in the queue.
+//
+//    // TODO: We used to do this after scheduling all midi events. Have there
+//    //       been any noticable effects of doing it first.
+//
+//    g_Sequencer.ScheduleEcho(queueId);
+//
+//    // Step the Pattern Store
+//
+//    Cluster nextCluster;
+//    TrigRepeater repeater;
+//    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
+//
+//    if ( g_State.RunState() || g_DeferStop-- > 0 )
+//    {
+//        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
+//        if ( g_ListBuilder.RealTimeRecord() )
+//            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
+//    }
+//
+//    if ( nextCluster.Empty() )
+//        return;
+//
+//    double tempo = timeline.tempo();
+//
+//    /*
+//          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
+//          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
+//
+//          Steps per beat, v = V/4.
+//          Steps per minute = Tv = TV/4
+//          Steps per second = TV/240
+//          Step length in mSec = 1000*240/TV
+//     */
+//
+//    double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
+//    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
+//
+//    repeater.Init(tempo, stepLengthMilliSecs);
+//
+//    for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
+//    {
+//        int noteNumber = note->m_NoteNumber;
+//
+//        if ( noteNumber < 0 )
+//            continue;
+//
+//        unsigned char noteVelocity;
+//
+//        // For real time events, move the note ahead or behind
+//        // the phase value of the step itself. (We can't move
+//        // too far ahead, obviously, but there's no mechanism
+//        // yet for dealing with that situation if it happens.)
+//
+//        double phaseAdjust = note->Phase() - g_State.Phase();
+//        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
+//
+//        int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
+//
+//        if ( note->m_NoteVelocity > 0 )
+//            noteVelocity = note->m_NoteVelocity;
+//        else
+//            noteVelocity = g_PatternStore.NoteVelocity();
+//
+//        double noteLength = note->Length();
+//        if ( lround(noteLength * 100) > 0 )
+//        {
+//            // Note length here is in beats. Convert to milliseconds.
+//            duration = lround(60000.0 * noteLength / tempo);
+//        }
+//
+//        int64_t queue_time_delta = 0;
+//        int interval = 0;
+//        repeater.Reset(noteVelocity);
+//
+//        do
+//        {
+//            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
+//            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
+//            g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
+//        }
+//        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
+//    }
+//
+//}
 
 void midi_action(int queueId)
 {
@@ -455,40 +451,167 @@ void load_from_string(string s, int & created, int & updated )
 
 }
 
+bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
+{
+    bool result = true;
+
+    if ( curKey != CursorKeys::no_key )
+    {
+        g_CursorKeys.RouteKey(curKey);
+        show_status_after_navigation();
+        update_edit_panels();
+        return true;
+    }
+
+    static string commandString;
+
+    switch (sym)
+    {
+    case 0xE6: // Ctrl-A
+        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+        set_status(STAT_POS_2, "All Data copied to clipboard ...");
+        set_status(COMMAND_HOME, "");
+        break;
+
+    case 0xA2:  // Ctrl-C, Copy
+        copy_clipboard(g_PatternStore.EditPatternToString());
+        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
+        set_status(COMMAND_HOME, "");
+        break;
+
+    case 0xAD2: // Ctrl-V, Paste
+        set_status(COMMAND_HOME, "");
+        try
+        {
+            int created, updates;
+            load_from_string(get_clipboard(), created, updates);
+            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
+        }
+        catch (string errorMessage)
+        {
+            set_status(STAT_POS_2, "%s", errorMessage.c_str());
+        }
+        update_pattern_status_panel();
+        update_edit_panels();
+        update_pattern_panel();
+        break;
+
+    case XK_Return: // Enter
+        if ( !commandString.empty() )
+        {
+            result = do_command(commandString);
+            commandString.clear();
+        }
+        else if ( g_ListBuilder.HandleKeybInput(10) )
+        {
+            if ( g_ListBuilder.RealTimeRecord() )
+                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+            else
+                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+            g_ListBuilder.Clear();
+            update_pattern_panel();
+            set_status(STAT_POS_2, "");
+        }
+        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+        {
+            show_status_after_navigation();
+        }
+        place_cursor(COMMAND_HOME);
+        set_status(COMMAND_HOME, "");
+        break;
+
+    case XK_space: // Space bar.
+        if ( commandString.empty() )
+        {
+            if ( g_ListBuilder.HandleKeybInput(XK_space) )
+                show_listbuilder_status();
+        }
+        else
+        {
+            commandString += sym;
+            place_cursor(COMMAND_HOME + commandString.size());
+            set_status(COMMAND_HOME, commandString.c_str());
+        }
+        break;
+
+    case XK_Tab:
+        place_cursor(COMMAND_HOME + commandString.size());
+        g_TextUI.NextBigPanelPage(1);
+        break;
+
+    case XK_ISO_Left_Tab:   // Shift-Tab
+        g_TextUI.NextBigPanelPage(-1);
+        break;
+
+    case XK_BackSpace:
+        if ( commandString.size() > 0 )
+            commandString.pop_back();
+        else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )
+            show_listbuilder_status();
+        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+            show_status_after_navigation();
+        place_cursor(COMMAND_HOME + commandString.size());
+        set_status(COMMAND_HOME, commandString.c_str());
+        break;
+
+    default:
+
+        if ( sym > 31 && sym < 127 )
+        {
+            commandString += sym;
+            place_cursor(COMMAND_HOME + commandString.size());
+            set_status(COMMAND_HOME, commandString.c_str());
+        }
+#if 0
+        else if ( true )
+        {
+            // We haven't used the symbol, so what was it?
+
+            string symbol = "X symbol: ";
+            char buff[20];
+            sprintf(buff, "%#x - ", sym);
+            symbol += buff;
+
+            if ( static_cast<unsigned char>(sym) < 32 )
+            {
+                sprintf(buff, "%i", static_cast<unsigned char>(sym));
+                symbol += buff;
+            }
+            else
+                symbol += static_cast<unsigned char>(sym);
+
+            symbol += " Cat:";
+
+            if ( xcb_is_keypad_key(sym) )
+                symbol += " keypad";
+            if ( xcb_is_private_keypad_key(sym) )
+                symbol += " private keypad";
+            if ( xcb_is_cursor_key(sym) )
+                symbol += " cursor";
+            if ( xcb_is_pf_key(sym) )
+                symbol += " pf";
+            if ( xcb_is_function_key(sym) )
+                symbol += " function";
+            if ( xcb_is_misc_function_key(sym) )
+                symbol += " misc function";
+            if ( xcb_is_modifier_key(sym) )
+                symbol += " modifier";
+
+            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), keycode, state, show_modifiers(state).c_str());
+
+        }
+#endif
+        break;
+    }
+
+    return result;
+}
+
 /*
     KEEP these in case we want to keep the option of
     building a purely ncurses version.
 */
 
-//unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
-//{
-//    {KEY_INSERT, CursorKeys::ins},
-//    {KEY_DELETE, CursorKeys::del},
-//    {KEY_SDELETE, CursorKeys::shift_delete},
-//    {KEY_CDELETE, CursorKeys::ctrl_delete},
-//    {KEY_TAB, CursorKeys::tab},
-//    {KEY_SHTAB, CursorKeys::shift_tab},
-//    {KEY_DOWN, CursorKeys::down},
-//    {KEY_UP, CursorKeys::up},
-//    {KEY_LEFT, CursorKeys::left},
-//    {KEY_RIGHT, CursorKeys::right},
-//    {KEY_SPGUP, CursorKeys::shift_page_up},
-//    {KEY_SPGDOWN, CursorKeys::shift_page_down},
-//    {KEY_APGUP, CursorKeys::alt_page_up},
-//    {KEY_APGDOWN, CursorKeys::alt_page_down},
-//    {KEY_CDOWN, CursorKeys::ctrl_down},
-//    {KEY_CUP, CursorKeys::ctrl_up},
-//    {KEY_CLEFT, CursorKeys::ctrl_left},
-//    {KEY_CRIGHT, CursorKeys::ctrl_right},
-//    {KEY_SDOWN, CursorKeys::shift_down},
-//    {KEY_SUP, CursorKeys::shift_up},
-//    {KEY_SLEFT, CursorKeys::shift_left},
-//    {KEY_SRIGHT, CursorKeys::shift_right},
-//    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
-//    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
-//    {KEY_CSUP, CursorKeys::ctrl_shift_up},
-//    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
-//};
 
 
 //bool key_input_action_ncurses()
@@ -498,8 +621,8 @@ void load_from_string(string s, int & created, int & updated )
 //    static string commandString;
 //
 //    int c = getch();
-////    const char * key = getkey();
-//
+//    const char * key = getkey();
+
 //    switch (c)
 //    {
 //    case 1: // Ctrl-A
@@ -652,254 +775,256 @@ void load_from_string(string s, int & created, int & updated )
 //    return result;
 //}
 
-// Use these two maps to search for X Unicode symbols and raw state/keycode combinations
-// that are used purely for menu navigation.
-
-unordered_map<int, CursorKeys::key_type_t> g_xcbSymbolToCursorKey =
-{
-    {XK_Insert, CursorKeys::ins},
-    {XK_Delete, CursorKeys::del},
-    {XK_Down, CursorKeys::down},
-    {XK_Up, CursorKeys::up},
-    {XK_Left, CursorKeys::left},
-    {XK_Right, CursorKeys::right},
-    {XK_Escape, CursorKeys::escape}
-};
-
-// Key values are constructed from (state << 8) + keycode
-unordered_map<int, CursorKeys::key_type_t> g_xcbKeycodeToCursorKey =
-{
-    {0x0170, CursorKeys::shift_page_up},
-    {0x0175, CursorKeys::shift_page_down},
-    {0x0870, CursorKeys::alt_page_up},
-    {0x0875, CursorKeys::alt_page_down},
-    {0x0474, CursorKeys::ctrl_down},
-    {0x046F, CursorKeys::ctrl_up},
-    {0x0471, CursorKeys::ctrl_left},
-    {0x0472, CursorKeys::ctrl_right},
-    {0x0174, CursorKeys::shift_down},
-    {0x016F, CursorKeys::shift_up},
-    {0x0171, CursorKeys::shift_left},
-    {0x0172, CursorKeys::shift_right},
-    {0x0571, CursorKeys::ctrl_shift_left},
-    {0x0572, CursorKeys::ctrl_shift_right},
-    {0x056F, CursorKeys::ctrl_shift_up},
-    {0x0574, CursorKeys::ctrl_shift_down},
-    {0x0177, CursorKeys::shift_delete},
-    {0x0477, CursorKeys::ctrl_delete}
-};
-
-// Utility for diagnostics.
-
-string show_modifiers (uint32_t mask)
-{
-    const char *MODIFIERS[] = {
-            "Shift", "Lock", "Ctrl", "Alt",
-            "Mod2", "Mod3", "Mod4", "Mod5",
-            "Button1", "Button2", "Button3", "Button4", "Button5"
-    };
-
-    string result;
-    for (const char **modifier = MODIFIERS ; mask; mask >>= 1, ++modifier) {
-        if (mask & 1) {
-            if ( ! result.empty() )
-                 result += '+';
-             result += *modifier;
-        }
-    }
-    return result;
-}
-
-
-bool key_input_action_xcb(uint8_t & keycode, uint16_t & state)
-{
-    bool result = true;
-
-    static string commandString;
-
-    // Convert to the character IDs we've been using with ncurses. We may drop this at some point.
-
-    CursorKeys::key_type_t curKey = CursorKeys::no_key;
-
-    xcb_keysym_t sym = g_CairoUI.GetKeysym(keycode, state);
-
-    if ( sym != 0 )
-    {
-        // Look for symbols that are used purely for CursorKey navigation.
-        // (Ins, Del, Up, Down, Left, Right, Esc).
-
-        try
-        {
-            curKey = g_xcbSymbolToCursorKey.at(sym);
-        }
-        catch(...)
-        {
-            // Nothing found, so just fall through to check specific symbols below.
-        }
-    }
-    else
-    {
-        // Look for raw decodes that map to CursorKeys.
-
-        try
-        {
-            // unsigned int lookup = (kr->state << 8) + kr->detail;
-            curKey = g_xcbKeycodeToCursorKey.at( (state << 8) + keycode);
-        }
-        catch(...)
-        {
-            // There's nothing here for us, so show some diagnostics and return.
-            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", keycode, state, show_modifiers(state).c_str());
-            return true;
-        }
-    }
-
-    if ( curKey != CursorKeys::no_key )
-    {
-        g_CursorKeys.RouteKey(curKey);
-        show_status_after_navigation();
-        update_edit_panels();
-        return true;
-    }
-
-    switch (sym)
-    {
-    case 0xE6: // Ctrl-A
-        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
-        set_status(STAT_POS_2, "All Data copied to clipboard ...");
-        set_status(COMMAND_HOME, "");
-        break;
-
-    case 0xA2:  // Ctrl-C, Copy
-        copy_clipboard(g_PatternStore.EditPatternToString());
-        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
-        set_status(COMMAND_HOME, "");
-        break;
-
-    case 0xAD2: // Ctrl-V, Paste
-        set_status(COMMAND_HOME, "");
-        try
-        {
-            int created, updates;
-            load_from_string(get_clipboard(), created, updates);
-            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
-        }
-        catch (string errorMessage)
-        {
-            set_status(STAT_POS_2, "%s", errorMessage.c_str());
-        }
-        update_pattern_status_panel();
-        update_edit_panels();
-        update_pattern_panel();
-        break;
-
-    case XK_Return: // Enter
-        if ( !commandString.empty() )
-        {
-            result = do_command(commandString);
-            commandString.clear();
-        }
-        else if ( g_ListBuilder.HandleKeybInput(10) )
-        {
-            if ( g_ListBuilder.RealTimeRecord() )
-                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
-            else
-                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-            g_ListBuilder.Clear();
-            update_pattern_panel();
-            set_status(STAT_POS_2, "");
-        }
-        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
-        {
-            show_status_after_navigation();
-        }
-        set_status(COMMAND_HOME, "");
-        break;
-
-    case XK_space: // Space bar.
-        if ( commandString.empty() )
-        {
-            if ( g_ListBuilder.HandleKeybInput(XK_space) )
-                show_listbuilder_status();
-        }
-        else
-        {
-            commandString += sym;
-            set_status(COMMAND_HOME, commandString.c_str());
-            place_cursor(COMMAND_HOME + commandString.size());
-        }
-        break;
-
-    case XK_Tab:
-        place_cursor(COMMAND_HOME + commandString.size());
-        g_TextUI.NextBigPanelPage(1);
-        break;
-
-    case XK_ISO_Left_Tab:   // Shift-Tab
-        g_TextUI.NextBigPanelPage(-1);
-        break;
-
-    case XK_BackSpace:
-        if ( commandString.size() > 0 )
-            commandString.pop_back();
-        else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )
-            show_listbuilder_status();
-        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
-            show_status_after_navigation();
-        set_status(COMMAND_HOME, commandString.c_str());
-        place_cursor(COMMAND_HOME + commandString.size());
-        break;
-
-    default:
-
-        if ( sym > 31 && sym < 127 )
-        {
-            commandString += sym;
-            set_status(COMMAND_HOME, commandString.c_str());
-            place_cursor(COMMAND_HOME + commandString.size());
-        }
-        else if ( true )
-        {
-            // We haven't used the symbol, so what was it?
-
-            string symbol = "X symbol: ";
-            char buff[20];
-            sprintf(buff, "%#x - ", sym);
-            symbol += buff;
-
-            if ( static_cast<unsigned char>(sym) < 32 )
-            {
-                sprintf(buff, "%i", static_cast<unsigned char>(sym));
-                symbol += buff;
-            }
-            else
-                symbol += static_cast<unsigned char>(sym);
-
-            symbol += " Cat:";
-
-            if ( xcb_is_keypad_key(sym) )
-                symbol += " keypad";
-            if ( xcb_is_private_keypad_key(sym) )
-                symbol += " private keypad";
-            if ( xcb_is_cursor_key(sym) )
-                symbol += " cursor";
-            if ( xcb_is_pf_key(sym) )
-                symbol += " pf";
-            if ( xcb_is_function_key(sym) )
-                symbol += " function";
-            if ( xcb_is_misc_function_key(sym) )
-                symbol += " misc function";
-            if ( xcb_is_modifier_key(sym) )
-                symbol += " modifier";
-
-            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), keycode, state, show_modifiers(state).c_str());
-
-        }
-        break;
-    }
-
-    return result;
-}
+//// Use these two maps to search for X Unicode symbols and raw state/keycode combinations
+//// that are used purely for menu navigation.
+//
+//unordered_map<int, CursorKeys::key_type_t> g_xcbSymbolToCursorKey =
+//{
+//    {XK_Insert, CursorKeys::ins},
+//    {XK_Delete, CursorKeys::del},
+//    {XK_Down, CursorKeys::down},
+//    {XK_Up, CursorKeys::up},
+//    {XK_Left, CursorKeys::left},
+//    {XK_Right, CursorKeys::right},
+//    {XK_Escape, CursorKeys::escape}
+//};
+//
+//// Key values are constructed from (state << 8) + keycode
+//unordered_map<int, CursorKeys::key_type_t> g_xcbKeycodeToCursorKey =
+//{
+//    {0x0170, CursorKeys::shift_page_up},
+//    {0x0175, CursorKeys::shift_page_down},
+//    {0x0870, CursorKeys::alt_page_up},
+//    {0x0875, CursorKeys::alt_page_down},
+//    {0x0474, CursorKeys::ctrl_down},
+//    {0x046F, CursorKeys::ctrl_up},
+//    {0x0471, CursorKeys::ctrl_left},
+//    {0x0472, CursorKeys::ctrl_right},
+//    {0x0174, CursorKeys::shift_down},
+//    {0x016F, CursorKeys::shift_up},
+//    {0x0171, CursorKeys::shift_left},
+//    {0x0172, CursorKeys::shift_right},
+//    {0x0571, CursorKeys::ctrl_shift_left},
+//    {0x0572, CursorKeys::ctrl_shift_right},
+//    {0x056F, CursorKeys::ctrl_shift_up},
+//    {0x0574, CursorKeys::ctrl_shift_down},
+//    {0x0177, CursorKeys::shift_delete},
+//    {0x0477, CursorKeys::ctrl_delete}
+//};
+//
+//// Utility for diagnostics.
+//
+//string show_modifiers (uint32_t mask)
+//{
+//    const char *MODIFIERS[] = {
+//            "Shift", "Lock", "Ctrl", "Alt",
+//            "Mod2", "Mod3", "Mod4", "Mod5",
+//            "Button1", "Button2", "Button3", "Button4", "Button5"
+//    };
+//
+//    string result;
+//    for (const char **modifier = MODIFIERS ; mask; mask >>= 1, ++modifier) {
+//        if (mask & 1) {
+//            if ( ! result.empty() )
+//                 result += '+';
+//             result += *modifier;
+//        }
+//    }
+//    return result;
+//}
+//
+//
+//bool key_input_action_xcb(uint8_t & keycode, uint16_t & state)
+//{
+//    bool result = true;
+//
+////    static string commandString;
+//
+//    // Convert to the character IDs we've been using with ncurses. We may drop this at some point.
+//
+//    CursorKeys::key_type_t curKey = CursorKeys::no_key;
+//
+//    xcb_keysym_t sym = g_CairoUI.GetKeysym(keycode, state);
+//
+//    if ( sym != 0 )
+//    {
+//        // Look for symbols that are used purely for CursorKey navigation.
+//        // (Ins, Del, Up, Down, Left, Right, Esc).
+//
+//        try
+//        {
+//            curKey = g_xcbSymbolToCursorKey.at(sym);
+//        }
+//        catch(...)
+//        {
+//            // Nothing found, so just fall through to check specific symbols below.
+//        }
+//    }
+//    else
+//    {
+//        // Look for raw decodes that map to CursorKeys.
+//
+//        try
+//        {
+//            // unsigned int lookup = (kr->state << 8) + kr->detail;
+//            curKey = g_xcbKeycodeToCursorKey.at( (state << 8) + keycode);
+//        }
+//        catch(...)
+//        {
+//            // There's nothing here for us, so show some diagnostics and return.
+//            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", keycode, state, show_modifiers(state).c_str());
+//            return true;
+//        }
+//    }
+//
+//    result = handle_key_input(curKey, sym);
+//
+////    if ( curKey != CursorKeys::no_key )
+////    {
+////        g_CursorKeys.RouteKey(curKey);
+////        show_status_after_navigation();
+////        update_edit_panels();
+////        return true;
+////    }
+////
+////    switch (sym)
+////    {
+////    case 0xE6: // Ctrl-A
+////        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+////        set_status(STAT_POS_2, "All Data copied to clipboard ...");
+////        set_status(COMMAND_HOME, "");
+////        break;
+////
+////    case 0xA2:  // Ctrl-C, Copy
+////        copy_clipboard(g_PatternStore.EditPatternToString());
+////        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
+////        set_status(COMMAND_HOME, "");
+////        break;
+////
+////    case 0xAD2: // Ctrl-V, Paste
+////        set_status(COMMAND_HOME, "");
+////        try
+////        {
+////            int created, updates;
+////            load_from_string(get_clipboard(), created, updates);
+////            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
+////        }
+////        catch (string errorMessage)
+////        {
+////            set_status(STAT_POS_2, "%s", errorMessage.c_str());
+////        }
+////        update_pattern_status_panel();
+////        update_edit_panels();
+////        update_pattern_panel();
+////        break;
+////
+////    case XK_Return: // Enter
+////        if ( !commandString.empty() )
+////        {
+////            result = do_command(commandString);
+////            commandString.clear();
+////        }
+////        else if ( g_ListBuilder.HandleKeybInput(10) )
+////        {
+////            if ( g_ListBuilder.RealTimeRecord() )
+////                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+////            else
+////                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+////            g_ListBuilder.Clear();
+////            update_pattern_panel();
+////            set_status(STAT_POS_2, "");
+////        }
+////        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+////        {
+////            show_status_after_navigation();
+////        }
+////        set_status(COMMAND_HOME, "");
+////        break;
+////
+////    case XK_space: // Space bar.
+////        if ( commandString.empty() )
+////        {
+////            if ( g_ListBuilder.HandleKeybInput(XK_space) )
+////                show_listbuilder_status();
+////        }
+////        else
+////        {
+////            commandString += sym;
+////            set_status(COMMAND_HOME, commandString.c_str());
+////            place_cursor(COMMAND_HOME + commandString.size());
+////        }
+////        break;
+////
+////    case XK_Tab:
+////        place_cursor(COMMAND_HOME + commandString.size());
+////        g_TextUI.NextBigPanelPage(1);
+////        break;
+////
+////    case XK_ISO_Left_Tab:   // Shift-Tab
+////        g_TextUI.NextBigPanelPage(-1);
+////        break;
+////
+////    case XK_BackSpace:
+////        if ( commandString.size() > 0 )
+////            commandString.pop_back();
+////        else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )
+////            show_listbuilder_status();
+////        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+////            show_status_after_navigation();
+////        set_status(COMMAND_HOME, commandString.c_str());
+////        place_cursor(COMMAND_HOME + commandString.size());
+////        break;
+////
+////    default:
+////
+////        if ( sym > 31 && sym < 127 )
+////        {
+////            commandString += sym;
+////            set_status(COMMAND_HOME, commandString.c_str());
+////            place_cursor(COMMAND_HOME + commandString.size());
+////        }
+////        else if ( true )
+////        {
+////            // We haven't used the symbol, so what was it?
+////
+////            string symbol = "X symbol: ";
+////            char buff[20];
+////            sprintf(buff, "%#x - ", sym);
+////            symbol += buff;
+////
+////            if ( static_cast<unsigned char>(sym) < 32 )
+////            {
+////                sprintf(buff, "%i", static_cast<unsigned char>(sym));
+////                symbol += buff;
+////            }
+////            else
+////                symbol += static_cast<unsigned char>(sym);
+////
+////            symbol += " Cat:";
+////
+////            if ( xcb_is_keypad_key(sym) )
+////                symbol += " keypad";
+////            if ( xcb_is_private_keypad_key(sym) )
+////                symbol += " private keypad";
+////            if ( xcb_is_cursor_key(sym) )
+////                symbol += " cursor";
+////            if ( xcb_is_pf_key(sym) )
+////                symbol += " pf";
+////            if ( xcb_is_function_key(sym) )
+////                symbol += " function";
+////            if ( xcb_is_misc_function_key(sym) )
+////                symbol += " misc function";
+////            if ( xcb_is_modifier_key(sym) )
+////                symbol += " modifier";
+////
+////            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), keycode, state, show_modifiers(state).c_str());
+////
+////        }
+////        break;
+////    }
+//
+//    return result;
+//}
 
 void sigterm_exit(int sig)
 {
@@ -944,10 +1069,14 @@ int main(int argc, char *argv[])
     */
 
     int npfd = g_Sequencer.GetFileDescriptorCount();
-    struct pollfd *pfd = (struct pollfd *)alloca((npfd + 1) * sizeof(struct pollfd));
-    pfd[0].fd = g_CairoUI.GetFileDescriptor();
+    struct pollfd *pfd = (struct pollfd *)alloca((npfd + 2) * sizeof(struct pollfd));
+    pfd[0].fd = 0;  // stdin
     pfd[0].events = POLLIN;
-    g_Sequencer.GetFileDescriptors(pfd + 1, npfd);
+    pfd[1].fd = g_CairoUI.GetFileDescriptor();
+    pfd[1].events = POLLIN;
+    g_Sequencer.GetFileDescriptors(pfd + 2, npfd);
+
+    bool gotXWindow = pfd[1].fd != 0;
 
     // Queue first events
 
@@ -959,18 +1088,48 @@ int main(int argc, char *argv[])
 
     while ( keep_going )
     {
-        if ( poll(pfd, npfd + 1, 10000) > 0 )
+        if ( poll(pfd, npfd + 2, 10000) > 0 )
         {
+            bool keyDataValid = false;
+            CursorKeys::key_type_t curKey = CursorKeys::no_key;
+            xcb_keysym_t sym = 0;
             if ( pfd[0].revents & POLLIN )
             {
-                uint8_t keycode;
-                uint16_t state;
-                bool keyDataValid = false;
-                keep_going = g_CairoUI.PollEvents(keyDataValid, keycode, state);
-                if ( keep_going && keyDataValid )
-                    keep_going = key_input_action_xcb(keycode, state);
+                keyDataValid = true;
+                g_TextUI.KeyInput(curKey, sym);
+//                bool keyDataValid = false;
+//                CursorKeys::key_type_t curKey = CursorKeys::no_key;
+//                xcb_keysym_t sym = 0;
+//                if ( gotXWindow )
+//                {
+////                    uint8_t keycode;
+////                    uint16_t state;
+////                    bool keyDataValid = false;
+////                    keep_going = g_CairoUI.PollEvents(keyDataValid, keycode, state);
+////                    if ( keep_going && keyDataValid )
+////                        keep_going = key_input_action_xcb(keycode, state);
+//                    keep_going = g_CairoUI.PollEvents(keyDataValid, curKey, sym);
+//                }
+//                else
+//                {
+//                    keyDataValid = true;
+//                    g_TextUI.KeyInput(curKey, sym);
+//                }
+//                if ( keyDataValid )
+//                {
+//                    keep_going = handle_key_input(curKey, sym);
+//                }
             }
-            for ( int i = 1; i < npfd + 1; i++ )
+            else if ( gotXWindow && (pfd[1].revents & POLLIN) )
+            {
+                keep_going = g_CairoUI.PollEvents(keyDataValid, curKey, sym);
+            }
+            if ( keep_going && keyDataValid )
+            {
+                keep_going = handle_key_input(curKey, sym);
+            }
+
+            for ( int i = 2; i < npfd + 2; i++ )
             {
                 if ( pfd[i].revents > 0 )
                     midi_action(queueId);

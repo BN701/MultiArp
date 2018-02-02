@@ -17,11 +17,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
 #include <set>
 #include <map>
-#include<cmath>
+#include <unordered_map>
 
 #include <ncurses.h>
+
+#define XK_MISCELLANY
+#define XK_XKB_KEYS
+#define XK_LATIN1
+#include <X11/keysymdef.h>  // XK_ Unicode key name defines
 
 #include "maTextUI.h"
 #include "maTranslateTable.h"
@@ -49,7 +55,8 @@ TextUI::TextUI()
     initscr();
     raw();
     keypad(stdscr, true);
-    curs_set(0);
+    noecho();
+    curs_set(1); // 0, 1, or 2 (the latter supposed to be 'highly visible', but same as 1 on my terminal.
 
     start_color();
 
@@ -182,7 +189,8 @@ void TextUI::Text(window_area_t area, int row, int col, const char * text, text_
     clrtoeol();
     wrefresh(window);
     attroff(attribute);
-    wmove(stdscr, scr_y, scr_x);
+    move(scr_y, scr_x);
+    refresh();
 }
 
 void TextUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
@@ -432,3 +440,198 @@ void TextUI::SetTopLine(int midiChannel, double stepValue, double quantum, int r
 
 }
 
+unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
+{
+    {KEY_INSERT, CursorKeys::ins},
+    {KEY_DELETE, CursorKeys::del},
+    {KEY_SDELETE, CursorKeys::shift_delete},
+    {KEY_CDELETE, CursorKeys::ctrl_delete},
+    {KEY_TAB, CursorKeys::tab},
+    {KEY_SHTAB, CursorKeys::shift_tab},
+    {KEY_DOWN, CursorKeys::down},
+    {KEY_UP, CursorKeys::up},
+    {KEY_LEFT, CursorKeys::left},
+    {KEY_RIGHT, CursorKeys::right},
+    {KEY_SPGUP, CursorKeys::shift_page_up},
+    {KEY_SPGDOWN, CursorKeys::shift_page_down},
+    {KEY_APGUP, CursorKeys::alt_page_up},
+    {KEY_APGDOWN, CursorKeys::alt_page_down},
+    {KEY_CDOWN, CursorKeys::ctrl_down},
+    {KEY_CUP, CursorKeys::ctrl_up},
+    {KEY_CLEFT, CursorKeys::ctrl_left},
+    {KEY_CRIGHT, CursorKeys::ctrl_right},
+    {KEY_SDOWN, CursorKeys::shift_down},
+    {KEY_SUP, CursorKeys::shift_up},
+    {KEY_SLEFT, CursorKeys::shift_left},
+    {KEY_SRIGHT, CursorKeys::shift_right},
+    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
+    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
+    {KEY_CSUP, CursorKeys::ctrl_shift_up},
+    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
+};
+
+void TextUI::KeyInput(CursorKeys::key_type_t & curKey, uint32_t & sym)
+{
+    int c = getch();
+
+    switch (c)
+    {
+    case 1: // Ctrl-A
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+//        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+//        set_status(STAT_POS_2, "All Data copied to clipboard ...");
+        sym = 0xE6;
+        break;
+    case 3:  // Ctrl-C, Copy
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+//        copy_clipboard(g_PatternStore.EditPatternToString());
+//        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
+        sym = 0xA2;
+        break;
+
+        // After using Alt-Enter, we seem to get additional Enter - char(10) - messages
+        // on the next keypress, regardless of what that key press actually is. Disabling
+        // this bit of code (probably) doesn't prevent that peculiar behaviour, but will
+        // at least discourage using Alt-Enter or Esc all round.
+
+//    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
+//        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
+//        {
+//            show_status_after_navigation();
+//        }
+//        break;
+
+    case 22: // Ctrl-V, Paste
+//        move(COMMAND_HOME);
+//        clrtoeol();
+//        refresh();
+//        try
+//        {
+//            int created, updates;
+//            load_from_string(get_clipboard(), created, updates);
+//            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
+//        }
+//        catch (string errorMessage)
+//        {
+//            set_status(STAT_POS_2, "%s", errorMessage.c_str());
+//        }
+//        update_pattern_status_panel();
+//        update_edit_panels();
+//        update_pattern_panel();
+        sym = 0xAD2;
+        break;
+
+    case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
+//        if ( !commandString.empty() )
+//        {
+//            result = do_command(commandString/*.c_str()*/);
+//            commandString.clear();
+//        }
+//        else if ( g_ListBuilder.HandleKeybInput(c) )
+//        {
+//            if ( g_ListBuilder.RealTimeRecord() )
+//                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+//            else
+//                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+//            g_ListBuilder.Clear();
+//            update_pattern_panel();
+//            set_status(STAT_POS_2, "");
+//        }
+//        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+//        {
+//            show_status_after_navigation();
+//        }
+//        move(COMMAND_HOME);
+//        clrtoeol();
+        sym = XK_Return;
+        break;
+
+    case 32: // Space bar.
+//        if ( commandString.empty() )
+//        {
+//            if ( g_ListBuilder.HandleKeybInput(c) )
+//                show_listbuilder_status();
+//            move(COMMAND_HOME);
+//        }
+//        else
+//            commandString += c;
+        sym = XK_space;
+        break;
+
+    case KEY_TAB:
+//        move(COMMAND_HOME + commandString.size());
+//        g_TextUI.NextBigPanelPage(1);
+        sym = XK_Tab;
+        break;
+
+    case KEY_SHTAB:
+//        g_TextUI.NextBigPanelPage(-1);
+        sym = XK_ISO_Left_Tab;
+        break;
+
+    case KEY_SPGUP:
+    case KEY_SPGDOWN:
+    case KEY_APGUP:
+    case KEY_APGDOWN:
+    case KEY_CDOWN:
+    case KEY_CUP:
+    case KEY_CLEFT:
+    case KEY_CRIGHT:
+    case KEY_SDOWN:
+    case KEY_SUP:
+    case KEY_SLEFT:
+    case KEY_SRIGHT:
+    case KEY_CSLEFT:
+    case KEY_CSRIGHT:
+    case KEY_CSUP:
+    case KEY_CSDOWN:
+    case KEY_DOWN:
+    case KEY_UP:
+    case KEY_LEFT:
+    case KEY_RIGHT:
+    case KEY_INSERT:
+    case KEY_DELETE:
+    case KEY_SDELETE:
+    case KEY_CDELETE:
+        curKey = g_CursorKeyMap.at(c);
+//        show_status_after_navigation();
+//        update_edit_panels();
+        break;
+
+    case KEY_BACKSPACE: // 263
+//        if ( commandString.size() > 0 )
+//            commandString.pop_back();
+//        else if ( g_ListBuilder.HandleKeybInput(c) )
+//            show_listbuilder_status();
+//        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+//            show_status_after_navigation();
+//        move(COMMAND_HOME + commandString.size());
+//        clrtoeol(); // Assuming the cursor has been put back to correct location.
+        sym = XK_BackSpace;
+        break;
+
+    default:
+#if 0
+        if ( true )
+        {
+            set_status(STAT_POS_2, "Key: %i", c);
+        }
+        else if ( commandString.size() == 0 )
+        {
+            set_status(STAT_POS_2, "");
+        }
+        if ( c > 31 && c < 127 )
+            commandString += c;
+#endif
+        sym = c;
+        break;
+    }
+
+//    refresh();
+
+//    return result;
+}

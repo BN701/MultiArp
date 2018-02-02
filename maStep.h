@@ -17,17 +17,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef MACOMMAND_H_INCLUDED
-#define MACOMMAND_H_INCLUDED
+#ifndef STEP_H
+#define STEP_H
 
-#include <string>
-
-void do_command_line(int argc, char *argv[]);
-bool do_command(std::string commandList);
-
-//#define RESET_NONE 0
-//#define RESET_ALL 1
-//#define RESET_CURRENT 2
+void queue_next_step(int queueId);
 
 
-#endif // MACOMMAND_H_INCLUDED
+#endif

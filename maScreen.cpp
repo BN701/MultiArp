@@ -38,7 +38,7 @@ extern PatternStore g_PatternStore;
 extern State g_State;
 
 TextUI g_TextUI;
-CairoUI g_CairoUI;
+CairoUI g_CairoUI(false);
 
 
 

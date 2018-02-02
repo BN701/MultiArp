@@ -25,16 +25,19 @@
 #include <cairo-xcb.h>
 
 #include "maBaseUI.h"
+#include "maCursorKeys.h"
 
 class CairoUI : public BaseUI
 {
     public:
-        CairoUI();
+        CairoUI(bool dummy = false);
         ~CairoUI();
 
         xcb_connection_t * Connection() { return m_Connection; }
 
-        bool PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state);
+//        bool PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state);
+        bool PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, uint32_t & sym);
+        bool KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym);
 
         virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = BaseUI::attr_normal, double scale = 1.0);
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
@@ -48,6 +51,7 @@ class CairoUI : public BaseUI
         void Refresh(Rectangle & r, bool useDouble = false);
 
     private:
+        bool m_Dummy = false;
         int m_Width = 800;          // These could be FP and we calculate pixel values on the fly.
         int m_Height = 500;
 
@@ -60,20 +64,20 @@ class CairoUI : public BaseUI
         cairo_font_face_t * m_FontFace = NULL;
         double m_FontHeight = 0.03;
 
-        xcb_connection_t * m_Connection;
-        xcb_screen_t * m_Screen;
-        int m_ScreenNo;
-        xcb_drawable_t m_Window;
-        xcb_visualtype_t * m_Visual;
+        xcb_connection_t * m_Connection = NULL;
+        xcb_screen_t * m_Screen = NULL;
+        int m_ScreenNo = -1;
+        xcb_drawable_t m_Window = {0};
+        xcb_visualtype_t * m_Visual = NULL;
 
-        xcb_gcontext_t m_gcPixmap;
-        xcb_pixmap_t m_Pixmap;
+        xcb_gcontext_t m_gcPixmap = {0};
+        xcb_pixmap_t m_Pixmap = {0};
 
-        xcb_key_symbols_t * m_KeySymbols;
+        xcb_key_symbols_t * m_KeySymbols = NULL;
 
         // Cairo surface.
 
-        cairo_surface_t * m_Surface;
+        cairo_surface_t * m_Surface = NULL;
 };
 
 #endif // MACAIROUI_H_INCLUDED

@@ -108,17 +108,6 @@ void update_progress_bar()
                     g_PatternStore.LastRealTimeBeat(),
                     g_Sequencer.ScheduleTimeSeconds(),
                     g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
-//    char text[80];
-//    sprintf(text, "Beat%9.2f (Sec%6i:%i)",
-//               g_PatternStore.LastRealTimeBeat(),
-//               g_Sequencer.ScheduleTimeSeconds(),
-//               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
-//
-//    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
-//               g_PatternStore.LastRealTimeBeat(),
-//               g_Sequencer.ScheduleTimeSeconds(),
-//               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
-//
 
 }
 

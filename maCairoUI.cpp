@@ -451,7 +451,6 @@ unordered_map<int, const char *> event_names =
     {XCB_GE_GENERIC, "XCB_GE_GENERIC"}
 };
 
-//bool CairoUI::PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state)
 bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
 {
     bool result = true;

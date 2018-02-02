@@ -477,19 +477,9 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
     switch (c)
     {
     case 1: // Ctrl-A
-//        move(COMMAND_HOME);
-//        clrtoeol();
-//        refresh();
-//        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
-//        set_status(STAT_POS_2, "All Data copied to clipboard ...");
         sym = 0xE6;
         break;
     case 3:  // Ctrl-C, Copy
-//        move(COMMAND_HOME);
-//        clrtoeol();
-//        refresh();
-//        copy_clipboard(g_PatternStore.EditPatternToString());
-//        set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         sym = 0xA2;
         break;
 
@@ -506,70 +496,22 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
 //        break;
 
     case 22: // Ctrl-V, Paste
-//        move(COMMAND_HOME);
-//        clrtoeol();
-//        refresh();
-//        try
-//        {
-//            int created, updates;
-//            load_from_string(get_clipboard(), created, updates);
-//            set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
-//        }
-//        catch (string errorMessage)
-//        {
-//            set_status(STAT_POS_2, "%s", errorMessage.c_str());
-//        }
-//        update_pattern_status_panel();
-//        update_edit_panels();
-//        update_pattern_panel();
         sym = 0xAD2;
         break;
 
     case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
-//        if ( !commandString.empty() )
-//        {
-//            result = do_command(commandString/*.c_str()*/);
-//            commandString.clear();
-//        }
-//        else if ( g_ListBuilder.HandleKeybInput(c) )
-//        {
-//            if ( g_ListBuilder.RealTimeRecord() )
-//                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
-//            else
-//                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-//            g_ListBuilder.Clear();
-//            update_pattern_panel();
-//            set_status(STAT_POS_2, "");
-//        }
-//        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
-//        {
-//            show_status_after_navigation();
-//        }
-//        move(COMMAND_HOME);
-//        clrtoeol();
         sym = XK_Return;
         break;
 
     case 32: // Space bar.
-//        if ( commandString.empty() )
-//        {
-//            if ( g_ListBuilder.HandleKeybInput(c) )
-//                show_listbuilder_status();
-//            move(COMMAND_HOME);
-//        }
-//        else
-//            commandString += c;
         sym = XK_space;
         break;
 
     case KEY_TAB:
-//        move(COMMAND_HOME + commandString.size());
-//        g_TextUI.NextBigPanelPage(1);
         sym = XK_Tab;
         break;
 
     case KEY_SHTAB:
-//        g_TextUI.NextBigPanelPage(-1);
         sym = XK_ISO_Left_Tab;
         break;
 
@@ -598,19 +540,9 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
     case KEY_SDELETE:
     case KEY_CDELETE:
         curKey = g_CursorKeyMap.at(c);
-//        show_status_after_navigation();
-//        update_edit_panels();
         break;
 
     case KEY_BACKSPACE: // 263
-//        if ( commandString.size() > 0 )
-//            commandString.pop_back();
-//        else if ( g_ListBuilder.HandleKeybInput(c) )
-//            show_listbuilder_status();
-//        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
-//            show_status_after_navigation();
-//        move(COMMAND_HOME + commandString.size());
-//        clrtoeol(); // Assuming the cursor has been put back to correct location.
         sym = XK_BackSpace;
         break;
 
@@ -631,7 +563,4 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
         break;
     }
 
-//    refresh();
-
-//    return result;
 }

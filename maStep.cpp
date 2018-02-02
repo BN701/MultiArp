@@ -73,18 +73,8 @@ void do_UI_updates()
 
     // Every step ...
 
-//    update_pattern_panel();     // TODO: Revert to updating this when updates are actually made.
-//    highlight_pattern_panel();  // Moves note highlight.
     update_pattern_panel();
-//    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
-
     update_progress_bar();
-//    set_status_w(STAT_POS_STEP, " Beat%9.2f\n (Sec%6i:%i)",
-//               /*g_State.Phase(),*/
-////               g_State.Beat(),
-//               g_PatternStore.LastRealTimeBeat(),
-//               g_Sequencer.ScheduleTimeSeconds(),
-//               g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 }
 
 void do_phase0_updates()

@@ -20,7 +20,7 @@
 #ifndef CHAINLINK_H
 #define CHAINLINK_H
 
-#include <string>
+//#include <string>
 
 #include "maCursorKeys.h"
 

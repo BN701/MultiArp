@@ -281,8 +281,10 @@ void TrigListItem::FromString(string s)
 
         transform(token.begin(), token.end(), token.begin(), ::tolower);
 
+#ifndef MA_BLUE
         try
         {
+#endif
             switch (e)
             {
             case tli_trig_mask:
@@ -314,6 +316,7 @@ void TrigListItem::FromString(string s)
             default:
                 break;
             }
+#ifndef MA_BLUE
         }
         catch(invalid_argument ex)
         {
@@ -322,6 +325,7 @@ void TrigListItem::FromString(string s)
         catch(out_of_range ex)
         {
         }
+#endif
     }
 }
 
@@ -340,8 +344,10 @@ void TrigListItem::FromSimpleString(string s)
 
     while ( s.size() > 0 )
     {
+#ifndef MA_BLUE
         try
         {
+#endif
             int i = stoi(s);
             if ( i <= 64 )
                 m_Trigs.push_back(i - 1);
@@ -350,11 +356,13 @@ void TrigListItem::FromSimpleString(string s)
             if ( pos == string::npos )
                 break;
             s.erase(0, pos + 1);
+#ifndef MA_BLUE
         }
         catch (...)
         {
             break;
         }
+#endif
     }
 
     m_TrigMask = MaskFromTrigs();

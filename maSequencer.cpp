@@ -17,39 +17,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef MACOMMAND_H_INCLUDED
-#define MACOMMAND_H_INCLUDED
+#include "maSequencer.h"
 
-#include <string>
+Sequencer g_Sequencer;
 
-#ifdef MA_BLUE
+Sequencer::Sequencer()
+{
+    //ctor
+}
 
-//typedef uint32_t xcb_keysym_t;
-
-#else
-
-#include <xcb/xcb.h>
-
-// Todo: move X key code dependency and set up our own codes.
-
-#define XK_MISCELLANY
-#define XK_XKB_KEYS
-#define XK_LATIN1
-#include <X11/keysymdef.h>  // XK_ Unicode key name defines
-
-
-void do_command_line(int argc, char *argv[]);
-#endif // MA_BLUE
-
-#include "maCursorKeys.h"
-
-bool do_command(std::string commandList);
-
-bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym);
-
-//#define RESET_NONE 0
-//#define RESET_ALL 1
-//#define RESET_CURRENT 2
-
-
-#endif // MACOMMAND_H_INCLUDED
+Sequencer::~Sequencer()
+{
+    //dtor
+}

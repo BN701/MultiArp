@@ -17,6 +17,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef TEENSYDUINO
 
 #include "maAlsaSequencer.h"
 
@@ -103,7 +104,7 @@ bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char 
 }
 
 
-bool AlsaSequencer::ScheduleEcho(int queueId)
+bool AlsaSequencer::ScheduleNextCallBack(int queueId)
 {
     snd_seq_event_t ev;
 
@@ -118,3 +119,5 @@ bool AlsaSequencer::ScheduleEcho(int queueId)
 
     return true;
 }
+
+#endif // TEENSYDUINO

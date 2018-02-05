@@ -232,6 +232,12 @@ string Note::NoteString(int n)
 
 int Note::NoteNumberFromString(string note)
 {
+#ifdef MA_BLUE
+    if ( mapNotesToNumbers.count(note.c_str()) == 1 )
+        return mapNotesToNumbers.at(note.c_str());
+    else
+        return -1;
+#else
     try
     {
         return mapNotesToNumbers.at(note.c_str());
@@ -240,6 +246,7 @@ int Note::NoteNumberFromString(string note)
     {
         return -1;
     }
+#endif
 }
 
 
@@ -488,16 +495,20 @@ void Cluster::FromString(string s)
     for ( vector<string>::iterator it = noteStrings.begin(); it != noteStrings.end(); it++ )
     {
         Note n;
+#ifndef MA_BLUE
         try
         {
+#endif
             n.FromString(*it);
             m_Notes.push_back(n);
+#ifndef MA_BLUE
         }
         catch (...)
         {
             // Do nothing with this, we just want to
             // carry on and try the next note.
         }
+#endif
 
     }
 }
@@ -773,7 +784,11 @@ void StepList::FromString(string s)
     vector<string> chordStrings = split(s.c_str(), ',', true);
 
     if ( chordStrings.size() == 0 )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Note List parse error: nothing found.");
+#endif
 
     Clear();
 
@@ -1296,7 +1311,11 @@ void RealTimeList::FromString(string s)
     vector<string> tokens = split(s.c_str(), ',', true);
 
     if ( tokens.size() == 0 )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Note List parse error: nothing found.");
+#endif
 
     // Expect field list in first token ...
 
@@ -1309,8 +1328,10 @@ void RealTimeList::FromString(string s)
         if ( token.empty() )
             continue;
 
+#ifndef MA_BLUE
         try
         {
+#endif
             switch (e)
             {
             case rtl_name_loop:
@@ -1328,6 +1349,7 @@ void RealTimeList::FromString(string s)
             default:
                 break;
             }
+#ifndef MA_BLUE
         }
         catch(invalid_argument ex)
         {
@@ -1336,6 +1358,7 @@ void RealTimeList::FromString(string s)
         catch(out_of_range ex)
         {
         }
+#endif
     }
 
     // Anything after that is a note.

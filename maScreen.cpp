@@ -19,8 +19,16 @@
 
 #include "maScreen.h"
 
-#include "maAlsaSequencer.h"
-#include "maAlsaSequencerQueue.h"
+#include <cstdarg>
+
+#ifdef MA_BLUE
+#include "maSequencer.h"
+extern Sequencer g_Sequencer;
+#else
+#include "platform_Linux/maAlsaSequencer.h"
+#include "platform_Linux/maAlsaSequencerQueue.h"
+extern AlsaSequencer g_Sequencer;
+#endif // MA_BLUE
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maState.h"
@@ -31,15 +39,15 @@ using namespace std;
 
 // Global ALSA Sequencer instance.
 
-extern AlsaSequencer g_Sequencer;
 extern CursorKeys g_CursorKeys;
 extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
 extern State g_State;
 
 TextUI g_TextUI;
+#ifndef MA_BLUE
 CairoUI g_CairoUI(false);
-
+#endif
 
 
 void place_cursor(int row, int col)
@@ -56,7 +64,9 @@ void set_status(int y, int x, const char *format, ...)
     va_end(args);
 
     g_TextUI.Text(BaseUI::whole_screen, y, x, text, BaseUI::attr_normal);
+#ifndef MA_BLUE
     g_CairoUI.Text(BaseUI::whole_screen, y+2, x, text, BaseUI::attr_normal);
+#endif
 }
 
 //void set_status_w(WINDOW * w, int y, int x, const char *format, ...)
@@ -69,7 +79,9 @@ void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, 
     va_end(args);
 
     g_TextUI.Text(area, y, x, text);
+#ifndef MA_BLUE
     g_CairoUI.Text(BaseUI::whole_screen, y + 3, x, text, BaseUI::attr_normal);
+#endif
 }
 
 
@@ -81,11 +93,13 @@ void set_top_line()
                         g_State.RunState(),
                         g_ListBuilder.MidiInputMode() );
 
+#ifndef MA_BLUE
     g_CairoUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
                         g_State.CurrentStepValue(),
                         g_State.Quantum(),
                         g_State.RunState(),
                         g_ListBuilder.MidiInputMode() );
+#endif
 }
 
 void update_progress_bar()
@@ -101,6 +115,7 @@ void update_progress_bar()
                     g_Sequencer.ScheduleTimeSeconds(),
                     g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
 
+#ifndef MA_BLUE
     g_CairoUI.Progress(progress,
                     stepWidth,
                     g_State.Phase() + 1,
@@ -108,6 +123,7 @@ void update_progress_bar()
                     g_PatternStore.LastRealTimeBeat(),
                     g_Sequencer.ScheduleTimeSeconds(),
                     g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
+#endif
 
 }
 
@@ -229,8 +245,10 @@ void update_pattern_panel()
     if ( g_TextUI.BigPanelHold() )
         return;
 
+#ifndef MA_BLUE
     try
     {
+#endif
         bool showTrigProgress = false;
         static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
 
@@ -281,11 +299,13 @@ void update_pattern_panel()
         if ( showTrigProgress )
             g_TextUI.Highlight(BaseUI::big_panel, 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
                 CP_PATTERN_LIST_PANEL, BaseUI::attr_underline);
+#ifndef MA_BLUE
     }
     catch (... /*string s*/)
     {
         // wprintw(g_TextUI.BigPanel(), s.c_str());
     }
+#endif
 
 }
 

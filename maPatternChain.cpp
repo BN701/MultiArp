@@ -74,14 +74,20 @@ void PatternChain::FromSimpleString(string s)
     vector<string> tokens = split(s.c_str(), ' ');
 
     if ( tokens.size() == 1 )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern Chain parse error: nothing entered.");
+#endif
 
     std::vector<ChainLink> newChain;
 
     for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
     {
+#ifndef MA_BLUE
         try
         {
+#endif
             size_t pos;
             int pattern = stoi(*it, &pos) - 1;
 
@@ -99,12 +105,13 @@ void PatternChain::FromSimpleString(string s)
             newChain.emplace_back();
             newChain.back().SetPattern(pattern);
             newChain.back().SetRepeats(repeats - 1);
+#ifndef MA_BLUE
         }
         catch ( invalid_argument )
         {
             // Do nothing and carry on with next token.
         }
-
+#endif
     }
 
     if ( !newChain.empty() )
@@ -121,23 +128,30 @@ void PatternChain::FromString(string s)
     vector<string> tokens = split(s.c_str(), ' ');
 
     if ( tokens.size() == 1 )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern Chain parse error: nothing entered.");
+#endif
 
     m_Chain.clear();
     m_PosEdit = 0;
 
     for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
     {
+#ifndef MA_BLUE
         try
         {
+#endif
             m_Chain.emplace_back();
             m_Chain.back().FromString(*it);
+#ifndef MA_BLUE
         }
         catch ( invalid_argument )
         {
             // Do nothing and carry on with next token.
         }
-
+#endif
     }
 }
 

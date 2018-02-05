@@ -171,6 +171,7 @@ struct StepList : public CursorKeys
 //    std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
 
     // std::string m_Label;
+    static StepList EmptyList;
 
     bool m_Complete;
 
@@ -291,6 +292,7 @@ struct RealTimeListParams : public CursorKeys
 
 struct RealTimeList : public CursorKeys
 {
+    static RealTimeList EmptyList;
     std::map<double,Note> m_RealTimeList;
 
 //    bool m_Complete = false;

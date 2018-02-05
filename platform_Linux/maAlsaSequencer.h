@@ -51,7 +51,7 @@ public:
     }
 
     bool ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len);
-    bool ScheduleEcho(int queueId);
+    bool ScheduleNextCallBack(int queueId);
 
     snd_seq_t * Handle()
     {

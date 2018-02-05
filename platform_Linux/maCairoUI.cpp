@@ -17,6 +17,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef MA_BLUE
 
 #include "maCairoUI.h"
 
@@ -73,10 +74,10 @@ bool FindMonoFont(cairo_t * cr)
     return false;
 }
 
-CairoUI::CairoUI(bool dummy):
-    m_Dummy(dummy)
+CairoUI::CairoUI(bool enable):
+    m_Enabled(enable)
 {
-    if ( m_Dummy )
+    if ( !m_Enabled )
         return;
 
     m_Connection = xcb_connect (NULL, &m_ScreenNo);
@@ -224,7 +225,7 @@ CairoUI::CairoUI(bool dummy):
 
 CairoUI::~CairoUI()
 {
-    if ( m_Dummy )
+    if ( !m_Enabled )
     {
         return;
     }
@@ -577,7 +578,7 @@ bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb
 
 void CairoUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute, double scale)
 {
-    if ( m_Dummy )
+    if ( !m_Enabled )
         return;
 
     cairo_t *cr = cairo_create(m_Surface);
@@ -652,7 +653,7 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
 
 void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
 {
-    if ( m_Dummy )
+    if ( !m_Enabled )
     {
         return;
     }
@@ -769,7 +770,7 @@ void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int 
 void CairoUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
                             double rtBeat, unsigned int queueSecs, unsigned int queueNano)
 {
-    if ( m_Dummy )
+    if ( !m_Enabled )
     {
         return;
     }
@@ -903,7 +904,7 @@ void CairoUI::Progress(double progress, double stepWidth, double beat, int patte
 
     snprintf(text, 80, "Beat %9.2f (Sec %6u.%u)", rtBeat, queueSecs, queueNano);
     cairo_set_source_rgb(cr, 1, 1, 1);
-    cairo_move_to (cr, x, y);
+    cairo_move_to (cr, x + m_GridSize, y);
     cairo_show_text (cr, text);
 
     Refresh(rUpdate);
@@ -911,3 +912,4 @@ void CairoUI::Progress(double progress, double stepWidth, double beat, int patte
     cairo_destroy(cr);
 }
 
+#endif // MA_BLUE

@@ -19,14 +19,21 @@
 
 #include "maCommand.h"
 
-#include<algorithm>
-#include<cstring>
-#include<cmath>
-#include<unordered_map>
+#include <algorithm>
+#include <cstring>
+#include <cmath>
+#include <unordered_map>
+#include <array>
 
+#ifdef MA_BLUE
+#include "maSequencer.h"
+extern Sequencer g_Sequencer;
+#else
+#include "platform_Linux/maAlsaSequencer.h"
+#include "platform_Linux/maAlsaSequencerQueue.h"
+extern AlsaSequencer g_Sequencer;
+#endif // MA_BLUE
 
-#include "maAlsaSequencer.h"
-#include "maAlsaSequencerQueue.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -38,13 +45,14 @@ using namespace std;
 
 // Global objects.
 
-extern AlsaSequencer g_Sequencer;
+#ifndef MA_BLUE
+#endif
+
 extern CursorKeys g_CursorKeys;
 extern State g_State;
 extern PatternStore g_PatternStore;
 extern TextUI g_TextUI;
 extern ListBuilder g_ListBuilder;
-//extern TranslateTable * pTranslateTable;
 
 enum command_t
 {
@@ -349,42 +357,68 @@ command_t command_from_string(string commandName)
 {
     command_t command;
 
+#ifdef MA_BLUE
+    for(auto i = commandName.begin(); i != commandName.end(); i++)
+    {
+        *i = tolower(*i);
+    }
+
+    if ( gCommandList.count(commandName) == 1 )
+        command = gCommandList[commandName];
+    else
+        command = C_NONE;
+#else
     try
     {
-        transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
-        command = gCommandList.at(commandName);
+       transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
+       command = gCommandList.at(commandName);
     }
     catch ( out_of_range const & e )
     {
-        command = C_NONE;
+       command = C_NONE;
     }
+    catch( ... )
+    {
+       command = C_NONE;
+    }
+#endif
 
     return command;
 }
 
-command_t command_from_string(vector<string> & tokens, int count = 1)
+command_t command_from_string(vector<string> & tokens, uint32_t count)
 {
+    if ( count > tokens.size() )
+        return C_NONE;
 
-    command_t command;
+    string phrase = tokens[0];
 
-    try
+    for ( uint32_t i = 1; i < count; i++ )
     {
-        string commandName = tokens[0];
-
-        for ( int i = 1; i < count; i++ )
-        {
-            commandName += " ";
-            commandName += tokens[i];
-        }
-
-        command = command_from_string(commandName);
-    }
-    catch ( out_of_range const & e )
-    {
-        command = C_NONE;
+        phrase += " ";
+        phrase += tokens[i];
     }
 
-    return command;
+    return command_from_string(phrase);
+
+//    try
+//    {
+//        string commandName = tokens[0];
+//
+//        for ( int i = 1; i < count; i++ )
+//        {
+//            commandName += " ";
+//            commandName += tokens[i];
+//        }
+//
+//        command = command_from_string(commandName);
+//    }
+//    catch ( out_of_range const & e )
+//    {
+//        command = C_NONE;
+//    }
+//
+//    return command;
 }
 
 void do_help(string topicName)
@@ -465,15 +499,19 @@ bool do_command(string commandString)
 
     int firstParameter = -1;
     for ( int i = tokens.size(); i >= 0; i-- )
+    {
         if ( command = command_from_string(tokens, i), command != C_NONE )
         {
             if ( static_cast<unsigned>(i) < tokens.size() )
                 firstParameter = i;
             break;
         }
+    }
 
+#ifndef MA_BLUE
     try
     {
+#endif
         int iTemp;
         double fTemp;
 
@@ -520,10 +558,16 @@ bool do_command(string commandString)
 
         case C_CUE  :
             if ( tokens.size() < 2 )
-                throw string("hint: play nn, where 'nn' is pattern number.");
+            {
+                set_status(STAT_POS_2,"Hint: play nn, where 'nn' is pattern number.");
+                break;
+            }
             iTemp = stoi(tokens[1].c_str()) - 1;
             if ( ! g_PatternStore.ValidPosition(iTemp) )
-                throw string("Requested pattern number out of range at the moment.");
+            {
+                set_status(STAT_POS_2,"Requested pattern number out of range at the moment.");
+                break;
+            }
             set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
             g_PatternStore.SetNewPatternPending(iTemp);
             break;
@@ -539,7 +583,10 @@ bool do_command(string commandString)
             {
                 iTemp = stoi(tokens[1].c_str()) - 1;
                 if ( ! g_PatternStore.ValidPosition(iTemp) )
-                    throw string("Requested pattern number out of range at the moment.");
+                {
+                    set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
+                    break;
+                }
                 set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
                 g_PatternStore.SetEditPos(iTemp);
                 update_pattern_status_panel();
@@ -574,7 +621,10 @@ bool do_command(string commandString)
 
         case C_DELETE :
             if ( g_PatternStore.PatternCount() == 0 )
-                throw string("Nothing to delete.");
+            {
+                set_status(STAT_POS_2, "Nothing to delete.");
+                break;
+            }
             if ( tokens.size() >= 2 && tokens.at(1) == "all" )
             {
                 g_PatternStore.DeleteAllPatterns();
@@ -626,7 +676,10 @@ bool do_command(string commandString)
 
         case C_STEPVAL :
             if ( tokens.size() < 2 )
-                throw string("Hint: step n");
+            {
+                set_status(STAT_POS_2, "Hint: step n");
+                break;
+            }
             fTemp = stod(tokens[1].c_str());
             if ( fTemp != 0 )
             {
@@ -654,7 +707,10 @@ bool do_command(string commandString)
                 }
             }
             else
-                throw string("Hint: gate h[old]|n[ormal]|n.n%");
+            {
+                set_status(STAT_POS_2, "Hint: gate h[old]|n[ormal]|n.n%");
+                break;
+            }
             break;
         case C_GATE_HOLD:
             g_PatternStore.SetGateHold(true);
@@ -665,7 +721,10 @@ bool do_command(string commandString)
 
         case C_VELOCITY :
             if ( tokens.size() < 2 )
-                throw string("Hint: vel[ocity] n");
+            {
+                set_status(STAT_POS_2, "Hint: vel[ocity] n");
+                break;
+            }
             iTemp = stoi(tokens[1].c_str());
             if ( iTemp >= 0 && iTemp <= 127 )
             {
@@ -680,7 +739,10 @@ bool do_command(string commandString)
 
         case C_TRANSPOSE :
             if ( tokens.size() < 2 )
-                throw string("Hint: trans[pose] n [now]");
+            {
+                set_status(STAT_POS_2, "Hint: trans[pose] n [now]");
+                break;
+            }
             iTemp = stoi(tokens[1].c_str());
             if ( tokens.size() >= 3 && tokens[2] == "now")
             {
@@ -700,7 +762,7 @@ bool do_command(string commandString)
             show_status_after_navigation();
             break;
         case C_FEEL_HELP:
-            throw string("feel new[list]|on|off|add|remove|respace|bypass");
+            set_status(STAT_POS_2, "feel new[list]|on|off|add|remove|respace|bypass");
             break;
         case C_FEEL_ON:
             g_PatternStore.FeelMapForEdit().SetActive(true);
@@ -747,7 +809,10 @@ bool do_command(string commandString)
 
         case C_SETROOT :
             if ( tokens.size() < 2 || ! g_PatternStore.TranslateTableForEdit().SetRoot(tokens[1]) )
-                throw string("Hint: root C, C#, Eb, C5, F#6, etc.");
+            {
+                set_status(STAT_POS_2, "Hint: root C, C#, Eb, C5, F#6, etc.");
+                break;
+            }
             else
                 show_translation_status();
             break;
@@ -793,7 +858,10 @@ bool do_command(string commandString)
 
         case C_QUANTUM :
             if ( tokens.size() < 2 )
-                throw string("Hint: quan[tum] n.nn");
+            {
+                set_status(STAT_POS_2, "Hint: quan[tum] n.nn");
+                break;
+            }
             fTemp = stod(tokens[1].c_str());
             if ( fTemp > 0 )
             {
@@ -805,13 +873,19 @@ bool do_command(string commandString)
 
         case C_SET_RESETONPATTERNCHANGE : // Auto-reset
             if ( tokens.size() < 2 )
-                throw string("Hint: autoreset on|off");
+            {
+                set_status(STAT_POS_2, "Hint: autoreset on|off");
+                break;
+            }
             if ( tokens[1] == "on")
                 g_PatternStore.SetResetOnPatternChange(true);
             else if (tokens[1] == "off")
                 g_PatternStore.SetResetOnPatternChange(false);
             else
-                throw string("Autoreset not changed.");
+            {
+                set_status(STAT_POS_2, "Autoreset not changed.");
+                break;
+            }
             break;
 
         case C_PATTERN_CHAIN :
@@ -919,18 +993,26 @@ bool do_command(string commandString)
 
         case C_LIST:
             if ( tokens.size() < 2 )
-                throw string("Hint: list new|delete|n [clear|: n1, n2 ,...]");
+            {
+                set_status(STAT_POS_2, "Hint: list new|delete|n [clear|: n1, n2 ,...]");
+                break;
+            }
             set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
             update_pattern_panel();
             break;
 
+#ifndef MA_BLUE
         case C_LIST_IMPORT:
             if ( tokens.size() < 2 )
-                throw string("Hint: import filename[.mid]");
+            {
+                set_status(STAT_POS_2, "Hint: import filename[.mid]");
+                break;
+            }
             g_PatternStore.UpdatePatternFromMidiFile(commandString);
             set_status(STAT_POS_2, "File imported to Real Time list.");
             update_pattern_panel();
             break;
+#endif
 
         case C_LIST_RT:
             g_PatternStore.CurrentEditRealTimeList().SetStatus();
@@ -1053,6 +1135,7 @@ bool do_command(string commandString)
         default :
             break;
         }
+#ifndef MA_BLUE
     }
     catch (invalid_argument e)
     {
@@ -1066,6 +1149,7 @@ bool do_command(string commandString)
     {
         set_status(STAT_POS_2, s.c_str());
     }
+#endif
 
     // Keeping track of all the places I might need to do this
     // is nearly impossible, so might as well just do it every
@@ -1076,6 +1160,7 @@ bool do_command(string commandString)
     return bResult;
 }
 
+#ifndef MA_BLUE
 void do_command_line(int argc, char *argv[])
 {
 
@@ -1120,6 +1205,7 @@ void do_command_line(int argc, char *argv[])
 
 
 }
+#endif
 
 enum global_element_names_t
 {
@@ -1169,8 +1255,10 @@ void load_from_string(string s, int & created, int & updated )
 
     for ( vector<string>::iterator i = rows.begin(); i != rows.end(); i++ )
     {
+#ifndef MA_BLUE
         try
         {
+#endif
             if ( g_PatternStore.FromString(*i, created, updated) ) // Give Pattern Store a chance to see the header.
                 continue;
 
@@ -1187,8 +1275,10 @@ void load_from_string(string s, int & created, int & updated )
 
                 transform(token.begin(), token.end(), token.begin(), ::tolower);
 
+#ifndef MA_BLUE
                 try
                 {
+#endif
                     switch (e)
                     {
                     case global_name_midi_channel:
@@ -1200,6 +1290,7 @@ void load_from_string(string s, int & created, int & updated )
                     default:
                         break;
                     }
+#ifndef MA_BLUE
                 }
                 catch(invalid_argument ex)
                 {
@@ -1208,7 +1299,9 @@ void load_from_string(string s, int & created, int & updated )
                 catch(out_of_range ex)
                 {
                 }
+#endif
             }
+#ifndef MA_BLUE
         }
         catch (invalid_argument e)
         {
@@ -1217,10 +1310,13 @@ void load_from_string(string s, int & created, int & updated )
         {
             errors.push_back(error);
         }
+#endif
     }
 
+#ifndef MA_BLUE
     if ( !errors.empty() )
         throw string("Pattern parse error: At least one row contained errors.");
+#endif
 
 }
 
@@ -1254,22 +1350,30 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
 
     case 0xAD2: // Ctrl-V, Paste
         set_status(COMMAND_HOME, "");
+#ifndef MA_BLUE
         try
         {
+#endif
             int created, updates;
             load_from_string(get_clipboard(), created, updates);
             set_status(STAT_POS_2, "Paste: %i updates, %i new patterns created.", updates, created);
+#ifndef MA_BLUE
         }
         catch (string errorMessage)
         {
             set_status(STAT_POS_2, "%s", errorMessage.c_str());
         }
+#endif
         update_pattern_status_panel();
         update_edit_panels();
         update_pattern_panel();
         break;
 
+#ifdef MA_BLUE
+    case 13:
+#else
     case XK_Return: // Enter
+#endif
         if ( !commandString.empty() )
         {
             result = do_command(commandString);
@@ -1293,10 +1397,18 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
         set_status(COMMAND_HOME, "");
         break;
 
+#ifdef MA_BLUE
+    case 32:
+#else
     case XK_space: // Space bar.
+#endif
         if ( commandString.empty() )
         {
+#ifdef MA_BLUE
+            if ( g_ListBuilder.HandleKeybInput(32) )
+#else
             if ( g_ListBuilder.HandleKeybInput(XK_space) )
+#endif
                 show_listbuilder_status();
         }
         else
@@ -1307,6 +1419,7 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
         }
         break;
 
+#ifndef MA_BLUE
     case XK_Tab:
         place_cursor(COMMAND_HOME + commandString.size());
         g_TextUI.NextBigPanelPage(1);
@@ -1315,8 +1428,13 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
     case XK_ISO_Left_Tab:   // Shift-Tab
         g_TextUI.NextBigPanelPage(-1);
         break;
+#endif
 
+#ifdef MA_BLUE
+    case 8:
+#else
     case XK_BackSpace:
+#endif
         if ( commandString.size() > 0 )
             commandString.pop_back();
         else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )

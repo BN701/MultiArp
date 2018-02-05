@@ -121,37 +121,17 @@ int main(int argc, char *argv[])
             bool keyDataValid = false;
             CursorKeys::key_type_t curKey = CursorKeys::no_key;
             xcb_keysym_t sym = 0;
+
             if ( pfd[0].revents & POLLIN )
             {
                 keyDataValid = true;
                 g_TextUI.KeyInput(curKey, sym);
-//                bool keyDataValid = false;
-//                CursorKeys::key_type_t curKey = CursorKeys::no_key;
-//                xcb_keysym_t sym = 0;
-//                if ( gotXWindow )
-//                {
-////                    uint8_t keycode;
-////                    uint16_t state;
-////                    bool keyDataValid = false;
-////                    keep_going = g_CairoUI.PollEvents(keyDataValid, keycode, state);
-////                    if ( keep_going && keyDataValid )
-////                        keep_going = key_input_action_xcb(keycode, state);
-//                    keep_going = g_CairoUI.PollEvents(keyDataValid, curKey, sym);
-//                }
-//                else
-//                {
-//                    keyDataValid = true;
-//                    g_TextUI.KeyInput(curKey, sym);
-//                }
-//                if ( keyDataValid )
-//                {
-//                    keep_going = handle_key_input(curKey, sym);
-//                }
             }
             else if ( gotXWindow && (pfd[1].revents & POLLIN) )
             {
                 keep_going = g_CairoUI.PollEvents(keyDataValid, curKey, sym);
             }
+
             if ( keep_going && keyDataValid )
             {
                 keep_going = handle_key_input(curKey, sym);

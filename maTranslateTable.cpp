@@ -348,7 +348,11 @@ bool TranslateTable::HandleKey(key_type_t k)
 void TranslateTable::FromString(string s)
 {
     if ( s.find(tt_element_names.at(tt_scale_heading)) == string::npos )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("TranslateTable::FromString() - Not a valid field list.");
+#endif // MA_BLUE
 
     for ( tt_element_names_t e = static_cast<tt_element_names_t>(1);
           e < num_tt_element_names;
@@ -359,8 +363,10 @@ void TranslateTable::FromString(string s)
         if ( token.empty() )
             continue;
 
+#ifndef MA_BLUE
         try
         {
+#endif // MA_BLUE
             switch (e)
             {
             case tt_name_scale:
@@ -387,6 +393,7 @@ void TranslateTable::FromString(string s)
             default:
                 break;
             }
+#ifndef MA_BLUE
         }
         catch(invalid_argument ex)
         {
@@ -395,6 +402,7 @@ void TranslateTable::FromString(string s)
         catch(out_of_range ex)
         {
         }
+#endif // MA_BLUE
     }
 
 }
@@ -474,32 +482,44 @@ void TranslateTable::SetScale(scale_t val)
         SetupScaleMaps();
     }
     else
+#ifdef MA_BLUE
+        return;
+#else
         throw int (-1); // Change this to something meaningful if we ever want to deal with it properly.
+#endif // MA_BLUE
 }
 
 bool TranslateTable::SetScale(std::string & name)
 {
     std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 
+#ifndef MA_BLUE
     try
     {
+#endif // MA_BLUE
         SetScale(tt_scale_tags.at(name));
         return true;
+#ifndef MA_BLUE
     }
     catch ( std::out_of_range const & e )
     {
         // Just try the next thing.
     }
+#endif // MA_BLUE
 
+#ifndef MA_BLUE
     try
     {
+#endif // MA_BLUE
         SetScale(static_cast<scale_t>(strtol(name.c_str(), NULL, 10) - 1));
         return true;
+#ifndef MA_BLUE
     }
     catch (...)
     {
         return false;
     }
+#endif // MA_BLUE
 
 }
 
@@ -594,19 +614,23 @@ void TranslateTable::SetupScaleMaps()
     int totalIntervals = 0;
     for ( unsigned i = 0; i < tokens.size(); i++ )
     {
+#ifndef MA_BLUE
         try
         {
+#endif // MA_BLUE
             int interval = std::strtol(tokens.at(i).c_str(), NULL, 10);
             m_Intervals.push_back(interval);
             m_NoteMap[totalIntervals] = i;
             totalIntervals += interval;
             if ( totalIntervals >= 12 )
                 break;
+#ifndef MA_BLUE
         }
         catch(...)
         {
             // Do nothing and try the next one.
         }
+#endif // MA_BLUE
     }
 
     if ( totalIntervals < 12 )
@@ -721,6 +745,12 @@ string TranslateTable::RootName()
 
 const char * TranslateTable::ScaleName()
 {
+#ifdef MA_BLUE
+    if ( tt_scale_names.count(m_Scale) != 0 )
+        return tt_scale_names.at(m_Scale);
+    else
+        return "unknown";
+#else
     try
     {
         return tt_scale_names.at(m_Scale);
@@ -729,10 +759,17 @@ const char * TranslateTable::ScaleName()
     {
         return "unknown";
     }
+#endif // MA_BLUE
 }
 
 const char * TranslateTable::PremapModeName()
 {
+#ifdef MA_BLUE
+    if ( tt_premap_mode_names.count(m_PremapMode) != 0 )
+        return tt_premap_mode_names.at(m_PremapMode);
+    else
+        return "unknown";
+#else
     try
     {
         return tt_premap_mode_names.at(m_PremapMode);
@@ -741,10 +778,17 @@ const char * TranslateTable::PremapModeName()
     {
         return "unknown";
     }
+#endif
 }
 
 const char * TranslateTable::AccidentalsModeName()
 {
+#ifdef MA_BLUE
+    if ( tt_accidentals_mode_names.count(m_AccidentalsMode) != 0 )
+        return tt_accidentals_mode_names.at(m_AccidentalsMode);
+    else
+        return "unknown";
+#else
     try
     {
         return tt_accidentals_mode_names.at(m_AccidentalsMode);
@@ -753,6 +797,7 @@ const char * TranslateTable::AccidentalsModeName()
     {
         return "unknown";
     }
+#endif
 }
 
 const char * TranslateTable::ShiftName()
@@ -778,14 +823,22 @@ void TranslateTable::LoadTableFromString(const char *s)
     vector<string> rows = split(s, '\n', true);
 
     if ( rows.size() == 0 )
+#ifdef MA_BLUE
+        return;
+#else
         throw std::string("Translate Table parse error: No rows found.");
+#endif
 
     for ( vector<string>::size_type row = 0; row < rows.size(); row++ )
     {
         vector<string> values = split(rows.at(row).c_str(), ',', true);
 
         if ( values.size() == 0 )
+#ifdef MA_BLUE
+            return;
+#else
             throw string("Translate Table parse error: No values found in row.");
+#endif
 
         for ( vector<string>::size_type col = 0; col < values.size(); col++ )
 //#ifdef DEBUG

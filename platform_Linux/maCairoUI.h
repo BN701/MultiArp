@@ -20,6 +20,8 @@
 #ifndef MACAIROUI_H_INCLUDED
 #define MACAIROUI_H_INCLUDED
 
+#ifndef MA_BLUE
+
 #include <xcb/xcb.h>
 #include <xcb/xcb_keysyms.h>
 #include <cairo-xcb.h>
@@ -30,12 +32,11 @@
 class CairoUI : public BaseUI
 {
     public:
-        CairoUI(bool dummy = false);
+        CairoUI(bool enabled = true);
         ~CairoUI();
 
         xcb_connection_t * Connection() { return m_Connection; }
 
-//        bool PollEvents(bool & gotKeyData, uint8_t & keycode, uint16_t & state);
         bool PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
         bool KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym);
 
@@ -51,7 +52,7 @@ class CairoUI : public BaseUI
         void Refresh(Rectangle & r, bool useDouble = false);
 
     private:
-        bool m_Dummy = false;
+        bool m_Enabled = true;
         int m_Width = 800;          // These could be FP and we calculate pixel values on the fly.
         int m_Height = 500;
 
@@ -79,5 +80,8 @@ class CairoUI : public BaseUI
 
         cairo_surface_t * m_Surface = NULL;
 };
+
+
+#endif // MA_BLUE
 
 #endif // MACAIROUI_H_INCLUDED

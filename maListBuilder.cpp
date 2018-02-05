@@ -20,8 +20,10 @@
 
 #include "maListBuilder.h"
 
-
+#ifndef MA_BLUE
 #include <alsa/asoundlib.h>
+#endif // MA_BLUE
+
 
 using namespace std;
 
@@ -35,6 +37,7 @@ using namespace std;
 ofstream fLog;
 #endif
 
+#ifndef MA_BLUE
 ListBuilder::ListBuilder(ableton::Link * linkInstance):
     m_Link(linkInstance)
 {
@@ -44,6 +47,7 @@ ListBuilder::ListBuilder(ableton::Link * linkInstance):
 #endif
 
 }
+#endif // MA_BLUE
 
 ListBuilder::~ListBuilder()
 {
@@ -194,12 +198,16 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
     {
         case MIDI_INPUT_REAL_TIME:
             {
+#ifdef MA_BLUE
+                // MA_BLUE Todo: What are we going to use for timestamping?
+                double beat = 0;
+#else
                 if ( m_Link == NULL )
                     throw string("ListBuilder::HandleMidi() - Expecting Ableton Link Instance to be set.");
                 chrono::microseconds t_now = m_Link->clock().micros();
                 ableton::Link::Timeline timeline = m_Link->captureAppTimeline();
                 double beat = timeline.beatAtTime(t_now, m_LinkQuantum);
-
+#endif
                 // Create notes for note-on, complete notes and calculate
                 // duration for note off.
 #if LOG_ON

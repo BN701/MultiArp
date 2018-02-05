@@ -17,6 +17,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef TEENSYDUINO
+
 #include "maAlsaSequencerQueue.h"
 
 AlsaSequencerQueue::AlsaSequencerQueue():
@@ -96,3 +98,6 @@ bool AlsaSequencerQueue::Start()
 
     return true;
 }
+
+
+#endif // TEENSYDUINO

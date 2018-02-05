@@ -95,8 +95,10 @@ void FeelMap::New(vector<string> & tokens)
     {
         for ( unsigned i = 2; i < tokens.size(); i++ )
         {
+#ifndef MA_BLUE
             try
             {
+#endif
                 double t = stod(tokens.at(i));
 
                 // Check if we're creating a default array of size 't',
@@ -114,11 +116,13 @@ void FeelMap::New(vector<string> & tokens)
 
                 if ( t > 0 && t < 1.0 )
                     m_StretchPoints.push_back(t); // We'll sort them after the loop.
+#ifndef MA_BLUE
             }
             catch(...)
             {
                 // Invalid parameter. Do nothing and try the next one.
             }
+#endif
         }
         sort(m_StretchPoints.begin(), m_StretchPoints.end());
     }
@@ -196,7 +200,11 @@ string FeelMap::ToString(const char * prefix)
 void FeelMap::FromString(string s)
 {
     if ( s.find("Feel Map") == string::npos )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("FeelMap::FromString() - Not a valid field list.");
+#endif
 
     vector<string> tokens = split(s.c_str(), ' ');
 

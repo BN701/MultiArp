@@ -21,7 +21,12 @@
 #define MASCREEN_H_INCLUDED
 
 #include "maTextUI.h"
-#include "maCairoUI.h"
+
+#ifndef MA_BLUE
+
+#include "platform_Linux/maCairoUI.h"
+
+#endif // MA_BLUE
 
 // Screen locations
 

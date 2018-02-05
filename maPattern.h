@@ -32,6 +32,7 @@
 
 struct Pattern
 {
+    static Pattern EmptyPattern;
     std::vector<StepList>::size_type m_Pos;
     std::vector<StepList>::size_type m_PosEdit;
     std::vector<RealTimeList>::size_type m_PosRealTimeEdit;
@@ -157,7 +158,9 @@ struct Pattern
     bool FromString(std::string s, int & updates);
     void AddRealTimeList(std::map<double,Note> realTimeList, double quantum);
     void AddRealTimeListFromString(std::vector<RealTimeList>::size_type index, std::string s);
+#ifndef MA_BLUE
     void AddRealTimeListFromMidiFile(std::string s);
+#endif
     void SetRealTimeMultipliers(std::vector<std::string>::iterator token, std::vector<std::string>::iterator last);
     void SetRealTimeQuantum(std::string & token);
     void SetRealTimeStartPhase(std::string & token);

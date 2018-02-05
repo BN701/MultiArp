@@ -163,11 +163,14 @@ struct PatternStore : public CursorKeys
     bool FromString(std::string s, int & created, int & updates);
     void UpdatePattern(StepList & noteList);
     void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
+#ifndef MA_BLUE
     void UpdatePatternFromMidiFile(std::string s);
+#endif
     void SetFieldsFromString(std::string s);
     void UpdatePatternChainFromSimpleString(std::string s); // Old style, from chain command, no support for jumps.
     void UpdatePatternChainFromString(std::string s);
 
+//    StepList & CurrentEditStepList();
     StepList & CurrentEditStepList();
     RealTimeList & CurrentEditRealTimeList();
     Pattern & CurrentPlayPattern();
@@ -273,8 +276,11 @@ struct PatternStore : public CursorKeys
     void PopDeletedPattern()
     {
         if ( m_Deleted.empty() )
+#ifdef MA_BLUE
+            return;
+#else
             throw std::string("There are no deleted patterns to restore.");
-
+#endif
         m_Patterns.push_back(m_Deleted.back());
         m_Deleted.pop_back();
 

@@ -17,16 +17,28 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
+#ifdef MA_BLUE
+
+#include "maSequencer.h"
+extern Sequencer g_Sequencer;
+
+#else
+
 #define LINK_PLATFORM_LINUX
 #include <ableton/Link.hpp>
 
-//#include <csignal>
+// Global Link instance.
 
-#include "maAlsaSequencer.h"
-//#include "maAlsaSequencerQueue.h"
-//#include "maCommand.h"
-//#include "maCursorKeys.h"
-//#include "maFeelMap.h"
+extern ableton::Link g_Link;
+extern chrono::microseconds g_LinkStartTime;
+
+#include "platform_Linux/maAlsaSequencer.h"
+extern AlsaSequencer g_Sequencer;
+
+#endif // MA_BLUE
+
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -36,17 +48,11 @@
 
 using namespace std;
 
-// Global Link instance.
-
-extern ableton::Link g_Link;
-extern chrono::microseconds g_LinkStartTime;
-
 // Global instances.
 
 extern CursorKeys g_CursorKeys;
 extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
-extern AlsaSequencer g_Sequencer;
 extern State g_State;
 
 //extern Display g_Display;
@@ -138,14 +144,21 @@ void queue_next_step(int queueId)
 
     // Get time of next step from Link.
 
-    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
 
     double nextBeat = g_State.Beat();
 
     nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
+
+#ifdef MA_BLUE
+    // MA_BLUE Todo: Convert beat (phase) to schedule time
+    chrono::microseconds t_next_usec;
+#else
+    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
     chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
 
     g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
+#endif
+
 
     if ( g_State.PhaseIsZero() )
     {
@@ -156,7 +169,9 @@ void queue_next_step(int queueId)
 
     // Set next schedule time on the queue
 
-    int64_t queue_time_usec;
+    int64_t queue_time_usec = 0;
+
+#ifndef MA_BLUE
     if ( g_LinkStartTime.count() < 0 )
     {
         g_LinkStartTime = t_next_usec;
@@ -166,12 +181,14 @@ void queue_next_step(int queueId)
     {
         queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
     }
+#endif
 
     if ( queue_time_usec < 0 )
     {
         // Sometimes at start up link appears to go backwards, especially if
         // there's another instance of the app running. For now, just keep
-        // reschedule and hope things settle down.
+        // reschedule and hope things settle down. This is probably our count
+        // in, though I haven't thought it through properly.
 //        raise(SIGINT);
         queue_time_usec = 0;
     }
@@ -182,9 +199,9 @@ void queue_next_step(int queueId)
     // arpeggio to be placed in the queue.
 
     // TODO: We used to do this after scheduling all midi events. Have there
-    //       been any noticable effects of doing it first.
+    //       been any noticable effects of doing it before?
 
-    g_Sequencer.ScheduleEcho(queueId);
+    g_Sequencer.ScheduleNextCallBack(queueId);
 
     // Step the Pattern Store
 
@@ -202,7 +219,11 @@ void queue_next_step(int queueId)
     if ( nextCluster.Empty() )
         return;
 
+#ifdef MA_BLUE
+    double tempo = 120.0;
+#else
     double tempo = timeline.tempo();
+#endif
 
     /*
           V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
@@ -307,7 +328,11 @@ void midi_action(int queueId)
                 otherEvents += 1;
                 break;
         }
+#ifdef MA_BLUE
+        // Todo MA_BLUE: How does event allocation work?
+#else
         snd_seq_free_event(ev);
+#endif
     }
     while ( g_Sequencer.EventInputPending() );
 }

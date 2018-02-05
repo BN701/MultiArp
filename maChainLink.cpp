@@ -17,9 +17,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cstdio>
+#include <cstdlib>
+
 #include "maChainLink.h"
 #include "maPatternChain.h"
 #include "maUtility.h"
+
 
 using namespace std;
 
@@ -55,7 +59,7 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
 
     char buff[50];
 
-    sprintf(buff, "%02i", m_Pattern + 1);
+    snprintf(buff, 50, "%02i", m_Pattern + 1);
     result += buff;
 
     // Show nothing if we just play once (m_Repeats == 1).
@@ -64,7 +68,7 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
     {
         if ( m_Repeats > 0 )
         {
-            sprintf(buff, "x%02i", m_Repeats + 1);
+            snprintf(buff, 50, "x%02i", m_Repeats + 1);
             result += buff;
         }
         else if ( m_Repeats < 0 )
@@ -72,7 +76,7 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
 
         if ( m_Repeats >= 0 && m_Jump >= 0 )
         {
-            sprintf(buff, ">%02i", m_Jump + 1);
+            snprintf(buff, 50, ">%02i", m_Jump + 1);
             result += buff;
         }
     }
@@ -80,12 +84,12 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
     {
         if ( m_Remaining >= 0 )
         {
-            sprintf(buff, " x%02i", m_Remaining + 1);
+            snprintf(buff, 50, " x%02i", m_Remaining + 1);
             result += buff;
         }
         else if ( m_Repeats > 0 )
         {
-            sprintf(buff, " x%02i", m_Repeats + 1);
+            snprintf(buff, 50, " x%02i", m_Repeats + 1);
             result += buff;
         }
         else if ( m_Repeats < 0 )
@@ -93,7 +97,7 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
 
         if ( m_Repeats >= 0 && m_Jump >= 0 )
         {
-            sprintf(buff, " >%02i", m_Jump + 1);
+            snprintf(buff, 50, " >%02i", m_Jump + 1);
             result += buff;
         }
     }
@@ -116,7 +120,7 @@ string ChainLink::ToString()
 {
     char buff[50];
 
-    sprintf(buff, "%i/%i/%i", m_Pattern, m_Repeats, m_Jump);
+    snprintf(buff, 50, "%i/%i/%i", m_Pattern, m_Repeats, m_Jump);
 
     return buff;
 }
@@ -125,12 +129,23 @@ void ChainLink::FromString(string & s)
 {
     vector<string> tokens = split(s.c_str(), '/');
 
+#ifdef MA_BLUE
+    if ( tokens.size() != 3 )
+        return;
+
+    m_Pattern = strtol(tokens.at(0).c_str(), NULL, 0);
+    m_Repeats = strtol(tokens.at(1).c_str(), NULL, 0);
+    m_Jump = strtol(tokens.at(2).c_str(), NULL, 0);
+
+    // Check 'errno' for proper handling.
+#else
     if ( tokens.size() != 3 )
         throw string("Pattern Chain parse error: nothing entered.");
 
     m_Pattern = stoi(tokens.at(0));
     m_Repeats = stoi(tokens.at(1));
     m_Jump = stoi(tokens.at(2));
+#endif
 }
 
 void ChainLink::SetStatus()
@@ -141,12 +156,12 @@ void ChainLink::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "[Chain Slot %02i] ", m_ItemID);
+    snprintf(buff, 50, "[Chain Slot %02i] ", m_ItemID);
     m_Status = buff;
 
     m_Status += "Pattern ";
     pos = m_Status.size();
-    sprintf(buff, "%i", m_Pattern + 1);
+    snprintf(buff, 50, "%i", m_Pattern + 1);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
@@ -154,7 +169,7 @@ void ChainLink::SetStatus()
     pos = m_Status.size();
     if ( m_Repeats >= 0 )
     {
-        sprintf(buff, "x %i", m_Repeats + 1);
+        snprintf(buff, 50, "x %i", m_Repeats + 1);
         m_Status += buff;
     }
     else
@@ -165,7 +180,7 @@ void ChainLink::SetStatus()
     pos = m_Status.size();
     if ( m_Jump >= 0 )
     {
-        sprintf(buff, "%i", m_Jump + 1);
+        snprintf(buff, 50, "%i", m_Jump + 1);
         m_Status += buff;
     }
     else

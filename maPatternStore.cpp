@@ -192,11 +192,17 @@ bool PatternStore::HandleKey(key_type_t k)
 
 StepList & PatternStore::CurrentEditStepList()
 {
+#ifdef MA_BLUE
+    if ( m_Patterns.empty() )
+        return StepList::EmptyList;
+    if ( m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
+        return StepList::EmptyList;
+#else
     if ( m_Patterns.empty() )
         throw string("Pattern Store is Empty.");
-
     if ( m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
         throw string("Current pattern has no lists.");
+#endif
 
     size_t pos = m_Patterns.at(m_PosEdit).m_PosEdit;
     return m_Patterns.at(m_PosEdit).m_StepListSet.at(pos);
@@ -204,12 +210,17 @@ StepList & PatternStore::CurrentEditStepList()
 
 RealTimeList & PatternStore::CurrentEditRealTimeList()
 {
+#ifdef MA_BLUE
+    if ( m_Patterns.empty() )
+        return RealTimeList::EmptyList;
+    if ( m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
+        return RealTimeList::EmptyList;
+#else
     if ( m_Patterns.empty() )
         throw string("Pattern Store is Empty.");
-
     if ( m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
         throw string("Current pattern has no real time lists.");
-
+#endif
     size_t pos = m_Patterns.at(m_PosEdit).m_PosRealTimeEdit;
     return m_Patterns.at(m_PosEdit).m_RealTimeSet.at(pos);
 }
@@ -226,7 +237,11 @@ double PatternStore::LastRealTimeBeat()
 Pattern & PatternStore::CurrentPlayPattern()
 {
     if ( m_Patterns.empty() )
+#ifdef MA_BLUE
+        return Pattern::EmptyPattern;
+#else
         throw string("Pattern Store is Empty.");
+#endif
 
     return m_Patterns.at(m_PosPlay);
 }
@@ -234,7 +249,11 @@ Pattern & PatternStore::CurrentPlayPattern()
 Pattern & PatternStore::CurrentEditPattern()
 {
     if ( m_Patterns.empty() )
+#ifdef MA_BLUE
+        return Pattern::EmptyPattern;
+#else
         throw string("Pattern Store is Empty.");
+#endif
 
     return m_Patterns.at(m_PosEdit);
 }
@@ -484,6 +503,7 @@ void PatternStore::UpdatePattern(std::map<double,Note> & realTimeList, double qu
     m_Patterns.at(m_PosEdit).AddRealTimeList(realTimeList, quantum);
 }
 
+#ifndef MA_BLUE
 void PatternStore::UpdatePatternFromMidiFile(string s)
 {
     if ( m_Patterns.empty() )
@@ -491,6 +511,7 @@ void PatternStore::UpdatePatternFromMidiFile(string s)
 
     m_Patterns.at(m_PosEdit).AddRealTimeListFromMidiFile(s);
 }
+#endif
 
 enum ps_element_names_t
 {
@@ -559,8 +580,10 @@ void PatternStore::SetFieldsFromString(string s)
 
         transform(token.begin(), token.end(), token.begin(), ::tolower);
 
+#ifndef MA_BLUE
         try
         {
+#endif
             switch (e)
             {
             case ps_name_pattern_chain_mode:
@@ -578,6 +601,7 @@ void PatternStore::SetFieldsFromString(string s)
             default:
                 break;
             }
+#ifndef MA_BLUE
         }
         catch(invalid_argument ex)
         {
@@ -586,14 +610,17 @@ void PatternStore::SetFieldsFromString(string s)
         catch(out_of_range ex)
         {
         }
+#endif
     }
 }
 
 
 bool PatternStore::FromString(string s, int & created, int & updates)
 {
+#ifndef MA_BLUE
     try
     {
+#endif
         if ( s.find("<< Pattern Store >>") == 0 )
         {
             // Do nothing, it's just a section heading for readability.
@@ -645,21 +672,28 @@ bool PatternStore::FromString(string s, int & created, int & updates)
             }
             return m_Patterns.at(m_PosEdit).FromString(s, updates);
         }
+#ifndef MA_BLUE
     }
     catch (invalid_argument e)
     {
         throw string("PatternStore::LoadFromString(), invalid argument.");
     }
+#endif
 }
 
 void PatternStore::DeleteCurrentRealTimeList()
 {
+#ifdef MA_BLUE
+    if ( m_Patterns.empty() )
+        return;
+    if ( m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
+        return;
+#else
     if ( m_Patterns.empty() )
         throw string("Pattern Store is Empty.");
-
     if ( m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
         throw string("Current pattern has no real time lists.");
-
+#endif
     m_Patterns.at(m_PosEdit).DeleteCurrentRealTimeList();
 
     SetStatus();
@@ -694,18 +728,22 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
     // For everything else, we need a list index and that should
     // be the next token.
 
+#ifndef MA_BLUE
     try
     {
+#endif
         index = stoi(tokens.at(1)) - 1;
 
         if ( index < 0 )
             return "List cannot be less than zero.";
 
+#ifndef MA_BLUE
     }
     catch ( invalid_argument e )
     {
         return "List number not valid.";
     }
+#endif
 
     // If we just have a list index, display list and set list pointer
     // to this index, then return.
@@ -795,7 +833,11 @@ FeelMap & PatternStore::FeelMapForEdit(bool setFocus)
 void PatternStore::SetUsePatternPlayData( bool val )
 {
     if ( val && m_Patterns.empty() )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Cannot use pattern play data until a pattern is loaded.");
+#endif
 
     m_UsePatternPlayData = val;
 }
@@ -874,7 +916,11 @@ unsigned char PatternStore::NoteVelocity()
 void PatternStore::StorePatternPlayData( /*State & state, TranslateTable & table,*/ unsigned char mask )
 {
     if ( m_Patterns.empty() )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern Store is empty.");
+#endif
 
     Pattern & p = m_Patterns.at(m_PosEdit);
     if ( mask & PLAY_DATA_STEP )
@@ -894,7 +940,11 @@ void PatternStore::StorePatternPlayData( /*State & state, TranslateTable & table
 string PatternStore::LoadPatternPlayData( /*State & state, TranslateTable & table,*/ unsigned char mask )
 {
     if ( m_Patterns.empty() )
+#ifdef MA_BLUE
+        return "";
+#else
         throw string("Pattern Store is empty.");
+#endif
 
     string result;
 
@@ -983,7 +1033,11 @@ string PatternStore::SetNewPatternOrJump( int val )
             return "Cueing pattern %i";
         }
         else
+#ifdef MA_BLUE
+            return "Requested pattern doesn't exist!";
+#else
             throw string("Requested pattern doesn't exist!");
+#endif
     }
     else
     {
@@ -994,6 +1048,10 @@ string PatternStore::SetNewPatternOrJump( int val )
             return "Jumping to chain step %i";
         }
         else
+#ifdef MA_BLUE
+            return "Jump stage doesn't exist!";
+#else
             throw string("Jump stage doesn't exist!");
+#endif
     }
 }

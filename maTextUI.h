@@ -21,14 +21,54 @@
 #define MATEXTUI_H_INCLUDED
 
 #include <vector>
+
+#ifdef MA_BLUE
+
+typedef unsigned int xcb_keysym_t;
+
+#else
+
+#define USE_NCURSES
 #include <xcb/xcb.h>
+
+#endif // MA_BLUE
+
 
 #include "maBaseUI.h"
 #include "maCursorKeys.h"
 
 //#include <ncurses.h>
 
-// Extra keys that aren't in ncurses.h
+#ifndef USE_NCURSES
+
+// Use ncurses key IDs for now.
+
+#define KEY_DOWN	0402		/* down-arrow key */
+#define KEY_UP		0403		/* up-arrow key */
+#define KEY_LEFT	0404		/* left-arrow key */
+#define KEY_RIGHT	0405		/* right-arrow key */
+#define KEY_HOME	0406		/* home key */
+#define KEY_BACKSPACE	0407		/* backspace key */
+#define KEY_SLEFT	0611		/* shifted left-arrow key */
+#define KEY_SRIGHT	0622		/* shifted right-arrow key */
+
+#define XK_BackSpace                     0xff08  /* Back space, back char */
+#define XK_Tab                           0xff09
+#define XK_Linefeed                      0xff0a  /* Linefeed, LF */
+#define XK_Clear                         0xff0b
+#define XK_Return                        0xff0d  /* Return, enter */
+#define XK_Pause                         0xff13  /* Pause, hold */
+#define XK_Scroll_Lock                   0xff14
+#define XK_Sys_Req                       0xff15
+#define XK_Escape                        0xff1b
+#define XK_Delete                        0xffff  /* Delete, rubout */
+
+#define XK_space                         0x0020  /* U+0020 SPACE */
+#define XK_ISO_Left_Tab                  0xfe20
+
+#endif
+
+// Extra keys that aren't in ncurses.h, values determined from observation
 
 #define KEY_INSERT  331
 #define KEY_DELETE  330

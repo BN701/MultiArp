@@ -22,6 +22,11 @@
 #include <map>
 #include <unordered_map>
 
+#include "maTextUI.h"
+#include "maTranslateTable.h"
+
+#ifdef USE_NCURSES
+
 #include <ncurses.h>
 
 #define XK_MISCELLANY
@@ -29,8 +34,7 @@
 #define XK_LATIN1
 #include <X11/keysymdef.h>  // XK_ Unicode key name defines
 
-#include "maTextUI.h"
-#include "maTranslateTable.h"
+#endif // USE_NCURSES
 
 using namespace std;
 
@@ -50,6 +54,7 @@ using namespace std;
 
 TextUI::TextUI()
 {
+#ifdef USE_NCURSES
     // Set up NCurses.
 
     initscr();
@@ -112,16 +117,20 @@ TextUI::TextUI()
     wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
     wbkgd(m_BigPanel, COLOR_PAIR(CP_PATTERN_LIST_PANEL));
     wbkgd(m_BigPanelExtra, COLOR_PAIR(CP_PIANO_WHITE_KEY));
+#endif
 }
 
 
 TextUI::~TextUI()
 {
+#ifdef USE_NCURSES
     delwin(m_SmallPanel);
     delwin(m_BigPanel);
     endwin();			/* End curses mode		  */
+#endif
 }
 
+#ifdef USE_NCURSES
 int TextUI::CursesAttribute(text_attribute_t attribute)
 {
     switch (attribute)
@@ -155,32 +164,40 @@ WINDOW * TextUI::AreaToWindow(window_area_t area)
             return stdscr;
     }
 }
+#endif
 
 void TextUI::ClearArea(window_area_t area)
 {
+#ifdef USE_NCURSES
     WINDOW * window = AreaToWindow(area);
     wmove(window, 0, 0);
     wclrtobot(window);
     wrefresh(window);
+#endif
 }
 
 void TextUI::PlaceCursor(int row, int col)
 {
+#ifdef USE_NCURSES
     move(row, col);
+#endif
 }
 
 void TextUI::Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr)
 {
+#ifdef USE_NCURSES
     WINDOW * window = AreaToWindow(area);
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
     mvwchgat(window, row, col, len, CursesAttribute(attr), colour, NULL);
     wrefresh(window);
     wmove(stdscr, scr_y, scr_x);
+#endif
 }
 
 void TextUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
 {
+#ifdef USE_NCURSES
     WINDOW * window = AreaToWindow(area);
     int scr_x, scr_y;
     attron(attribute);
@@ -191,6 +208,7 @@ void TextUI::Text(window_area_t area, int row, int col, const char * text, text_
     attroff(attribute);
     move(scr_y, scr_x);
     refresh();
+#endif
 }
 
 void TextUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
@@ -240,6 +258,7 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
     snprintf(buff, 10, "%7.2f ", beat /* g_State.Phase() + 1 */);
     barline += buff;
 
+#ifdef USE_NCURSES
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
 
@@ -275,6 +294,7 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
 
     move(scr_y, scr_x);
     refresh();
+#endif
 
     char text[80];
     snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
@@ -285,6 +305,7 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
 
 void TextUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 {
+#ifdef USE_NCURSES
     const int kbdStart = 29;
     WINDOW *panel = m_BigPanelExtra;
     wmove(panel, 0, 0);
@@ -415,6 +436,7 @@ void TextUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 //    pairs.clear();
 
     wrefresh(panel);
+#endif
 }
 
 
@@ -472,7 +494,11 @@ unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
 
 void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
 {
+#ifdef MA_BLUE
+    int c = 0;
+#else
     int c = getch();
+#endif
 
     switch (c)
     {

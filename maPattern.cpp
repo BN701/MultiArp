@@ -17,13 +17,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "maListBuilder.h"  // Listbuilder is used for midi file import.
-#include "maPattern.h"
-
-#include "MidiFile.h"
-
+#include <cmath>
+#include <cstring>
+#include <numeric>
 #include <unordered_map>
 
+#ifndef MA_BLUE
+#include "MidiFile.h"
+#endif // MA_BLUE
+
+#include "maListBuilder.h"  // Listbuilder is used for midi file import.
+#include "maPattern.h"
 #include "maUtility.h"
 
 using namespace std;
@@ -238,8 +242,10 @@ void Pattern::SetFieldsFromString(string s)
         if ( token.empty() )
             continue;
 
+#ifndef MA_BLUE
         try
         {
+#endif
             switch (e)
             {
             case pat_name_step_value:
@@ -260,6 +266,7 @@ void Pattern::SetFieldsFromString(string s)
             default:
                 break;
             }
+#ifndef MA_BLUE
         }
         catch(invalid_argument ex)
         {
@@ -268,14 +275,17 @@ void Pattern::SetFieldsFromString(string s)
         catch(out_of_range ex)
         {
         }
+#endif
     }
 }
 
 
 bool Pattern::FromString(string s, int & updates)
 {
+#ifndef MA_BLUE
     try
     {
+#endif
         // This is now a klunky hack to allow for both 'Default' and 'Pattern' tags,
         // when initializing from a string.
         //
@@ -291,7 +301,11 @@ bool Pattern::FromString(string s, int & updates)
             int index = stoi(s.substr(5)) - 1;
             size_t pos = s.find(' ', 5);
             if ( pos == string::npos )
+#ifdef MA_BLUE
+                return false;
+#else
                 throw string("Pattern::FromString(), Step parameter list is empty.");
+#endif
             AddListFromString(index, s.substr(pos));
             updates += 1;
             return true;
@@ -301,7 +315,11 @@ bool Pattern::FromString(string s, int & updates)
             int index = stoi(s.substr(10)) - 1;
             size_t pos = s.find(' ', 10);
             if ( pos == string::npos )
+#ifdef MA_BLUE
+                return false;
+#else
                 throw string("Pattern::FromString(), Step parameter list is empty.");
+#endif
             AddListFromString(index, s.substr(pos));
             updates += 1;
             return true;
@@ -311,7 +329,11 @@ bool Pattern::FromString(string s, int & updates)
             int index = stoi(s.substr(15)) - 1;
             size_t pos = s.find(' ', 15);
             if ( pos == string::npos )
+#ifdef MA_BLUE
+                return false;
+#else
                 throw string("Pattern::FromString(), Real Time parameter list is empty.");
+#endif
             AddRealTimeListFromString(index, s.substr(pos));
             updates += 1;
             return true;
@@ -342,17 +364,23 @@ bool Pattern::FromString(string s, int & updates)
         }
         else
             return false;
+#ifndef MA_BLUE
     }
     catch (invalid_argument ex)
     {
         throw string("Pattern::FromString(), failed to read a number somewhere in the parameter list.");
     }
+#endif
 }
 
 void Pattern::AddListFromString(vector<StepList>::size_type index, string s)
 {
     if ( index < 0 )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern::AddListFromString(), invalid list index.");
+#endif
 
     if ( index >= m_StepListSet.size() )
         m_StepListSet.resize(index + 1);
@@ -369,7 +397,11 @@ void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum
 void Pattern::AddRealTimeListFromString(vector<RealTimeList>::size_type index, string s)
 {
     if ( index < 0 )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern::AddListFromString(), invalid list index.");
+#endif
 
     if ( index >= m_RealTimeSet.size() )
         m_RealTimeSet.resize(index + 1);
@@ -377,6 +409,7 @@ void Pattern::AddRealTimeListFromString(vector<RealTimeList>::size_type index, s
     m_RealTimeSet.at(index).FromString(s);
 }
 
+#ifndef MA_BLUE
 void Pattern::AddRealTimeListFromMidiFile(string s)
 {
     MidiFile midiFile;
@@ -444,17 +477,24 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
     if ( importedTracks == 0 )
         throw string("Something went wrong, nothing imported.");
 }
+#endif
 
 void Pattern::SetRealTimeMultipliers(vector<string>::iterator token, vector<string>::iterator end)
 {
     if ( m_RealTimeSet.empty() )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern::SetRealTimeMultipliers() - No RealTime lists present.");
+#endif
 
     double rate = 1.0;
     double increment = 0.0;
 
+#ifndef MA_BLUE
     try
     {
+#endif
         // Token should point to rate.
 
         rate = stod(token->c_str());
@@ -463,11 +503,13 @@ void Pattern::SetRealTimeMultipliers(vector<string>::iterator token, vector<stri
 
         if ( ++token != end )
             increment = stod(token->c_str());
+#ifndef MA_BLUE
     }
     catch (...)
     {
         throw string("Pattern::SetRealTimeMultipliers() - There's something wrong with the parameter list.");
     }
+#endif
 
     for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++, rate += increment)
         rtList->SetMultiplier(rate);
@@ -476,10 +518,19 @@ void Pattern::SetRealTimeMultipliers(vector<string>::iterator token, vector<stri
 void Pattern::SetRealTimeQuantum(string & token)
 {
     if ( m_RealTimeSet.empty() )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern::SetRealTimeQuantum() - No RealTime lists present.");
+#endif
 
     double quantum;
 
+#ifdef MA_BLUE
+    quantum = strtod(token.c_str(), NULL);
+    if ( errno != 0 )
+        return;
+#else
     try
     {
         quantum = stod(token.c_str());
@@ -488,6 +539,7 @@ void Pattern::SetRealTimeQuantum(string & token)
     {
         throw string("Pattern::SetRealTimeQuantum() - There's something wrong with the parameter list.");
     }
+#endif
 
     for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
         rtList->SetQuantum(quantum);
@@ -497,10 +549,19 @@ void Pattern::SetRealTimeQuantum(string & token)
 void Pattern::SetRealTimeStartPhase(string & token)
 {
     if ( m_RealTimeSet.empty() )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern::SetRealTimeStartPhase() - No RealTime lists present.");
+#endif
 
     double phase;
 
+#ifdef MA_BLUE
+    phase = strtod(token.c_str(), NULL)/100;
+    if ( errno != 0 )
+        return;
+#else
     try
     {
         phase = stod(token.c_str())/100;
@@ -509,6 +570,7 @@ void Pattern::SetRealTimeStartPhase(string & token)
     {
         throw string("Pattern::SetRealTimePhase() - There's something wrong with the parameter list.");
     }
+#endif
 
     // Calculate an overall pattern phase length using current list phaselengths.
 
@@ -547,14 +609,20 @@ unordered_map<string, rt_echo_parameter_t> rt_echo_parameter_lookup =
 void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::iterator last)
 {
     if ( m_RealTimeSet.empty() )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Pattern::StartRealTimeEcho() - No RealTime lists present.");
+#endif
 
     double inc = 0;
     double target = 0;
     int interval = 0;
 
+#ifndef MA_BLUE
     try
     {
+#endif
         for(; token != last; token++ )
         {
             switch(rt_echo_parameter_lookup.at(token->c_str()))
@@ -572,14 +640,20 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
                 break;
             }
         }
+#ifndef MA_BLUE
     }
     catch (...)
     {
         throw string("Pattern::StartRealTimeEcho() - There's something wrong with the parameter list.");
     }
+#endif
 
     if ( equals_3(inc, 0) )
+#ifdef MA_BLUE
+        return;
+#else
         throw string("Increment must be set for other parameters to have and effect.");
+#endif
 
     auto rtList = m_RealTimeSet.begin() + m_PosEdit;
 
@@ -612,11 +686,11 @@ string Pattern::Label(size_t width)
         width = 80;
 
     if ( m_Label.size() > width - 2 )                    // Allow for quotes.
-        sprintf(format, "%%.%lus...", width - 5);    // Allow for quotes and ellipsis.
+        snprintf(format, 20, "%%.%lus...", width - 5);    // Allow for quotes and ellipsis.
     else
         strcpy(format, "%s");
 
-    sprintf(buf, format, m_Label.c_str());
+    snprintf(buf, 100, format, m_Label.c_str());
 
     return buf;
 }

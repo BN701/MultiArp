@@ -38,6 +38,53 @@ class Rectangle
 class BaseUI
 {
     public:
+        enum key_command_t
+        {
+            key_down,
+            key_up,
+            key_left,
+            key_right,
+            key_home,
+            key_backspace,
+            key_sleft,
+            key_sright,
+            key_tab,
+            key_stab,
+            key_linefeed,
+            key_return,
+            key_escape,
+            key_delete,
+            key_space,
+            key_insert,
+            key_sdelete,
+            key_cdelete,
+            key_cleft,
+            key_cright,
+            key_cup,
+            key_cdown,
+            key_csleft,
+            key_csright,
+            key_csup,
+            key_csdown,
+            key_aright,
+            key_aleft,
+            key_aup,
+            key_adown,
+            key_asright,
+            key_asleft,
+            key_asup,
+            key_asdown,
+            key_sup,
+            key_sdown,
+            key_pgup,
+            key_pgdown,
+            key_spgup,
+            key_spgdown,
+            key_cpgup,
+            key_cpgdown,
+            key_apgup,
+            key_apgdown
+        };
 
         enum text_attribute_t
         {

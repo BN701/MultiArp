@@ -22,6 +22,7 @@
 #include <cstdarg>
 
 #ifdef MA_BLUE
+#include <cstdio>
 #include "maSequencer.h"
 extern Sequencer g_Sequencer;
 #else
@@ -44,9 +45,9 @@ extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
 extern State g_State;
 
-TextUI g_TextUI;
+extern AnsiUI g_TextUI;
 #ifndef MA_BLUE
-CairoUI g_CairoUI(false);
+extern CairoUI g_CairoUI;
 #endif
 
 
@@ -70,7 +71,7 @@ void set_status(int y, int x, const char *format, ...)
 }
 
 //void set_status_w(WINDOW * w, int y, int x, const char *format, ...)
-void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, ...)
+void set_status_w(AnsiUI::window_area_t area, int y, int x, const char *format, ...)
 {
     char text[100];
     va_list args;
@@ -169,8 +170,8 @@ void update_edit_panels(bool refreshList)
 
     switch ( g_TextUI.BigPanelPage() )
     {
-    case TextUI::one:
-    case TextUI::two:
+    case AnsiUI::one:
+    case AnsiUI::two:
         break;
     default:
         return;

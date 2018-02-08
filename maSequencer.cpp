@@ -19,7 +19,6 @@
 
 #include "maSequencer.h"
 
-Sequencer g_Sequencer;
 
 Sequencer::Sequencer()
 {
@@ -29,4 +28,10 @@ Sequencer::Sequencer()
 Sequencer::~Sequencer()
 {
     //dtor
+}
+
+void Sequencer::SetScheduleTime(uint64_t t)
+{
+    m_NextScheduleTime.tv_sec = t / 1000000;
+    m_NextScheduleTime.tv_nsec = (t % 1000000) * 1000;
 }

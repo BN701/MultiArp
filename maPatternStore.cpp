@@ -19,6 +19,18 @@
 
 #include "maPatternStore.h"
 
+#if defined(MA_BLUE)
+#include <cstdio>
+#include <cstdlib>
+#endif
+
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+#define U_FORMAT    "%u"
+#else
+#define U_FORMAT    "%lu"
+#endif
+
+
 #include <algorithm>
 #include <cstring>
 #include <unordered_map>
@@ -27,6 +39,15 @@
 #include "maState.h"
 
 using namespace std;
+
+//// Static instances of empty items
+//// for use by member functions that
+//// return references when no patterns
+//// or other items have been created.
+//
+//StepList StepList::EmptyList;
+//RealTimeList RealTimeList::EmptyList;
+//Pattern Pattern::EmptyPattern;
 
 void PatternStore::SetStatus()
 {
@@ -39,10 +60,14 @@ void PatternStore::SetStatus()
         return;
 
     char buff[100];
-
+#if defined(MA_BLUE)
+    const char * format = "%u/%u";
+#else
+    const char * format = "%lu/%lu";
+#endif
     m_Status = "Pattern ";
     pos = m_Status.size();
-    sprintf(buff, "%lu/%lu", m_PosEdit + 1, m_Patterns.size());
+    snprintf(buff, 100, format, m_PosEdit + 1, m_Patterns.size());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
@@ -50,7 +75,7 @@ void PatternStore::SetStatus()
     pos = m_Status.size();
     if ( !m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
-        sprintf(buff, "%lu/%lu",
+        snprintf(buff, 100, format,
             m_Patterns.at(m_PosEdit).m_PosEdit + 1,
             m_Patterns.at(m_PosEdit).m_StepListSet.size());
         m_Status += buff;
@@ -65,7 +90,7 @@ void PatternStore::SetStatus()
     pos = m_Status.size();
     if ( !m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
     {
-        sprintf(buff, "%lu/%lu",
+        snprintf(buff, 100, format,
             m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1,
             m_Patterns.at(m_PosEdit).m_RealTimeSet.size());
         m_Status += buff;
@@ -84,13 +109,13 @@ void PatternStore::SetStatus()
     m_Highlights.push_back(m_FieldPositions.at(m_PatternStoreFocus));
 }
 
-bool PatternStore::HandleKey(key_type_t k)
+bool PatternStore::HandleKey(BaseUI::key_command_t k)
 {
     int temp;
 
     switch ( k )
     {
-    case enter:
+    case BaseUI::key_return:
         switch ( m_PatternStoreFocus )
         {
         case psf_pattern:
@@ -135,19 +160,19 @@ bool PatternStore::HandleKey(key_type_t k)
         }
         break;
 
-    case left:
+    case BaseUI::key_left:
         temp = static_cast<int>(m_PatternStoreFocus) - 1;
         if ( temp >= 0 && temp < num_psf_menu_focus_modes )
             m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
         break;
 
-    case right:
+    case BaseUI::key_right:
         temp = static_cast<int>(m_PatternStoreFocus) + 1;
         if ( temp >= 0 && temp < num_psf_menu_focus_modes )
             m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
         break;
 
-    case up:
+    case BaseUI::key_up:
         switch ( m_PatternStoreFocus )
         {
         case psf_pattern:
@@ -164,7 +189,7 @@ bool PatternStore::HandleKey(key_type_t k)
         }
         break;
 
-    case down:
+    case BaseUI::key_down:
         switch ( m_PatternStoreFocus )
         {
         case psf_pattern:
@@ -299,9 +324,20 @@ string PatternStore::PatternStatusPlay()
 
     string result;
     char buf[80];
+#if defined(MA_BLUE)
+    const char * format = "Play: %u";
+#else
+    const char * format = "Play: %lu";
+#endif
 
-    sprintf(buf, "Play: %lu", m_PosPlay + 1);
+    snprintf(buf, 80, format, m_PosPlay + 1);
     result += buf;
+
+#if defined(MA_BLUE)
+    const char * format2 = ", Chain: %c [%u/%u]";
+#else
+    const char * format2 = ", Chain: %c [%lu/%lu]";
+#endif
 
     switch ( m_PatternChain.Mode() )
     {
@@ -310,11 +346,11 @@ string PatternStore::PatternStatusPlay()
             break;
 
         case PatternChain::natural :
-            sprintf(buf, ", Chain: N [%lu/%lu]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+            snprintf(buf, 80, format2, 'N', m_PatternChain.PosPlay() + 1, m_PatternChain.size());
             break;
 
         case PatternChain::quantum :
-            sprintf(buf, ", Chain: Q, [%lu/%lu]", m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+            snprintf(buf, 80, format2, 'Q', m_PatternChain.PosPlay() + 1, m_PatternChain.size());
             break;
         default:
             break;
@@ -334,18 +370,18 @@ string PatternStore::PatternStatusEdit()
     string result;
     char buf[80];
 
-    sprintf(buf, "Edit: %lu", m_PosEdit + 1);
+    snprintf(buf, 80, "Edit: " U_FORMAT, m_PosEdit + 1);
     result += buf;
 
     if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
     {
-        sprintf(buf, ", List %lu", m_Patterns.at(m_PosEdit).m_PosEdit + 1);
+        snprintf(buf, 80, ", List " U_FORMAT, m_Patterns.at(m_PosEdit).m_PosEdit + 1);
         result += buf;
 
         int listCount = m_Patterns.at(m_PosEdit).m_StepListSet.size();
         if ( listCount > 1 )
         {
-            sprintf(buf, " of %i", listCount);
+            snprintf(buf, 80, " of %i", listCount);
             result += buf;
         }
     }
@@ -361,7 +397,7 @@ string PatternStore::PatternOverview()
 {
     char buff[200];
 
-    sprintf(buff, "Patterns: %i, Edit %s, Global Vel/Gate: %i/%.0f%% (Hold %s)",
+    snprintf(buff, 200, "Patterns: %i, Edit %s, Global Vel/Gate: %i/%.0f%% (Hold %s)",
                PatternCount(),
                EditFocusFollowsPlay() ? "locked" : "unlocked",
                m_DefaultPattern.Velocity(),
@@ -478,7 +514,13 @@ string PatternStore::PatternSelectionList(unsigned start, unsigned rows)
     for ( size_t pos = start; pos < start + rows && pos < m_Patterns.size(); pos++ )
     {
         char buff[50];
-        sprintf(buff, " %02lu ", pos + 1);
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+        snprintf(buff, 50, " %02u ", pos + 1);
+#else
+        snprintf(buff, 50, " %02lu ", pos + 1);
+#endif
+
+
         result += buff;
         result += m_Patterns.at(pos).Label(15);
         result += '\n';
@@ -523,8 +565,12 @@ enum ps_element_names_t
     num_ps_element_names
 };
 
-
-unordered_map<ps_element_names_t, const char *> ps_element_names = {
+#if defined(MA_BLUE)
+unordered_map<int, const char *> ps_element_names =
+#else
+unordered_map<ps_element_names_t, const char *> ps_element_names =
+#endif
+{
     {ps_heading, "Pattern Store"},
     {ps_name_pattern_chain_mode, "Pattern Chain Mode"},
     {ps_name_reset_on_pattern_change, "Reset on pattern change"},
@@ -542,13 +588,13 @@ string PatternStore::ToString()
     result += PatternChainToString();
     result += "\n\n";
 
-    sprintf(buff, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChain.Mode()));
+    snprintf(buff, 100, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChain.Mode()));
     result += buff;
-    sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "On" : "Off");
+    snprintf(buff, 100, "Store %s %s\n", ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "On" : "Off");
     result += buff;
-    sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_edit_focus_follows_play), m_EditPosFollowsPlay ? "On" : "Off");
+    snprintf(buff, 100, "Store %s %s\n", ps_element_names.at(ps_name_edit_focus_follows_play), m_EditPosFollowsPlay ? "On" : "Off");
     result += buff;
-    sprintf(buff, "Store %s %s\n", ps_element_names.at(ps_name_use_pattern_play_data), m_UsePatternPlayData ? "On" : "Off");
+    snprintf(buff, 100, "Store %s %s\n", ps_element_names.at(ps_name_use_pattern_play_data), m_UsePatternPlayData ? "On" : "Off");
     result += buff;
     result += '\n';
 
@@ -558,7 +604,7 @@ string PatternStore::ToString()
 
     for ( unsigned i = 0; i < m_Patterns.size(); i++ )
     {
-        sprintf(buff, "<< Pattern %i >>\n\n", i + 1);
+        snprintf(buff, 100, "<< Pattern %i >>\n\n", i + 1);
         result += buff;
         result += m_Patterns.at(i).ToString("Pattern");
         result += "\n";
@@ -587,7 +633,7 @@ void PatternStore::SetFieldsFromString(string s)
             switch (e)
             {
             case ps_name_pattern_chain_mode:
-                m_PatternChain.SetMode(static_cast<PatternChain::pattern_chain_mode_t>(stoi(token)));
+                m_PatternChain.SetMode(static_cast<PatternChain::pattern_chain_mode_t>(strtol(token.c_str(), NULL, 0)));
                 break;
             case ps_name_reset_on_pattern_change:
                 m_ResetOnPatternChange = token == "on";
@@ -640,7 +686,7 @@ bool PatternStore::FromString(string s, int & created, int & updates)
         }
         else if ( s.find("<< Pattern ") == 0 ) // Create pattern with specific ID
         {
-            size_t index = stoi(s.substr(11)) - 1;
+            size_t index = strtol(s.substr(11).c_str(), NULL, 0) - 1;
             if ( m_Patterns.size() < index + 1)
                 m_Patterns.resize(index + 1);
             m_PosEdit = index;
@@ -732,7 +778,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
     try
     {
 #endif
-        index = stoi(tokens.at(1)) - 1;
+        index = strtol(tokens.at(1).c_str(), NULL, 0) - 1;
 
         if ( index < 0 )
             return "List cannot be less than zero.";
@@ -999,20 +1045,24 @@ string PatternStore::ShowPatternPlayData()
 
     if ( usePatternPlayData )
     {
-        sprintf(buff, "P %02lu: ", m_PosEdit + 1);
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+        snprintf(buff, 100, "P %02u: ", m_PosEdit + 1);
+#else
+        snprintf(buff, 100, "P %02lu: ", m_PosEdit + 1);
+#endif
         result += buff;
     }
     else
         result += "GLOB: ";
 
-    sprintf(buff, "Step %.2f, ", p.StepValue());
+    snprintf(buff, 100, "Step %.2f, ", p.StepValue());
     result += buff;
 
-    sprintf(buff, "Vel/Gate %i/%.0f%% (Hold %s), ", p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
+    snprintf(buff, 100, "Vel/Gate %i/%.0f%% (Hold %s), ", p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
     result += buff;
 
     TranslateTable table = p.PatternTranslateTable();
-    sprintf(buff, "C/T: %i/%i (%s), %s-%s",
+    snprintf(buff, 100, "C/T: %i/%i (%s), %s-%s",
             table.Transpose(),
             table.DegreeShift(),
             table.ShiftName(),

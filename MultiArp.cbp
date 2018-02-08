@@ -37,12 +37,27 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-fno-exceptions" />
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add option="-DMA_BLUE" />
+					<Add option="-DMA_BLUE_PC" />
 					<Add directory="./" />
 				</Compiler>
+			</Target>
+			<Target title="Release (Blue)">
+				<Option output="bin/Release/MultiArp" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="This is -midi=6 the -step=4 title -midi=nonsense -midi=-7 -step=4.05 -step= -midi= -step=nonsense -step=0" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DMA_BLUE" />
+					<Add directory="./" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
@@ -50,8 +65,6 @@
 			<Add option="-Wall" />
 			<Add directory="../link/include" />
 			<Add directory="../link/modules/asio-standalone/asio/include" />
-			<Add directory="../github/link/include" />
-			<Add directory="../github/link/modules/asio-standalone/asio/include" />
 			<Add directory="../midifile/include/" />
 			<Add directory="/usr/include/cairo" />
 			<Add directory="/usr/include/pango-1.0" />
@@ -66,9 +79,6 @@
 			<Add option="-lxcb" />
 			<Add option="-lxcb-keysyms" />
 			<Add option="-lcairo" />
-			<Add option="-lpango-1.0" />
-			<Add option="-lpangocairo-1.0" />
-			<Add option="`$(pkg-config --libs gtk+3.0)`" />
 			<Add library="../midifile/lib/libmidifile.a" />
 			<Add directory="/usr/lib/x86_64-linux-gnu" />
 		</Linker>
@@ -84,6 +94,8 @@
 		</Unit>
 		<Unit filename="maAlsaSequencer.h" />
 		<Unit filename="maAlsaSequencerQueue.h" />
+		<Unit filename="maAnsiUI.cpp" />
+		<Unit filename="maAnsiUI.h" />
 		<Unit filename="maBaseUI.cpp" />
 		<Unit filename="maBaseUI.h" />
 		<Unit filename="maCairoUI.h" />
@@ -91,6 +103,7 @@
 		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
 		<Unit filename="maCommand.h" />
+		<Unit filename="maCursesUI.h" />
 		<Unit filename="maCursorKeys.cpp" />
 		<Unit filename="maCursorKeys.h" />
 		<Unit filename="maFeelMap.cpp" />
@@ -113,8 +126,6 @@
 		<Unit filename="maState.h" />
 		<Unit filename="maStep.cpp" />
 		<Unit filename="maStep.h" />
-		<Unit filename="maTextUI.cpp" />
-		<Unit filename="maTextUI.h" />
 		<Unit filename="maTranslateTable.cpp" />
 		<Unit filename="maTranslateTable.h" />
 		<Unit filename="maTrigList.cpp" />
@@ -124,24 +135,19 @@
 		<Unit filename="maUtility.cpp" />
 		<Unit filename="maUtility.h" />
 		<Unit filename="notelist.hpp" />
-		<Unit filename="platform_Linux/maAlsaSequencer.cpp">
-			<Option link="0" />
-		</Unit>
+		<Unit filename="platform_Linux/maAlsaSequencer.cpp" />
 		<Unit filename="platform_Linux/maAlsaSequencer.h" />
-		<Unit filename="platform_Linux/maAlsaSequencerQueue.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
+		<Unit filename="platform_Linux/maAlsaSequencerQueue.cpp" />
 		<Unit filename="platform_Linux/maAlsaSequencerQueue.h" />
 		<Unit filename="platform_Linux/maCairoUI.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Release (Blue)" />
 		</Unit>
 		<Unit filename="platform_Linux/maCairoUI.h" />
-		<Unit filename="platform_Linux/multi_arp.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
+		<Unit filename="platform_Linux/maCursesUI.cpp" />
+		<Unit filename="platform_Linux/maCursesUI.h" />
+		<Unit filename="platform_Linux/multi_arp.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

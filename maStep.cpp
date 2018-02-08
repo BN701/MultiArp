@@ -19,6 +19,8 @@
 
 #include <cmath>
 
+using namespace std;
+
 #ifdef MA_BLUE
 
 #include "maSequencer.h"
@@ -39,6 +41,7 @@ extern AlsaSequencer g_Sequencer;
 
 #endif // MA_BLUE
 
+#include "maCursorKeys.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -46,7 +49,6 @@ extern AlsaSequencer g_Sequencer;
 #include "maStep.h"
 //#include "maUtility.h"
 
-using namespace std;
 
 // Global instances.
 
@@ -169,7 +171,7 @@ void queue_next_step(int queueId)
 
     // Set next schedule time on the queue
 
-    int64_t queue_time_usec = 0;
+    uint64_t queue_time_usec = 0;
 
 #ifndef MA_BLUE
     if ( g_LinkStartTime.count() < 0 )

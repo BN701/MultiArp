@@ -17,6 +17,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#if defined(MA_BLUE)
+#include <cstdio>
+#endif
 
 #include "maTrigList.h"
 #include "maUtility.h"
@@ -60,11 +63,11 @@ void TrigList::SetStatus()
 
 }
 
-bool TrigList::HandleKey(key_type_t k)
+bool TrigList::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case enter:
+    case BaseUI::key_return:
         if ( !m_TrigItems.empty() )
         {
             TrigListItem & n = m_TrigItems.at(m_PosEdit);
@@ -75,29 +78,29 @@ bool TrigList::HandleKey(key_type_t k)
         }
         break;
 
-    case back_space:
-    case escape:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
 
-    case right:
+    case BaseUI::key_right:
         if ( m_PosEdit < m_TrigItems.size() - 1 )
             m_PosEdit += 1;
         break;
 
-    case ctrl_left:
+    case BaseUI::key_ctrl_left:
         if ( !m_TrigItems.empty() )
         {
             m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit, m_TrigItems.at(m_PosEdit));
         }
         break;
 
-    case ctrl_right:
+    case BaseUI::key_ctrl_right:
         if ( !m_TrigItems.empty() )
         {
             m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit + 1, m_TrigItems.at(m_PosEdit));
@@ -105,7 +108,7 @@ bool TrigList::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_left:
+    case BaseUI::key_shift_left:
         if ( m_TrigItems.empty() )
         {
             m_TrigItems.emplace_back();
@@ -115,7 +118,7 @@ bool TrigList::HandleKey(key_type_t k)
             m_TrigItems.insert(m_TrigItems.begin() + m_PosEdit, *(new TrigListItem()));
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         if ( !m_TrigItems.empty() )
         {
             m_TrigItems.erase(m_TrigItems.begin() + m_PosEdit);
@@ -124,7 +127,7 @@ bool TrigList::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_right:
+    case BaseUI::key_shift_right:
         if ( m_TrigItems.empty() )
         {
             m_TrigItems.emplace_back();
@@ -235,7 +238,11 @@ string TrigList::ToStringForDisplay()
 //            result += ' ';
         if ( i == m_Pos )
         {
-            sprintf(buff, "%3lu| ", m_Pos + 1);
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+            snprintf(buff, 50, "%3u| ", m_Pos + 1);
+#else
+            snprintf(buff, 50, "%3lu| ", m_Pos + 1);
+#endif
             result += buff;
         }
         result += m_TrigItems.at(i).MenuString(9);

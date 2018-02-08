@@ -37,8 +37,10 @@ class CairoUI : public BaseUI
 
         xcb_connection_t * Connection() { return m_Connection; }
 
-        bool PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
-        bool KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym);
+//        bool PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
+        bool PollEvents(bool & gotKeyData, BaseUI::key_command_t & key);
+//        bool KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym);
+        bool KeyInput(uint8_t keycode, uint16_t state, BaseUI::key_command_t & key);
 
         virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = BaseUI::attr_normal, double scale = 1.0);
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);

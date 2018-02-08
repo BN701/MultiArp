@@ -22,7 +22,11 @@
 #include <numeric>
 #include <unordered_map>
 
-#ifndef MA_BLUE
+#ifdef MA_BLUE
+#include <cerrno>
+#include <cstdlib>
+#include <cstdio>
+#else
 #include "MidiFile.h"
 #endif // MA_BLUE
 
@@ -151,8 +155,11 @@ enum pat_element_names_t
     num_pat_element_names
 };
 
-
+#if defined(MA_BLUE)
+unordered_map<int, const char *> pat_element_names = {
+#else
 unordered_map<pat_element_names_t, const char *> pat_element_names = {
+#endif
     {pat_heading, "Pattern"},
     {pat_name_step_value, "Step Value"},
     {pat_name_gate, "Gate"},
@@ -183,19 +190,19 @@ string Pattern::ToString(const char * prefix)
 
     char buffer[200];
 
-    sprintf(buffer, "%s %.2f", pat_element_names.at(pat_name_step_value), m_StepValue);
+    snprintf(buffer, 200, "%s %.2f", pat_element_names.at(pat_name_step_value), m_StepValue);
     result += buffer;
 
     if ( !result.empty() )
         result += ' ';
-    sprintf(buffer, "%s %.2f %s %s",
+    snprintf(buffer, 200, "%s %.2f %s %s",
             pat_element_names.at(pat_name_gate), m_Gate,
             pat_element_names.at(pat_name_gate_hold), m_GateHold ? "ON" : "OFF");
     result += buffer;
 
     if ( !result.empty() )
         result += ' ';
-    sprintf(buffer, "%s %i", pat_element_names.at(pat_name_velocity), m_Velocity);
+    snprintf(buffer, 200, "%s %i", pat_element_names.at(pat_name_velocity), m_Velocity);
     result += buffer;
     result += "\n";
 
@@ -212,7 +219,7 @@ string Pattern::ToString(const char * prefix)
     for ( vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++, index++ )
     {
         char buffer[20];
-        sprintf(buffer, "Step List %i ", index);
+        snprintf(buffer, 200, "Step List %i ", index);
         result += buffer;
         result += (*i).ToString();
         result += "\n";
@@ -222,7 +229,7 @@ string Pattern::ToString(const char * prefix)
     for ( vector<RealTimeList>::iterator i = m_RealTimeSet.begin(); i != m_RealTimeSet.end(); i++, index++ )
     {
         char buffer[20];
-        sprintf(buffer, "Real Time List %i ", index);
+        snprintf(buffer, 200, "Real Time List %i ", index);
         result += buffer;
         result += (*i).ToString();
         result += "\n";
@@ -249,16 +256,16 @@ void Pattern::SetFieldsFromString(string s)
             switch (e)
             {
             case pat_name_step_value:
-                m_StepValue = stod(token);
+                m_StepValue = strtod(token.c_str(), NULL);
                 break;
             case pat_name_gate:
-                m_Gate = stod(token);
+                m_Gate = strtod(token.c_str(), NULL);
                 break;
             case pat_name_gate_hold:
                 m_GateHold = token == "ON";
                 break;
             case pat_name_velocity:
-                m_Velocity = stoi(token);
+                m_Velocity = strtol(token.c_str(), NULL, 0);
                 break;
             case pat_name_label:
                 m_Label = token;
@@ -298,7 +305,7 @@ bool Pattern::FromString(string s, int & updates)
         if ( s.find("List ") == 0 )
         {
             // Old tag, should remove this after a while.
-            int index = stoi(s.substr(5)) - 1;
+            int index = strtol(s.substr(5).c_str(), NULL, 0) - 1;
             size_t pos = s.find(' ', 5);
             if ( pos == string::npos )
 #ifdef MA_BLUE
@@ -312,7 +319,7 @@ bool Pattern::FromString(string s, int & updates)
         }
         else if ( s.find("Step List ") == 0 )
         {
-            int index = stoi(s.substr(10)) - 1;
+            int index = strtol(s.substr(10).c_str(), NULL, 0) - 1;
             size_t pos = s.find(' ', 10);
             if ( pos == string::npos )
 #ifdef MA_BLUE
@@ -326,7 +333,7 @@ bool Pattern::FromString(string s, int & updates)
         }
         else if ( s.find("Real Time List ") == 0 )
         {
-            int index = stoi(s.substr(15)) - 1;
+            int index = strtol(s.substr(15).c_str(), NULL, 0) - 1;
             size_t pos = s.find(' ', 15);
             if ( pos == string::npos )
 #ifdef MA_BLUE
@@ -497,12 +504,12 @@ void Pattern::SetRealTimeMultipliers(vector<string>::iterator token, vector<stri
 #endif
         // Token should point to rate.
 
-        rate = stod(token->c_str());
+        rate = strtod(token->c_str(), NULL);
 
         // Now look for optional step increment.
 
         if ( ++token != end )
-            increment = stod(token->c_str());
+            increment = strtod(token->c_str(), NULL);
 #ifndef MA_BLUE
     }
     catch (...)
@@ -628,13 +635,16 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
             switch(rt_echo_parameter_lookup.at(token->c_str()))
             {
             case rte_increment:
-                inc = stod(*(++token));
+//                inc = stod(*(++token));
+                inc = strtod((++token)->c_str(), NULL);
                 break;
             case rte_target:
-                target = stod(*(++token));
+//                target = stod(*(++token));
+                target = strtod((++token)->c_str(), NULL);
                 break;
             case rte_interval:
-                interval = stoi(*(++token));
+//                interval = stoi(*(++token));
+                interval = strtol((++token)->c_str(), NULL, 0);
                 break;
             default:
                 break;
@@ -686,7 +696,14 @@ string Pattern::Label(size_t width)
         width = 80;
 
     if ( m_Label.size() > width - 2 )                    // Allow for quotes.
-        snprintf(format, 20, "%%.%lus...", width - 5);    // Allow for quotes and ellipsis.
+    {
+#if defined(MA_BLUE)
+        const char * format2 = "%%.%us...";
+#else
+        const char * format2 = "%%.%lus...";
+#endif
+        snprintf(format, 20, format2, width - 5);    // Allow for quotes and ellipsis.
+    }
     else
         strcpy(format, "%s");
 

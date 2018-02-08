@@ -19,10 +19,15 @@
 
 #include "maTranslateTable.h"
 
-#include <vector>
+#include <algorithm>
 #include <string>
 #include <unordered_map>
-#include <algorithm>
+#include <vector>
+
+#if defined(MA_BLUE)
+#include <cstdio>
+#include <cstdlib>
+#endif
 
 #include "maNotes.h"
 #include "maPatternStore.h"
@@ -100,8 +105,12 @@ enum tt_element_names_t
     num_tt_element_names
 };
 
-
-unordered_map<tt_element_names_t, const char *> tt_element_names = {
+#if defined(MA_BLUE)
+unordered_map<int, const char *> tt_element_names =
+#else
+unordered_map<tt_element_names_t, const char *> tt_element_names =
+#endif
+{
     {tt_scale_heading, "Scale"},
     {tt_name_scale, "scale"},
     {tt_name_accidentals, "accidentals"},
@@ -113,8 +122,12 @@ unordered_map<tt_element_names_t, const char *> tt_element_names = {
     {num_tt_element_names, ""}
 };
 
-
-unordered_map<scale_t, const char*>  tt_scale_strings = {
+#if defined(MA_BLUE)
+unordered_map<int, const char*>  tt_scale_strings =
+#else
+unordered_map<scale_t, const char*>  tt_scale_strings =
+#endif
+{
     {major, "2, 2, 1, 2, 2, 2, 1"},
     {harmonic_minor, "2, 1, 2, 2, 1, 3, 1"},
     {major_dorian, "2, 1, 2, 2, 2, 1, 2"},
@@ -129,7 +142,12 @@ unordered_map<scale_t, const char*>  tt_scale_strings = {
     {minor_blues, "3, 2, 1, 1, 3, 1"}
 };
 
-unordered_map<scale_t, const char *> tt_scale_names = {
+#if defined(MA_BLUE)
+unordered_map<int, const char *> tt_scale_names =
+#else
+unordered_map<scale_t, const char *> tt_scale_names =
+#endif
+{
     {major, "Major"},
     {natural_minor, "Natural minor"},
     {harmonic_minor, "Harmonic minor"},
@@ -180,7 +198,11 @@ unordered_map<string, scale_t> tt_scale_tags = // Possible tags setting ID from 
     {"blues", minor_blues}
 };
 
+#if defined(MA_BLUE)
+unordered_map<int, const char *> tt_accidentals_mode_names =
+#else
 unordered_map<accidentals_mode_t, const char *> tt_accidentals_mode_names =
+#endif
 {
     {accmode_upper, "upper"},
     {accmode_lower, "lower"},
@@ -206,7 +228,11 @@ accidentals_mode_t tt_accidentals_mode_lookup(string s)
 }
 
 
+#if defined(MA_BLUE)
+unordered_map<int, const char *> tt_premap_mode_names =
+#else
 unordered_map<scale_premap_mode_t, const char *> tt_premap_mode_names =
+#endif
 {
     {premap_off, "off"},
     {premap_mute, "mute"},
@@ -270,22 +296,22 @@ void TranslateTable::Reset()
     m_NewTranspose = 0;
 }
 
-bool TranslateTable::HandleKey(key_type_t k)
+bool TranslateTable::HandleKey(BaseUI::key_command_t k)
 {
     int temp;
     switch ( k )
     {
-    case left:
+    case BaseUI::key_left:
         temp = static_cast<int>(m_TranslateTableFocus) - 1;
         if ( temp >= 0 && temp < num_tt_menu_focus_modes )
             m_TranslateTableFocus = static_cast<translate_table_menu_focus_t>(temp);
         break;
-    case right:
+    case BaseUI::key_right:
         temp = static_cast<int>(m_TranslateTableFocus) + 1;
         if ( temp >= 0 && temp < num_tt_menu_focus_modes )
             m_TranslateTableFocus = static_cast<translate_table_menu_focus_t>(temp);
         break;
-    case up:
+    case BaseUI::key_up:
         switch ( m_TranslateTableFocus )
         {
         case chromatic_shift:
@@ -310,7 +336,7 @@ bool TranslateTable::HandleKey(key_type_t k)
             break;
         }
         break;
-    case down:
+    case BaseUI::key_down:
         switch ( m_TranslateTableFocus )
         {
         case chromatic_shift:
@@ -343,7 +369,6 @@ bool TranslateTable::HandleKey(key_type_t k)
 
     return true;
 }
-
 
 void TranslateTable::FromString(string s)
 {
@@ -379,16 +404,16 @@ void TranslateTable::FromString(string s)
                 m_PremapMode = tt_premap_mode_lookup(token);
                 break;
             case tt_name_root:
-                m_Root = stoi(token);
+                m_Root = strtol(token.c_str(), NULL, 0);
                 break;
             case tt_name_chromatic:
-                m_Transpose = stoi(token);
+                m_Transpose = strtol(token.c_str(), NULL, 0);
                 break;
             case tt_name_shift:
-                m_DegreeShift = stoi(token);
+                m_DegreeShift = strtol(token.c_str(), NULL, 0);
                 break;
             case tt_name_degrees:
-                m_ScaleDegrees = stoi(token);
+                m_ScaleDegrees = strtol(token.c_str(), NULL, 0);
                 break;
             default:
                 break;
@@ -421,7 +446,7 @@ string TranslateTable::ToString(const char * prefix)
         result += ' ';
     }
 
-    sprintf(buff, "%s\\\n    %s %i %s %i %s %i %s '%s'",
+    snprintf(buff, 100, "%s\\\n    %s %i %s %i %s %i %s '%s'",
             tt_element_names.at(tt_scale_heading),
             tt_element_names.at(tt_name_root), m_Root,
             tt_element_names.at(tt_name_chromatic), m_Transpose,
@@ -438,14 +463,14 @@ string TranslateTable::ToString(const char * prefix)
 //        result += ' ';
 //    }
 
-//    sprintf(buff, "%s %s %i %s '%s' %s '%s'",
+//    snprintf(buff, 100, "%s %s %i %s '%s' %s '%s'",
 //            tt_element_names.at(tt_scale_heading),
 //            tt_element_names.at(tt_name_degrees), m_ScaleDegrees,
 //            tt_element_names.at(tt_name_accidentals), tt_accidentals_mode_names.at(m_AccidentalsMode),
 //            tt_element_names.at(tt_name_premap), tt_premap_mode_names.at(m_PremapMode)
 //            );
 
-    sprintf(buff, "\\\n    %s %i %s '%s' %s '%s'",
+    snprintf(buff, 100, "\\\n    %s %i %s '%s' %s '%s'",
             tt_element_names.at(tt_name_degrees), m_ScaleDegrees,
             tt_element_names.at(tt_name_accidentals), tt_accidentals_mode_names.at(m_AccidentalsMode),
             tt_element_names.at(tt_name_premap), tt_premap_mode_names.at(m_PremapMode)
@@ -608,8 +633,7 @@ void TranslateTable::SetupScaleMaps()
     for ( int i = 0; i < 12; i++ )
         m_NoteMap[i] = 0;
 
-
-    vector<string> tokens = split(tt_scale_strings.at(m_Scale), ',', true);
+    vector<string> tokens = split(tt_scale_strings[m_Scale], ',', true);
 
     int totalIntervals = 0;
     for ( unsigned i = 0; i < tokens.size(); i++ )
@@ -671,7 +695,7 @@ string TranslateTable::ShowScale()
     char buff[20];
     for ( vector<int>::iterator it = m_Intervals.begin(); it < m_Intervals.end(); it++ )
     {
-        sprintf(buff, "%i", (*it));
+        snprintf(buff, 20, "%i", (*it));
         if ( !result.empty() )
             result += ", ";
         result += buff;
@@ -688,7 +712,7 @@ string TranslateTable::ShowNoteMap()
         result += ' ';
         if ( m_NoteMap[i] != 0 )
         {
-            sprintf(buff, "%s", tt_numerals[m_NoteMap[i]]);
+            snprintf(buff, 20, "%s", tt_numerals[m_NoteMap[i]]);
             result += buff;
         }
         else result += '.';
@@ -705,32 +729,32 @@ void TranslateTable::SetStatus()
     m_Highlights.clear();
 
     int pos = 0;
-    sprintf(buff, "Chr': %2i", m_Transpose);
+    snprintf(buff, 200, "Chr': %2i", m_Transpose);
     m_Status += buff;
     m_FieldPositions.emplace_back(5, static_cast<int>(m_Status.size()) - 5);
 
     pos = m_Status.size();
-    sprintf(buff, ", Tonal: %2i (%s)", m_DegreeShift, ShiftName());
+    snprintf(buff, 200, ", Tonal: %2i (%s)", m_DegreeShift, ShiftName());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos + 8, m_Status.size() - pos - 8);
 
     pos = m_Status.size();
-    sprintf(buff, " %s", RootName().c_str());
+    snprintf(buff, 200, " %s", RootName().c_str());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos + 1, m_Status.size() - pos - 1);
 
     pos = m_Status.size();
-    sprintf(buff, "-%s", ScaleName());
+    snprintf(buff, 200, "-%s", ScaleName());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos + 1, m_Status.size() - pos - 1);
 
     pos = m_Status.size();
-    sprintf(buff, ", premap %s", PremapModeName());
+    snprintf(buff, 200, ", premap %s", PremapModeName());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos + 9, m_Status.size() - pos - 9);
 
     pos = m_Status.size();
-    sprintf(buff, ", acc's %s", AccidentalsModeName());
+    snprintf(buff, 200, ", acc's %s", AccidentalsModeName());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos + 8, m_Status.size() - pos - 8);
 
@@ -1072,7 +1096,7 @@ string TranslateDiags::UpdateLog()
     m_InOutPairs.emplace_back(m_NoteIn, m_NoteOut);
 
     //                          In   Octave   Premap Degree/Actual Chro Final
-    sprintf(buff, " %3s %-10.10s %3s  %2i+%-2i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %-12s",
+    snprintf(buff, 200, " %3s %-10.10s %3s  %2i+%-2i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %-12s",
         Note::NoteString(m_Root).c_str(),
         tt_scale_names.at(m_Scale),
         Note::NoteString(m_NoteIn).c_str(),

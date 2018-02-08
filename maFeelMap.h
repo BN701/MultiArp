@@ -59,7 +59,8 @@ class FeelMap : public CursorKeys
 
     protected:
 
-        virtual bool HandleKey(key_type_t k);
+//        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
 
     private:
 

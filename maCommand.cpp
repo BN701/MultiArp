@@ -26,6 +26,8 @@
 #include <array>
 
 #ifdef MA_BLUE
+#include <cstdio>
+#include <cstdlib>
 #include "maSequencer.h"
 extern Sequencer g_Sequencer;
 #else
@@ -34,6 +36,7 @@ extern Sequencer g_Sequencer;
 extern AlsaSequencer g_Sequencer;
 #endif // MA_BLUE
 
+//#include "maCursorKeys.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -51,7 +54,7 @@ using namespace std;
 extern CursorKeys g_CursorKeys;
 extern State g_State;
 extern PatternStore g_PatternStore;
-extern TextUI g_TextUI;
+extern AnsiUI g_TextUI;
 extern ListBuilder g_ListBuilder;
 
 enum command_t
@@ -543,13 +546,13 @@ bool do_command(string commandString)
             break;
 
         case C_PAGE_ONE:
-            g_TextUI.SetBigPanelPage(TextUI::one);
+            g_TextUI.SetBigPanelPage(AnsiUI::one);
             break;
         case C_PAGE_TWO:
-            g_TextUI.SetBigPanelPage(TextUI::two);
+            g_TextUI.SetBigPanelPage(AnsiUI::two);
             break;
         case C_PAGE_THREE:
-            g_TextUI.SetBigPanelPage(TextUI::three);
+            g_TextUI.SetBigPanelPage(AnsiUI::three);
             break;
         case C_PAGE_HOLD:
             g_TextUI.ToggleBigPanelHold();
@@ -562,8 +565,12 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2,"Hint: play nn, where 'nn' is pattern number.");
                 break;
             }
-            iTemp = stoi(tokens[1].c_str()) - 1;
-            if ( ! g_PatternStore.ValidPosition(iTemp) )
+#if defined(MA_BLUE)
+            iTemp = strtol(tokens[1].c_str(), NULL, 0);
+#else
+            iTemp = stoi(tokens[1].c_str());
+#endif
+            if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
             {
                 set_status(STAT_POS_2,"Requested pattern number out of range at the moment.");
                 break;
@@ -581,8 +588,12 @@ bool do_command(string commandString)
             }
             else
             {
-                iTemp = stoi(tokens[1].c_str()) - 1;
-                if ( ! g_PatternStore.ValidPosition(iTemp) )
+#if defined(MA_BLUE)
+                iTemp = strtol(tokens[1].c_str(), NULL, 0);
+#else
+                iTemp = stoi(tokens[1].c_str());
+#endif
+                if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
                 {
                     set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
                     break;
@@ -680,7 +691,11 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2, "Hint: step n");
                 break;
             }
+#if defined(MA_BLUE)
+            fTemp = strtod(tokens[1].c_str(), NULL);
+#else
             fTemp = stod(tokens[1].c_str());
+#endif
             if ( fTemp != 0 )
             {
                 set_status(STAT_POS_2, "Setting %s Step Value: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
@@ -695,7 +710,11 @@ bool do_command(string commandString)
         case C_GATELENGTH :
             if ( tokens.size() >= 2 )
             {
+#if defined(MA_BLUE)
+                fTemp = strtod(tokens[1].c_str(), NULL);
+#else
                 fTemp = stod(tokens[1].c_str());
+#endif
                 if ( fTemp >= 0 )
                 {
                     set_status(STAT_POS_2, "Setting %s Gate Length: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
@@ -725,15 +744,19 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2, "Hint: vel[ocity] n");
                 break;
             }
+#if defined(MA_BLUE)
+            iTemp = strtol(tokens[1].c_str(), NULL, 0);
+#else
             iTemp = stoi(tokens[1].c_str());
-            if ( iTemp >= 0 && iTemp <= 127 )
+#endif
+            if ( iTemp > 0 && iTemp <= 127 )
             {
                 set_status(STAT_POS_2, "Setting %s velocity: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
                 g_PatternStore.SetNoteVelocity(iTemp);
             }
             else
             {
-                set_status(STAT_POS_2, "Velocity must be in the range 0 .. 127.", tokens[1].c_str());
+                set_status(STAT_POS_2, "Velocity must be in the range 1 .. 127.", tokens[1].c_str());
             }
             break;
 
@@ -743,7 +766,11 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2, "Hint: trans[pose] n [now]");
                 break;
             }
+#if defined(MA_BLUE)
+            iTemp = strtol(tokens[1].c_str(), NULL, 0);
+#else
             iTemp = stoi(tokens[1].c_str());
+#endif
             if ( tokens.size() >= 3 && tokens[2] == "now")
             {
                 set_status(STAT_POS_2, "Transpose value set.");
@@ -822,7 +849,11 @@ bool do_command(string commandString)
             {
                 // Expect a number and use it to set midi channel.
 
+#if defined(MA_BLUE)
+                int iTemp = strtol(tokens[1].c_str(), NULL, 0);
+#else
                 int iTemp = stoi(tokens[1].c_str());
+#endif
                 if ( iTemp >= 1 && iTemp <= 16)
                 {
                     set_status(STAT_POS_2, "Set midi channel: %s", tokens[1].c_str());
@@ -862,7 +893,11 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2, "Hint: quan[tum] n.nn");
                 break;
             }
+#if defined(MA_BLUE)
+            fTemp = strtod(tokens[1].c_str(), NULL);
+#else
             fTemp = stod(tokens[1].c_str());
+#endif
             if ( fTemp > 0 )
             {
                 set_status(STAT_POS_2, "Setting new Quantum: %s", tokens[1].c_str());
@@ -1128,9 +1163,18 @@ bool do_command(string commandString)
             break;
 
         case C_NONE :
-            iTemp = stoi(tokens[0]) - 1;
+#ifdef MA_BLUE
+            iTemp = strtol(tokens[0].c_str(), NULL, 0);
+            if ( iTemp == 0 )
+            {
+                set_status(STAT_POS_2, "Phrase not recognised.");
+                break;
+            }
+#else
+            iTemp = stoi(tokens[0]);
+#endif
             // Function returns a format string. Too obfuscated?
-            set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp).c_str(), iTemp + 1);
+            set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp).c_str(), iTemp);
             break;
         default :
             break;
@@ -1216,7 +1260,12 @@ enum global_element_names_t
 };
 
 
-unordered_map<global_element_names_t, const char *> global_element_names = {
+#if defined(MA_BLUE)
+unordered_map <int, const char *> global_element_names =
+#else
+unordered_map <global_element_names_t, const char *> global_element_names =
+#endif
+{
     {global_heading, "Global"},
     {global_name_midi_channel, "Midi Channel"},
     {global_name_link_quantum, "Link Quantum"},
@@ -1231,9 +1280,9 @@ string globals_to_string()
 
     char buff[200];
 
-    sprintf(buff, "%s %i\n", global_element_names.at(global_name_midi_channel), g_Sequencer.MidiChannel() + 1);
+    snprintf(buff, 200, "%s %i\n", global_element_names.at(global_name_midi_channel), g_Sequencer.MidiChannel() + 1);
     result += buff;
-    sprintf(buff, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
+    snprintf(buff, 200, "%s %.2f\n", global_element_names.at(global_name_link_quantum), g_State.Quantum());
     result += buff;
 
     result += '\n';
@@ -1275,10 +1324,21 @@ void load_from_string(string s, int & created, int & updated )
 
                 transform(token.begin(), token.end(), token.begin(), ::tolower);
 
-#ifndef MA_BLUE
+#ifdef MA_BLUE
+                switch (e)
+                {
+                case global_name_midi_channel:
+                    g_Sequencer.SetMidiChannel(strtol(token.c_str(), NULL, 0) - 1);
+                    break;
+                case global_name_link_quantum:
+                    g_State.SetNewQuantumPending(strtod(token.c_str(), NULL));
+                    break;
+                default:
+                    break;
+                }
+#else
                 try
                 {
-#endif
                     switch (e)
                     {
                     case global_name_midi_channel:
@@ -1290,7 +1350,6 @@ void load_from_string(string s, int & created, int & updated )
                     default:
                         break;
                     }
-#ifndef MA_BLUE
                 }
                 catch(invalid_argument ex)
                 {
@@ -1320,13 +1379,16 @@ void load_from_string(string s, int & created, int & updated )
 
 }
 
-bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
+//bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
+
+
+bool handle_key_input(BaseUI::key_command_t key)
 {
     bool result = true;
 
-    if ( curKey != CursorKeys::no_key )
+    if ( key > BaseUI::key_menu_control )
     {
-        g_CursorKeys.RouteKey(curKey);
+        g_CursorKeys.RouteKey(key);
         show_status_after_navigation();
         update_edit_panels();
         return true;
@@ -1334,21 +1396,22 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
 
     static string commandString;
 
-    switch (sym)
+    switch (key)
     {
-    case 0xE6: // Ctrl-A
+#if !defined(MA_BLUE) || defined(MA_BLUE_PC)
+    case BaseUI::key_ctrl_a: // 0xE6: // Ctrl-A
         copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
         set_status(COMMAND_HOME, "");
         break;
 
-    case 0xA2:  // Ctrl-C, Copy
+    case BaseUI::key_ctrl_c: // 0xA2:  // Ctrl-C, Copy
         copy_clipboard(g_PatternStore.EditPatternToString());
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         set_status(COMMAND_HOME, "");
         break;
 
-    case 0xAD2: // Ctrl-V, Paste
+    case BaseUI::key_ctrl_v: // 0xAD2: // Ctrl-V, Paste
         set_status(COMMAND_HOME, "");
 #ifndef MA_BLUE
         try
@@ -1368,12 +1431,8 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
         update_edit_panels();
         update_pattern_panel();
         break;
-
-#ifdef MA_BLUE
-    case 13:
-#else
-    case XK_Return: // Enter
 #endif
+    case BaseUI::key_return: // Enter
         if ( !commandString.empty() )
         {
             result = do_command(commandString);
@@ -1389,7 +1448,7 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
             update_pattern_panel();
             set_status(STAT_POS_2, "");
         }
-        else if ( g_CursorKeys.RouteKey(CursorKeys::enter) )
+        else if ( g_CursorKeys.RouteKey(BaseUI::key_return) )
         {
             show_status_after_navigation();
         }
@@ -1397,49 +1456,41 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
         set_status(COMMAND_HOME, "");
         break;
 
-#ifdef MA_BLUE
-    case 32:
-#else
-    case XK_space: // Space bar.
-#endif
+    case BaseUI::key_space: // XK_space: // Space bar.
         if ( commandString.empty() )
         {
 #ifdef MA_BLUE
             if ( g_ListBuilder.HandleKeybInput(32) )
 #else
-            if ( g_ListBuilder.HandleKeybInput(XK_space) )
+            if ( g_ListBuilder.HandleKeybInput(' ') )
 #endif
                 show_listbuilder_status();
         }
         else
         {
-            commandString += sym;
+            commandString += ' ';
             place_cursor(COMMAND_HOME + commandString.size());
             set_status(COMMAND_HOME, commandString.c_str());
         }
         break;
 
 #ifndef MA_BLUE
-    case XK_Tab:
+    case BaseUI::key_tab: // XK_Tab:
         place_cursor(COMMAND_HOME + commandString.size());
         g_TextUI.NextBigPanelPage(1);
         break;
 
-    case XK_ISO_Left_Tab:   // Shift-Tab
+    case BaseUI::key_shift_tab: // XK_ISO_Left_Tab:   // Shift-Tab
         g_TextUI.NextBigPanelPage(-1);
         break;
 #endif
 
-#ifdef MA_BLUE
-    case 8:
-#else
-    case XK_BackSpace:
-#endif
+    case BaseUI::key_backspace: // XK_BackSpace:
         if ( commandString.size() > 0 )
             commandString.pop_back();
-        else if ( g_ListBuilder.HandleKeybInput(CursorKeys::back_space) )
+        else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_backspace) )
             show_listbuilder_status();
-        else if ( g_CursorKeys.RouteKey(CursorKeys::back_space) )
+        else if ( g_CursorKeys.RouteKey(BaseUI::key_backspace) )
             show_status_after_navigation();
         place_cursor(COMMAND_HOME + commandString.size());
         set_status(COMMAND_HOME, commandString.c_str());
@@ -1447,9 +1498,9 @@ bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
 
     default:
 
-        if ( sym > 31 && sym < 127 )
+        if ( key > 32 && key < 127 )
         {
-            commandString += sym;
+            commandString += key;
             place_cursor(COMMAND_HOME + commandString.size());
             set_status(COMMAND_HOME, commandString.c_str());
         }

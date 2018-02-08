@@ -28,24 +28,26 @@
 
 #else
 
-#include <xcb/xcb.h>
-
-// Todo: move X key code dependency and set up our own codes.
-
-#define XK_MISCELLANY
-#define XK_XKB_KEYS
-#define XK_LATIN1
-#include <X11/keysymdef.h>  // XK_ Unicode key name defines
-
+//#include <xcb/xcb.h>
+//
+//// Todo: move X key code dependency and set up our own codes.
+//
+//#define XK_MISCELLANY
+//#define XK_XKB_KEYS
+//#define XK_LATIN1
+//#include <X11/keysymdef.h>  // XK_ Unicode key name defines
+//
 
 void do_command_line(int argc, char *argv[]);
 #endif // MA_BLUE
 
 #include "maCursorKeys.h"
+#include "maBaseUI.h"
 
 bool do_command(std::string commandList);
 
-bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym);
+//bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym);
+bool handle_key_input(BaseUI::key_command_t key);
 
 //#define RESET_NONE 0
 //#define RESET_ALL 1

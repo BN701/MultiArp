@@ -28,33 +28,70 @@
 //
 
 
-//#define _USE_MATH_DEFINES
-
-#define LINK_PLATFORM_LINUX
-#include <ableton/Link.hpp>
-
-
-#include "maAlsaSequencer.h"
 #include "maCommand.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
 #include "maStep.h"
 
+//
+// Use of MA_BLUE in this file is to create a PC platform
+// that can be used to test and debug MA_BLUE configurations
+// away from the embedded platform. This includes things
+// like no-exception handling, alternative UI elements.
+//
+// This file is never run on the embedded target itself.
+//
+/////////////////////////////////////////////////////////////
+
+#ifdef MA_BLUE
+
+#include <poll.h>
+
+#include "maSequencer.h"
+Sequencer g_Sequencer;
+
+ListBuilder g_ListBuilder;
+
+#else
+
+#define LINK_PLATFORM_LINUX
+#include <ableton/Link.hpp>
+
+#include "maAlsaSequencer.h"
+
 // Global Link instance.
 
 ableton::Link g_Link(120.);
 std::chrono::microseconds g_LinkStartTime(-1);
 
-// Global instances.
-
 AlsaSequencer g_Sequencer;
 ListBuilder g_ListBuilder(&g_Link);
+
+#endif
+
+// Global instances.
+
 PatternStore g_PatternStore;
 
-extern TextUI g_TextUI;
-extern CairoUI g_CairoUI;
+AnsiUI g_TextUI;
+#ifndef MA_BLUE
+CairoUI g_CairoUI(true);
+#endif
 
+// Static instances of empty items
+// for use by member functions that
+// return references when no patterns
+// or other items have been created.
+//
+// (And having them here
+// seems to ensure that they're
+// initialized after the other static
+// data they depend on.)
+
+StepList StepList::EmptyList;
+RealTimeList RealTimeList::EmptyList;
+Pattern Pattern::EmptyPattern;
 
 void sigterm_exit(int sig)
 {
@@ -63,12 +100,73 @@ void sigterm_exit(int sig)
 
 int main(int argc, char *argv[])
 {
-    g_PatternStore.SetFocus();
-    do_command_line(argc, argv);
-
     // Initialize ...
 
+    // Termination handlers.
+
+//    signal(SIGINT, sigterm_exit);
+//    signal(SIGINT, SIG_IGN);
+
+#if !defined(MA_BLUE)// || defined(MA_BLUE_PC)
+    signal(SIGTERM, sigterm_exit);
+#endif
+
+    g_PatternStore.SetFocus();
+
+#ifdef MA_BLUE
+
+    set_top_line();
+
+    // Poll for keyboard input to start with.
+
+    struct pollfd *pfd = (struct pollfd *)alloca(sizeof(struct pollfd));
+    pfd[0].fd = 0;  // stdin
+    pfd[0].events = POLLIN;
+
+    // Queue first events
+
+//    queue_next_step(queueId);
+
+    // Polling loop
+
+    bool keep_going = true;
+
+    while ( keep_going )
+    {
+        if ( poll(pfd, 1, 10000) > 0 )
+        {
+            bool keyDataValid = false;
+            BaseUI::key_command_t key;
+
+            if ( pfd[0].revents & POLLIN )
+            {
+                keyDataValid = true;
+                key = g_TextUI.KeyInput();
+            }
+//            else if ( gotXWindow && (pfd[1].revents & POLLIN) )
+//            {
+//                keep_going = g_CairoUI.PollEvents(keyDataValid, key);
+//            }
+
+            if ( keep_going && keyDataValid )
+            {
+                keep_going = handle_key_input(key);
+            }
+
+//            for ( int i = 2; i < npfd + 2; i++ )
+//            {
+//                if ( pfd[i].revents > 0 )
+//                    midi_action(queueId);
+//            }
+        }
+    }
+
+#else
+
+    do_command_line(argc, argv);
+
     g_Link.enable(true); // Start peer-to-peer interactions.
+
 
     int queueIndex = g_Sequencer.CreateQueue();
     int queueId = g_Sequencer.Queue(queueIndex).GetQueueId();
@@ -80,12 +178,6 @@ int main(int argc, char *argv[])
     g_Sequencer.Queue(queueIndex).Start();
 
     set_top_line();
-
-    // Termination handlers.
-
-    signal(SIGINT, sigterm_exit);
-    signal(SIGTERM, sigterm_exit);
-
 
     /*
     * Set up polling ...
@@ -119,22 +211,23 @@ int main(int argc, char *argv[])
         if ( poll(pfd, npfd + 2, 10000) > 0 )
         {
             bool keyDataValid = false;
-            CursorKeys::key_type_t curKey = CursorKeys::no_key;
-            xcb_keysym_t sym = 0;
+            BaseUI::key_command_t key;
+            // CursorKeys::key_type_t curKey = CursorKeys::no_key;
+            // xcb_keysym_t sym = 0;
 
             if ( pfd[0].revents & POLLIN )
             {
                 keyDataValid = true;
-                g_TextUI.KeyInput(curKey, sym);
+                key = g_TextUI.KeyInput();
             }
             else if ( gotXWindow && (pfd[1].revents & POLLIN) )
             {
-                keep_going = g_CairoUI.PollEvents(keyDataValid, curKey, sym);
+                keep_going = g_CairoUI.PollEvents(keyDataValid, key);
             }
 
             if ( keep_going && keyDataValid )
             {
-                keep_going = handle_key_input(curKey, sym);
+                keep_going = handle_key_input(key);
             }
 
             for ( int i = 2; i < npfd + 2; i++ )
@@ -144,5 +237,6 @@ int main(int argc, char *argv[])
             }
         }
     }
+#endif
 
 }

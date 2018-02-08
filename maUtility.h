@@ -27,8 +27,10 @@
 std::vector<std::string> split(const char *str, char c = ' ', bool wantEmptyTokens = false);
 std::string find_token(std::string s, const char * name);
 
+#if !defined(MA_BLUE) || defined(MA_BLUE_PC)
 std::string get_clipboard();
 void copy_clipboard(std::string s);
+#endif
 
 int64_t lcm(int64_t a, int64_t b);
 int64_t gcd(int64_t a, int64_t b);

@@ -214,7 +214,7 @@ class TranslateTable : public CursorKeys
             num_tt_menu_focus_modes
         };
 
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         translate_table_menu_focus_t m_TranslateTableFocus;
 
     private:

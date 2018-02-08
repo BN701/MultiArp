@@ -22,6 +22,11 @@
 #include <cmath>
 #include <unordered_map>
 
+#if defined(MA_BLUE)
+#include <cstdio>
+#include <cstdlib>
+#endif
+
 #include "maTrigListItem.h"
 #include "maUtility.h"
 
@@ -37,11 +42,11 @@ void ArpeggioStage::FromString(std::string s)
 {
     vector<string> tokens = split(s.c_str(), '/');
 
-    if ( tokens.size() < 0 )
+    if ( tokens.size() < 2 )
         return;
 
-    m_Interval = stoi(tokens.at(0));
-    m_Steps = stoi(tokens.at(1));
+    m_Interval = strtol(tokens.at(0).c_str(), NULL, 0);
+    m_Steps = strtol(tokens.at(1).c_str(), NULL, 0);
 }
 
 //
@@ -49,7 +54,11 @@ void ArpeggioStage::FromString(std::string s)
 //
 //////////////////////////////////////////////////////////////
 
+#if defined(MA_BLUE)
+unordered_map<int, const char *> tr_decay_mode_names =
+#else
 unordered_map<TrigRepeater::decay_mode_t, const char *> tr_decay_mode_names =
+#endif
 {
     {TrigRepeater::off, "off"},
     {TrigRepeater::exponential, "exponential"},
@@ -215,7 +224,11 @@ enum tli_element_names_t
 };
 
 
+#if defined(MA_BLUE)
+unordered_map<int, const char *> tli_element_names = {
+#else
 unordered_map<tli_element_names_t, const char *> tli_element_names = {
+#endif
     {tli_trig_mask, "Trig Mask"},
     {tli_multiplier, "Multiplier"},
     {tli_skip, "Skip"},
@@ -235,7 +248,7 @@ string TrigListItem::ToString()
 
     string result;
 
-    sprintf(buff, "%s %lu %s %.3f %s '%s' %s '%s' %s %i %s %.3f \\\n",
+    snprintf(buff, 200, "%s %lu %s %.3f %s '%s' %s '%s' %s %i %s %.3f \\\n",
             tli_element_names.at(tli_trig_mask), m_TrigMask,
             tli_element_names.at(tli_multiplier), m_Multiplier,
             tli_element_names.at(tli_skip), m_Skip ? "On" : "Off",
@@ -245,7 +258,7 @@ string TrigListItem::ToString()
             );
     result += buff;
 
-    sprintf(buff, "      %s %.3f %s '%s'",
+    snprintf(buff, 200, "      %s %.3f %s '%s'",
             tli_element_names.at(tli_velocity_decay), m_Repeater.VelocityDecay(),
             tli_element_names.at(tli_decay_mode), tr_decay_mode_names.at(m_Repeater.DecayMode())
             );
@@ -253,11 +266,11 @@ string TrigListItem::ToString()
 
     if ( !m_Repeater.Arpeggio().empty() )
     {
-        sprintf(buff, " %s {", tli_element_names.at(tli_arpeggio));
+        snprintf(buff, 200, " %s {", tli_element_names.at(tli_arpeggio));
         result += buff;
         for ( auto it = m_Repeater.Arpeggio().begin(); it != m_Repeater.Arpeggio().end(); )
         {
-            sprintf(buff, "%i/%i", it->m_Interval, it->m_Steps);
+            snprintf(buff, 200, "%i/%i", it->m_Interval, it->m_Steps);
             result += buff;
             if ( ++it != m_Repeater.Arpeggio().end() )
                 result += ' ';
@@ -288,10 +301,10 @@ void TrigListItem::FromString(string s)
             switch (e)
             {
             case tli_trig_mask:
-                m_TrigMask = stoi(token);
+                m_TrigMask = strtol(token.c_str(), NULL, 0);
                 break;
             case tli_multiplier:
-                m_Multiplier = stod(token);
+                m_Multiplier = strtod(token.c_str(), NULL);
             case tli_skip:
                 m_Skip = token == "on";
                 break;
@@ -299,13 +312,13 @@ void TrigListItem::FromString(string s)
                 m_Mute = token == "on";
                 break;
             case tli_repeats:
-                m_Repeater.SetRepeats(stoi(token));
+                m_Repeater.SetRepeats(strtol(token.c_str(), NULL, 0));
                 break;
             case tli_repeat_time:
-                m_Repeater.SetRepeatTime(stod(token));
+                m_Repeater.SetRepeatTime(strtod(token.c_str(), NULL));
                 break;
             case tli_velocity_decay:
-                m_Repeater.SetVelocityDecay(stod(token));
+                m_Repeater.SetVelocityDecay(strtod(token.c_str(), NULL));
                 break;
             case tli_decay_mode:
                 m_Repeater.SetDecayMode(tr_decay_mode_lookup(token));
@@ -348,7 +361,7 @@ void TrigListItem::FromSimpleString(string s)
         try
         {
 #endif
-            int i = stoi(s);
+            int i = strtol(s.c_str(), NULL, 0);
             if ( i <= 64 )
                 m_Trigs.push_back(i - 1);
 
@@ -413,7 +426,7 @@ string TrigListItem::TrigMaskToString()
         {
             if ( (m_TrigMask & mask) > 0 )
             {
-                sprintf(buff, "%s%i", addSpacer ? "+" : "", i + 1);
+                snprintf(buff, 200, "%s%i", addSpacer ? "+" : "", i + 1);
                 result += buff;
                 addSpacer = true;
             }
@@ -431,13 +444,13 @@ string TrigListItem::MenuString(unsigned width)
 
     if ( lround(m_Multiplier * 100) != 100 )
     {
-        sprintf(buff, "x%.2f", m_Multiplier);
+        snprintf(buff, 200, "x%.2f", m_Multiplier);
         result += buff;
     }
 
     if ( m_Repeater.Repeats() > 0 )
     {
-        sprintf(buff, "/R%i", m_Repeater.Repeats());
+        snprintf(buff, 200, "/R%i", m_Repeater.Repeats());
         result += buff;
     }
 
@@ -479,7 +492,7 @@ void TrigListItem::SetStatus()
 
     m_Status += ", Mul ";
     pos = m_Status.size();
-    sprintf(buff, "%.2f", m_Multiplier);
+    snprintf(buff, 200, "%.2f", m_Multiplier);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
@@ -504,7 +517,7 @@ void TrigListItem::SetStatus()
     pos = m_Status.size();
     if ( m_Repeater.Repeats() > 0 )
     {
-        sprintf(buff, "%i", m_Repeater.Repeats());
+        snprintf(buff, 200, "%i", m_Repeater.Repeats());
         m_Status += buff;
     }
     else
@@ -515,7 +528,7 @@ void TrigListItem::SetStatus()
     pos = m_Status.size();
     if ( lround(100 * m_Repeater.RepeatTime()) > 0 )
     {
-        sprintf(buff, "%.2f", m_Repeater.RepeatTime());
+        snprintf(buff, 200, "%.2f", m_Repeater.RepeatTime());
         m_Status += buff;
     }
     else
@@ -531,7 +544,7 @@ void TrigListItem::SetStatus()
     pos = m_Status.size();
     if ( lround(100 * m_Repeater.VelocityDecay()) > 0 )
     {
-        sprintf(buff, "%.2f", m_Repeater.VelocityDecay());
+        snprintf(buff, 200, "%.2f", m_Repeater.VelocityDecay());
         m_Status += buff;
     }
     else
@@ -543,7 +556,7 @@ void TrigListItem::SetStatus()
         m_Status += " Arp (interval/steps): ";
         for ( auto it = m_Repeater.Arpeggio().begin(); it != m_Repeater.Arpeggio().end(); )
         {
-            sprintf(buff, "%i/%i", it->m_Interval, it->m_Steps);
+            snprintf(buff, 200, "%i/%i", it->m_Interval, it->m_Steps);
             pos = m_Status.size();
             m_Status += buff;
             m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
@@ -556,7 +569,7 @@ void TrigListItem::SetStatus()
 
 }
 
-bool TrigListItem::HandleKey(key_type_t k)
+bool TrigListItem::HandleKey(BaseUI::key_command_t k)
 {
     bool newTrigs = false;
     bool shift = false;
@@ -567,23 +580,23 @@ bool TrigListItem::HandleKey(key_type_t k)
 
     switch ( k )
     {
-    case enter:
-    case back_space:
-    case escape:
+    case BaseUI::key_return:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         if ( m_TrigListItemFocus > 0 )
             m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus - 1);
         break;
 
-    case right:
+    case BaseUI::key_right:
         if ( m_TrigListItemFocus < num_tlif_types + arp.size() - 1 )
             m_TrigListItemFocus = static_cast<trig_list_item_menu_focus_t>(m_TrigListItemFocus + 1);
         break;
 
-    case shift_left:
+    case BaseUI::key_shift_left:
         if ( arp.empty() )
         {
             arp.push_back(*(new ArpeggioStage(1,1)));
@@ -593,7 +606,7 @@ bool TrigListItem::HandleKey(key_type_t k)
             arp.insert(arp.begin() + arpIndex, *(new ArpeggioStage(1,1)));
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         if ( arpIndex >= 0 )
         {
             arp.erase(arp.begin() + arpIndex);
@@ -602,7 +615,7 @@ bool TrigListItem::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_right:
+    case BaseUI::key_shift_right:
         if ( arp.empty() )
         {
             arp.push_back(*(new ArpeggioStage(1,1)));
@@ -616,10 +629,10 @@ bool TrigListItem::HandleKey(key_type_t k)
         break;
 
 
-    case shift_up:
+    case BaseUI::key_shift_up:
         shift = true;
         inc = 0.01;
-    case up:
+    case BaseUI::key_up:
         switch ( m_TrigListItemFocus )
         {
         case tlif_trigs:
@@ -656,10 +669,10 @@ bool TrigListItem::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_down:
+    case BaseUI::key_shift_down:
         shift = true;
         inc = 0.01;
-    case down:
+    case BaseUI::key_down:
         switch ( m_TrigListItemFocus )
         {
         case tlif_trigs:

@@ -159,6 +159,7 @@ string find_token(string s, const char * name)
 }
 
 
+#if !defined(MA_BLUE) || defined(MA_BLUE_PC)
 
 void copy_clipboard(std::string s)
 {
@@ -200,6 +201,7 @@ std::string get_clipboard()
     return s;
 
 }
+#endif
 
 int64_t gcd(int64_t a, int64_t b)
 {

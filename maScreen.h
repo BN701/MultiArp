@@ -20,7 +20,7 @@
 #ifndef MASCREEN_H_INCLUDED
 #define MASCREEN_H_INCLUDED
 
-#include "maTextUI.h"
+#include "maAnsiUI.h"
 
 #ifndef MA_BLUE
 
@@ -35,14 +35,14 @@
 
 #define COMMAND_HOME 6,4
 #define STAT_POS_TOPLINE 0,0
-#define STAT_POS_STEP TextUI::progress_panel, 0,0
-#define STAT_POS_PATTERN TextUI::small_panel, 1,0
-#define STAT_POS_PATTERN_EDIT TextUI::small_panel, 2,0
+#define STAT_POS_STEP AnsiUI::progress_panel, 0,0
+#define STAT_POS_PATTERN AnsiUI::small_panel, 1,0
+#define STAT_POS_PATTERN_EDIT AnsiUI::small_panel, 2,0
 #define STAT_POS_2 5,4
 #define STAT_POS_MENU 1,4
 
 void set_status(int y, int x, const char *format, ... );
-void set_status_w(TextUI::window_area_t area, int y, int x, const char *format, ...);
+void set_status_w(AnsiUI::window_area_t area, int y, int x, const char *format, ...);
 
 void place_cursor(int row, int col);
 

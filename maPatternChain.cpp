@@ -17,6 +17,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#if defined(MA_BLUE)
+#include <cerrno>
+#include <cstdlib>
+#include <cstdio>
+#endif
+
 #include <unordered_map>
 
 #include "maPatternChain.h"
@@ -52,7 +58,7 @@ string PatternChain::ToStringForDisplay(unsigned firstRow, unsigned rows)
             result +=  '\n';
 
         char buff[20];
-        sprintf(buff, "%02i - ", 4 * row + 1);
+        snprintf(buff, 20, "%02i - ", 4 * row + 1);
         result += buff;
 
         for ( unsigned i = 0; i < 4; i++ )
@@ -89,8 +95,16 @@ void PatternChain::FromSimpleString(string s)
         {
 #endif
             size_t pos;
+#if defined(MA_BLUE)
+            const char *startPtr = it->c_str();
+            char *endPtr;
+            int pattern = strtol(startPtr, &endPtr, 0) - 1;
+            if ( errno != 0 )
+                continue;
+            pos = endPtr - startPtr;
+#else
             int pattern = stoi(*it, &pos) - 1;
-
+#endif
             if ( pattern < 0 )
                 continue;
 
@@ -99,7 +113,7 @@ void PatternChain::FromSimpleString(string s)
             {
                 pos = (*it).find('x');
                 if ( pos != string::npos )
-                    repeats = stoi((*it).substr(pos + 1));
+                    repeats = strtol((*it).substr(pos + 1).c_str(), NULL, 0);
             }
 
             newChain.emplace_back();
@@ -198,8 +212,11 @@ void PatternChain::Delete()
     SetStatus();
 }
 
-
+#if defined(MA_BLUE)
+unordered_map<int, const char *> pc_mode_names =
+#else
 unordered_map<PatternChain::pattern_chain_mode_t, const char *> pc_mode_names =
+#endif
 {
     {PatternChain::off, "off"},
     {PatternChain::natural, "natural"},
@@ -275,7 +292,7 @@ void PatternChain::SetStatus()
     {
         m_Status += " ";
         pos = m_Status.size();
-        sprintf(buff, "%i:", i + 1);
+        snprintf(buff, 20, "%i:", i + 1);
         m_Status += buff;
         m_Status += m_Chain.at(i).ToStringForDisplay(true, 1);
         m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
@@ -285,11 +302,11 @@ void PatternChain::SetStatus()
         m_Highlights.push_back(m_FieldPositions.at(m_MenuFocus));
 }
 
-bool PatternChain::HandleKey(key_type_t k)
+bool PatternChain::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case enter:
+    case BaseUI::key_return:
         if ( m_MenuFocus >= num_pc_menu_items && m_PosEdit < m_Chain.size() )
         {
             ChainLink & link = m_Chain.at(m_PosEdit);
@@ -300,7 +317,7 @@ bool PatternChain::HandleKey(key_type_t k)
             link.SetReturnFocus(this);  // Generic return pointer to CursorKeys object.
         }
         break;
-    case left:
+    case BaseUI::key_left:
         if ( m_MenuFocus > 0 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
@@ -309,7 +326,7 @@ bool PatternChain::HandleKey(key_type_t k)
 //        if ( m_PosEdit > 0 )
 //            m_PosEdit -= 1;
         break;
-    case right:
+    case BaseUI::key_right:
         if ( m_MenuFocus < num_pc_menu_items + m_Chain.size() - 1 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
@@ -318,7 +335,7 @@ bool PatternChain::HandleKey(key_type_t k)
 //        if ( m_PosEdit < m_Chain.size() - 1 )
 //            m_PosEdit += 1;
         break;
-    case up:
+    case BaseUI::key_up:
         switch (m_MenuFocus)
         {
         case mode:
@@ -329,7 +346,7 @@ bool PatternChain::HandleKey(key_type_t k)
         }
         break;
 
-    case down:
+    case BaseUI::key_down:
         switch (m_MenuFocus)
         {
         case mode:
@@ -341,22 +358,22 @@ bool PatternChain::HandleKey(key_type_t k)
         break;
 
 
-    case shift_right:
-    case shift_left:
+    case BaseUI::key_shift_right:
+    case BaseUI::key_shift_left:
         switch (m_MenuFocus)
         {
         case mode:
             if ( !m_Chain.empty() )
                 break;
         default:
-            if ( k == shift_right)
+            if ( k == BaseUI::key_shift_right)
                 m_PosEdit += 1;
             New();
             break;
         }
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         switch (m_MenuFocus)
         {
         case mode:

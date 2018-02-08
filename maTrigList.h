@@ -58,7 +58,7 @@ class TrigList : public CursorKeys
         virtual void SetStatus();
 
     protected:
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
 
     private:
         std::vector<TrigListItem> m_TrigItems;

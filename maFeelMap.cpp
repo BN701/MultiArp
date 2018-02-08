@@ -99,7 +99,7 @@ void FeelMap::New(vector<string> & tokens)
             try
             {
 #endif
-                double t = stod(tokens.at(i));
+                double t = strtod(tokens.at(i).c_str(), NULL);
 
                 // Check if we're creating a default array of size 't',
                 // (Don't allow higher than 12, mostly because we
@@ -245,7 +245,7 @@ void FeelMap::SetStatus()
         m_Highlights.push_back(m_FieldPositions.at(m_EditPoint));
 }
 
-bool FeelMap::HandleKey(key_type_t k)
+bool FeelMap::HandleKey(BaseUI::key_command_t k)
 {
     if ( ! m_Active /*|| m_EditPoint == 0 || m_EditPoint == m_StretchPoints.size() - 1*/ )
         return true;
@@ -255,7 +255,7 @@ bool FeelMap::HandleKey(key_type_t k)
 
     if ( m_StretchPoints.empty() )
     {
-        if ( k == shift_left || k == shift_right )
+        if ( k == BaseUI::key_shift_left || k == BaseUI::key_shift_right )
         {
             m_StretchPoints.push_back(0.0);
             m_StretchPoints.push_back(1.0);
@@ -266,7 +266,7 @@ bool FeelMap::HandleKey(key_type_t k)
 
     if ( m_StretchPoints.size() < 3 )
     {
-        if ( k == shift_left || k == shift_right )
+        if ( k == BaseUI::key_shift_left || k == BaseUI::key_shift_right )
         {
             m_EditPoint = 0;
             Add();
@@ -282,11 +282,11 @@ bool FeelMap::HandleKey(key_type_t k)
 
     switch ( k )
     {
-    case left:
+    case BaseUI::key_left:
         if ( m_EditPoint > 1 )
             m_EditPoint -= 1;
         break;
-    case right:
+    case BaseUI::key_right:
         if ( static_cast<unsigned>(m_EditPoint) < m_StretchPoints.size() - 2 )
             m_EditPoint += 1;
         break;
@@ -301,17 +301,17 @@ bool FeelMap::HandleKey(key_type_t k)
 //            m_EditPoint = tEditPoint;
 //        break;
 
-    case shift_up:
+    case BaseUI::key_shift_up:
         inc = 0.01;
-    case up:
+    case BaseUI::key_up:
         tStretchPoint += inc;
         if ( tStretchPoint < m_StretchPoints.at(m_EditPoint + 1) )
             m_StretchPoints.at(m_EditPoint) = tStretchPoint;
         break;
 
-    case shift_down:
+    case BaseUI::key_shift_down:
         inc = 0.01;
-    case down:
+    case BaseUI::key_down:
         tStretchPoint -= inc;
         if ( tStretchPoint > m_StretchPoints.at(m_EditPoint -1) )
             m_StretchPoints.at(m_EditPoint) = tStretchPoint;
@@ -327,16 +327,16 @@ bool FeelMap::HandleKey(key_type_t k)
 //            m_StretchPoints.at(m_EditPoint) = tStretchPoint;
 //        break;
 
-    case shift_left:
+    case BaseUI::key_shift_left:
         m_EditPoint -= 1;
         Add();
         break;
 
-    case shift_right:
+    case BaseUI::key_shift_right:
         Add();
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         Remove();
         break;
 

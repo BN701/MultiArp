@@ -265,38 +265,79 @@ void CairoUI::Refresh(Rectangle & r, bool useDouble)
 // Use these two maps to search for X Unicode symbols and raw state/keycode combinations
 // that are used purely for menu navigation.
 
-unordered_map<int, CursorKeys::key_type_t> g_xcbSymbolToCursorKey =
+//unordered_map<int, CursorKeys::key_type_t> g_xcbSymbolToCursorKey =
+//{
+//    {XK_Insert, CursorKeys::ins},
+//    {XK_Delete, CursorKeys::del},
+//    {XK_Down, CursorKeys::down},
+//    {XK_Up, CursorKeys::up},
+//    {XK_Left, CursorKeys::left},
+//    {XK_Right, CursorKeys::right},
+//    {XK_Escape, CursorKeys::escape}
+//};
+
+// Key values are constructed from (state << 8) + keycode
+//unordered_map<int, CursorKeys::key_type_t> g_xcbKeycodeToCursorKey =
+//{
+//    {0x0170, CursorKeys::shift_page_up},
+//    {0x0175, CursorKeys::shift_page_down},
+//    {0x0870, CursorKeys::alt_page_up},
+//    {0x0875, CursorKeys::alt_page_down},
+//    {0x0474, CursorKeys::ctrl_down},
+//    {0x046F, CursorKeys::ctrl_up},
+//    {0x0471, CursorKeys::ctrl_left},
+//    {0x0472, CursorKeys::ctrl_right},
+//    {0x0174, CursorKeys::shift_down},
+//    {0x016F, CursorKeys::shift_up},
+//    {0x0171, CursorKeys::shift_left},
+//    {0x0172, CursorKeys::shift_right},
+//    {0x0571, CursorKeys::ctrl_shift_left},
+//    {0x0572, CursorKeys::ctrl_shift_right},
+//    {0x056F, CursorKeys::ctrl_shift_up},
+//    {0x0574, CursorKeys::ctrl_shift_down},
+//    {0x0177, CursorKeys::shift_delete},
+//    {0x0477, CursorKeys::ctrl_delete}
+//};
+
+unordered_map<int, BaseUI::key_command_t> g_xcbSymbolToBaseUIKey =
 {
-    {XK_Insert, CursorKeys::ins},
-    {XK_Delete, CursorKeys::del},
-    {XK_Down, CursorKeys::down},
-    {XK_Up, CursorKeys::up},
-    {XK_Left, CursorKeys::left},
-    {XK_Right, CursorKeys::right},
-    {XK_Escape, CursorKeys::escape}
+    {XK_Insert, BaseUI::key_insert},
+    {XK_Delete, BaseUI::key_delete},
+    {XK_Down, BaseUI::key_down},
+    {XK_Up, BaseUI::key_up},
+    {XK_Left, BaseUI::key_left},
+    {XK_Right, BaseUI::key_right},
+    {XK_Escape, BaseUI::key_escape},
+    {XK_Return, BaseUI::key_return},
+    {XK_space, BaseUI::key_space},
+    {XK_ISO_Left_Tab, BaseUI::key_shift_tab},
+    {0xE6, BaseUI::key_ctrl_a},
+    {0xA2, BaseUI::key_ctrl_c},
+    {0xAD2, BaseUI::key_ctrl_v}
+
 };
 
 // Key values are constructed from (state << 8) + keycode
-unordered_map<int, CursorKeys::key_type_t> g_xcbKeycodeToCursorKey =
+unordered_map<int, BaseUI::key_command_t> g_xcbKeycodeToBaseUIKey =
 {
-    {0x0170, CursorKeys::shift_page_up},
-    {0x0175, CursorKeys::shift_page_down},
-    {0x0870, CursorKeys::alt_page_up},
-    {0x0875, CursorKeys::alt_page_down},
-    {0x0474, CursorKeys::ctrl_down},
-    {0x046F, CursorKeys::ctrl_up},
-    {0x0471, CursorKeys::ctrl_left},
-    {0x0472, CursorKeys::ctrl_right},
-    {0x0174, CursorKeys::shift_down},
-    {0x016F, CursorKeys::shift_up},
-    {0x0171, CursorKeys::shift_left},
-    {0x0172, CursorKeys::shift_right},
-    {0x0571, CursorKeys::ctrl_shift_left},
-    {0x0572, CursorKeys::ctrl_shift_right},
-    {0x056F, CursorKeys::ctrl_shift_up},
-    {0x0574, CursorKeys::ctrl_shift_down},
-    {0x0177, CursorKeys::shift_delete},
-    {0x0477, CursorKeys::ctrl_delete}
+    {0x0170, BaseUI::key_shift_page_up},
+    {0x0175, BaseUI::key_shift_page_down},
+    {0x0870, BaseUI::key_alt_page_up},
+    {0x0875, BaseUI::key_alt_page_down},
+    {0x0474, BaseUI::key_ctrl_down},
+    {0x046F, BaseUI::key_ctrl_up},
+    {0x0471, BaseUI::key_ctrl_left},
+    {0x0472, BaseUI::key_ctrl_right},
+    {0x0174, BaseUI::key_shift_down},
+    {0x016F, BaseUI::key_shift_up},
+    {0x0171, BaseUI::key_shift_left},
+    {0x0172, BaseUI::key_shift_right},
+    {0x0571, BaseUI::key_ctrl_shift_left},
+    {0x0572, BaseUI::key_ctrl_shift_right},
+    {0x056F, BaseUI::key_ctrl_shift_up},
+    {0x0574, BaseUI::key_ctrl_shift_down},
+    {0x0177, BaseUI::key_shift_delete},
+    {0x0477, BaseUI::key_ctrl_delete}
 };
 
 // Utility for diagnostics.
@@ -322,13 +363,103 @@ string show_modifiers (uint32_t mask)
 
 
 
-bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym)
+//bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym)
+//{
+//    bool result = true;
+//
+//    curKey = CursorKeys::no_key;
+//
+//    sym = GetKeysym(keycode, state);
+//
+//    if ( sym != 0 )
+//    {
+//        // Look for symbols that are used purely for CursorKey navigation.
+//        // (Ins, Del, Up, Down, Left, Right, Esc).
+//
+//        try
+//        {
+//            curKey = g_xcbSymbolToCursorKey.at(sym);
+//        }
+//        catch(...)
+//        {
+//            // Nothing found, so just fall through to check specific symbols below.
+//        }
+//    }
+//    else
+//    {
+//        // Look for raw decodes that map to CursorKeys.
+//
+//        try
+//        {
+//            // unsigned int lookup = (kr->state << 8) + kr->detail;
+//            curKey = g_xcbKeycodeToCursorKey.at( (state << 8) + keycode);
+//        }
+//        catch(...)
+//        {
+//            // There's nothing here for us, so show some diagnostics and return.
+////            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", keycode, state, show_modifiers(state).c_str());
+//            return true;
+//        }
+//    }
+//
+////    result = handle_key_input(curKey, sym);
+//
+////    default:
+////
+////        if ( sym > 31 && sym < 127 )
+////        {
+////            commandString += sym;
+////            set_status(COMMAND_HOME, commandString.c_str());
+////            place_cursor(COMMAND_HOME + commandString.size());
+////        }
+////        else if ( true )
+////        {
+////            // We haven't used the symbol, so what was it?
+////
+////            string symbol = "X symbol: ";
+////            char buff[20];
+////            sprintf(buff, "%#x - ", sym);
+////            symbol += buff;
+////
+////            if ( static_cast<unsigned char>(sym) < 32 )
+////            {
+////                sprintf(buff, "%i", static_cast<unsigned char>(sym));
+////                symbol += buff;
+////            }
+////            else
+////                symbol += static_cast<unsigned char>(sym);
+////
+////            symbol += " Cat:";
+////
+////            if ( xcb_is_keypad_key(sym) )
+////                symbol += " keypad";
+////            if ( xcb_is_private_keypad_key(sym) )
+////                symbol += " private keypad";
+////            if ( xcb_is_cursor_key(sym) )
+////                symbol += " cursor";
+////            if ( xcb_is_pf_key(sym) )
+////                symbol += " pf";
+////            if ( xcb_is_function_key(sym) )
+////                symbol += " function";
+////            if ( xcb_is_misc_function_key(sym) )
+////                symbol += " misc function";
+////            if ( xcb_is_modifier_key(sym) )
+////                symbol += " modifier";
+////
+////            set_status(STAT_POS_2, "%s - Detail/State: %#x/%#x (%s)", symbol.c_str(), keycode, state, show_modifiers(state).c_str());
+////
+////        }
+////        break;
+////    }
+//
+//    return result;
+//}
+
+bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, BaseUI::key_command_t & key)
 {
     bool result = true;
 
-    curKey = CursorKeys::no_key;
-
-    sym = GetKeysym(keycode, state);
+    xcb_keysym_t sym = GetKeysym(keycode, state);
 
     if ( sym != 0 )
     {
@@ -337,11 +468,12 @@ bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t &
 
         try
         {
-            curKey = g_xcbSymbolToCursorKey.at(sym);
+            key = g_xcbSymbolToBaseUIKey.at(sym);
         }
         catch(...)
         {
             // Nothing found, so just fall through to check specific symbols below.
+            key = static_cast<BaseUI::key_command_t>(sym);
         }
     }
     else
@@ -351,13 +483,13 @@ bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t &
         try
         {
             // unsigned int lookup = (kr->state << 8) + kr->detail;
-            curKey = g_xcbKeycodeToCursorKey.at( (state << 8) + keycode);
+            key = g_xcbKeycodeToBaseUIKey.at( (state << 8) + keycode);
         }
         catch(...)
         {
             // There's nothing here for us, so show some diagnostics and return.
 //            set_status(STAT_POS_2, "X key NULL symbol. Detail/State: %#x/%#x (%s)", keycode, state, show_modifiers(state).c_str());
-            return true;
+            return false;
         }
     }
 
@@ -452,7 +584,8 @@ unordered_map<int, const char *> event_names =
     {XCB_GE_GENERIC, "XCB_GE_GENERIC"}
 };
 
-bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
+//bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
+bool CairoUI::PollEvents(bool & gotKeyData, BaseUI::key_command_t & key)
 {
     bool result = true;
     gotKeyData = false;
@@ -539,7 +672,8 @@ bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb
             {
                 xcb_key_release_event_t *kr = (xcb_key_release_event_t *) event;
                 gotKeyData = true;
-                KeyInput(kr->detail, kr->state, curKey, sym);
+//                KeyInput(kr->detail, kr->state, curKey, sym);
+                KeyInput(kr->detail, kr->state, key);
                 break;
             }
 

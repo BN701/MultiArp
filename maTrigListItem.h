@@ -78,7 +78,7 @@ struct ArpeggioStage
 };
 
 
-class TrigRepeater : public CursorKeys
+class TrigRepeater// : public CursorKeys
 {
     public:
         enum decay_mode_t
@@ -160,7 +160,7 @@ class TrigListItem : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         enum trig_list_item_menu_focus_t
         {
             tlif_trigs,

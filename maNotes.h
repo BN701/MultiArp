@@ -102,7 +102,7 @@ struct Note : public CursorKeys
             num_nef_types
         };
 
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         note_edit_menu_focus_t m_NoteEditFocus = nef_note_number;
 
 };
@@ -157,7 +157,7 @@ struct Cluster : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         std::vector<Note>::size_type m_PosEdit = 0;
 
 };
@@ -246,7 +246,7 @@ struct StepList : public CursorKeys
 
     virtual void SetStatus();
     protected:
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         std::vector<Cluster>::size_type m_PosEdit = 0;
 
 };
@@ -284,7 +284,7 @@ struct RealTimeListParams : public CursorKeys
             num_rt_params_menu_focus_modes
         };
 
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         rt_params_menu_focus_t m_RTParamsFocus = rtp_loop_start;
 
 };
@@ -343,7 +343,7 @@ struct RealTimeList : public CursorKeys
     virtual void SetStatus();
     protected:
 
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         int m_RTListFocus = 0;
         int m_SubMenus = 1; // How many submenu items will there be in the CursorKeys menu?
 

@@ -23,6 +23,10 @@
 #include <cmath>
 #include <unordered_map>
 
+#if defined(MA_BLUE)
+#include <cstdio>
+#endif
+
 #include "maUtility.h"
 
 using namespace std;
@@ -223,7 +227,7 @@ string Note::NoteString(int n)
     if ( n >= 0 )
     {
         char buffer[25];
-        sprintf(buffer, "%s%i", mapNumbersToNotes.at(n % 12).c_str(), n / 12);
+        snprintf(buffer, 25, "%s%i", mapNumbersToNotes.at(n % 12).c_str(), n / 12);
         return buffer;
     }
     else
@@ -257,14 +261,14 @@ string Note::ToString(bool fullFormat)
 
     char buffer[25];
     if ( fullFormat && m_NoteVelocity >= 0 )
-        sprintf(buffer, "%s%i:%i:%.3f:%.3f",
+        snprintf(buffer, 25, "%s%i:%i:%.3f:%.3f",
             mapNumbersToNotes.at(m_NoteNumber % 12).c_str(),
             m_NoteNumber / 12,
             m_NoteVelocity,
             m_Phase,
             m_Length);
     else
-        sprintf(buffer, "%s%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12);
+        snprintf(buffer, 25, "%s%i", mapNumbersToNotes.at(m_NoteNumber % 12).c_str(), m_NoteNumber / 12);
 
     return buffer;
 }
@@ -285,7 +289,7 @@ void Note::FromString(string s)
 
     if ( tokens.size() >= 2 )
     {
-        m_NoteVelocity = stoi(tokens.at(1));
+        m_NoteVelocity = strtol(tokens.at(1).c_str(), NULL, 0);
         if ( m_NoteVelocity < 0 || m_NoteVelocity > 127 )
             m_NoteVelocity = -1;
     }
@@ -293,12 +297,12 @@ void Note::FromString(string s)
         m_NoteVelocity = -1;
 
     if ( tokens.size() >= 3 )
-        m_Phase = stod(tokens.at(2));
+        m_Phase = strtod(tokens.at(2).c_str(), NULL);
     else
         m_Phase = 0.0;
 
     if ( tokens.size() >= 4 )
-        m_Length = stod(tokens.at(3));
+        m_Length = strtod(tokens.at(3).c_str(), NULL);
     else
         m_Length = 0.0;
 
@@ -312,7 +316,7 @@ void Note::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "[Note %i] ", m_ItemID);
+    snprintf(buff, 200, "[Note %i] ", m_ItemID);
     m_Status = buff;
 
     pos = m_Status.size();
@@ -323,7 +327,7 @@ void Note::SetStatus()
     pos = m_Status.size();
     if ( m_NoteVelocity > 0 )
     {
-        sprintf(buff, "%i", m_NoteVelocity);
+        snprintf(buff, 200, "%i", m_NoteVelocity);
         m_Status += buff;
     }
     else
@@ -334,7 +338,7 @@ void Note::SetStatus()
     pos = m_Status.size();
     if ( lround(100 * m_Length) > 0 )
     {
-        sprintf(buff, "%.2f", m_Length);
+        snprintf(buff, 200, "%.2f", m_Length);
         m_Status += buff;
     }
     else
@@ -345,33 +349,33 @@ void Note::SetStatus()
 
 }
 
-bool Note::HandleKey(key_type_t k)
+bool Note::HandleKey(BaseUI::key_command_t k)
 {
     double inc = 0.1;
     int note_inc = 1;
 
     switch ( k )
     {
-    case enter:
-    case back_space:
-    case escape:
+    case BaseUI::key_return:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         if ( m_NoteEditFocus > 0 )
             m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus - 1);
         break;
 
-    case right:
+    case BaseUI::key_right:
         if ( m_NoteEditFocus < num_nef_types - 1 )
             m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus + 1);
         break;
 
-    case shift_up:
+    case BaseUI::key_shift_up:
         inc = 0.01;
         note_inc = 12;
-    case up:
+    case BaseUI::key_up:
         switch ( m_NoteEditFocus )
         {
         case nef_note_number:
@@ -390,10 +394,10 @@ bool Note::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_down:
+    case BaseUI::key_shift_down:
         inc = 0.01;
         note_inc = 12;
-    case down:
+    case BaseUI::key_down:
         switch ( m_NoteEditFocus )
         {
         case nef_note_number:
@@ -566,7 +570,7 @@ void Cluster::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "[Cluster %i] ", m_ItemID);
+    snprintf(buff, 50, "[Cluster %i] ", m_ItemID);
     m_Status = buff;
 
     for ( unsigned i = 0; i < m_Notes.size(); i++ )
@@ -583,11 +587,11 @@ void Cluster::SetStatus()
 
 }
 
-bool Cluster::HandleKey(key_type_t k)
+bool Cluster::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case enter:
+    case BaseUI::key_return:
         if ( !m_Notes.empty() )
         {
             Note & n = m_Notes.at(m_PosEdit);
@@ -598,45 +602,45 @@ bool Cluster::HandleKey(key_type_t k)
         }
         break;
 
-    case back_space:
-    case escape:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
 
-    case right:
+    case BaseUI::key_right:
         if ( m_PosEdit < m_Notes.size() - 1 )
             m_PosEdit += 1;
         break;
 
-    case up:
+    case BaseUI::key_up:
         if ( m_ReturnFocus != NULL )
         {
-            m_ReturnFocus->HandleKey(right);
-            m_ReturnFocus->HandleKey(enter);
+            m_ReturnFocus->HandleKey(BaseUI::key_right);
+            m_ReturnFocus->HandleKey(BaseUI::key_return);
         }
         return true;
 
-    case down:
+    case BaseUI::key_down:
         if ( m_ReturnFocus != NULL )
         {
-            m_ReturnFocus->HandleKey(left);
-            m_ReturnFocus->HandleKey(enter);
+            m_ReturnFocus->HandleKey(BaseUI::key_left);
+            m_ReturnFocus->HandleKey(BaseUI::key_return);
         }
         return true;
 
-    case ctrl_left:
+    case BaseUI::key_ctrl_left:
         if ( !m_Notes.empty() )
         {
             m_Notes.insert(m_Notes.begin() + m_PosEdit, m_Notes.at(m_PosEdit));
         }
         break;
 
-    case ctrl_right:
+    case BaseUI::key_ctrl_right:
         if ( !m_Notes.empty() )
         {
             m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, m_Notes.at(m_PosEdit));
@@ -644,7 +648,7 @@ bool Cluster::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_left:
+    case BaseUI::key_shift_left:
         if ( m_Notes.empty() )
         {
             m_Notes.emplace_back();
@@ -654,7 +658,7 @@ bool Cluster::HandleKey(key_type_t k)
             m_Notes.insert(m_Notes.begin() + m_PosEdit, *(new Note()));
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         if ( !m_Notes.empty() )
         {
             m_Notes.erase(m_Notes.begin() + m_PosEdit);
@@ -663,7 +667,7 @@ bool Cluster::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_right:
+    case BaseUI::key_shift_right:
         if ( m_Notes.empty() )
         {
             m_Notes.emplace_back();
@@ -721,7 +725,12 @@ string StepList::ToStringForDisplay(int & offset, int & length)
             result += ' ';
         if ( i == m_LastRequestedPos )
         {
-            sprintf(buff, "%3lu| ", m_LastRequestedPos + 1);
+#if defined(MA_BLUE)
+            const char * format = "%3u| ";
+#else
+            const char * format = "%3lu| ";
+#endif
+            snprintf(buff, 50, format, m_LastRequestedPos + 1);
             result += buff;
         }
         if ( i == 0 )
@@ -808,7 +817,7 @@ void StepList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "[Step List %i] ", m_ItemID);
+    snprintf(buff, 200, "[Step List %i] ", m_ItemID);
     m_Status = buff;
 
 
@@ -829,11 +838,11 @@ void StepList::SetStatus()
         m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
-bool StepList::HandleKey(key_type_t k)
+bool StepList::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case enter:
+    case BaseUI::key_return:
         if ( ! m_Clusters.empty() )
         {
             Cluster & c = m_Clusters.at(m_PosEdit);
@@ -844,38 +853,38 @@ bool StepList::HandleKey(key_type_t k)
         }
         break;
 
-    case back_space:
-    case escape:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
 
-    case right:
+    case BaseUI::key_right:
         if ( m_PosEdit < m_Clusters.size() - 1 )
             m_PosEdit += 1;
         break;
 
-    case up:
-    case down:
+    case BaseUI::key_up:
+    case BaseUI::key_down:
         if ( m_ReturnFocus != NULL )
         {
             m_ReturnFocus->HandleKey(k);
-            m_ReturnFocus->HandleKey(enter);
+            m_ReturnFocus->HandleKey(BaseUI::key_return);
         }
         return true;
 
-    case ctrl_left:
+    case BaseUI::key_ctrl_left:
         if ( !m_Clusters.empty() )
         {
             m_Clusters.insert(m_Clusters.begin() + m_PosEdit, m_Clusters.at(m_PosEdit));
         }
         break;
 
-    case ctrl_right:
+    case BaseUI::key_ctrl_right:
         if ( !m_Clusters.empty() )
         {
             m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, m_Clusters.at(m_PosEdit));
@@ -883,7 +892,7 @@ bool StepList::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_left:
+    case BaseUI::key_shift_left:
         if ( m_Clusters.empty() )
         {
             m_Clusters.emplace_back();
@@ -893,7 +902,7 @@ bool StepList::HandleKey(key_type_t k)
             m_Clusters.insert(m_Clusters.begin() + m_PosEdit, *(new Cluster()));
         break;
 
-    case shift_right:
+    case BaseUI::key_shift_right:
         if ( m_Clusters.empty() )
         {
             m_Clusters.emplace_back();
@@ -906,7 +915,7 @@ bool StepList::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         if ( !m_Clusters.empty() )
         {
             m_Clusters.erase(m_Clusters.begin() + m_PosEdit);
@@ -932,7 +941,11 @@ bool StepList::HandleKey(key_type_t k)
 //
 //////////////////////////////////////////////////////////////////////////
 
+#if defined(MA_BLUE)
+unordered_map<int, const char *> rtp_window_mode_names =
+#else
 unordered_map<RealTimeListParams::rtp_window_mode_t, const char *> rtp_window_mode_names =
+#endif
 {
     {RealTimeListParams::normal, "centered"},
     {RealTimeListParams::small, "centered-small"},
@@ -977,63 +990,63 @@ void RealTimeListParams::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "[RT List %i] ", m_ItemID);
+    snprintf(buff, 200, "[RT List %i] ", m_ItemID);
     m_Status = buff;
 
     m_Status += " Loop - ";
 
     m_Status += "S: ";
     pos = m_Status.size();
-    sprintf(buff, "%.2f", m_LoopStart);
+    snprintf(buff, 200, "%.2f", m_LoopStart);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
     m_Status += " Q: ";
     pos = m_Status.size();
-    sprintf(buff, "%.2f", m_Quantum);
+    snprintf(buff, 200, "%.2f", m_Quantum);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
     m_Status += " Mul: ";
     pos = m_Status.size();
-    sprintf(buff, "%.2f", m_Multiplier);
+    snprintf(buff, 200, "%.2f", m_Multiplier);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
     m_Status += " Window Mode: ";
     pos = m_Status.size();
-    sprintf(buff, "%s", rtp_window_mode_names.at(m_WindowMode));
+    snprintf(buff, 200, "%s", rtp_window_mode_names.at(m_WindowMode));
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
     m_Highlights.push_back(m_FieldPositions.at(m_RTParamsFocus));
 }
 
-bool RealTimeListParams::HandleKey(key_type_t k)
+bool RealTimeListParams::HandleKey(BaseUI::key_command_t k)
 {
     int temp;
     double inc = 0.1;
     switch ( k )
     {
-    case enter:
-    case back_space:
-    case escape:
+    case BaseUI::key_return:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         temp = static_cast<int>(m_RTParamsFocus) - 1;
         if ( temp >= 0 && temp < num_rt_params_menu_focus_modes )
             m_RTParamsFocus = static_cast<rt_params_menu_focus_t>(temp);
         break;
 
-    case right:
+    case BaseUI::key_right:
         temp = static_cast<int>(m_RTParamsFocus) + 1;
         if ( temp >= 0 && temp < num_rt_params_menu_focus_modes )
             m_RTParamsFocus = static_cast<rt_params_menu_focus_t>(temp);
         break;
 
-    case del:
+    case BaseUI::key_delete:
         switch ( m_RTParamsFocus )
         {
         case rtp_loop_start:
@@ -1050,9 +1063,9 @@ bool RealTimeListParams::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_up:
+    case BaseUI::key_shift_up:
         inc = 0.01;
-    case up:
+    case BaseUI::key_up:
         switch ( m_RTParamsFocus )
         {
         case rtp_loop_start:
@@ -1072,9 +1085,9 @@ bool RealTimeListParams::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_down:
+    case BaseUI::key_shift_down:
         inc = 0.01;
-    case down:
+    case BaseUI::key_down:
         switch ( m_RTParamsFocus )
         {
         case rtp_loop_start:
@@ -1155,7 +1168,7 @@ void RealTimeList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    sprintf(buff, "[RT List %i] ", m_ItemID);
+    snprintf(buff, 200, "[RT List %i] ", m_ItemID);
     m_Status = buff;
 
     pos = m_Status.size();
@@ -1167,7 +1180,7 @@ void RealTimeList::SetStatus()
     for ( it = m_RealTimeList.begin(); it != m_RealTimeList.end(); it++ )
     {
         pos = m_Status.size() + 1; // "+ 1" because there's a space before the phase value.
-        sprintf(buff, " %.2f:", it->first);
+        snprintf(buff, 200, " %.2f:", it->first);
         m_Status += buff;
         m_Status += it->second.ToString(false);
         m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
@@ -1177,7 +1190,7 @@ void RealTimeList::SetStatus()
 
 }
 
-bool RealTimeList::HandleKey(key_type_t k)
+bool RealTimeList::HandleKey(BaseUI::key_command_t k)
 {
     double inc = 0.1;
 
@@ -1187,7 +1200,7 @@ bool RealTimeList::HandleKey(key_type_t k)
 
     switch ( k )
     {
-    case enter:
+    case BaseUI::key_return:
         if ( m_RTListFocus < m_SubMenus )
         {
             m_Params.SetItemID(m_ItemID);
@@ -1204,35 +1217,35 @@ bool RealTimeList::HandleKey(key_type_t k)
         }
         break;
 
-    case back_space:
-    case escape:
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
         ReturnFocus();
         break;
 
-    case left:
+    case BaseUI::key_left:
         if ( m_RTListFocus > 0 )
             m_RTListFocus -= 1;
         break;
 
-    case right:
+    case BaseUI::key_right:
         if ( static_cast<unsigned>(m_RTListFocus) < m_FieldPositions.size() - 1 )
             m_RTListFocus += 1;
         break;
 
-    case shift_up:
-    case shift_down:
+    case BaseUI::key_shift_up:
+    case BaseUI::key_shift_down:
         inc = 0.01;
-    case up:
-    case down:
+    case BaseUI::key_up:
+    case BaseUI::key_down:
         if ( m_RTListFocus < m_SubMenus && m_ReturnFocus != NULL )
         {
             m_ReturnFocus->HandleKey(k);
-            m_ReturnFocus->HandleKey(enter);
+            m_ReturnFocus->HandleKey(BaseUI::key_return);
             return true;
         }
         else if ( m_RTListFocus >= m_SubMenus )   // Update note start time (phase).
         {
-            if ( k == down || k == shift_down )
+            if ( k == BaseUI::key_down || k == BaseUI::key_shift_down )
                 inc *= -1;
 
             auto result = MoveNote(it, it->second.Phase() + inc);
@@ -1246,7 +1259,7 @@ bool RealTimeList::HandleKey(key_type_t k)
         }
         break;
 
-    case shift_delete:
+    case BaseUI::key_shift_delete:
         if ( m_RTListFocus >= m_SubMenus )
         {
             m_UndoList.push_back(it->second);
@@ -1256,7 +1269,7 @@ bool RealTimeList::HandleKey(key_type_t k)
         }
         break;
 
-    case ctrl_delete:
+    case BaseUI::key_ctrl_delete:
         if ( !m_UndoList.empty() )
         {
             // Re-insert and reset our cursor position.
@@ -1297,8 +1310,12 @@ enum rtl_element_names_t
     num_rtl_element_names
 };
 
-
-unordered_map<rtl_element_names_t, const char *> rtl_element_names = {
+#if defined(MA_BLUE)
+unordered_map<int, const char *> rtl_element_names =
+#else
+unordered_map<rtl_element_names_t, const char *> rtl_element_names =
+#endif
+{
     {rtl_name_loop, "Loop"},
     {rtl_name_quantum, "Quantum"},
     {rtl_name_multiplier, "Multiplier"},
@@ -1335,13 +1352,13 @@ void RealTimeList::FromString(string s)
             switch (e)
             {
             case rtl_name_loop:
-                m_Params.m_LoopStart = stod(token);
+                m_Params.m_LoopStart = strtod(token.c_str(), NULL);
                 break;
             case rtl_name_quantum:
-                m_Params.m_Quantum = stod(token);
+                m_Params.m_Quantum = strtod(token.c_str(), NULL);
                 break;
             case rtl_name_multiplier:
-                m_Params.m_Multiplier = stod(token);
+                m_Params.m_Multiplier = strtod(token.c_str(), NULL);
                 break;
             case rtl_name_window_adjust:
                 m_Params.m_WindowMode = rtp_window_mode_lookup(token);
@@ -1392,7 +1409,7 @@ string RealTimeList::ToString()
     string result;
 
     char buff[200];
-    sprintf(buff, " %s %.3f %s %.3f %s %.3f %s '%s'",
+    snprintf(buff, 200, " %s %.3f %s %.3f %s %.3f %s '%s'",
             rtl_element_names.at(rtl_name_loop), m_Params.m_LoopStart,
             rtl_element_names.at(rtl_name_quantum), m_Params.m_Quantum,
             rtl_element_names.at(rtl_name_multiplier), m_Params.m_Multiplier,
@@ -1421,8 +1438,8 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, unsigned wid
     length = 0;
 
     char buff[100];
-    sprintf(buff, "%05.2f ", m_LastRequestedPhase);
-//    sprintf(buff, "%05.2f ", m_InternalBeat);
+    snprintf(buff, 100, "%05.2f ", m_LastRequestedPhase);
+//    snprintf(buff, 100, "%05.2f ", m_InternalBeat);
 
     string result = buff;
 
@@ -1486,7 +1503,7 @@ string RealTimeList::ToStringForDisplay(int & offset, int & length, unsigned wid
         result.resize(width);
 
 #if 0
-    sprintf(buff, "\n    Multiplier %.2f, Loop Start %.2f, Loop Quantum %.2f, Window Adjust %s",
+    snprintf(buff, 100, "\n    Multiplier %.2f, Loop Start %.2f, Loop Quantum %.2f, Window Adjust %s",
         m_Params.m_Multiplier,
         m_Params.m_LoopStart,
         m_Params.m_LocalQuantum,

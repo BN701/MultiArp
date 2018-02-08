@@ -17,103 +17,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef MATEXTUI_H_INCLUDED
-#define MATEXTUI_H_INCLUDED
+#ifndef MACURSESUI_H_INCLUDED
+#define MACURSESUI_H_INCLUDED
 
 #include <vector>
 
-#ifdef MA_BLUE
-
-typedef unsigned int xcb_keysym_t;
-
-#else
-
-#define USE_NCURSES
-#include <xcb/xcb.h>
-
-#endif // MA_BLUE
+#include <ncurses.h>
 
 
 #include "maBaseUI.h"
 #include "maCursorKeys.h"
-
-//#include <ncurses.h>
-
-#ifndef USE_NCURSES
-
-// Use ncurses key IDs for now.
-
-#define KEY_DOWN	0402		/* down-arrow key */
-#define KEY_UP		0403		/* up-arrow key */
-#define KEY_LEFT	0404		/* left-arrow key */
-#define KEY_RIGHT	0405		/* right-arrow key */
-#define KEY_HOME	0406		/* home key */
-#define KEY_BACKSPACE	0407		/* backspace key */
-#define KEY_SLEFT	0611		/* shifted left-arrow key */
-#define KEY_SRIGHT	0622		/* shifted right-arrow key */
-
-#define XK_BackSpace                     0xff08  /* Back space, back char */
-#define XK_Tab                           0xff09
-#define XK_Linefeed                      0xff0a  /* Linefeed, LF */
-#define XK_Clear                         0xff0b
-#define XK_Return                        0xff0d  /* Return, enter */
-#define XK_Pause                         0xff13  /* Pause, hold */
-#define XK_Scroll_Lock                   0xff14
-#define XK_Sys_Req                       0xff15
-#define XK_Escape                        0xff1b
-#define XK_Delete                        0xffff  /* Delete, rubout */
-
-#define XK_space                         0x0020  /* U+0020 SPACE */
-#define XK_ISO_Left_Tab                  0xfe20
-
-#endif
-
-// Extra keys that aren't in ncurses.h, values determined from observation
-
-#define KEY_INSERT  331
-#define KEY_DELETE  330
-#define KEY_SDELETE 383
-#define KEY_CDELETE 519
-#define KEY_CLEFT   545
-#define KEY_CRIGHT  560
-#define KEY_CUP     525
-#define KEY_CDOWN   566
-
-#define KEY_CSLEFT   546
-#define KEY_CSRIGHT  561
-#define KEY_CSUP     567
-#define KEY_CSDOWN   526
-
-#define KEY_ARIGHT  558
-#define KEY_ALEFT   543
-#define KEY_AUP     564
-#define KEY_ADOWN   523
-
-#define KEY_ASRIGHT  559
-#define KEY_ASLEFT   544
-#define KEY_ASUP     565
-#define KEY_ASDOWN   524
-
-#define KEY_SUP     337
-#define KEY_SDOWN   336
-
-#define KEY_PGUP    339
-#define KEY_PGDOWN  338
-
-#define KEY_SPGUP   398
-#define KEY_SPGDOWN 396
-
-#define KEY_TAB     9
-#define KEY_SHTAB    353 // "KEY_STAB", my preferred name, is already defined in /usr/include/curses.h as "0524", /* set-tab key */"
-
-
-// These are no different to plain PGUP/PGDOWN
-
-#define KEY_CPGUP
-#define KEY_CPGDOWN
-
-#define KEY_APGUP   553
-#define KEY_APGDOWN 548
 
 // Color Pair uses
 
@@ -138,17 +51,13 @@ enum colour_pairs
     CP_REALTIME
 };
 
-#if !defined(CURSES_H)
-struct WINDOW;
-#endif
 
-
-class TextUI : public BaseUI
+class CursesUI : public BaseUI
 {
     public:
 
-        TextUI();
-        ~TextUI();
+        CursesUI();
+        ~CursesUI();
 
         WINDOW * AreaToWindow(window_area_t area);
         int CursesAttribute(text_attribute_t attribute);
@@ -158,7 +67,8 @@ class TextUI : public BaseUI
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
 
-        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
+//        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
+        key_command_t KeyInput();
 
         void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
 
@@ -176,4 +86,4 @@ class TextUI : public BaseUI
 
 };
 
-#endif // MATEXTUI_H_INCLUDED
+#endif // MACURSESUI_H_INCLUDED

@@ -35,55 +35,78 @@ class Rectangle
     void ScaleD2I(double scale = 1.0);
 };
 
+class WindowRect : public Rectangle
+{
+    public:
+        WindowRect(int height, int width, int row, int col):    // Field order here is from NCurses.
+            Rectangle(col, row, width, height)                  // Note the order reversal: row/col -> col/row!
+        {}
+
+        void MapToFullScreen(int & x, int & y)
+        {
+            x += m_iX;
+            y += m_iY;
+        }
+
+        int m_Background = 0;
+        int m_Foreground = 0;
+};
+
 class BaseUI
 {
     public:
         enum key_command_t
         {
+            key_none = 256,   // Allow pass through for ASCII characters.,
+            key_ctrl_a,
+            key_ctrl_c,
+            key_ctrl_v,
+            key_backspace,
+            key_space,          // Can be used command key as well as simple ASCII 32
+            key_tab,
+            key_shift_tab,
+            key_linefeed,
+            key_return,
+            key_escape,
+            key_menu_control,   // Boundary marker, not actually used as a key.
             key_down,
             key_up,
             key_left,
             key_right,
             key_home,
-            key_backspace,
-            key_sleft,
-            key_sright,
-            key_tab,
-            key_stab,
-            key_linefeed,
-            key_return,
-            key_escape,
+            key_end,
+            key_shift_left,
+            key_shift_right,
             key_delete,
-            key_space,
             key_insert,
-            key_sdelete,
-            key_cdelete,
-            key_cleft,
-            key_cright,
-            key_cup,
-            key_cdown,
-            key_csleft,
-            key_csright,
-            key_csup,
-            key_csdown,
-            key_aright,
-            key_aleft,
-            key_aup,
-            key_adown,
-            key_asright,
-            key_asleft,
-            key_asup,
-            key_asdown,
-            key_sup,
-            key_sdown,
-            key_pgup,
-            key_pgdown,
-            key_spgup,
-            key_spgdown,
-            key_cpgup,
-            key_cpgdown,
-            key_apgup,
-            key_apgdown
+            key_shift_delete,
+            key_ctrl_delete,
+            key_ctrl_left,
+            key_ctrl_right,
+            key_ctrl_up,
+            key_ctrl_down,
+            key_ctrl_shift_left,
+            key_ctrl_shift_right,
+            key_ctrl_shift_up,      // Not available with ANSI (Ubuntu/xfce4-terminal)
+            key_ctrl_shift_down,    // Not available with ANSI (Ubuntu/xfce4-terminal)
+            key_alt_right,
+            key_alt_left,
+            key_alt_up,
+            key_alt_down,
+            key_alt_shift_right,
+            key_alt_shift_left,
+            key_alt_shift_up,
+            key_alt_shift_down,
+            key_shift_up,
+            key_shift_down,
+            key_page_up,
+            key_page_down,
+            key_shift_page_up,      // Not available with ANSI (Ubuntu/xfce4-terminal)
+            key_shift_page_down,    // Not available with ANSI (Ubuntu/xfce4-terminal)
+            key_ctrl_page_up,
+            key_ctrl_page_down,
+            key_alt_page_up,
+            key_alt_page_down,
         };
 
         enum text_attribute_t
@@ -128,7 +151,17 @@ class BaseUI
         void ToggleBigPanelHold() { m_BigPanelHold = ! m_BigPanelHold; }
         bool BigPanelHold() { return m_BigPanelHold; }
 
+        void MapToFullScreen(window_area_t area, int & row, int & col);
+        WindowRect & AreaToWindowRect(window_area_t area);
+
     protected:
+        WindowRect m_WholeScreen = WindowRect(25, 80, 0, 0);
+        WindowRect m_SmallPanel = WindowRect(4, 56, 2, 4);
+        WindowRect m_ProgressPanel = WindowRect(2, 15, 3, 61);
+        WindowRect m_EditListPanel = WindowRect(4, 20, 8, 4);
+        WindowRect m_EditSummaryPanel = WindowRect(4, 52, 8, 24);
+        WindowRect m_BigPanel = WindowRect(11, 80, 12, 0);
+        WindowRect m_BigPanelExtra = WindowRect(4, 72, 8, 4);
 
     private:
         big_panel_page_t m_BigPanelPage = one;

@@ -391,7 +391,7 @@ struct PatternStore : public CursorKeys
             num_psf_menu_focus_modes
         };
 
-        virtual bool HandleKey(key_type_t k);
+        virtual bool HandleKey(BaseUI::key_command_t k);
         pattern_store_menu_focus_t m_PatternStoreFocus;
 
 };

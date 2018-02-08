@@ -195,11 +195,13 @@ void ChainLink::SetStatus()
     m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
-bool ChainLink::HandleKey(key_type_t k)
+//bool ChainLink::HandleKey(key_type_t k)
+bool ChainLink::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case enter:
+//    case enter:
+    case BaseUI::key_return:
         if ( m_PosEdit == 3 && m_Parent != NULL )
         {
             m_Parent->at(m_Parent->PosPlay()).ClearRemaining();
@@ -209,19 +211,23 @@ bool ChainLink::HandleKey(key_type_t k)
             ReturnFocus();
         break;
 
-    case back_space:
+//    case back_space:
+    case BaseUI::key_backspace:
         ReturnFocus();
         break;
 
-    case left:
+//    case left:
+    case BaseUI::key_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
-    case right:
+//    case right:
+    case BaseUI::key_right:
         if ( m_PosEdit < 3 )
             m_PosEdit += 1;
         break;
-    case up:
+//    case up:
+    case BaseUI::key_up:
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
@@ -238,7 +244,8 @@ bool ChainLink::HandleKey(key_type_t k)
             break;
         }
         break;
-    case down:
+//    case down:
+    case BaseUI::key_down:
         switch ( m_PosEdit )
         {
         case 0:     // Pattern

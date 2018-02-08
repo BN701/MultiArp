@@ -104,8 +104,9 @@ enum midi_input_modes_t
 class ListBuilder
 {
     public:
-        ListBuilder() {};
-#ifndef MA_BLUE
+#if defined(MA_BLUE)
+        ListBuilder();
+#else
         ListBuilder(ableton::Link * linkInstance);
 #endif // MA_BLUE
         virtual ~ListBuilder();

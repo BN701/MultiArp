@@ -22,10 +22,9 @@
 #include <map>
 #include <unordered_map>
 
-#include "maTextUI.h"
+#include "maCursesUI.h"
 #include "maTranslateTable.h"
 
-#ifdef USE_NCURSES
 
 #include <ncurses.h>
 
@@ -34,9 +33,81 @@
 #define XK_LATIN1
 #include <X11/keysymdef.h>  // XK_ Unicode key name defines
 
-#endif // USE_NCURSES
-
 using namespace std;
+
+// Use ncurses key IDs for now.
+
+#define KEY_DOWN	0402		/* down-arrow key */
+#define KEY_UP		0403		/* up-arrow key */
+#define KEY_LEFT	0404		/* left-arrow key */
+#define KEY_RIGHT	0405		/* right-arrow key */
+#define KEY_HOME	0406		/* home key */
+#define KEY_BACKSPACE	0407		/* backspace key */
+#define KEY_SLEFT	0611		/* shifted left-arrow key */
+#define KEY_SRIGHT	0622		/* shifted right-arrow key */
+
+//#define XK_BackSpace                     0xff08  /* Back space, back char */
+//#define XK_Tab                           0xff09
+//#define XK_Linefeed                      0xff0a  /* Linefeed, LF */
+//#define XK_Clear                         0xff0b
+//#define XK_Return                        0xff0d  /* Return, enter */
+//#define XK_Pause                         0xff13  /* Pause, hold */
+//#define XK_Scroll_Lock                   0xff14
+//#define XK_Sys_Req                       0xff15
+//#define XK_Escape                        0xff1b
+//#define XK_Delete                        0xffff  /* Delete, rubout */
+//
+//#define XK_space                         0x0020  /* U+0020 SPACE */
+//#define XK_ISO_Left_Tab                  0xfe20
+
+
+// Extra keys that aren't in ncurses.h, values determined from observation
+
+#define KEY_INSERT  331
+#define KEY_DELETE  330
+#define KEY_SDELETE 383
+#define KEY_CDELETE 519
+#define KEY_CLEFT   545
+#define KEY_CRIGHT  560
+#define KEY_CUP     525
+#define KEY_CDOWN   566
+
+#define KEY_CSLEFT   546
+#define KEY_CSRIGHT  561
+#define KEY_CSUP     567
+#define KEY_CSDOWN   526
+
+#define KEY_ARIGHT  558
+#define KEY_ALEFT   543
+#define KEY_AUP     564
+#define KEY_ADOWN   523
+
+#define KEY_ASRIGHT  559
+#define KEY_ASLEFT   544
+#define KEY_ASUP     565
+#define KEY_ASDOWN   524
+
+#define KEY_SUP     337
+#define KEY_SDOWN   336
+
+#define KEY_PGUP    339
+#define KEY_PGDOWN  338
+
+#define KEY_SPGUP   398
+#define KEY_SPGDOWN 396
+
+#define KEY_TAB     9
+#define KEY_SHTAB    353 // "KEY_STAB", my preferred name, is already defined in /usr/include/curses.h as "0524", /* set-tab key */"
+
+
+// These are no different to plain PGUP/PGDOWN
+
+#define KEY_CPGUP
+#define KEY_CPGDOWN
+
+#define KEY_APGUP   553
+#define KEY_APGDOWN 548
+
 
 #define COLOUR_GREEN        8
 #define COLOUR_RED          9
@@ -52,9 +123,8 @@ using namespace std;
 #define COLOUR_BLACK        20
 
 
-TextUI::TextUI()
+CursesUI::CursesUI()
 {
-#ifdef USE_NCURSES
     // Set up NCurses.
 
     initscr();
@@ -117,21 +187,17 @@ TextUI::TextUI()
     wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
     wbkgd(m_BigPanel, COLOR_PAIR(CP_PATTERN_LIST_PANEL));
     wbkgd(m_BigPanelExtra, COLOR_PAIR(CP_PIANO_WHITE_KEY));
-#endif
 }
 
 
-TextUI::~TextUI()
+CursesUI::~CursesUI()
 {
-#ifdef USE_NCURSES
     delwin(m_SmallPanel);
     delwin(m_BigPanel);
     endwin();			/* End curses mode		  */
-#endif
 }
 
-#ifdef USE_NCURSES
-int TextUI::CursesAttribute(text_attribute_t attribute)
+int CursesUI::CursesAttribute(text_attribute_t attribute)
 {
     switch (attribute)
     {
@@ -144,7 +210,7 @@ int TextUI::CursesAttribute(text_attribute_t attribute)
     };
 }
 
-WINDOW * TextUI::AreaToWindow(window_area_t area)
+WINDOW * CursesUI::AreaToWindow(window_area_t area)
 {
     switch (area)
     {
@@ -164,40 +230,32 @@ WINDOW * TextUI::AreaToWindow(window_area_t area)
             return stdscr;
     }
 }
-#endif
 
-void TextUI::ClearArea(window_area_t area)
+void CursesUI::ClearArea(window_area_t area)
 {
-#ifdef USE_NCURSES
     WINDOW * window = AreaToWindow(area);
     wmove(window, 0, 0);
     wclrtobot(window);
     wrefresh(window);
-#endif
 }
 
-void TextUI::PlaceCursor(int row, int col)
+void CursesUI::PlaceCursor(int row, int col)
 {
-#ifdef USE_NCURSES
     move(row, col);
-#endif
 }
 
-void TextUI::Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr)
+void CursesUI::Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr)
 {
-#ifdef USE_NCURSES
     WINDOW * window = AreaToWindow(area);
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
     mvwchgat(window, row, col, len, CursesAttribute(attr), colour, NULL);
     wrefresh(window);
     wmove(stdscr, scr_y, scr_x);
-#endif
 }
 
-void TextUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
+void CursesUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
 {
-#ifdef USE_NCURSES
     WINDOW * window = AreaToWindow(area);
     int scr_x, scr_y;
     attron(attribute);
@@ -208,10 +266,9 @@ void TextUI::Text(window_area_t area, int row, int col, const char * text, text_
     attroff(attribute);
     move(scr_y, scr_x);
     refresh();
-#endif
 }
 
-void TextUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
+void CursesUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
                         double rtBeat, unsigned int queueSecs, unsigned int queueNano)
 {
     int row = 2;
@@ -258,7 +315,6 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
     snprintf(buff, 10, "%7.2f ", beat /* g_State.Phase() + 1 */);
     barline += buff;
 
-#ifdef USE_NCURSES
     int scr_x, scr_y;
     getyx(stdscr, scr_y, scr_x);
 
@@ -294,7 +350,6 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
 
     move(scr_y, scr_x);
     refresh();
-#endif
 
     char text[80];
     snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
@@ -303,9 +358,8 @@ void TextUI::Progress(double progress, double stepWidth, double beat, int patter
 }
 
 
-void TextUI::ShowNoteTransforms(vector<InOutPair> & pairs)
+void CursesUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 {
-#ifdef USE_NCURSES
     const int kbdStart = 29;
     WINDOW *panel = m_BigPanelExtra;
     wmove(panel, 0, 0);
@@ -436,11 +490,10 @@ void TextUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 //    pairs.clear();
 
     wrefresh(panel);
-#endif
 }
 
 
-void TextUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
+void CursesUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
 {
     char text[100];
     snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
@@ -462,51 +515,178 @@ void TextUI::SetTopLine(int midiChannel, double stepValue, double quantum, int r
 
 }
 
-unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
+unordered_map<int, BaseUI::key_command_t> g_CursesToBaseUIKeyMap =
 {
-    {KEY_INSERT, CursorKeys::ins},
-    {KEY_DELETE, CursorKeys::del},
-    {KEY_SDELETE, CursorKeys::shift_delete},
-    {KEY_CDELETE, CursorKeys::ctrl_delete},
-    {KEY_TAB, CursorKeys::tab},
-    {KEY_SHTAB, CursorKeys::shift_tab},
-    {KEY_DOWN, CursorKeys::down},
-    {KEY_UP, CursorKeys::up},
-    {KEY_LEFT, CursorKeys::left},
-    {KEY_RIGHT, CursorKeys::right},
-    {KEY_SPGUP, CursorKeys::shift_page_up},
-    {KEY_SPGDOWN, CursorKeys::shift_page_down},
-    {KEY_APGUP, CursorKeys::alt_page_up},
-    {KEY_APGDOWN, CursorKeys::alt_page_down},
-    {KEY_CDOWN, CursorKeys::ctrl_down},
-    {KEY_CUP, CursorKeys::ctrl_up},
-    {KEY_CLEFT, CursorKeys::ctrl_left},
-    {KEY_CRIGHT, CursorKeys::ctrl_right},
-    {KEY_SDOWN, CursorKeys::shift_down},
-    {KEY_SUP, CursorKeys::shift_up},
-    {KEY_SLEFT, CursorKeys::shift_left},
-    {KEY_SRIGHT, CursorKeys::shift_right},
-    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
-    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
-    {KEY_CSUP, CursorKeys::ctrl_shift_up},
-    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
+    {KEY_INSERT, BaseUI::key_insert},
+    {KEY_DELETE, BaseUI::key_delete},
+    {KEY_SDELETE, BaseUI::key_shift_delete},
+    {KEY_CDELETE, BaseUI::key_ctrl_delete},
+    {KEY_TAB, BaseUI::key_tab},
+    {KEY_SHTAB, BaseUI::key_shift_tab},
+    {KEY_DOWN, BaseUI::key_down},
+    {KEY_UP, BaseUI::key_up},
+    {KEY_LEFT, BaseUI::key_left},
+    {KEY_RIGHT, BaseUI::key_right},
+    {KEY_SPGUP, BaseUI::key_shift_page_up},
+    {KEY_SPGDOWN, BaseUI::key_shift_page_down},
+    {KEY_APGUP, BaseUI::key_alt_page_up},
+    {KEY_APGDOWN, BaseUI::key_alt_page_down},
+    {KEY_CDOWN, BaseUI::key_ctrl_down},
+    {KEY_CUP, BaseUI::key_ctrl_up},
+    {KEY_CLEFT, BaseUI::key_ctrl_left},
+    {KEY_CRIGHT, BaseUI::key_ctrl_right},
+    {KEY_SDOWN, BaseUI::key_shift_down},
+    {KEY_SUP, BaseUI::key_shift_up},
+    {KEY_SLEFT, BaseUI::key_shift_left},
+    {KEY_SRIGHT, BaseUI::key_shift_right},
+    {KEY_CSLEFT, BaseUI::key_ctrl_shift_left},
+    {KEY_CSRIGHT, BaseUI::key_ctrl_shift_right},
+    {KEY_CSUP, BaseUI::key_ctrl_shift_up},
+    {KEY_CSDOWN, BaseUI::key_ctrl_shift_down}
 };
 
-void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
+//unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
+//{
+//    {KEY_INSERT, CursorKeys::ins},
+//    {KEY_DELETE, CursorKeys::del},
+//    {KEY_SDELETE, CursorKeys::shift_delete},
+//    {KEY_CDELETE, CursorKeys::ctrl_delete},
+//    {KEY_TAB, CursorKeys::tab},
+//    {KEY_SHTAB, CursorKeys::shift_tab},
+//    {KEY_DOWN, CursorKeys::down},
+//    {KEY_UP, CursorKeys::up},
+//    {KEY_LEFT, CursorKeys::left},
+//    {KEY_RIGHT, CursorKeys::right},
+//    {KEY_SPGUP, CursorKeys::shift_page_up},
+//    {KEY_SPGDOWN, CursorKeys::shift_page_down},
+//    {KEY_APGUP, CursorKeys::alt_page_up},
+//    {KEY_APGDOWN, CursorKeys::alt_page_down},
+//    {KEY_CDOWN, CursorKeys::ctrl_down},
+//    {KEY_CUP, CursorKeys::ctrl_up},
+//    {KEY_CLEFT, CursorKeys::ctrl_left},
+//    {KEY_CRIGHT, CursorKeys::ctrl_right},
+//    {KEY_SDOWN, CursorKeys::shift_down},
+//    {KEY_SUP, CursorKeys::shift_up},
+//    {KEY_SLEFT, CursorKeys::shift_left},
+//    {KEY_SRIGHT, CursorKeys::shift_right},
+//    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
+//    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
+//    {KEY_CSUP, CursorKeys::ctrl_shift_up},
+//    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
+//};
+//
+//void CursesUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
+//{
+//#ifdef MA_BLUE
+//    int c = 0;
+//#else
+//    int c = getch();
+//#endif
+//
+//    switch (c)
+//    {
+//    case 1: // Ctrl-A
+//        sym = 0xE6;
+//        break;
+//    case 3:  // Ctrl-C, Copy
+//        sym = 0xA2;
+//        break;
+//
+//        // After using Alt-Enter, we seem to get additional Enter - char(10) - messages
+//        // on the next keypress, regardless of what that key press actually is. Disabling
+//        // this bit of code (probably) doesn't prevent that peculiar behaviour, but will
+//        // at least discourage using Alt-Enter or Esc all round.
+//
+////    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
+////        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
+////        {
+////            show_status_after_navigation();
+////        }
+////        break;
+//
+//    case 22: // Ctrl-V, Paste
+//        sym = 0xAD2;
+//        break;
+//
+//    case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
+//        sym = XK_Return;
+//        break;
+//
+//    case 32: // Space bar.
+//        sym = XK_space;
+//        break;
+//
+//    case KEY_TAB:
+//        sym = XK_Tab;
+//        break;
+//
+//    case KEY_SHTAB:
+//        sym = XK_ISO_Left_Tab;
+//        break;
+//
+//    case KEY_SPGUP:
+//    case KEY_SPGDOWN:
+//    case KEY_APGUP:
+//    case KEY_APGDOWN:
+//    case KEY_CDOWN:
+//    case KEY_CUP:
+//    case KEY_CLEFT:
+//    case KEY_CRIGHT:
+//    case KEY_SDOWN:
+//    case KEY_SUP:
+//    case KEY_SLEFT:
+//    case KEY_SRIGHT:
+//    case KEY_CSLEFT:
+//    case KEY_CSRIGHT:
+//    case KEY_CSUP:
+//    case KEY_CSDOWN:
+//    case KEY_DOWN:
+//    case KEY_UP:
+//    case KEY_LEFT:
+//    case KEY_RIGHT:
+//    case KEY_INSERT:
+//    case KEY_DELETE:
+//    case KEY_SDELETE:
+//    case KEY_CDELETE:
+//        curKey = g_CursorKeyMap.at(c);
+//        break;
+//
+//    case KEY_BACKSPACE: // 263
+//        sym = XK_BackSpace;
+//        break;
+//
+//    default:
+//#if 0
+//        if ( true )
+//        {
+//            set_status(STAT_POS_2, "Key: %i", c);
+//        }
+//        else if ( commandString.size() == 0 )
+//        {
+//            set_status(STAT_POS_2, "");
+//        }
+//        if ( c > 31 && c < 127 )
+//            commandString += c;
+//#endif
+//        sym = c;
+//        break;
+//    }
+//
+//}
+
+BaseUI::key_command_t CursesUI::KeyInput()
 {
-#ifdef MA_BLUE
-    int c = 0;
-#else
     int c = getch();
-#endif
+
+    key_command_t key;
 
     switch (c)
     {
     case 1: // Ctrl-A
-        sym = 0xE6;
+        key = key_ctrl_a;
         break;
     case 3:  // Ctrl-C, Copy
-        sym = 0xA2;
+        key = key_ctrl_c;
         break;
 
         // After using Alt-Enter, we seem to get additional Enter - char(10) - messages
@@ -522,23 +702,23 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
 //        break;
 
     case 22: // Ctrl-V, Paste
-        sym = 0xAD2;
+        key = key_ctrl_v;
         break;
 
     case 10: // Enter (Ctl-J *and* Ctl-M will also fire this one.)
-        sym = XK_Return;
+        key = key_return;
         break;
 
     case 32: // Space bar.
-        sym = XK_space;
+        key = key_space;
         break;
 
     case KEY_TAB:
-        sym = XK_Tab;
+        key = key_tab;
         break;
 
     case KEY_SHTAB:
-        sym = XK_ISO_Left_Tab;
+        key = key_shift_tab;
         break;
 
     case KEY_SPGUP:
@@ -565,11 +745,11 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
     case KEY_DELETE:
     case KEY_SDELETE:
     case KEY_CDELETE:
-        curKey = g_CursorKeyMap.at(c);
+        key = g_CursesToBaseUIKeyMap.at(c);
         break;
 
     case KEY_BACKSPACE: // 263
-        sym = XK_BackSpace;
+        key = key_backspace;
         break;
 
     default:
@@ -585,8 +765,9 @@ void TextUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
         if ( c > 31 && c < 127 )
             commandString += c;
 #endif
-        sym = c;
+        key = static_cast<BaseUI::key_command_t>(c);
         break;
     }
 
+    return key;
 }

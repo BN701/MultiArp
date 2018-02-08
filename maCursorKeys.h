@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include "maBaseUI.h"
 struct screen_pos_t
 {
     int offset;
@@ -37,39 +38,39 @@ class CursorKeys
         CursorKeys(const CursorKeys & val);
         virtual ~CursorKeys();
 
-        enum key_type_t
-        {
-            no_key,
-            enter,
-            back_space,
-            escape,
-            ins,
-            del,
-            shift_delete,
-            ctrl_delete,
-            tab,
-            shift_tab,
-            up,
-            down,
-            left,
-            right,
-            shift_page_up,
-            shift_page_down,
-            alt_page_up,
-            alt_page_down,
-            ctrl_down,
-            ctrl_up,
-            ctrl_left,
-            ctrl_right,
-            shift_down,
-            shift_up,
-            shift_left,
-            shift_right,
-            ctrl_shift_left,
-            ctrl_shift_right,
-            ctrl_shift_up,
-            ctrl_shift_down
-        };
+//        enum key_type_t
+//        {
+//            no_key,
+//            enter,
+//            back_space,
+//            escape,
+//            ins,
+//            del,
+//            shift_delete,
+//            ctrl_delete,
+//            tab,
+//            shift_tab,
+//            up,
+//            down,
+//            left,
+//            right,
+//            shift_page_up,
+//            shift_page_down,
+//            alt_page_up,
+//            alt_page_down,
+//            ctrl_down,
+//            ctrl_up,
+//            ctrl_left,
+//            ctrl_right,
+//            shift_down,
+//            shift_up,
+//            shift_left,
+//            shift_right,
+//            ctrl_shift_left,
+//            ctrl_shift_right,
+//            ctrl_shift_up,
+//            ctrl_shift_down
+//        };
 
         enum follow_up_action_t
         {
@@ -92,16 +93,21 @@ class CursorKeys
             m_ReturnFocus = NULL;
         }
 
-        // These two must be overriden.
+        // These two should be overriden, but don't make them pure as we
+        // need to declare an instance of *this* class to route keystrokes
+        // to the active menu instance.
 
         virtual void SetStatus() {}
-        virtual bool HandleKey(key_type_t k) { return false; };
+//        virtual void SetStatus() = 0;
+        virtual bool HandleKey(BaseUI::key_command_t k) { return false; };
+//        virtual bool HandleKey(BaseUI::key_command_t k) = 0;
 
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
 
         static bool MenuActive();
-        static bool RouteKey(key_type_t k);
+//        static bool RouteKey(key_type_t k);
+        static bool RouteKey(BaseUI::key_command_t k);
         static std::string & Status();
         static std::string & Help();
         static bool FirstField();

@@ -20,7 +20,9 @@
 
 #include "maListBuilder.h"
 
-#ifndef MA_BLUE
+#ifdef MA_BLUE
+#include <cstdio>
+#else
 #include <alsa/asoundlib.h>
 #endif // MA_BLUE
 
@@ -37,7 +39,12 @@ using namespace std;
 ofstream fLog;
 #endif
 
-#ifndef MA_BLUE
+#if defined(MA_BLUE)
+ListBuilder::ListBuilder()
+{
+    //ctor
+}
+#else
 ListBuilder::ListBuilder(ableton::Link * linkInstance):
     m_Link(linkInstance)
 {
@@ -119,7 +126,12 @@ std::string ListBuilder::ToString()
         case MIDI_INPUT_REAL_TIME:
             {
                 char buff[100];
-                sprintf(buff, " Open: %lu, captured: %lu", m_OpenNotes.size(), m_RealTimeList.size());
+#if defined(MA_BLUE)
+                const char * format = " Open: %u, captured: %u";
+#else
+                const char * format = " Open: %lu, captured: %lu";
+#endif
+                snprintf(buff, 100, format, m_OpenNotes.size(), m_RealTimeList.size());
                 return buff;
             }
             break;
@@ -212,7 +224,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                 // duration for note off.
 #if LOG_ON
                 char buff[100];
-                sprintf(buff, "Beat %6.2f", beat);
+                snprintf(buff, 100, "Beat %6.2f", beat);
                 fLog << buff;
 #endif
 
@@ -227,7 +239,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                     else
                         m_OpenNotes.insert(make_pair(ev->data.note.note, note));
 #if LOG_ON
-                    sprintf(buff, " opening %3i\n", ev->data.note.note);
+                    snprintf(buff, 100, " opening %3i\n", ev->data.note.note);
                     fLog << buff;
 #endif
                 }
@@ -263,7 +275,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                         m_RealTimeUndoIndex.push_back(m_RealTimeList.insert(make_pair(note.Phase(), note)).first);
 
 #if LOG_ON
-                        sprintf(buff, " closing %3i, phase %6.2f length %6.2f\n",
+                        snprintf(buff, 100, " closing %3i, phase %6.2f length %6.2f\n",
                                 ev->data.note.note,
                                 note.Phase(),
                                 note.Length());

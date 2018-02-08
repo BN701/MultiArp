@@ -17,7 +17,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TEENSYDUINO
 
 #include "maAlsaSequencer.h"
 
@@ -120,4 +119,3 @@ bool AlsaSequencer::ScheduleNextCallBack(int queueId)
     return true;
 }
 
-#endif // TEENSYDUINO

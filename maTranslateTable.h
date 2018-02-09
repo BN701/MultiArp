@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "maCursorKeys.h"
 #include "maNotes.h"
@@ -145,6 +146,11 @@ class TranslateTable : public CursorKeys
         TranslateTable();
         virtual ~TranslateTable();
 
+#if defined(MA_BLUE)
+        static std::unordered_map<int, const char*>  tt_scale_strings;
+#else
+        static std::unordered_map<scale_t, const char*>  tt_scale_strings;
+#endif
 
         void Reset();
 
@@ -224,6 +230,7 @@ class TranslateTable : public CursorKeys
 
         std::vector<matrix_t> m_Tables;
 
+        bool m_ScaleValid = false;
         // int m_NoteMap[12];          // Maps semitons to scale degrees
         std::vector<int> m_NoteMap;
         // int m_Intervals[12];        // Lists steps, in semitones, for each degree.

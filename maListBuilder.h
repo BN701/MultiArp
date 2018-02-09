@@ -104,11 +104,10 @@ enum midi_input_modes_t
 class ListBuilder
 {
     public:
-#if defined(MA_BLUE)
         ListBuilder();
-#else
+#if !defined(MA_BLUE)
         ListBuilder(ableton::Link * linkInstance);
-#endif // MA_BLUE
+#endif // !MA_BLUE
         virtual ~ListBuilder();
 
         bool HandleKeybInput(int c);

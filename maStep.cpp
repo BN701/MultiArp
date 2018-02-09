@@ -52,7 +52,6 @@ extern AlsaSequencer g_Sequencer;
 
 // Global instances.
 
-extern CursorKeys g_CursorKeys;
 extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
 extern State g_State;
@@ -65,12 +64,12 @@ void do_UI_updates()
 {
     // If pattern changed last step ...
 
-    if ( g_PatternStore.PatternChanged(true) )
-    {
-        set_top_line();
-        update_edit_panels();
-        set_status(STAT_POS_2, "Pattern changed ...");
-    }
+// Hack    if ( g_PatternStore.PatternChanged(true) )
+// Hack    {
+// Hack        set_top_line();
+// Hack        update_edit_panels();
+// Hack        set_status(STAT_POS_2, "Pattern changed ...");
+// Hack    }
 
     // If phase zero last step ...
 
@@ -87,47 +86,47 @@ void do_UI_updates()
 
 void do_phase0_updates()
 {
-    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
-
-    g_State.SetCurrentStepValue(g_PatternStore.StepValue());
-
-    if ( g_State.NewQuantumPending() )
-    {
-        set_status(STAT_POS_2, "New quantum value set.");
-    }
-
-    if ( g_PatternStore.TranslateTableForPlay().NewTransposePending() )
-    {
-        set_status(STAT_POS_2, "Transpose set.");
-    }
-
-    if ( g_PatternStore.NewPatternPending() )
-    {
-        set_status(STAT_POS_2, "Pattern changed.");
-    }
-
-    if ( g_State.NewRunStatePending() )
-    {
-        if ( g_State.RunState() )
-            g_PatternStore.ResetAllPatterns();
-        gDeferStop = g_State.DeferStop();
-    }
-
-    if ( g_State.PatternReset() != RESET_NONE )
-    {
-        switch ( g_State.PatternReset() )
-        {
-            case RESET_ALL :
-                g_PatternStore.ResetAllPatterns();
-                set_status(STAT_POS_2, "All patterns were reset.");
-                break;
-            case RESET_CURRENT :
-                g_PatternStore.ResetCurrentPattern();
-                set_status(STAT_POS_2, "Current pattern was reset.");
-                break;
-        }
-        g_State.SetPatternReset(RESET_NONE);
-    }
+// Hack    g_PatternStore.TranslateTableForPlay().Diags().ResetLog();
+// Hack
+// Hack    g_State.SetCurrentStepValue(g_PatternStore.StepValue());
+// Hack
+// Hack    if ( g_State.NewQuantumPending() )
+// Hack    {
+// Hack        set_status(STAT_POS_2, "New quantum value set.");
+// Hack    }
+// Hack
+// Hack    if ( g_PatternStore.TranslateTableForPlay().NewTransposePending() )
+// Hack    {
+// Hack        set_status(STAT_POS_2, "Transpose set.");
+// Hack    }
+// Hack
+// Hack    if ( g_PatternStore.NewPatternPending() )
+// Hack    {
+// Hack        set_status(STAT_POS_2, "Pattern changed.");
+// Hack    }
+// Hack
+// Hack    if ( g_State.NewRunStatePending() )
+// Hack    {
+// Hack        if ( g_State.RunState() )
+// Hack            g_PatternStore.ResetAllPatterns();
+// Hack        gDeferStop = g_State.DeferStop();
+// Hack    }
+// Hack
+// Hack    if ( g_State.PatternReset() != RESET_NONE )
+// Hack    {
+// Hack        switch ( g_State.PatternReset() )
+// Hack        {
+// Hack            case RESET_ALL :
+// Hack                g_PatternStore.ResetAllPatterns();
+// Hack                set_status(STAT_POS_2, "All patterns were reset.");
+// Hack                break;
+// Hack            case RESET_CURRENT :
+// Hack                g_PatternStore.ResetCurrentPattern();
+// Hack                set_status(STAT_POS_2, "Current pattern was reset.");
+// Hack                break;
+// Hack        }
+// Hack        g_State.SetPatternReset(RESET_NONE);
+// Hack    }
 
     set_top_line();
 }
@@ -135,156 +134,156 @@ void do_phase0_updates()
 
 void queue_next_step(int queueId)
 {
-    // We're called when ALSA has played the events we scheduled last time we were here,
-    // so updating position info at this point should reflect what we are hearing.
-
-    do_UI_updates();
-
-    // Now incrememt the step/beat and get on with scheduling the next events.
-
-    g_State.Step(g_PatternStore.StepValueMultiplier());
-
-    // Get time of next step from Link.
-
-
-    double nextBeat = g_State.Beat();
-
-    nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
-
-#ifdef MA_BLUE
-    // MA_BLUE Todo: Convert beat (phase) to schedule time
-    chrono::microseconds t_next_usec;
-#else
-    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-    chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
-
-    g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
-#endif
-
-
-    if ( g_State.PhaseIsZero() )
-    {
-        do_phase0_updates();
-        g_PatternStore.SetPhaseIsZero();
-        g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
-    }
-
-    // Set next schedule time on the queue
-
-    uint64_t queue_time_usec = 0;
-
-#ifndef MA_BLUE
-    if ( g_LinkStartTime.count() < 0 )
-    {
-        g_LinkStartTime = t_next_usec;
-        queue_time_usec = 0;
-    }
-    else
-    {
-        queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
-    }
-#endif
-
-    if ( queue_time_usec < 0 )
-    {
-        // Sometimes at start up link appears to go backwards, especially if
-        // there's another instance of the app running. For now, just keep
-        // reschedule and hope things settle down. This is probably our count
-        // in, though I haven't thought it through properly.
-//        raise(SIGINT);
-        queue_time_usec = 0;
-    }
-
-    g_Sequencer.SetScheduleTime(queue_time_usec);
-
-    // Schedule an event to be fired back to our own app which prompts another
-    // arpeggio to be placed in the queue.
-
-    // TODO: We used to do this after scheduling all midi events. Have there
-    //       been any noticable effects of doing it before?
-
-    g_Sequencer.ScheduleNextCallBack(queueId);
-
-    // Step the Pattern Store
-
-    Cluster nextCluster;
-    TrigRepeater repeater;
-    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
-
-    if ( g_State.RunState() || gDeferStop-- > 0 )
-    {
-        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
-        if ( g_ListBuilder.RealTimeRecord() )
-            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
-    }
-
-    if ( nextCluster.Empty() )
-        return;
-
-#ifdef MA_BLUE
-    double tempo = 120.0;
-#else
-    double tempo = timeline.tempo();
-#endif
-
-    /*
-          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
-          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
-
-          Steps per beat, v = V/4.
-          Steps per minute = Tv = TV/4
-          Steps per second = TV/240
-          Step length in mSec = 1000*240/TV
-     */
-
-    double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
-    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
-
-    repeater.Init(tempo, stepLengthMilliSecs);
-
-    for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
-    {
-        int noteNumber = note->m_NoteNumber;
-
-        if ( noteNumber < 0 )
-            continue;
-
-        unsigned char noteVelocity;
-
-        // For real time events, move the note ahead or behind
-        // the phase value of the step itself. (We can't move
-        // too far ahead, obviously, but there's no mechanism
-        // yet for dealing with that situation if it happens.)
-
-        double phaseAdjust = note->Phase() - g_State.Phase();
-        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
-
-        int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
-
-        if ( note->m_NoteVelocity > 0 )
-            noteVelocity = note->m_NoteVelocity;
-        else
-            noteVelocity = g_PatternStore.NoteVelocity();
-
-        double noteLength = note->Length();
-        if ( lround(noteLength * 100) > 0 )
-        {
-            // Note length here is in beats. Convert to milliseconds.
-            duration = lround(60000.0 * noteLength / tempo);
-        }
-
-        int64_t queue_time_delta = 0;
-        int interval = 0;
-        repeater.Reset(noteVelocity);
-
-        do
-        {
-            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
-            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-            g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
-        }
-        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
-    }
+// Hack    // We're called when ALSA has played the events we scheduled last time we were here,
+// Hack    // so updating position info at this point should reflect what we are hearing.
+// Hack
+// Hack    do_UI_updates();
+// Hack
+// Hack    // Now incrememt the step/beat and get on with scheduling the next events.
+// Hack
+// Hack    g_State.Step(g_PatternStore.StepValueMultiplier());
+// Hack
+// Hack    // Get time of next step from Link.
+// Hack
+// Hack
+// Hack    double nextBeat = g_State.Beat();
+// Hack
+// Hack    nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
+// Hack
+// Hack#ifdef MA_BLUE
+// Hack    // MA_BLUE Todo: Convert beat (phase) to schedule time
+// Hack    chrono::microseconds t_next_usec;
+// Hack#else
+// Hack    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+// Hack    chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
+// Hack
+// Hack    g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
+// Hack#endif
+// Hack
+// Hack
+// Hack    if ( g_State.PhaseIsZero() )
+// Hack    {
+// Hack        do_phase0_updates();
+// Hack        g_PatternStore.SetPhaseIsZero();
+// Hack// Hack        g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
+// Hack    }
+// Hack
+// Hack    // Set next schedule time on the queue
+// Hack
+// Hack    uint64_t queue_time_usec = 0;
+// Hack
+// Hack#ifndef MA_BLUE
+// Hack    if ( g_LinkStartTime.count() < 0 )
+// Hack    {
+// Hack        g_LinkStartTime = t_next_usec;
+// Hack        queue_time_usec = 0;
+// Hack    }
+// Hack    else
+// Hack    {
+// Hack        queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
+// Hack    }
+// Hack#endif
+// Hack
+// Hack    if ( queue_time_usec < 0 )
+// Hack    {
+// Hack        // Sometimes at start up link appears to go backwards, especially if
+// Hack        // there's another instance of the app running. For now, just keep
+// Hack        // reschedule and hope things settle down. This is probably our count
+// Hack        // in, though I haven't thought it through properly.
+// Hack//        raise(SIGINT);
+// Hack        queue_time_usec = 0;
+// Hack    }
+// Hack
+// Hack    g_Sequencer.SetScheduleTime(queue_time_usec);
+// Hack
+// Hack    // Schedule an event to be fired back to our own app which prompts another
+// Hack    // arpeggio to be placed in the queue.
+// Hack
+// Hack    // TODO: We used to do this after scheduling all midi events. Have there
+// Hack    //       been any noticable effects of doing it before?
+// Hack
+// Hack    g_Sequencer.ScheduleNextCallBack(queueId);
+// Hack
+// Hack    // Step the Pattern Store
+// Hack
+// Hack    Cluster nextCluster;
+// Hack    TrigRepeater repeater;
+// Hack    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
+// Hack
+// Hack    if ( g_State.RunState() || gDeferStop-- > 0 )
+// Hack    {
+// Hack        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
+// Hack// Hack if ( g_ListBuilder.RealTimeRecord() )
+// Hack// Hack     nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
+// Hack    }
+// Hack
+// Hack    if ( nextCluster.Empty() )
+// Hack        return;
+// Hack
+// Hack#ifdef MA_BLUE
+// Hack    double tempo = 120.0;
+// Hack#else
+// Hack    double tempo = timeline.tempo();
+// Hack#endif
+// Hack
+// Hack    /*
+// Hack          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
+// Hack          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.
+// Hack
+// Hack          Steps per beat, v = V/4.
+// Hack          Steps per minute = Tv = TV/4
+// Hack          Steps per second = TV/240
+// Hack          Step length in mSec = 1000*240/TV
+// Hack     */
+// Hack
+// Hack    double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
+// Hack    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
+// Hack
+// Hack    repeater.Init(tempo, stepLengthMilliSecs);
+// Hack
+// Hack    for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
+// Hack    {
+// Hack        int noteNumber = note->m_NoteNumber;
+// Hack
+// Hack        if ( noteNumber < 0 )
+// Hack            continue;
+// Hack
+// Hack        unsigned char noteVelocity;
+// Hack
+// Hack        // For real time events, move the note ahead or behind
+// Hack        // the phase value of the step itself. (We can't move
+// Hack        // too far ahead, obviously, but there's no mechanism
+// Hack        // yet for dealing with that situation if it happens.)
+// Hack
+// Hack        double phaseAdjust = note->Phase() - g_State.Phase();
+// Hack        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
+// Hack
+// Hack        int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
+// Hack
+// Hack        if ( note->m_NoteVelocity > 0 )
+// Hack            noteVelocity = note->m_NoteVelocity;
+// Hack        else
+// Hack            noteVelocity = g_PatternStore.NoteVelocity();
+// Hack
+// Hack        double noteLength = note->Length();
+// Hack        if ( lround(noteLength * 100) > 0 )
+// Hack        {
+// Hack            // Note length here is in beats. Convert to milliseconds.
+// Hack            duration = lround(60000.0 * noteLength / tempo);
+// Hack        }
+// Hack
+// Hack        int64_t queue_time_delta = 0;
+// Hack        int interval = 0;
+// Hack        repeater.Reset(noteVelocity);
+// Hack
+// Hack        do
+// Hack        {
+// Hack            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
+// Hack            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
+// Hack            g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
+// Hack        }
+// Hack        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
+// Hack    }
 
 }
 
@@ -310,21 +309,21 @@ void midi_action(int queueId)
 
         case SND_SEQ_EVENT_NOTEON:
         case SND_SEQ_EVENT_NOTEOFF:
-            if ( g_ListBuilder.HandleMidi(ev) )
-            {
-                // HandleMidi() only returns true in QUICK entry
-                // mode, where midi input alone is used to manage
-                // notelist updates.
-
-                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-                g_ListBuilder.Clear();
-                set_status(STAT_POS_2, "");
-                update_pattern_panel();
-            }
-            else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
-            {
-                show_listbuilder_status();
-            }
+// Hack            if ( g_ListBuilder.HandleMidi(ev) )
+// Hack            {
+// Hack                // HandleMidi() only returns true in QUICK entry
+// Hack                // mode, where midi input alone is used to manage
+// Hack                // notelist updates.
+// Hack
+// Hack                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+// Hack                g_ListBuilder.Clear();
+// Hack                set_status(STAT_POS_2, "");
+// Hack                update_pattern_panel();
+// Hack            }
+// Hack            else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
+// Hack            {
+// Hack                show_listbuilder_status();
+// Hack            }
             break;
             default:
                 otherEvents += 1;

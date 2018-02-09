@@ -123,9 +123,11 @@ unordered_map<tt_element_names_t, const char *> tt_element_names =
 };
 
 #if defined(MA_BLUE)
-unordered_map<int, const char*>  tt_scale_strings =
+//unordered_map<int, const char*>  tt_scale_strings =
+unordered_map<int, const char*>  TranslateTable::tt_scale_strings =
 #else
-unordered_map<scale_t, const char*>  tt_scale_strings =
+//unordered_map<scale_t, const char*>  tt_scale_strings
+unordered_map<scale_t, const char*>  TranslateTable::tt_scale_strings =
 #endif
 {
     {major, "2, 2, 1, 2, 2, 2, 1"},
@@ -262,12 +264,20 @@ scale_premap_mode_t tt_premap_mode_lookup(string s)
 TranslateTable::TranslateTable():
     m_TranslateTableFocus(chromatic_shift)
 {
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_TRANSLATETABLE);
+#endif
+
     //ctor
 
     m_NoteMap.resize(12);
 
     Reset();
-    SetupScaleMaps();
+
+//    SetupScaleMaps();
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_TRANSLATETABLE + 3);
+#endif
 
 #if 0
     LoadTableFromString(tt_major);
@@ -622,18 +632,44 @@ bool TranslateTable::SetScale(StepList & list)
 
     m_Scale = from_list;
     m_ScaleDegrees = m_Intervals.size();
+    m_ScaleValid = true;
 
     return true;
 }
 
 void TranslateTable::SetupScaleMaps()
 {
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_SETUPSCALEMAPS);
+#endif
+
     m_Intervals.clear();
+
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_SETUPSCALEMAPS + 1);
+#endif
 
     for ( int i = 0; i < 12; i++ )
         m_NoteMap[i] = 0;
 
-    vector<string> tokens = split(tt_scale_strings[m_Scale], ',', true);
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_SETUPSCALEMAPS + 2);
+#endif
+
+    int n = tt_scale_strings.size();
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_SETUPSCALEMAPS + 3);
+    EepromStore(n);
+#endif
+
+    if ( n == 0 )
+        return;
+    const char * scaleString = tt_scale_strings[m_Scale];
+    vector<string> tokens = split(scaleString, ',', true);
+
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_SETUPSCALEMAPS + 4);
+#endif
 
     int totalIntervals = 0;
     for ( unsigned i = 0; i < tokens.size(); i++ )
@@ -663,7 +699,12 @@ void TranslateTable::SetupScaleMaps()
         m_Intervals.back() += 12 - totalIntervals;
     }
 
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    EepromStore(SP_SETUPSCALEMAPS + 9);
+#endif
+
     m_ScaleDegrees = m_Intervals.size();
+    m_ScaleValid = true;
 }
 
 bool TranslateTable::SetRoot(std::string & name)
@@ -1124,6 +1165,9 @@ string TranslateDiags::UpdateLog()
 
 int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 {
+    if ( !m_ScaleValid )
+        SetupScaleMaps();
+
     m_Diags.Reset();
     m_Diags.m_Root = m_Root;
     m_Diags.m_NoteIn = note;

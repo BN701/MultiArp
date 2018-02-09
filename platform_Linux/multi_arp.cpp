@@ -32,6 +32,7 @@
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
+#include "maState.h"
 #include "maStep.h"
 
 //
@@ -50,8 +51,9 @@
 
 #include "maSequencer.h"
 Sequencer g_Sequencer;
-
 ListBuilder g_ListBuilder;
+
+// Hack ListBuilder g_ListBuilder;
 
 #else
 
@@ -72,12 +74,15 @@ ListBuilder g_ListBuilder(&g_Link);
 
 // Global instances.
 
-PatternStore g_PatternStore;
+// Hack PatternStore g_PatternStore;
 
 AnsiUI g_TextUI;
 #ifndef MA_BLUE
 CairoUI g_CairoUI(true);
 #endif
+
+State g_State;
+//PatternStore g_PatternStore;
 
 // Static instances of empty items
 // for use by member functions that
@@ -111,7 +116,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, sigterm_exit);
 #endif
 
-    g_PatternStore.SetFocus();
+// Hack    g_PatternStore.SetFocus();
 
 #ifdef MA_BLUE
 

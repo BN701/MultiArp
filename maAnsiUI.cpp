@@ -18,6 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
+#include <cstdarg>
 #include <cstdio>
 #include <set>
 #include <map>
@@ -29,14 +30,38 @@
 using namespace std;
 
 #if defined(USE_SERIAL)
-size_t SerialWrite(const char * text);
-int SerialGetChar();
+
+#include <Arduino.h>
+#include <EEPROM.h>
+
+size_t SerialWrite(const char * text)
+{
+    return Serial.write(text);
+}
+
+int SerialGetChar()
+{
+    return Serial.read();
+}
+
+static int ee_address = 1;
+void EepromStore(uint8_t value)
+{
+    EEPROM.write(++ee_address, value);
+}
+
 #endif
 
 AnsiUI::AnsiUI()
 {
 #if defined(USE_SERIAL)
     // I/O is unbuffered, I think.
+
+    byte counter = EEPROM.read(0);
+    EEPROM.write(0, ++counter);
+    for ( int i = 1; i < 255; i++ )
+        EepromStore(0);
+    ee_address = 0;
 #else
 
     // Without this we may or may not get timely output.
@@ -57,7 +82,7 @@ AnsiUI::AnsiUI()
     Write("\033[12h");  // Echo off, maybe.
 //    Write("\033[?25l"); // Cursor off, maybe.
 
-    WriteYX(6, 1, "=> ");
+    WriteXY(1, 6, "=> ");
 
 #endif
 
@@ -82,6 +107,15 @@ size_t AnsiUI::Write(const char * s)
 #endif
 }
 
+int AnsiUI::Read()
+{
+#if defined(USE_SERIAL)
+    return SerialGetChar();
+#else
+    return getchar();
+#endif
+}
+
 void AnsiUI::PlaceCursor(int row, int col)
 {
     char ansi[20];
@@ -89,11 +123,40 @@ void AnsiUI::PlaceCursor(int row, int col)
     Write(ansi);
 }
 
-size_t AnsiUI::WriteYX(int row, int col, const char * s)
+size_t AnsiUI::WriteXY(int col, int row, const char * s)
 {
     PlaceCursor(row, col);
     return Write(s);
 }
+
+size_t AnsiUI::FWriteXY(int col, int row, const char *format, ...)
+{
+    char text[100];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(text, 100, format, args);
+    va_end(args);
+
+    return WriteXY(col, row, text);
+}
+
+void AnsiUI::ClearEOL()
+{
+    Write("\033[0K"); // Clear to end of line.
+}
+
+void AnsiUI::ResetScreen()
+{
+    Write("\033[2J");          // Clear screen
+//    Write("\033[12h");  // Echo off, maybe.
+//    Write("\033[?25l"); // Cursor off, maybe.
+    Write("\033[10;25r");       // Set scrolling region, but only seems to work with Minicom in VT102 mode,
+                                // which would be lovely if that particular terminal emulator could send
+                                // reliable escape sequences (but it doesn't, and it just happens to use
+                                // ncurses. Hmm ...
+    WriteXY(1, 6, "=>");
+}
+
 
 //int AnsiUI::CursesAttribute(text_attribute_t attribute)
 //{
@@ -130,9 +193,9 @@ void AnsiUI::Highlight(window_area_t area, int row, int col, int len, int colour
 void AnsiUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
 {
     MapToFullScreen(area, row, col);
-    WriteYX(row, col, text);
+    WriteXY(col, row, text);
     if ( area == whole_screen )
-        Write("\033[0K"); // Clear to end of line.
+        ClearEOL();
 //    WINDOW * window = AreaToWindow(area);
 //    int scr_x, scr_y;
 //    attron(attribute);
@@ -392,11 +455,6 @@ void AnsiUI::SetTopLine(int midiChannel, double stepValue, double quantum, int r
 
 }
 
-
-#if 0
-            key_ctrl_c,     /// !! This currently terminates app. !!
-#endif
-
 unordered_map<string, BaseUI::key_command_t> g_EscSeqToKeyCommand =
 {
     {"[A", BaseUI::key_up},
@@ -442,12 +500,11 @@ unordered_map<string, BaseUI::key_command_t> g_EscSeqToKeyCommand =
     {"[5;5~", BaseUI::key_ctrl_page_up},
     {"[6;5~", BaseUI::key_ctrl_page_down},
     {"[5;3~", BaseUI::key_alt_page_up},
-    {"[6;3~", BaseUI::key_alt_page_down},
-
-
+    {"[6;3~", BaseUI::key_alt_page_down}
 };
 
-BaseUI::key_command_t GetCSISequence(int firstChar)
+
+BaseUI::key_command_t AnsiUI::GetCSISequence(int firstChar)
 {
     /*
         This little loop for capturing control sequences, including ones
@@ -466,29 +523,36 @@ BaseUI::key_command_t GetCSISequence(int firstChar)
     int c;
     do
     {
-        c = getchar();
+        c = Read();
         sequence += c;
     } while ( c < 0x40 || c > 0x7e );    // CSI sequence ends with 'alphabetic' character.
+
 
 #if 0
     const char * s = sequence.c_str();
     auto n = g_EscSeqToKeyCommand.count(sequence);
 #endif
 
+    key_command_t key;
     if ( g_EscSeqToKeyCommand.count(sequence) == 1 )
-        return g_EscSeqToKeyCommand[sequence];
+        key = g_EscSeqToKeyCommand[sequence];
     else
-        return BaseUI::key_none;
+        key = key_none;
+
+    FWriteXY(0, 24, "Sequence: %s ... %s", sequence.c_str(), KeyName(key));
+    ClearEOL();
+
+    return key;
 }
 
 BaseUI::key_command_t AnsiUI::KeyInput()
 {
-    int c = getchar();
+    int c = Read();
 
     if ( c == 27 )
     {
-        c = getchar();
-        switch (c )
+        c = Read();
+        switch (c)
         {
             case '[':
                 return GetCSISequence(c);
@@ -496,6 +560,8 @@ BaseUI::key_command_t AnsiUI::KeyInput()
                 break;
         }
     }
+
+//    FWriteXY(0, 25, "Char: %c\n", c);
 
     key_command_t key;
 
@@ -528,6 +594,7 @@ BaseUI::key_command_t AnsiUI::KeyInput()
     case 126:
         return key_delete;
 
+    case 8:
     case 127:
         return key_backspace;
 

@@ -39,12 +39,11 @@ using namespace std;
 ofstream fLog;
 #endif
 
-#if defined(MA_BLUE)
 ListBuilder::ListBuilder()
 {
     //ctor
 }
-#else
+#if !defined(MA_BLUE)
 ListBuilder::ListBuilder(ableton::Link * linkInstance):
     m_Link(linkInstance)
 {
@@ -54,7 +53,7 @@ ListBuilder::ListBuilder(ableton::Link * linkInstance):
 #endif
 
 }
-#endif // MA_BLUE
+#endif // !MA_BLUE
 
 ListBuilder::~ListBuilder()
 {

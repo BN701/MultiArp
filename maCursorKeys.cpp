@@ -24,6 +24,10 @@ CursorKeys * CursorKeys::m_Focus = NULL;
 
 CursorKeys::CursorKeys()
 {
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+    if ( SP_CURSORKEYS )
+        EepromStore(SP_CURSORKEYS);
+#endif
     //ctor
 }
 

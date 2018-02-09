@@ -6,6 +6,7 @@ bin/
 *.layout
 *.log
 *.bmarks
+*.hex
 
 # Prerequisites
 *.d

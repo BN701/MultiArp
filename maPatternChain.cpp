@@ -34,7 +34,7 @@ using namespace std;
 PatternChain::PatternChain()
 {
     //ctor
-    m_Help = "S-Left/Right: new item before/after cursor, S-Del: delete current item";
+//    m_Help = "S-Left/Right: new item before/after cursor, S-Del: delete current item";
 }
 
 PatternChain::~PatternChain()

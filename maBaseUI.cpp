@@ -1,6 +1,7 @@
 #include "maBaseUI.h"
 
 #include <cmath>
+#include <unordered_map>
 
 void Rectangle::ScaleD2I(double scale)
 {
@@ -77,6 +78,74 @@ void BaseUI::MapToFullScreen(window_area_t area, int & row, int & col)
 //            break;
 //    }
 
+}
+
+std::unordered_map<int, const char *> g_KeyNames =
+{
+    {BaseUI::key_none, "key_none"},
+    {BaseUI::key_ctrl_a, "key_ctrl_a"},
+    {BaseUI::key_ctrl_c, "key_ctrl_c"},
+    {BaseUI::key_ctrl_v, "key_ctrl_v"},
+    {BaseUI::key_backspace, "key_backspace"},
+    {BaseUI::key_space, "key_space"},
+    {BaseUI::key_tab, "key_tab"},
+    {BaseUI::key_shift_tab, "key_shift_tab"},
+    {BaseUI::key_linefeed, "key_linefeed"},
+    {BaseUI::key_return, "key_return"},
+    {BaseUI::key_escape, "key_escape"},
+    {BaseUI::key_menu_control, "key_menu_control"},
+
+    {BaseUI::key_up, "key_up"},
+    {BaseUI::key_down, "key_down"},
+    {BaseUI::key_right, "key_right"},
+    {BaseUI::key_left, "key_left"},
+    {BaseUI::key_home, "key_home"},
+    {BaseUI::key_end, "key_end"},
+
+    {BaseUI::key_shift_up, "key_shift_up"},
+    {BaseUI::key_shift_down, "key_shift_down"},
+    {BaseUI::key_shift_right, "key_shift_right"},
+    {BaseUI::key_shift_left, "key_shift_left"},
+
+    {BaseUI::key_alt_up, "key_alt_up"},
+    {BaseUI::key_alt_down, "key_alt_down"},
+    {BaseUI::key_alt_right, "key_alt_right"},
+    {BaseUI::key_alt_left, "key_alt_left"},
+
+    {BaseUI::key_alt_shift_up, "key_alt_shift_up"},
+    {BaseUI::key_alt_shift_down, "key_alt_shift_down"},
+    {BaseUI::key_alt_shift_right, "key_alt_shift_right"},
+    {BaseUI::key_alt_shift_left, "key_alt_shift_left"},
+
+    {BaseUI::key_ctrl_up, "key_ctrl_up"},
+    {BaseUI::key_ctrl_down, "key_ctrl_down"},
+    {BaseUI::key_ctrl_right, "key_ctrl_right"},
+    {BaseUI::key_ctrl_left, "key_ctrl_left"},
+
+    {BaseUI::key_ctrl_shift_up, "key_ctrl_shift_up"},        // Not received with Ubuntu/xfce4-terminal
+    {BaseUI::key_ctrl_shift_down, "key_ctrl_shift_down"},      // Not received with Ubuntu/xfce4-terminal
+    {BaseUI::key_ctrl_shift_right, "key_ctrl_shift_right"},
+    {BaseUI::key_ctrl_shift_left, "key_ctrl_shift_left"},
+
+    {BaseUI::key_insert, "key_insert"},
+    {BaseUI::key_delete, "key_delete"},
+    {BaseUI::key_page_up, "key_page_up"},
+    {BaseUI::key_page_down, "key_page_down"},
+    {BaseUI::key_shift_delete, "key_shift_delete"},
+    {BaseUI::key_ctrl_delete, "key_ctrl_delete"},
+
+    {BaseUI::key_ctrl_page_up, "key_ctrl_page_up"},
+    {BaseUI::key_ctrl_page_down, "key_ctrl_page_down"},
+    {BaseUI::key_alt_page_up, "key_alt_page_up"},
+    {BaseUI::key_alt_page_down, "key_alt_page_down"}
+};
+
+const char * BaseUI::KeyName(key_command_t key)
+{
+    if ( g_KeyNames.count(key) != 0 )
+        return g_KeyNames[key];
+    else
+        return "unknown key";
 }
 
 void BaseUI::NextBigPanelPage( int direction )

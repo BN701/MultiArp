@@ -38,7 +38,7 @@ FeelMap::FeelMap():
     m_EditPoint(1)
 {
     //ctor
-    m_Help = "S-Left/Right: insert point, S-Del: delete, (S-)Up/Dn: change value";
+// Hack    m_Help = "S-Left/Right: insert point, S-Del: delete, (S-)Up/Dn: change value";
 #if LOG_ON
     fLog.open("FeelMap.log");
 #endif

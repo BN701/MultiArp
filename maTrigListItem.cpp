@@ -201,7 +201,7 @@ bool TrigRepeater::Step(int64_t & queue_delta, int & interval, unsigned char & n
 TrigListItem::TrigListItem()
 {
     //ctor
-    m_Help = "S-L/R: add arp stage. S-Del: delete. Up/Dn: interval, S-Up/Dn: steps";
+// Hack    m_Help = "S-L/R: add arp stage. S-Del: delete. Up/Dn: interval, S-Up/Dn: steps";
 }
 
 TrigListItem::~TrigListItem()

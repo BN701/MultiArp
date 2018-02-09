@@ -30,7 +30,7 @@ using namespace std;
 ChainLink::ChainLink()
 {
     //ctor
-    m_Help = "In PC mode, enter number on command line to jump to stage.";
+// Hack    m_Help = "In PC mode, enter number on command line to jump to stage.";
 }
 
 ChainLink::~ChainLink()

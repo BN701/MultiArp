@@ -3,6 +3,22 @@
 
 //#include "maListBuilder.h"
 
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+//#include <Arduino.h>
+#include <cstdint>
+void EepromStore(uint8_t value);
+
+#define SP_SEQUENCER        1
+#define SP_LISTBUILDER      2
+#define SP_UI               3
+#define SP_STATE            4
+#define SP_PATTERNSTORE     5
+#define SP_CURSORKEYS       0
+#define SP_TRANSLATETABLE   10
+#define SP_SETUPSCALEMAPS   20
+#define SP_UTILS_SPLIT      30
+#endif
+
 struct InOutPair;
 
 class Rectangle
@@ -153,6 +169,8 @@ class BaseUI
 
         void MapToFullScreen(window_area_t area, int & row, int & col);
         WindowRect & AreaToWindowRect(window_area_t area);
+
+        static const char * KeyName(key_command_t key);
 
     protected:
         WindowRect m_WholeScreen = WindowRect(25, 80, 0, 0);

@@ -86,8 +86,15 @@ class AnsiUI : public BaseUI
                 int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano);
         void ShowNoteTransforms(std::vector<InOutPair> & pairs);
 
+        key_command_t GetCSISequence(int firstChar);
+
+        int Read();
+        void ResetScreen();
+        void ClearEOL();
+
         size_t Write(const char * s);
-        size_t WriteYX(int row, int col, const char * s);
+        size_t WriteXY(int col, int row, const char * s);
+        size_t FWriteXY(int col, int row, const char *format, ...);
 
     private:
 #ifndef USE_SERIAL

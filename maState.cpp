@@ -19,7 +19,7 @@
 
 #include "maState.h"
 
-State g_State;  // Global State instance.
+extern State g_State;  // Global State instance.
 
 
 State::State():

@@ -26,6 +26,7 @@
 
 #include "maAnsiUI.h"
 #include "maTranslateTable.h"
+#include "maUtility.h"
 
 using namespace std;
 
@@ -47,7 +48,8 @@ int SerialGetChar()
 static int ee_address = 1;
 void EepromStore(uint8_t value)
 {
-    EEPROM.write(++ee_address, value);
+    if ( false )
+        EEPROM.write(++ee_address, value);
 }
 
 #endif
@@ -125,6 +127,9 @@ void AnsiUI::PlaceCursor(int row, int col)
 
 size_t AnsiUI::WriteXY(int col, int row, const char * s)
 {
+    m_LastCol = col;
+    m_LastRow = row;
+    m_LastWrite = s;
     PlaceCursor(row, col);
     return Write(s);
 }
@@ -157,6 +162,15 @@ void AnsiUI::ResetScreen()
     WriteXY(1, 6, "=>");
 }
 
+void AnsiUI::SendRestoreCursor()
+{
+    Write("\033[u");
+}
+
+void AnsiUI::SendSaveCursor()
+{
+    Write("\033[s");
+}
 
 //int AnsiUI::CursesAttribute(text_attribute_t attribute)
 //{
@@ -180,6 +194,15 @@ void AnsiUI::ClearArea(window_area_t area)
 }
 
 
+void AnsiUI::HighlightLastWrite(int col, int len, int colour, text_attribute_t attr)
+{
+    SendSaveCursor();
+    Write("\033[7m");
+    WriteXY(m_LastCol + col, m_LastRow, m_LastWrite.substr(col, len).c_str());
+    Write("\033[0m");
+    SendRestoreCursor();
+}
+
 void AnsiUI::Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr)
 {
 //    WINDOW * window = AreaToWindow(area);
@@ -190,12 +213,53 @@ void AnsiUI::Highlight(window_area_t area, int row, int col, int len, int colour
 //    wmove(stdscr, scr_y, scr_x);
 }
 
-void AnsiUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute)
+unordered_map<int, const char *> attribute_strings =
 {
+    {BaseUI::attr_normal, "\033[0m"},
+    {BaseUI::attr_bold, "\033[1m"},
+    {BaseUI::attr_underline, "\033[4m"},
+    {BaseUI::attr_reverse, "\033[7m"}
+};
+
+void AnsiUI::SetAttribute(text_attribute_t attr)
+{
+    if ( attribute_strings.count(attr) == 1 )
+        Write(attribute_strings[attr]);
+}
+
+void AnsiUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attr)
+{
+    SendSaveCursor();
+
     MapToFullScreen(area, row, col);
-    WriteXY(col, row, text);
-    if ( area == whole_screen )
-        ClearEOL();
+
+    vector<string> entries = split(text, '\n', true);
+
+    int rowCount = 0;
+    for ( auto e = entries.begin(); e != entries.end(); e++ )
+    {
+        if ( rowCount++ == m_RowHighlight )
+        {
+            SetAttribute(attr_reverse);
+            m_RowHighlight = -1;
+        }
+        else
+            SetAttribute(attr);
+        WriteXY(col, row++, e->c_str());
+        if ( area == whole_screen )
+            ClearEOL();
+        else
+        {
+            string pad;
+            pad.resize(AreaToWindowRect(area).m_iWidth - e->size(), ' ');
+            Write(pad.c_str());
+        }
+    }
+
+    SetAttribute();
+
+    SendRestoreCursor();
+
 //    WINDOW * window = AreaToWindow(area);
 //    int scr_x, scr_y;
 //    attron(attribute);
@@ -442,16 +506,16 @@ void AnsiUI::SetTopLine(int midiChannel, double stepValue, double quantum, int r
                quantum,
                runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
 
-    Text(BaseUI::whole_screen, 0, 0, text, BaseUI::attr_normal);
+    Text(whole_screen, 0, 0, text, attr_bold);
 
     vector<int> midiInputColour = {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME};
     Highlight(BaseUI::whole_screen, 0, 0, 80,
         midiInputColour.at(midiInputMode),  // Hmm ...
-        BaseUI::attr_bold);
+        attr_bold);
 
     Highlight(BaseUI::whole_screen, 0, 60, 5,
         runState != 0 ? CP_RUNNING : CP_MAIN,
-        BaseUI::attr_bold);
+        attr_bold);
 
 }
 
@@ -539,8 +603,10 @@ BaseUI::key_command_t AnsiUI::GetCSISequence(int firstChar)
     else
         key = key_none;
 
+    SendSaveCursor();
     FWriteXY(0, 24, "Sequence: %s ... %s", sequence.c_str(), KeyName(key));
     ClearEOL();
+    SendRestoreCursor();
 
     return key;
 }

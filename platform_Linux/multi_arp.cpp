@@ -53,8 +53,6 @@
 Sequencer g_Sequencer;
 ListBuilder g_ListBuilder;
 
-// Hack ListBuilder g_ListBuilder;
-
 #else
 
 #define LINK_PLATFORM_LINUX
@@ -74,7 +72,7 @@ ListBuilder g_ListBuilder(&g_Link);
 
 // Global instances.
 
-// Hack PatternStore g_PatternStore;
+PatternStore g_PatternStore;
 
 AnsiUI g_TextUI;
 #ifndef MA_BLUE
@@ -116,7 +114,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, sigterm_exit);
 #endif
 
-// Hack    g_PatternStore.SetFocus();
+   g_PatternStore.SetFocus();
 
 #ifdef MA_BLUE
 

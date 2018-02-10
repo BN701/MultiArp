@@ -129,7 +129,8 @@ class BaseUI
         {
             attr_normal = 0,
             attr_bold = 1,
-            attr_underline = 2
+            attr_underline = 2,
+            attr_reverse = 4
         };
 
         enum window_area_t
@@ -156,7 +157,7 @@ class BaseUI
         virtual ~BaseUI();
 
 //        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute, double scale) = 0;
-
+        virtual void MoveCursorToHome() {}
         virtual void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode) = 0;
         virtual void Progress(double progress, double stepWidth, double beat,
             int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano) = 0;
@@ -173,6 +174,10 @@ class BaseUI
         static const char * KeyName(key_command_t key);
 
     protected:
+
+        int m_HomeCol = 4;
+        int m_HomeRow = 6;
+
         WindowRect m_WholeScreen = WindowRect(25, 80, 0, 0);
         WindowRect m_SmallPanel = WindowRect(4, 56, 2, 4);
         WindowRect m_ProgressPanel = WindowRect(2, 15, 3, 61);

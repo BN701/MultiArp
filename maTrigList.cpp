@@ -29,7 +29,7 @@ using namespace std;
 TrigList::TrigList()
 {
     //ctor
-// Hack    m_Help = "S-L/R: add trig stage, C-L/R: copy trig stage, S-Del: delete ";
+   m_Help = "S-L/R: add trig stage, C-L/R: copy trig stage, S-Del: delete ";
 }
 
 TrigList::~TrigList()

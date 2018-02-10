@@ -9,6 +9,7 @@
 #include "maCommand.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
+#include "maScreen.h"
 #include "maSequencer.h"
 #include "maState.h"
 
@@ -53,20 +54,24 @@ Pattern Pattern::EmptyPattern;
 
 void setup()
 {
+    g_PatternStore.SetFocus();
+
     Serial.begin(115200);
     delay(1000); // Do this else the following print() is missed.
-    g_TextUI.WriteXY(0, 0, "Hello, world ...");
+    g_TextUI.FWriteXY(0, 0, "Hello, world ...");
     delay(1000);
 
     g_TextUI.ResetScreen();
+    set_top_line();
 }
 
 
 void loop() {
 
+    // User input ...
+
     if ( Serial.available() > 0 )
     {
-        // incomingByte = Serial.read();
         BaseUI::key_command_t key = g_TextUI.KeyInput();
         handle_key_input(key);
     }
@@ -78,8 +83,10 @@ void loop() {
     if ( currentMillis - previousMillis > interval )
     {
         previousMillis = currentMillis;
+        g_TextUI.SendSaveCursor();
         g_TextUI.FWriteXY(4, 2, "%s (%i)", words.at(messageNumber).c_str(), testMap.at(words.at(messageNumber)));
         g_TextUI.ClearEOL();
+        g_TextUI.SendRestoreCursor();
         ++messageNumber %= 3;
     }
 

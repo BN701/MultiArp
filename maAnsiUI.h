@@ -72,10 +72,22 @@ class AnsiUI : public BaseUI
 
 //        int CursesAttribute(text_attribute_t attribute);
 
+        void SetAttribute(text_attribute_t = attr_normal);
         virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = attr_normal);
+        void SetTextRowHighlight(int row)   // Only support inverse video attribute for now.
+        {
+            m_RowHighlight = row;
+        }
+        void HighlightLastWrite(int col, int len, int colour, text_attribute_t attr);
         void Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr = attr_normal);
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
+        virtual void MoveCursorToHome()
+        {
+            PlaceCursor(m_HomeRow, m_HomeCol);
+        }
+        void SendSaveCursor();
+        void SendRestoreCursor();
 
 //        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
         key_command_t KeyInput();
@@ -91,12 +103,17 @@ class AnsiUI : public BaseUI
         int Read();
         void ResetScreen();
         void ClearEOL();
-
-        size_t Write(const char * s);
-        size_t WriteXY(int col, int row, const char * s);
         size_t FWriteXY(int col, int row, const char *format, ...);
 
+    protected:
+        size_t Write(const char * s);
+        size_t WriteXY(int col, int row, const char * s);
+
     private:
+        std::string m_LastWrite;
+        int m_LastRow = 0;
+        int m_LastCol = 0;
+        int m_RowHighlight = -1;
 #ifndef USE_SERIAL
         struct termios m_old_tio;
         struct termios m_new_tio;

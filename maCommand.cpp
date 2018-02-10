@@ -536,19 +536,20 @@ bool do_command(string commandString)
 
         case C_RESET_SCREEN:
             g_TextUI.ResetScreen();
+            set_top_line();
             break;
 
 
-// Hack        case C_SET_LABEL:
-// Hack            if ( tokens.size() > 1 )
-// Hack            {
-// Hack                size_t pos = commandString.find(' ') + 1;
-// Hack                g_PatternStore.CurrentEditPattern().SetLabel(commandString.substr(pos).c_str());
-// Hack            }
-// Hack            set_status(STAT_POS_2, "Pattern %i: %s",
-// Hack                g_PatternStore.CurrentEditPatternID(),
-// Hack                g_PatternStore.CurrentEditPattern().Label(50).c_str());
-// Hack            break;
+       case C_SET_LABEL:
+           if ( tokens.size() > 1 )
+           {
+               size_t pos = commandString.find(' ') + 1;
+               g_PatternStore.CurrentEditPattern().SetLabel(commandString.substr(pos).c_str());
+           }
+           set_status(STAT_POS_2, "Pattern %i: %s",
+               g_PatternStore.CurrentEditPatternID(),
+               g_PatternStore.CurrentEditPattern().Label(50).c_str());
+           break;
 
         case C_PAGE_ONE:
             g_TextUI.SetBigPanelPage(AnsiUI::one);
@@ -575,96 +576,96 @@ bool do_command(string commandString)
 #else
             iTemp = stoi(tokens[1].c_str());
 #endif
-// Hack            if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
-// Hack            {
-// Hack                set_status(STAT_POS_2,"Requested pattern number out of range at the moment.");
-// Hack                break;
-// Hack            }
+           if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
+           {
+               set_status(STAT_POS_2,"Requested pattern number out of range at the moment.");
+               break;
+           }
             set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
-// Hack            g_PatternStore.SetNewPatternPending(iTemp);
+           g_PatternStore.SetNewPatternPending(iTemp);
             break;
 
-// Hack         case C_EDIT :
-// Hack             if ( tokens.size() < 2 )
-// Hack             {
-// Hack                 g_PatternStore.SetFocus();
-// Hack                 g_PatternStore.SetStatus();
-// Hack                 show_status_after_navigation();
-// Hack             }
-// Hack             else
-// Hack             {
-// Hack #if defined(MA_BLUE)
-// Hack                 iTemp = strtol(tokens[1].c_str(), NULL, 0);
-// Hack #else
-// Hack                 iTemp = stoi(tokens[1].c_str());
-// Hack #endif
-// Hack                 if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
-// Hack                 {
-// Hack                     set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
-// Hack                     break;
-// Hack                 }
-// Hack                 set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
-// Hack                 g_PatternStore.SetEditPos(iTemp);
-// Hack                 update_pattern_status_panel();
-// Hack             }
-// Hack             break;
+        case C_EDIT :
+            if ( tokens.size() < 2 )
+            {
+                g_PatternStore.SetFocus();
+                g_PatternStore.SetStatus();
+                show_status_after_navigation();
+            }
+            else
+            {
+#if defined(MA_BLUE)
+                iTemp = strtol(tokens[1].c_str(), NULL, 0);
+#else
+                iTemp = stoi(tokens[1].c_str());
+#endif
+                if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
+                {
+                    set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
+                    break;
+                }
+                set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
+                g_PatternStore.SetEditPos(iTemp);
+                update_pattern_status_panel();
+            }
+            break;
 
-// Hack        case C_EDIT_CURSOR_LOCK:
-// Hack            g_PatternStore.SetEditFocusFollowsPlay(true);
-// Hack            set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
-// Hack            update_pattern_status_panel();
-// Hack            break;
-// Hack        case C_EDIT_CURSOR_UNLOCK:
-// Hack            g_PatternStore.SetEditFocusFollowsPlay(false);
-// Hack            set_status(STAT_POS_2, "Edit focus unlocked.");
-// Hack            break;
-// Hack        case C_EDIT_CURSOR_LOCK_STATUS:
-// Hack            set_status(STAT_POS_2, "Edit focus %s.", g_PatternStore.EditFocusFollowsPlay() ? "locked" : "unlocked");
-// Hack            break;
-// Hack
-// Hack        case C_NEW :
-// Hack            g_PatternStore.AddEmptyPattern(tokens.begin() + 1, tokens.end());
-// Hack            // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
-// Hack            set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
-// Hack            update_pattern_status_panel();
-// Hack            break;
-// Hack
-// Hack        case C_COPY :
-// Hack            g_PatternStore.CopyCurrentPattern();
-// Hack            set_status(STAT_POS_2, "Current pattern copied at position %i.", g_PatternStore.m_Patterns.size());
-// Hack            update_pattern_status_panel();
-// Hack            break;
-// Hack
-// Hack        case C_DELETE :
-// Hack            if ( g_PatternStore.PatternCount() == 0 )
-// Hack            {
-// Hack                set_status(STAT_POS_2, "Nothing to delete.");
-// Hack                break;
-// Hack            }
-// Hack            if ( tokens.size() >= 2 && tokens.at(1) == "all" )
-// Hack            {
-// Hack                g_PatternStore.DeleteAllPatterns();
-// Hack                set_status(STAT_POS_2, "All patterns deleted. (\'Undo\' retrieves them one at a time.)");
-// Hack            }
-// Hack            else
-// Hack            {
-// Hack                g_PatternStore.DeleteCurrentPattern();
-// Hack                set_status(STAT_POS_2, "Current pattern deleted. (\'Undo\' puts it at the end of the list.)");
-// Hack            }
-// Hack            update_pattern_status_panel();
-// Hack            break;
-// Hack
-// Hack        case C_UNDO :
-// Hack            g_PatternStore.PopDeletedPattern();
-// Hack            set_status(STAT_POS_2, "Pattern restored at position %i.", g_PatternStore.m_Patterns.size());
-// Hack            update_pattern_status_panel();
-// Hack            break;
-// Hack
-// Hack        case C_CLEAR :
-// Hack            g_PatternStore.ClearCurrentPattern();
-// Hack            // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
-// Hack            set_status(STAT_POS_2, "Current edit pattern cleared. (\'Undo\' restores it to the end of the list.)");
-// Hack            break;
+       case C_EDIT_CURSOR_LOCK:
+           g_PatternStore.SetEditFocusFollowsPlay(true);
+           set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
+           update_pattern_status_panel();
+           break;
+       case C_EDIT_CURSOR_UNLOCK:
+           g_PatternStore.SetEditFocusFollowsPlay(false);
+           set_status(STAT_POS_2, "Edit focus unlocked.");
+           break;
+       case C_EDIT_CURSOR_LOCK_STATUS:
+           set_status(STAT_POS_2, "Edit focus %s.", g_PatternStore.EditFocusFollowsPlay() ? "locked" : "unlocked");
+           break;
+
+       case C_NEW :
+           g_PatternStore.AddEmptyPattern(tokens.begin() + 1, tokens.end());
+           // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
+           set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
+           update_pattern_status_panel();
+           break;
+
+       case C_COPY :
+           g_PatternStore.CopyCurrentPattern();
+           set_status(STAT_POS_2, "Current pattern copied at position %i.", g_PatternStore.m_Patterns.size());
+           update_pattern_status_panel();
+           break;
+
+       case C_DELETE :
+           if ( g_PatternStore.PatternCount() == 0 )
+           {
+               set_status(STAT_POS_2, "Nothing to delete.");
+               break;
+           }
+           if ( tokens.size() >= 2 && tokens.at(1) == "all" )
+           {
+               g_PatternStore.DeleteAllPatterns();
+               set_status(STAT_POS_2, "All patterns deleted. (\'Undo\' retrieves them one at a time.)");
+           }
+           else
+           {
+               g_PatternStore.DeleteCurrentPattern();
+               set_status(STAT_POS_2, "Current pattern deleted. (\'Undo\' puts it at the end of the list.)");
+           }
+           update_pattern_status_panel();
+           break;
+
+       case C_UNDO :
+           g_PatternStore.PopDeletedPattern();
+           set_status(STAT_POS_2, "Pattern restored at position %i.", g_PatternStore.m_Patterns.size());
+           update_pattern_status_panel();
+           break;
+
+       case C_CLEAR :
+           g_PatternStore.ClearCurrentPattern();
+           // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
+           set_status(STAT_POS_2, "Current edit pattern cleared. (\'Undo\' restores it to the end of the list.)");
+           break;
 
         case C_RESET :
             if ( tokens.size() >= 2 && tokens.at(1) == "all" )
@@ -672,18 +673,18 @@ bool do_command(string commandString)
                 g_State.SetPatternReset(RESET_ALL);
                 set_status(STAT_POS_2, "All patterns will be reset.");
             }
-// Hack            else if ( g_PatternStore.EditPatternIsPlayPattern() )
-// Hack            {
-// Hack
-// Hack                g_State.SetPatternReset(RESET_CURRENT);
-// Hack                set_status(STAT_POS_2, "Current pattern will be reset.");
-// Hack            }
-// Hack            else
-// Hack            {
-// Hack                // Reset the edit pattern immediately.
-// Hack                g_PatternStore.ResetCurrentPattern();
-// Hack                set_status(STAT_POS_2, "Edit pattern was reset.");
-// Hack            }
+           else if ( g_PatternStore.EditPatternIsPlayPattern() )
+           {
+
+               g_State.SetPatternReset(RESET_CURRENT);
+               set_status(STAT_POS_2, "Current pattern will be reset.");
+           }
+           else
+           {
+               // Reset the edit pattern immediately.
+               g_PatternStore.ResetCurrentPattern();
+               set_status(STAT_POS_2, "Edit pattern was reset.");
+           }
             break;
 
         case C_RESET_BEAT:
@@ -703,8 +704,8 @@ bool do_command(string commandString)
 #endif
             if ( fTemp != 0 )
             {
-// Hack                set_status(STAT_POS_2, "Setting %s Step Value: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
-// Hack                g_PatternStore.SetStepValue(fTemp);
+               set_status(STAT_POS_2, "Setting %s Step Value: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
+               g_PatternStore.SetStepValue(fTemp);
             }
             else
             {
@@ -722,8 +723,8 @@ bool do_command(string commandString)
 #endif
                 if ( fTemp >= 0 )
                 {
-// Hack                    set_status(STAT_POS_2, "Setting %s Gate Length: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
-// Hack                    g_PatternStore.SetGateLength(fTemp/100);
+                   set_status(STAT_POS_2, "Setting %s Gate Length: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
+                   g_PatternStore.SetGateLength(fTemp/100);
                 }
                 else
                 {
@@ -736,12 +737,12 @@ bool do_command(string commandString)
                 break;
             }
             break;
-// Hack        case C_GATE_HOLD:
-// Hack            g_PatternStore.SetGateHold(true);
-// Hack            break;
-// Hack        case C_GATE_NORMAL:
-// Hack            g_PatternStore.SetGateHold(false);
-// Hack            break;
+       case C_GATE_HOLD:
+           g_PatternStore.SetGateHold(true);
+           break;
+       case C_GATE_NORMAL:
+           g_PatternStore.SetGateHold(false);
+           break;
 
         case C_VELOCITY :
             if ( tokens.size() < 2 )
@@ -756,8 +757,8 @@ bool do_command(string commandString)
 #endif
             if ( iTemp > 0 && iTemp <= 127 )
             {
-// Hack                set_status(STAT_POS_2, "Setting %s velocity: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
-// Hack                g_PatternStore.SetNoteVelocity(iTemp);
+               set_status(STAT_POS_2, "Setting %s velocity: %s", g_PatternStore.UsePatternPlayData() ? "pattern" : "global", tokens[1].c_str());
+               g_PatternStore.SetNoteVelocity(iTemp);
             }
             else
             {
@@ -779,54 +780,54 @@ bool do_command(string commandString)
             if ( tokens.size() >= 3 && tokens[2] == "now")
             {
                 set_status(STAT_POS_2, "Transpose value set.");
-// Hack                g_PatternStore.TranslateTableForEdit().SetTranspose(iTemp);
+                g_PatternStore.TranslateTableForEdit().SetTranspose(iTemp);
                 set_top_line();
             }
             else
             {
                 set_status(STAT_POS_2, "Setting transpose value: %s", tokens[1].c_str());
-// Hack                g_PatternStore.TranslateTableForEdit().SetNewTransposePending(iTemp);
+                g_PatternStore.TranslateTableForEdit().SetNewTransposePending(iTemp);
             }
             break;
 
         case C_FEEL:
-// Hack            g_PatternStore.FeelMapForEdit().SetStatus();
+            g_PatternStore.FeelMapForEdit().SetStatus();
             show_status_after_navigation();
             break;
         case C_FEEL_HELP:
             set_status(STAT_POS_2, "feel new[list]|on|off|add|remove|respace|bypass");
             break;
         case C_FEEL_ON:
-// Hack            g_PatternStore.FeelMapForEdit().SetActive(true);
+            g_PatternStore.FeelMapForEdit().SetActive(true);
             show_status_after_navigation();
             break;
         case C_FEEL_OFF:
-// Hack            g_PatternStore.FeelMapForEdit().SetActive(false);
+           g_PatternStore.FeelMapForEdit().SetActive(false);
             show_status_after_navigation();
             break;
         case C_FEEL_NEW:
-// Hack            g_PatternStore.FeelMapForEdit().New(tokens);
+           g_PatternStore.FeelMapForEdit().New(tokens);
             show_status_after_navigation();
             break;
         case C_FEEL_ADD:
-// Hack            g_PatternStore.FeelMapForEdit().Add();
+           g_PatternStore.FeelMapForEdit().Add();
             show_status_after_navigation();
             break;
         case C_FEEL_REMOVE:
-// Hack            g_PatternStore.FeelMapForEdit().Remove();
+           g_PatternStore.FeelMapForEdit().Remove();
             show_status_after_navigation();
             break;
         case C_FEEL_RESPACE:
-// Hack            g_PatternStore.FeelMapForEdit().Respace();
+           g_PatternStore.FeelMapForEdit().Respace();
             show_status_after_navigation();
             break;
 
         case C_SCALE:
-// Hack            g_PatternStore.TranslateTableForEdit().SetStatus();    // This automatically sets focus.
+           g_PatternStore.TranslateTableForEdit().SetStatus();    // This automatically sets focus.
             show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:
-// Hack            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditStepList());
+           g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditStepList());
             show_translation_map_status();
             break;
         case C_SCALE_SHOW:
@@ -840,13 +841,13 @@ bool do_command(string commandString)
             break;
 
         case C_SETROOT :
-// Hack            if ( tokens.size() < 2 || ! g_PatternStore.TranslateTableForEdit().SetRoot(tokens[1]) )
-// Hack            {
-// Hack                set_status(STAT_POS_2, "Hint: root C, C#, Eb, C5, F#6, etc.");
-// Hack                break;
-// Hack            }
-// Hack            else
-// Hack                show_translation_status();
+           if ( tokens.size() < 2 || ! g_PatternStore.TranslateTableForEdit().SetRoot(tokens[1]) )
+           {
+               set_status(STAT_POS_2, "Hint: root C, C#, Eb, C5, F#6, etc.");
+               break;
+           }
+           else
+               show_translation_status();
             break;
 
         case C_MIDI:
@@ -872,22 +873,22 @@ bool do_command(string commandString)
             }
             break;
         case C_MIDI_REAL_TIME:
-// Hack            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_REAL_TIME);
+           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_REAL_TIME);
             set_status(STAT_POS_2, "Midi Input set to REAL TIME.");
             set_top_line();
             break;
         case C_MIDI_STEP:
-// Hack            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_STEP);
+           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_STEP);
             set_status(STAT_POS_2, "Midi Input set to STEP mode.");
             set_top_line();
             break;
         case C_MIDI_QUICK:
-// Hack            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_QUICK);
+           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_QUICK);
             set_status(STAT_POS_2, "Midi Input set to QUICK mode.");
             set_top_line();
             break;
         case C_MIDI_OFF:
-// Hack            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
+           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
             set_status(STAT_POS_2, "Midi Input OFF.");
             set_top_line();
             break;
@@ -917,44 +918,44 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2, "Hint: autoreset on|off");
                 break;
             }
-// Hack            if ( tokens[1] == "on")
-// Hack                g_PatternStore.SetResetOnPatternChange(true);
-// Hack            else if (tokens[1] == "off")
-// Hack                g_PatternStore.SetResetOnPatternChange(false);
-// Hack            else
-// Hack            {
-// Hack                set_status(STAT_POS_2, "Autoreset not changed.");
-// Hack                break;
-// Hack            }
+           if ( tokens[1] == "on")
+               g_PatternStore.SetResetOnPatternChange(true);
+           else if (tokens[1] == "off")
+               g_PatternStore.SetResetOnPatternChange(false);
+           else
+           {
+               set_status(STAT_POS_2, "Autoreset not changed.");
+               break;
+           }
             break;
 
         case C_PATTERN_CHAIN :
-// Hack            if ( tokens.size() >= 2 )
-// Hack                g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
-// Hack            g_PatternStore.PatternChainForEdit().SetStatus();
-// Hack            g_PatternStore.PatternChainForEdit().SetFocus();
-// Hack            show_status_after_navigation();
+           if ( tokens.size() >= 2 )
+               g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
+           g_PatternStore.PatternChainForEdit().SetStatus();
+           g_PatternStore.PatternChainForEdit().SetFocus();
+           show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_OFF:
-// Hack            g_PatternStore.SetPatternChainMode(PatternChain::off);
+           g_PatternStore.SetPatternChainMode(PatternChain::off);
             break;
         case C_PATTERN_CHAIN_NATURAL:
-// Hack            g_PatternStore.SetPatternChainMode(PatternChain::natural);
+           g_PatternStore.SetPatternChainMode(PatternChain::natural);
             break;
         case C_PATTERN_CHAIN_QUANTUM:
-// Hack            g_PatternStore.SetPatternChainMode(PatternChain::quantum);
+           g_PatternStore.SetPatternChainMode(PatternChain::quantum);
             break;
         case C_PATTERN_CHAIN_CLEAR:
-// Hack            g_PatternStore.PatternChainForEdit().Clear();
+           g_PatternStore.PatternChainForEdit().Clear();
             show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_NEW:
-// Hack            g_PatternStore.PatternChainForEdit().New();
+           g_PatternStore.PatternChainForEdit().New();
             show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_DELETE:
-// Hack            g_PatternStore.PatternChainForEdit().Delete();
-// Hack            g_PatternStore.PatternChainForEdit().SetStatus();
+           g_PatternStore.PatternChainForEdit().Delete();
+           g_PatternStore.PatternChainForEdit().SetStatus();
             show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_JUMP:
@@ -970,60 +971,60 @@ bool do_command(string commandString)
             break;
 
         case C_STORE_STEP:
-// Hack            g_PatternStore.StorePatternPlayData(PLAY_DATA_STEP);
-// Hack            set_status(STAT_POS_2, "Step Value stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
+           g_PatternStore.StorePatternPlayData(PLAY_DATA_STEP);
+           set_status(STAT_POS_2, "Step Value stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_GATE:
             break;
         case C_STORE_VELOCITY:
-// Hack            g_PatternStore.StorePatternPlayData(PLAY_DATA_VELO);
-// Hack            set_status(STAT_POS_2, "Velocity stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
+           g_PatternStore.StorePatternPlayData(PLAY_DATA_VELO);
+           set_status(STAT_POS_2, "Velocity stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_SCALE:
-// Hack            g_PatternStore.StorePatternPlayData(PLAY_DATA_SCALE);
-// Hack            set_status(STAT_POS_2, "Scale settings stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
+           g_PatternStore.StorePatternPlayData(PLAY_DATA_SCALE);
+           set_status(STAT_POS_2, "Scale settings stored with pattern %i.", g_PatternStore.CurrentEditPatternID());
             break;
         case C_STORE_ALL:
-// Hack            g_PatternStore.StorePatternPlayData();
+           g_PatternStore.StorePatternPlayData();
             set_status(STAT_POS_2, "All play data stored to current edit pattern.");
             break;
 
         case C_LOAD_STEP:
-// Hack            set_status(STAT_POS_2, "Pattern %i: %s",
-// Hack                g_PatternStore.CurrentEditPatternID(),
-// Hack                g_PatternStore.LoadPatternPlayData(PLAY_DATA_STEP).c_str());
+           set_status(STAT_POS_2, "Pattern %i: %s",
+               g_PatternStore.CurrentEditPatternID(),
+               g_PatternStore.LoadPatternPlayData(PLAY_DATA_STEP).c_str());
             break;
         case C_LOAD_GATE:
-// Hack            set_status(STAT_POS_2, "Pattern %i: %s",
-// Hack                g_PatternStore.CurrentEditPatternID(),
-// Hack                g_PatternStore.LoadPatternPlayData(PLAY_DATA_GATE).c_str());
+           set_status(STAT_POS_2, "Pattern %i: %s",
+               g_PatternStore.CurrentEditPatternID(),
+               g_PatternStore.LoadPatternPlayData(PLAY_DATA_GATE).c_str());
             break;
         case C_LOAD_VELOCITY:
-// Hack            set_status(STAT_POS_2, "Pattern %i: %s",
-// Hack                g_PatternStore.CurrentEditPatternID(),
-// Hack                g_PatternStore.LoadPatternPlayData(PLAY_DATA_VELO).c_str());
+           set_status(STAT_POS_2, "Pattern %i: %s",
+               g_PatternStore.CurrentEditPatternID(),
+               g_PatternStore.LoadPatternPlayData(PLAY_DATA_VELO).c_str());
             break;
         case C_LOAD_SCALE:
-// Hack            set_status(STAT_POS_2, "Pattern %i: %s",
-// Hack                g_PatternStore.CurrentEditPatternID(),
-// Hack                g_PatternStore.LoadPatternPlayData(PLAY_DATA_SCALE).c_str());
+           set_status(STAT_POS_2, "Pattern %i: %s",
+               g_PatternStore.CurrentEditPatternID(),
+               g_PatternStore.LoadPatternPlayData(PLAY_DATA_SCALE).c_str());
             break;
         case C_LOAD_ALL:
-// Hack            set_status(STAT_POS_2, "Pattern %i: %s",
-// Hack                g_PatternStore.CurrentEditPatternID(),
-// Hack                g_PatternStore.LoadPatternPlayData().c_str());
+           set_status(STAT_POS_2, "Pattern %i: %s",
+               g_PatternStore.CurrentEditPatternID(),
+               g_PatternStore.LoadPatternPlayData().c_str());
             break;
 
         case C_USE:
-// Hack            set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
+           set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
             break;
         case C_USE_GLOBAL_PLAYDATA:
-// Hack            g_PatternStore.SetUsePatternPlayData(false);
-// Hack            set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
+           g_PatternStore.SetUsePatternPlayData(false);
+           set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
             break;
         case C_USE_PATTERN_PLAYDATA:
-// Hack            g_PatternStore.SetUsePatternPlayData(true);
-// Hack            set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
+           g_PatternStore.SetUsePatternPlayData(true);
+           set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
             break;
         case C_USE_HELP:
             set_status(STAT_POS_2, "use g[lobal]|p[attern]");
@@ -1035,8 +1036,8 @@ bool do_command(string commandString)
                 set_status(STAT_POS_2, "Hint: list new|delete|n [clear|: n1, n2 ,...]");
                 break;
             }
-// Hack            set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
-// Hack            update_pattern_panel();
+           set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
+           update_pattern_panel();
             break;
 
 #ifndef MA_BLUE
@@ -1052,62 +1053,62 @@ bool do_command(string commandString)
             break;
 #endif
 
-// Hack        case C_LIST_RT:
-// Hack            g_PatternStore.CurrentEditRealTimeList().SetStatus();
-// Hack            g_PatternStore.CurrentEditRealTimeList().SetFocus();
-// Hack            show_status_after_navigation();
-// Hack            break;
-// Hack
-// Hack        case C_LIST_RT_DELETE:
-// Hack            g_PatternStore.DeleteCurrentRealTimeList();
-// Hack            g_PatternStore.SetFocus();
-// Hack            g_PatternStore.SetStatus();
-// Hack            show_status_after_navigation();
-// Hack            break;
-// Hack
-// Hack        case C_LIST_RT_RATE:
-// Hack            if ( firstParameter > 0 )
-// Hack            {
-// Hack                g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens.begin() + firstParameter, tokens.end());
-// Hack                set_status(STAT_POS_2, "Pattern %i: Real Time playback rates set.", g_PatternStore.CurrentEditPatternID());
-// Hack                show_status_after_navigation();
-// Hack            }
-// Hack            else
-// Hack                set_status(STAT_POS_2, "help: real time rate \"rate\" [\"step\"]");
-// Hack            break;
-// Hack
-// Hack        case C_LIST_RT_QUANTUM:
-// Hack            if ( firstParameter > 0 )
-// Hack            {
-// Hack                g_PatternStore.CurrentEditPattern().SetRealTimeQuantum(tokens.at(firstParameter));
-// Hack                set_status(STAT_POS_2, "Pattern %i: loop length (quantum) set for Real Timelists.", g_PatternStore.CurrentEditPatternID());
-// Hack                show_status_after_navigation();
-// Hack            }
-// Hack            else
-// Hack                set_status(STAT_POS_2, "help: real time quantum [q]");
-// Hack            break;
-// Hack
-// Hack        case C_LIST_RT_START_PHASE:
-// Hack            if ( firstParameter > 0 )
-// Hack            {
-// Hack                g_PatternStore.CurrentEditPattern().SetRealTimeStartPhase(tokens.at(firstParameter));
-// Hack                set_status(STAT_POS_2, "Pattern %i: start phase set for Real Time lists.", g_PatternStore.CurrentEditPatternID());
-// Hack                show_status_after_navigation();
-// Hack            }
-// Hack            else
-// Hack                set_status(STAT_POS_2, "help: real time phase [0..99%]");
-// Hack            break;
-// Hack
-// Hack        case C_LIST_RT_ECHO:
-// Hack            if ( firstParameter > 0 )
-// Hack            {
-// Hack                g_PatternStore.CurrentEditPattern().StartRealTimeEcho(tokens.begin() + firstParameter, tokens.end());
-// Hack                set_status(STAT_POS_2, "Pattern %i: started echo on current Real Time list.", g_PatternStore.CurrentEditPatternID());
-// Hack                show_status_after_navigation();
-// Hack            }
-// Hack            else
-// Hack                set_status(STAT_POS_2, "help: real time echo inc[rement] n.nn int[erval] n t[arget] nn%");
-// Hack            break;
+       case C_LIST_RT:
+           g_PatternStore.CurrentEditRealTimeList().SetStatus();
+           g_PatternStore.CurrentEditRealTimeList().SetFocus();
+           show_status_after_navigation();
+           break;
+
+       case C_LIST_RT_DELETE:
+           g_PatternStore.DeleteCurrentRealTimeList();
+           g_PatternStore.SetFocus();
+           g_PatternStore.SetStatus();
+           show_status_after_navigation();
+           break;
+
+       case C_LIST_RT_RATE:
+           if ( firstParameter > 0 )
+           {
+               g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens.begin() + firstParameter, tokens.end());
+               set_status(STAT_POS_2, "Pattern %i: Real Time playback rates set.", g_PatternStore.CurrentEditPatternID());
+               show_status_after_navigation();
+           }
+           else
+               set_status(STAT_POS_2, "help: real time rate \"rate\" [\"step\"]");
+           break;
+
+       case C_LIST_RT_QUANTUM:
+           if ( firstParameter > 0 )
+           {
+               g_PatternStore.CurrentEditPattern().SetRealTimeQuantum(tokens.at(firstParameter));
+               set_status(STAT_POS_2, "Pattern %i: loop length (quantum) set for Real Timelists.", g_PatternStore.CurrentEditPatternID());
+               show_status_after_navigation();
+           }
+           else
+               set_status(STAT_POS_2, "help: real time quantum [q]");
+           break;
+
+       case C_LIST_RT_START_PHASE:
+           if ( firstParameter > 0 )
+           {
+               g_PatternStore.CurrentEditPattern().SetRealTimeStartPhase(tokens.at(firstParameter));
+               set_status(STAT_POS_2, "Pattern %i: start phase set for Real Time lists.", g_PatternStore.CurrentEditPatternID());
+               show_status_after_navigation();
+           }
+           else
+               set_status(STAT_POS_2, "help: real time phase [0..99%]");
+           break;
+
+       case C_LIST_RT_ECHO:
+           if ( firstParameter > 0 )
+           {
+               g_PatternStore.CurrentEditPattern().StartRealTimeEcho(tokens.begin() + firstParameter, tokens.end());
+               set_status(STAT_POS_2, "Pattern %i: started echo on current Real Time list.", g_PatternStore.CurrentEditPatternID());
+               show_status_after_navigation();
+           }
+           else
+               set_status(STAT_POS_2, "help: real time echo inc[rement] n.nn int[erval] n t[arget] nn%");
+           break;
 
         case C_HELP :
             if ( tokens.size() < 2 )
@@ -1121,26 +1122,26 @@ bool do_command(string commandString)
             break;
 
 
-// Hack        case C_TRIGS:
-// Hack            if ( firstParameter > 0 )
-// Hack            {
-// Hack//                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
-// Hack                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(tokens.begin() + firstParameter, tokens.end());
-// Hack            }
-// Hack            g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
-// Hack            g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
-// Hack            show_status_after_navigation();
-// Hack            break;
-// Hack
-// Hack        case C_TRIGS_ARPEGGIO:
-// Hack            if ( firstParameter > 0 )
-// Hack            {
-// Hack                g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(tokens.begin() + firstParameter, tokens.end());
-// Hack            }
-// Hack            g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
-// Hack            g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
-// Hack            show_status_after_navigation();
-// Hack            break;
+       case C_TRIGS:
+           if ( firstParameter > 0 )
+           {
+//                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
+               g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(tokens.begin() + firstParameter, tokens.end());
+           }
+           g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
+           g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
+           show_status_after_navigation();
+           break;
+
+       case C_TRIGS_ARPEGGIO:
+           if ( firstParameter > 0 )
+           {
+               g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(tokens.begin() + firstParameter, tokens.end());
+           }
+           g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
+           g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
+           show_status_after_navigation();
+           break;
 
 #if 0
         case C_TRIGS:
@@ -1177,7 +1178,7 @@ bool do_command(string commandString)
             iTemp = stoi(tokens[0]);
 #endif
             // Function returns a format string. Too obfuscated?
-// Hack            set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp).c_str(), iTemp);
+           set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp).c_str(), iTemp);
             break;
         default :
             break;
@@ -1311,8 +1312,8 @@ void load_from_string(string s, int & created, int & updated )
         try
         {
 #endif
-// Hack            if ( g_PatternStore.FromString(*i, created, updated) ) // Give Pattern Store a chance to see the header.
-// Hack                continue;
+           if ( g_PatternStore.FromString(*i, created, updated) ) // Give Pattern Store a chance to see the header.
+               continue;
 
             // Handle global fields here (for the time being).
 
@@ -1388,11 +1389,13 @@ void load_from_string(string s, int & created, int & updated )
 bool handle_key_input(BaseUI::key_command_t key)
 {
 #if 1
+        g_TextUI.SendSaveCursor();
         if ( key < BaseUI::key_none)
             g_TextUI.FWriteXY(50, 25, "Key: %c (%i)", key, key);
         else
             g_TextUI.FWriteXY(50, 25, "Key: %s (%i)", BaseUI::KeyName(key), key);
         g_TextUI.ClearEOL();
+        g_TextUI.SendRestoreCursor();
 #endif
 
     bool result = true;
@@ -1411,13 +1414,13 @@ bool handle_key_input(BaseUI::key_command_t key)
     {
 #if !defined(MA_BLUE) || defined(MA_BLUE_PC)
     case BaseUI::key_ctrl_a: // 0xE6: // Ctrl-A
-// Hack        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+       copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
         set_status(COMMAND_HOME, "");
         break;
 
     case BaseUI::key_ctrl_c: // 0xA2:  // Ctrl-C, Copy
-// Hack        copy_clipboard(g_PatternStore.EditPatternToString());
+       copy_clipboard(g_PatternStore.EditPatternToString());
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         set_status(COMMAND_HOME, "");
         break;
@@ -1449,16 +1452,16 @@ bool handle_key_input(BaseUI::key_command_t key)
             result = do_command(commandString);
             commandString.clear();
         }
-// Hack else if ( g_ListBuilder.HandleKeybInput(10) )
-// Hack {
-// Hack     if ( g_ListBuilder.RealTimeRecord() )
-// Hack         g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
-// Hack     else
-// Hack         g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-// Hack     g_ListBuilder.Clear();
-// Hack     update_pattern_panel();
-// Hack     set_status(STAT_POS_2, "");
-// Hack }
+else if ( g_ListBuilder.HandleKeybInput(10) )
+{
+    if ( g_ListBuilder.RealTimeRecord() )
+        g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+    else
+        g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+    g_ListBuilder.Clear();
+    update_pattern_panel();
+    set_status(STAT_POS_2, "");
+}
         else if ( CursorKeys::RouteKey(BaseUI::key_return) )
         {
             show_status_after_navigation();
@@ -1471,7 +1474,7 @@ bool handle_key_input(BaseUI::key_command_t key)
         if ( commandString.empty() )
         {
 #ifdef MA_BLUE
-// Hack            if ( g_ListBuilder.HandleKeybInput(32) )
+           if ( g_ListBuilder.HandleKeybInput(32) )
 #else
             if ( g_ListBuilder.HandleKeybInput(' ') )
 #endif
@@ -1499,8 +1502,8 @@ bool handle_key_input(BaseUI::key_command_t key)
     case BaseUI::key_backspace: // XK_BackSpace:
         if ( commandString.size() > 0 )
             commandString.pop_back();
-// Hack        else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_backspace) )
-// Hack            show_listbuilder_status();
+       else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_backspace) )
+           show_listbuilder_status();
         else if ( CursorKeys::RouteKey(BaseUI::key_backspace) )
             show_status_after_navigation();
         place_cursor(COMMAND_HOME + commandString.size());

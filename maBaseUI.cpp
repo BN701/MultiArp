@@ -53,31 +53,6 @@ WindowRect & BaseUI::AreaToWindowRect(window_area_t area)
 void BaseUI::MapToFullScreen(window_area_t area, int & row, int & col)
 {
     AreaToWindowRect(area).MapToFullScreen(col, row);
-
-//    switch (area)
-//    {
-//        case whole_screen:
-//            break;
-//        case big_panel:
-//            m_BigPanel.MapToFullScreen(col, row);
-//            break;
-//        case small_panel:
-//            m_SmallPanel.MapToFullScreen(col, row);
-//            break;
-//        case progress_panel:
-//            m_ProgressPanel.MapToFullScreen(col, row);
-//            break;
-//        case edit_list_panel:
-//            m_EditListPanel.MapToFullScreen(col, row);
-//            break;
-//        case edit_summary_panel:
-//            m_EditSummaryPanel.MapToFullScreen(col, row);
-//            break;
-//        case big_panel_extra:
-//            m_BigPanelExtra.MapToFullScreen(col, row);
-//            break;
-//    }
-
 }
 
 std::unordered_map<int, const char *> g_KeyNames =

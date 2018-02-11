@@ -47,6 +47,7 @@
 
 #ifdef MA_BLUE
 
+#include <chrono>
 #include <poll.h>
 
 #include "maSequencer.h"
@@ -69,6 +70,8 @@ AlsaSequencer g_Sequencer;
 ListBuilder g_ListBuilder(&g_Link);
 
 #endif
+
+using namespace std;
 
 // Global instances.
 
@@ -132,11 +135,33 @@ int main(int argc, char *argv[])
 
     // Polling loop
 
+    auto start = chrono::high_resolution_clock::now();
+
+    queue_next_step(0);
+
     bool keep_going = true;
 
     while ( keep_going )
     {
-        if ( poll(pfd, 1, 10000) > 0 )
+
+        auto elapsed = chrono::high_resolution_clock::now() - start;
+        uint64_t microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
+
+        while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(microseconds) )
+        {
+            switch (ev->type)
+            {
+                case SND_SEQ_EVENT_ECHO:
+                    // This is our 'tick', so schedule everything
+                    // that should happen next, including the
+                    // next tick.
+                    queue_next_step(0);
+                    break;
+            }
+            g_Sequencer.PopEvent();
+        }
+
+        if ( poll(pfd, 1, 0) > 0 )
         {
             bool keyDataValid = false;
             BaseUI::key_command_t key;

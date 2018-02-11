@@ -275,74 +275,57 @@ void AnsiUI::Text(window_area_t area, int row, int col, const char * text, text_
 void AnsiUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
                         double rtBeat, unsigned int queueSecs, unsigned int queueNano)
 {
-//    int row = 2;
-//    int col = 4;
-//    double width = 64;
-//
-//    int n = lround(width * progress);
-//    int len = lround(width * stepWidth);
-//
-//    if ( len < 1 )
-//        len = 1;
-//
-//    int mode = 0;
-//    if ( len < 3 )
-//        mode = 1;
-//    else if ( len < 9 )
-//        mode = 2;
-//
-//    if ( n + len > 64 )
-//        len = width - n;
-//
-//    char lineFill, markerFill;
-//
-//    switch ( mode )
-//    {
-//    case 1:
-//        lineFill = '-';
-//        markerFill = '>';
-//        break;
-//    case 2:
-//        lineFill = ' ';
-//        markerFill = '>';
-//        break;
-//    default:
-//        lineFill = ' ';
-//        markerFill = '-';
-//        break;
-//
-//    }
-//
-//    string marker(len, markerFill);
-//    string barline(width, lineFill);
-//    char buff[10];
-//    snprintf(buff, 10, "%7.2f ", beat /* g_State.Phase() + 1 */);
-//    barline += buff;
-//
-//    int scr_x, scr_y;
-//    getyx(stdscr, scr_y, scr_x);
-//
-//    switch ( mode )
-//    {
-//    case 1:
-//        attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
-//        mvprintw(row, col, barline.c_str());
-//        attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
-//        mvprintw(row, col + n, marker.c_str());
-//        break;
-//    case 2:
-//        attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
-//        mvprintw(row, col, barline.c_str());
-//        attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
-//        mvprintw(row, col + n, marker.c_str());
-//        break;
-//    default:
-//        attron(COLOR_PAIR(CP_PROGRESS_BAR_BKGND));
-//        mvprintw(row, col, barline.c_str());
-//        attron(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
-//        mvprintw(row, col + n, marker.c_str());
-//        break;
-//    }
+    int row = 2;
+    int col = 4;
+    double width = 64;
+
+    int n = lround(width * progress);
+    int len = lround(width * stepWidth);
+
+    if ( len < 1 )
+        len = 1;
+
+    int mode = 0;
+    if ( len < 3 )
+        mode = 1;
+    else if ( len < 9 )
+        mode = 2;
+
+    if ( n + len > 64 )
+        len = width - n;
+
+    char lineFill, markerFill;
+
+    switch ( mode )
+    {
+    case 1:
+        lineFill = '-';
+        markerFill = '>';
+        break;
+    case 2:
+        lineFill = ' ';
+        markerFill = '>';
+        break;
+    default:
+        lineFill = ' ';
+        markerFill = '-';
+        break;
+
+    }
+
+    string marker(len, markerFill);
+    string barline(width, lineFill);
+    char buff[10];
+    snprintf(buff, 10, "%7.2f ", beat /* g_State.Phase() + 1 */);
+    barline += buff;
+
+    SendSaveCursor();
+
+    WriteXY(col, row, barline.c_str());
+    WriteXY(col + n, row, marker.c_str());
+
+    SendRestoreCursor();
+
 //
 //    attroff(COLOR_PAIR(CP_PROGRESS_BAR_HIGHLIGHT));
 //
@@ -354,11 +337,11 @@ void AnsiUI::Progress(double progress, double stepWidth, double beat, int patter
 //
 //    move(scr_y, scr_x);
 //    refresh();
-//
-//    char text[80];
-//    snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
-//    Text(progress_panel, 0, 0, text);
-//
+
+    char text[80];
+    snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
+    Text(progress_panel, 0, 0, text);
+
 }
 
 

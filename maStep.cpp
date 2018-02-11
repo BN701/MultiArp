@@ -23,6 +23,7 @@ using namespace std;
 
 #ifdef MA_BLUE
 
+#include <math.h>
 #include "maSequencer.h"
 extern Sequencer g_Sequencer;
 
@@ -152,7 +153,10 @@ void queue_next_step(int queueId)
 
 #ifdef MA_BLUE
    // MA_BLUE Todo: Convert beat (phase) to schedule time
-   chrono::microseconds t_next_usec;
+   chrono::microseconds t_next_usec(llround(nextBeat * 60000000/120));
+
+   g_State.SetPhase(fmod(nextBeat, g_State.Quantum()));
+
 #else
    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
    chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
@@ -172,7 +176,9 @@ void queue_next_step(int queueId)
 
    uint64_t queue_time_usec = 0;
 
-#ifndef MA_BLUE
+#ifdef MA_BLUE
+    queue_time_usec = llround(nextBeat * 60000000/120);
+#else
    if ( g_LinkStartTime.count() < 0 )
    {
        g_LinkStartTime = t_next_usec;
@@ -212,9 +218,9 @@ void queue_next_step(int queueId)
 
    if ( g_State.RunState() || gDeferStop-- > 0 )
    {
-       g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
-if ( g_ListBuilder.RealTimeRecord() )
-    nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
+        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
+        if ( g_ListBuilder.RealTimeRecord() )
+            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
    }
 
    if ( nextCluster.Empty() )

@@ -12,6 +12,7 @@
 #include "maScreen.h"
 #include "maSequencer.h"
 #include "maState.h"
+#include "maStep.h"
 
 using namespace std;
 
@@ -63,8 +64,25 @@ void setup()
 
     g_TextUI.ResetScreen();
     set_top_line();
+    queue_next_step(0);
+
 }
 
+uint64_t sysTimeMicros()
+{
+    static uint32_t time_wraps = 0;
+    static uint32_t time_prev_u = 0;
+
+    uint32_t current_u = micros();
+
+    if ( current_u < time_prev_u )
+        time_wraps++;
+
+    time_prev_u = current_u;
+
+    uint64_t t = time_wraps;
+    return (t << 32) + current_u;
+}
 
 void loop() {
 
@@ -76,18 +94,36 @@ void loop() {
         handle_key_input(key);
     }
 
+    while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(sysTimeMicros()) )
+    {
+        switch (ev->type)
+        {
+            case SND_SEQ_EVENT_ECHO:
+                // This is our 'tick', so schedule everything
+                // that should happen next, including the
+                // next tick.
+                queue_next_step(0);
+                break;
+        }
+        g_Sequencer.PopEvent();
+    }
+
     // Check if it's time for another tick ...
 
-    unsigned long currentMillis = millis();
-
-    if ( currentMillis - previousMillis > interval )
-    {
-        previousMillis = currentMillis;
-        g_TextUI.SendSaveCursor();
-        g_TextUI.FWriteXY(4, 2, "%s (%i)", words.at(messageNumber).c_str(), testMap.at(words.at(messageNumber)));
-        g_TextUI.ClearEOL();
-        g_TextUI.SendRestoreCursor();
-        ++messageNumber %= 3;
-    }
+//    unsigned long currentMillis = millis();
+//
+//    g_TextUI.FWriteXY(4, 8, "m:%lu", currentMillis);
+//    g_TextUI.FWriteXY(4, 9, "u:%llu", sysTimeMicros());
+//
+//    if ( currentMillis - previousMillis > interval )
+//    {
+//        previousMillis = currentMillis;
+//
+//        g_TextUI.SendSaveCursor();
+//        g_TextUI.FWriteXY(12, 2, "%s (%i)", words.at(messageNumber).c_str(), testMap.at(words.at(messageNumber)));
+//        g_TextUI.ClearEOL();
+//        g_TextUI.SendRestoreCursor();
+//        ++messageNumber %= 3;
+//    }
 
 }

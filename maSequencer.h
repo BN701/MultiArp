@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <chrono>
+#include <forward_list>
 
 #include "alsa_types.h"
 
@@ -43,15 +44,12 @@ class Sequencer
             return m_NextScheduleTime.tv_nsec;
         }
 
-        bool ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len)
-        {
-            return true;
-        }
 
-        bool ScheduleNextCallBack(int queueId)
-        {
-            return true;
-        }
+        bool ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t len);
+        bool ScheduleNextCallBack(int queueId);
+
+        snd_seq_event_t * GetEvent(uint64_t);
+        void PopEvent();
 
 //
 //        snd_seq_t * Handle()
@@ -93,7 +91,7 @@ class Sequencer
             return m_MidiChannel;
         }
 
-        void SetMidiChannel( unsigned char c )
+        void SetMidiChannel( uint8_t c )
         {
             m_MidiChannel = c;
         }
@@ -103,19 +101,26 @@ class Sequencer
 //            snd_seq_set_client_name(m_SeqHandle, name);
 //        }
 
-    protected:
+    private:
 
 //        snd_seq_t *m_SeqHandle;
 
 //        std::vector<AlsaSequencerQueue> m_QueueList;
 
+        uint64_t m_NextScheduleTimeMicros = 0;
         snd_seq_real_time_t m_NextScheduleTime;
 
-        unsigned char m_MidiChannel;
+        uint8_t m_MidiChannel;
 //        int m_PortInId;
 //        int m_PortOutId;
 
-    private:
+        bool ScheduleEvent(snd_seq_event_t & ev);
+
+        std::forward_list<snd_seq_event_t> m_EventQueue;
+        uint64_t m_tQueueHead = static_cast<uint64_t>(-1);
+        uint64_t m_tQueueTail = 0;
+//        bool m_InsertFirst;
+//        bool m_InsertLast = true;
 };
 
 #endif // MASEQUENCER_H

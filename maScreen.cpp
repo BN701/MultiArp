@@ -63,7 +63,7 @@ void set_status(int y, int x, const char *format, ...)
     vsnprintf(text, 100, format, args);
     va_end(args);
 
-    g_TextUI.Text(BaseUI::whole_screen, y, x, text, BaseUI::attr_normal);
+    g_TextUI.Text(BaseUI::whole_screen, y, x, text, NULL, BaseUI::attr_normal);
 #ifndef MA_BLUE
     g_CairoUI.Text(BaseUI::whole_screen, y+2, x, text, BaseUI::attr_normal);
 #endif
@@ -246,33 +246,43 @@ void update_pattern_panel()
     if ( g_TextUI.BigPanelHold() )
         return;
 
-#ifndef MA_BLUE
+#if !defined(MA_BLUE) // || defined(MA_BLUE_PC)
     try
     {
 #endif
         bool showTrigProgress = false;
         static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
-
+        string text;
         switch ( g_TextUI.BigPanelPage() )
         {
         case BaseUI::one:
             g_TextUI.ClearArea(BaseUI::big_panel);
-            g_TextUI.Text(BaseUI::big_panel, 0, 0, g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79).c_str());
+            text = g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79);
+            g_TextUI.Text(BaseUI::big_panel, 0, 0, text.c_str(), & highlights);
+#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
+            highlights.clear();
+#endif
             showTrigProgress = true;
             break;
         case BaseUI::two:
             g_TextUI.ClearArea(BaseUI::big_panel);
-            g_TextUI.Text(BaseUI::big_panel, 0, 0, g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79).c_str());
+            text = g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79);
+            g_TextUI.Text(BaseUI::big_panel, 0, 0, text.c_str(), & highlights);
             showTrigProgress = true;
+#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
+            highlights.clear();
+#endif
             break;
         case BaseUI::three:
             layout_pattern_extra_panel(g_PatternStore.TranslateTableForPlay().Diags().InOutPairs());
-            g_TextUI.Text(BaseUI::big_panel, 0, 0, g_PatternStore.TranslateTableForPlay().Diags().Log(highlights).c_str());
+            text = g_PatternStore.TranslateTableForPlay().Diags().Log(highlights);
+            g_TextUI.Text(BaseUI::big_panel, 0, 0, text.c_str(), & highlights);
             break;
         default:
             break;
         }
 
+#if !defined(MA_BLUE) // || defined(MA_BLUE_PC)
         switch ( g_TextUI.BigPanelPage() )
         {
         case BaseUI::one:
@@ -300,7 +310,6 @@ void update_pattern_panel()
         if ( showTrigProgress )
             g_TextUI.Highlight(BaseUI::big_panel, 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
                 CP_PATTERN_LIST_PANEL, BaseUI::attr_underline);
-#ifndef MA_BLUE
     }
     catch (... /*string s*/)
     {
@@ -362,9 +371,11 @@ void show_status_after_navigation()
 
     set_status(STAT_POS_MENU, status.substr(adjustOffset, width).c_str());
 
+    g_TextUI.SendSaveCursor();
     for ( size_t i = 0; i < highlights.size(); i++ )
 //        g_TextUI.Highlight(BaseUI::whole_screen, STAT_POS_MENU + highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
         g_TextUI.HighlightLastWrite(highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+    g_TextUI.SendRestoreCursor();
 
 }
 

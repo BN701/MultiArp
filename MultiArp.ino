@@ -94,6 +94,10 @@ void loop() {
         handle_key_input(key);
     }
 
+    // Midi send queue ...
+
+    uint8_t midiChannel = g_Sequencer.MidiChannel();
+
     while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(sysTimeMicros()) )
     {
         switch (ev->type)
@@ -103,6 +107,12 @@ void loop() {
                 // that should happen next, including the
                 // next tick.
                 queue_next_step(0);
+                break;
+            case SND_SEQ_EVENT_NOTEON:
+                usbMIDI.sendNoteOn(ev->data.note.note, ev->data.note.velocity, midiChannel);
+                break;
+            case SND_SEQ_EVENT_NOTEOFF:
+                usbMIDI.sendNoteOff(ev->data.note.note, ev->data.note.velocity, midiChannel);
                 break;
         }
         g_Sequencer.PopEvent();

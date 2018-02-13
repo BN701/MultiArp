@@ -194,13 +194,16 @@ void AnsiUI::ClearArea(window_area_t area)
 }
 
 
-void AnsiUI::HighlightLastWrite(int col, int len, int colour, text_attribute_t attr)
+void AnsiUI::HighlightLastWrite(uint16_t col, uint16_t len, uint16_t colour, text_attribute_t attr)
 {
-    SendSaveCursor();
+    if ( len == 0 || m_LastWrite.size() < col + len )
+        return;
+    // Colour and attribute ignored for now, just set inverse video.
+//    SendSaveCursor();
     Write("\033[7m");
     WriteXY(m_LastCol + col, m_LastRow, m_LastWrite.substr(col, len).c_str());
     Write("\033[0m");
-    SendRestoreCursor();
+//    SendRestoreCursor();
 }
 
 void AnsiUI::Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr)
@@ -227,7 +230,7 @@ void AnsiUI::SetAttribute(text_attribute_t attr)
         Write(attribute_strings[attr]);
 }
 
-void AnsiUI::Text(window_area_t area, int row, int col, const char * text, text_attribute_t attr)
+void AnsiUI::Text(window_area_t area, int row, int col, const char * text, vector<PosInfo2> * highlights, text_attribute_t attr)
 {
     SendSaveCursor();
 
@@ -235,24 +238,35 @@ void AnsiUI::Text(window_area_t area, int row, int col, const char * text, text_
 
     vector<string> entries = split(text, '\n', true);
 
-    int rowCount = 0;
-    for ( auto e = entries.begin(); e != entries.end(); e++ )
+    int R = 0;  // Row counter.
+    for ( auto e = entries.begin(); e != entries.end(); e++, R++, row++ )
     {
-        if ( rowCount++ == m_RowHighlight )
+        if ( R == m_RowHighlight )
         {
             SetAttribute(attr_reverse);
             m_RowHighlight = -1;
         }
         else
             SetAttribute(attr);
-        WriteXY(col, row++, e->c_str());
+        WriteXY(col, row, e->c_str());
+        if ( highlights != NULL && ! highlights->empty() )
+        {
+            for ( auto h = highlights->begin(); h != highlights->end(); h++ )
+            {
+                if ( R == h->row )
+                    HighlightLastWrite(h->offset, h->length);
+            }
+        }
         if ( area == whole_screen )
+        {
+            PlaceCursorXY(col + e->size(), row);
             ClearEOL();
+        }
         else
         {
             string pad;
             pad.resize(AreaToWindowRect(area).m_iWidth - e->size(), ' ');
-            Write(pad.c_str());
+            WriteXY(col + e->size(), row, pad.c_str());
         }
     }
 
@@ -489,7 +503,7 @@ void AnsiUI::SetTopLine(int midiChannel, double stepValue, double quantum, int r
                quantum,
                runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
 
-    Text(whole_screen, 0, 0, text, attr_bold);
+    Text(whole_screen, 0, 0, text, NULL, attr_bold);
 
     vector<int> midiInputColour = {CP_MAIN, CP_RECORD, CP_RECORD, CP_REALTIME};
     Highlight(BaseUI::whole_screen, 0, 0, 80,
@@ -587,7 +601,7 @@ BaseUI::key_command_t AnsiUI::GetCSISequence(int firstChar)
         key = key_none;
 
     SendSaveCursor();
-    FWriteXY(0, 24, "Sequence: %s ... %s", sequence.c_str(), KeyName(key));
+    FWriteXY(0, 24, "Esc: ""%s"", %s", sequence.c_str(), KeyName(key));
     ClearEOL();
     SendRestoreCursor();
 

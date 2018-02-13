@@ -876,7 +876,7 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
         if ( i == m_PosEdit )
         {
             result += " -> ";
-            highlights.push_back(PosInfo2(row, 1, 2));
+//             highlights.push_back(PosInfo2(row, 1, 2));
         }
         else
             result += "    ";
@@ -886,11 +886,13 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
             highlights.push_back(PosInfo2(row, centre, 4));
             line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
             result += Centre(line, centre, width, offset);
-            highlights.push_back(PosInfo2(row++, offset + 4, length));
+            if ( length > 0 )
+                highlights.push_back(PosInfo2(row++, offset + 4, length));
             break;
         case 2:
             line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
-            highlights.push_back(PosInfo2(row++, offset + 4, length));
+            if ( length > 0 )
+                highlights.push_back(PosInfo2(row++, offset + 4, length));
             line += '\n';
             result += line;
             break;

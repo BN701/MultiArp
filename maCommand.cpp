@@ -1391,9 +1391,9 @@ bool handle_key_input(BaseUI::key_command_t key)
 #if 1
         g_TextUI.SendSaveCursor();
         if ( key < BaseUI::key_none)
-            g_TextUI.FWriteXY(50, 25, "Key: %c (%i)", key, key);
+            g_TextUI.FWriteXY(40, 25, "Cha: %c (%i)", key, key);
         else
-            g_TextUI.FWriteXY(50, 25, "Key: %s (%i)", BaseUI::KeyName(key), key);
+            g_TextUI.FWriteXY(40, 25, "Key: %s (%i)", BaseUI::KeyName(key), key);
         g_TextUI.ClearEOL();
         g_TextUI.SendRestoreCursor();
 #endif

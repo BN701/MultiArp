@@ -49,6 +49,7 @@
 
 #include <chrono>
 #include <poll.h>
+#include <thread>
 
 #include "maSequencer.h"
 Sequencer g_Sequencer;
@@ -187,6 +188,9 @@ int main(int argc, char *argv[])
 //                    midi_action(queueId);
 //            }
         }
+
+        // Pop this in here so we don't drive the CPU hot by fast looping.
+        std::this_thread::sleep_for(chrono::milliseconds(1));
     }
 
 #else

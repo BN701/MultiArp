@@ -38,6 +38,7 @@
 
 #include "maBaseUI.h"
 #include "maCursorKeys.h"
+#include "maNotes.h"
 
 // Color Pair uses
 
@@ -73,15 +74,19 @@ class AnsiUI : public BaseUI
 //        int CursesAttribute(text_attribute_t attribute);
 
         void SetAttribute(text_attribute_t = attr_normal);
-        virtual void Text(window_area_t area, int row, int col, const char * text, text_attribute_t attribute = attr_normal);
+        virtual void Text(window_area_t area, int row, int col, const char * text, std::vector<PosInfo2> * highlights = NULL, text_attribute_t attribute = attr_normal);
         void SetTextRowHighlight(int row)   // Only support inverse video attribute for now.
         {
             m_RowHighlight = row;
         }
-        void HighlightLastWrite(int col, int len, int colour, text_attribute_t attr);
+        void HighlightLastWrite(uint16_t col, uint16_t len, uint16_t colour = 0, text_attribute_t attr = attr_reverse);
         void Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr = attr_normal);
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
+        void PlaceCursorXY(int col, int row)
+        {
+            PlaceCursor(row, col);
+        }
         virtual void MoveCursorToHome()
         {
             PlaceCursor(m_HomeRow, m_HomeCol);

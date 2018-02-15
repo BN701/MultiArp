@@ -91,13 +91,14 @@ class AnsiUI : public BaseUI
         {
             PlaceCursor(m_HomeRow, m_HomeCol);
         }
-        void SendSaveCursor();
-        void SendRestoreCursor();
+        void SendSaveCursor();          // Calls to these two cannot be nested as
+        void SendRestoreCursor();       // the terminal doesn't maintain a stack of positions.
+        void SendSaveAndHideCursor();
 
 //        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
         key_command_t KeyInput();
 
-        void SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiMode);
+        void SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiMode);
 
         virtual void Progress(double progress, double stepWidth, double beat,
                 int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano);

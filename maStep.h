@@ -21,7 +21,10 @@
 #define STEP_H
 
 void queue_next_step(int queueId);
-void midi_action(int queueId);
+void handle_midi_event(snd_seq_event_t *ev, int queueId = -1);
 
+#if !defined(MA_BLUE)
+void read_midi_ALSA(int queueId);
+#endif
 
 #endif

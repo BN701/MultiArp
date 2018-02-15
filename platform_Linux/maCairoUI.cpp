@@ -785,7 +785,7 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
     Refresh(r);
 }
 
-void CairoUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
+void CairoUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiInputMode)
 {
     if ( !m_Enabled )
     {

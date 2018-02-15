@@ -82,6 +82,7 @@ enum command_t
     C_GATE_NORMAL,
     C_VELOCITY,
     C_TRANSPOSE,
+    C_TEMPO,
 
     C_SCALE,
     C_SCALE_FROM_LIST,
@@ -172,8 +173,10 @@ enum command_t
 
 unordered_map<string, command_t> gCommandList =
 {
+#if !defined(MA_BLUE) || defined(MA_BLUE_PC)
     {"exit", C_EXIT},
     {"quit", C_EXIT},
+#endif
     {"help", C_HELP},
     {"cls", C_RESET_SCREEN},
 
@@ -211,6 +214,8 @@ unordered_map<string, command_t> gCommandList =
     {"gate h", C_GATE_HOLD,},
     {"gate normal", C_GATE_NORMAL,},
     {"gate n", C_GATE_NORMAL,},
+    {"tempo", C_TEMPO},
+    {"te", C_TEMPO},
 
     {"velocity", C_VELOCITY},
     {"vel", C_VELOCITY},
@@ -912,6 +917,23 @@ bool do_command(string commandString)
             }
             break;
 
+#if defined(MA_BLUE)
+        case C_TEMPO :
+            if ( tokens.size() < 2 )
+            {
+                set_status(STAT_POS_2, "Hint: te[mpo] n.nn");
+                break;
+            }
+            fTemp = strtod(tokens[1].c_str(), NULL);
+            if ( fTemp > 0 )
+            {
+                g_State.SetTempo(fTemp);
+                set_status(STAT_POS_2, "New Tempo: %s", tokens[1].c_str());
+                set_top_line();
+            }
+            break;
+#endif
+
         case C_SET_RESETONPATTERNCHANGE : // Auto-reset
             if ( tokens.size() < 2 )
             {
@@ -1391,7 +1413,7 @@ bool handle_key_input(BaseUI::key_command_t key)
 #if 1
         g_TextUI.SendSaveCursor();
         if ( key < BaseUI::key_none)
-            g_TextUI.FWriteXY(40, 25, "Cha: %c (%i)", key, key);
+            g_TextUI.FWriteXY(40, 25, "Key: '%c' (%i)", key, key);
         else
             g_TextUI.FWriteXY(40, 25, "Key: %s (%i)", BaseUI::KeyName(key), key);
         g_TextUI.ClearEOL();

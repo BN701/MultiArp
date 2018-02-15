@@ -22,6 +22,10 @@
 
 #ifdef MA_BLUE
 #include <cstdio>
+
+#include "maState.h"
+extern State g_State;
+
 #else
 #include <alsa/asoundlib.h>
 #endif // MA_BLUE
@@ -211,7 +215,13 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
             {
 #ifdef MA_BLUE
                 // MA_BLUE Todo: What are we going to use for timestamping?
-                double beat = 0;
+                //               Hopefully, incoming event will be timestamped
+                //               and we can calculate a beat from that.
+                //               (If we know start time and have constant tempo,
+                //               then life would be simple, but that isn't going
+                //               to be the case.)
+
+                double beat = g_State.BeatFromEvent(ev);
 #else
                 if ( m_Link == NULL )
                     throw string("ListBuilder::HandleMidi() - Expecting Ableton Link Instance to be set.");

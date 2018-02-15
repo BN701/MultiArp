@@ -172,6 +172,13 @@ void AnsiUI::SendSaveCursor()
     Write("\033[s");
 }
 
+void AnsiUI::SendSaveAndHideCursor()
+{
+    Write("\033[s");    // Save
+    Write("\033[?25h"); // Hide.
+    // Write("\033[?25l"); // Show it again.
+}
+
 //int AnsiUI::CursesAttribute(text_attribute_t attribute)
 //{
 //    switch (attribute)
@@ -494,12 +501,13 @@ void AnsiUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 }
 
 
-void AnsiUI::SetTopLine(int midiChannel, double stepValue, double quantum, int runState, int midiInputMode)
+void AnsiUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiInputMode)
 {
     char text[100];
-    snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
+    snprintf(text, 100, "MultiArp - Midi:%02i, Step:%5.2f, Tempo:%5.2f, Quantum:%5.2f   %s",
                midiChannel,
                stepValue,
+               tempo,
                quantum,
                runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
 
@@ -601,7 +609,7 @@ BaseUI::key_command_t AnsiUI::GetCSISequence(int firstChar)
         key = key_none;
 
     SendSaveCursor();
-    FWriteXY(0, 24, "Esc: ""%s"", %s", sequence.c_str(), KeyName(key));
+    FWriteXY(0, 24, "Esc: \"%s\", %s", sequence.c_str(), KeyName(key));
     ClearEOL();
     SendRestoreCursor();
 

@@ -129,9 +129,10 @@ bool Sequencer::ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t le
     // time in preference to m_NextScheduleTime.
 
     uint64_t note_off_u = static_cast<uint64_t>(ev.time.time.tv_sec) * 1000000 + ev.time.time.tv_nsec/1000 + static_cast<uint64_t>(len) * 1000;
+    ev.type = SND_SEQ_EVENT_NOTEOFF;
     ev.time.time.tv_sec = note_off_u / 1000000;
     ev.time.time.tv_nsec = (note_off_u % 1000000) * 1000;
-    ev.data.note.velocity = 9;
+    ev.data.note.velocity = 0;
 
     return ScheduleEvent(ev);
 }

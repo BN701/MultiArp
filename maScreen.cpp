@@ -89,6 +89,11 @@ void set_top_line()
 {
     g_TextUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
                         g_State.CurrentStepValue(),
+#if defined(MA_BLUE)
+                        g_State.Tempo(),
+#else
+                        120,
+#endif
                         g_State.Quantum(),
                         g_State.RunState(),
                         g_ListBuilder.MidiInputMode() );
@@ -96,6 +101,7 @@ void set_top_line()
 #ifndef MA_BLUE
     g_CairoUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
                         g_State.CurrentStepValue(),
+                        120,
                         g_State.Quantum(),
                         g_State.RunState(),
                         g_ListBuilder.MidiInputMode() );

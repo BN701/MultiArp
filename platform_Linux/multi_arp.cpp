@@ -45,7 +45,7 @@
 //
 /////////////////////////////////////////////////////////////
 
-#ifdef MA_BLUE
+#if defined(MA_BLUE)
 
 #include <chrono>
 #include <poll.h>
@@ -54,6 +54,16 @@
 #include "maSequencer.h"
 Sequencer g_Sequencer;
 ListBuilder g_ListBuilder;
+
+#if defined(MA_BLUE_PC)
+// Direct midi IO with ALSA ...
+// (This should be independent of
+// and ALSA sequencer activity
+// in the main PC build.)
+
+#include "maAlsaTestSupport.h"
+
+#endif
 
 #else
 
@@ -120,31 +130,34 @@ int main(int argc, char *argv[])
 
    g_PatternStore.SetFocus();
 
-#ifdef MA_BLUE
+#if defined(MA_BLUE)
+
+#if defined(MA_BLUE_PC)
+    init_alsa_test_support();
+#endif
 
     set_top_line();
 
     // Poll for keyboard input to start with.
 
-    struct pollfd *pfd = (struct pollfd *)alloca(sizeof(struct pollfd));
+    int npfd = alsa_midi_test_support_GetFileDescriptorCount();
+    struct pollfd *pfd = (struct pollfd *)alloca((npfd + 1) * sizeof(struct pollfd));
     pfd[0].fd = 0;  // stdin
     pfd[0].events = POLLIN;
+    alsa_midi_test_support_GetFileDescriptors(pfd + 1, npfd);
 
     // Queue first events
 
-//    queue_next_step(queueId);
+    queue_next_step(0);
 
     // Polling loop
 
     auto start = chrono::high_resolution_clock::now();
 
-    queue_next_step(0);
-
     bool keep_going = true;
 
     while ( keep_going )
     {
-
         auto elapsed = chrono::high_resolution_clock::now() - start;
         uint64_t microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
 
@@ -158,11 +171,15 @@ int main(int argc, char *argv[])
                     // next tick.
                     queue_next_step(0);
                     break;
+                case SND_SEQ_EVENT_NOTEON:
+                case SND_SEQ_EVENT_NOTEOFF:
+                    alsa_midi_write_event(ev);
+                    break;
             }
             g_Sequencer.PopEvent();
         }
 
-        if ( poll(pfd, 1, 0) > 0 )
+        if ( poll(pfd, 2, 1) > 0 )
         {
             bool keyDataValid = false;
             BaseUI::key_command_t key;
@@ -182,15 +199,24 @@ int main(int argc, char *argv[])
                 keep_going = handle_key_input(key);
             }
 
-//            for ( int i = 2; i < npfd + 2; i++ )
-//            {
-//                if ( pfd[i].revents > 0 )
-//                    midi_action(queueId);
-//            }
+            for ( int i = 1; i < npfd + 1; i++ )
+            {
+                if ( pfd[i].revents > 0 )
+                {
+                    do
+                    {
+                        snd_seq_event_t *ev;
+                        alsa_midi_read_input(& ev);
+                        handle_midi_event(ev);
+                        alsa_midi_free_event(ev);
+                    }
+                    while ( alsa_midi_input_pending() );
+                }
+            }
         }
 
         // Pop this in here so we don't drive the CPU hot by fast looping.
-        std::this_thread::sleep_for(chrono::milliseconds(1));
+//        std::this_thread::sleep_for(chrono::milliseconds(1));
     }
 
 #else
@@ -265,7 +291,7 @@ int main(int argc, char *argv[])
             for ( int i = 2; i < npfd + 2; i++ )
             {
                 if ( pfd[i].revents > 0 )
-                    midi_action(queueId);
+                    read_midi_ALSA(queueId);
             }
         }
     }

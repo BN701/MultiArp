@@ -23,98 +23,53 @@
 #include<inttypes.h>
 #include<string>
 
+#if defined(MA_BLUE)
+#include "alsa_types.h"
+#endif
+
 #include "maTranslateTable.h"
 
 class State
 {
     public:
-        /** Default constructor */
         State();
-        /** Default destructor */
         virtual ~State();
 
         void Step(double stepValueMultiplier);
-
         void Progress(double & progress, double & stepWidth);
-        /** Access m_StepValue
-         * \return The current value of m_StepValue
-         */
+
         double CurrentStepValue() { return m_CurrentStepValue; }
         double LastUsedStepValue() { return m_LastUsedStepValue; }
-        /** Set m_StepValue
-         * \param val New value to set
-         */
+
         void SetCurrentStepValue(double val)
         {
             if ( val <= 0 ) // !!!
                 return;
             m_CurrentStepValue = val;
         }
-        /** Access m_Quantum
-         * \return The current value of m_Quantum
-         */
+
         double Quantum() { return m_Quantum; }
-        /** Set m_Quantum
-         * \param val New value to set
-         */
         void SetQuantum(double val) { m_Quantum = val; }
-        /** Access m_RunState
-         * \return The current value of m_RunState
-         */
-        bool RunState() { return m_RunState; }
-        /** Set m_RunState
-         * \param val New value to set
-         */
+        bool NewQuantumPending();
+        void SetNewQuantumPending( double val );
+
+
         void SetRunState(bool val) { m_RunState = val; }
-        /** Access m_Beat
-         * \return The current value of m_Beat
-         */
-        double Beat() { return m_Beat; }
-        /** Set m_Beat
-         * \param val New value to set
-         */
-        void SetBeat(double val) { m_Beat = val; }
-        /** Access m_Step
-         * \return The current value of m_Step
-         */
-        // int64_t Step() { return m_Step; }
-        /** Set m_Step
-         * \param val New value to set
-         */
-        // void SetStep(int64_t val) { m_Step = val; } // Don't think we ever use this directly.
-        /** Access m_Phase
-         * \return The true if value of m_Phase is zero
-         */
-        double PhaseIsZero() { return m_Phase == 0; } // !!!!
-        /** Access m_Phase
-         * \return The current value of m_Phase
-         */
-        double Phase() { return m_Phase; }
-        /** Set m_Phase
-         * \param val New value to set
-         */
-        void SetPhase(double val) { m_Phase = val; }
-        /** Access m_PatternReset
-         * \return The current value of m_PatternReset
-         */
-        int PatternReset() { return m_PatternReset; }
-        /** Set m_PatternReset
-         * \param val New value to set
-         */
-        void SetPatternReset(int val) { m_PatternReset = val; }
-
-        /*
-            These accessors are used as once-only pairs. A new value is set and
-            a flag is set. When the flag is checked the new value is applied and
-            the flag is cleared.
-         */
-
+        bool RunState() { return m_RunState; }
         void SetNewRunStatePending(bool val, int defer = 0);
         bool NewRunStatePending();
+
         int DeferStop() { return m_DeferStop; }
 
-        void SetNewQuantumPending( double val );
-        bool NewQuantumPending();
+        double Beat() { return m_Beat; }
+        void SetBeat(double val) { m_Beat = val; }
+
+        bool PhaseIsZero();
+        double Phase() { return m_Phase; }
+        void SetPhase(double val) { m_Phase = val; }
+
+        int PatternReset() { return m_PatternReset; }
+        void SetPatternReset(int val) { m_PatternReset = val; }
 
     protected:
 
@@ -122,11 +77,11 @@ class State
 
         double m_CurrentStepValue;
         double m_LastUsedStepValue;
-        double m_Quantum; //!< Member variable "m_Quantum"
-        bool m_RunState; //!< Member variable "m_RunState"
-        double m_Beat; //!< Member variable "m_Beat"
-        double m_Phase; //!< Member variable "m_Phase"
-        int m_PatternReset; //!<Member variable "m_PatternReset"
+        double m_Quantum;
+        bool m_RunState;
+        double m_Beat;
+        double m_Phase;
+        int m_PatternReset;
 
         bool m_NewRunStatePending;
         bool m_NewRunState;
@@ -134,6 +89,21 @@ class State
         int m_NewQuantum;
 
         int m_DeferStop;
+
+#if defined(MA_BLUE)
+    public:
+
+        double Tempo() { return m_Tempo; }
+        void SetTempo( double val ) { m_Tempo = val; }
+
+        double TimeLineMicros() { return m_TimeLineMicros; }
+
+        double BeatFromEvent(snd_seq_event_t *ev);
+
+    private:
+        double m_Tempo = 120.0;
+        double m_TimeLineMicros = 0;  // Incremented by every call to step, tracking beat position, adjusted for tempo.
+#endif
 
 };
 

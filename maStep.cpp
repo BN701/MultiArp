@@ -147,19 +147,19 @@ void queue_next_step(int queueId)
    // Get time of next step from Link.
 
 
-   double nextBeat = g_State.Beat();
+   double nextBeatStrict = g_State.Beat();    // This is absolute beat value since the clock started,
 
-   nextBeat = g_PatternStore.FeelMapForPlay().Adjust(nextBeat);
+   double nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
 
 #ifdef MA_BLUE
    // MA_BLUE Todo: Convert beat (phase) to schedule time
-   chrono::microseconds t_next_usec(llround(nextBeat * 60000000/120));
+//   chrono::microseconds t_next_usec(llround(nextBeat * 60000000/120));
 
-   g_State.SetPhase(fmod(nextBeat, g_State.Quantum()));
+   g_State.SetPhase(fmod(nextBeatStrict, g_State.Quantum()));
 
 #else
    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-   chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeat, g_State.Quantum());
+   chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeatSwung, g_State.Quantum());
 
    g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
 #endif
@@ -177,7 +177,8 @@ void queue_next_step(int queueId)
    uint64_t queue_time_usec = 0;
 
 #ifdef MA_BLUE
-    queue_time_usec = llround(nextBeat * 60000000/120);
+//    queue_time_usec = llround(nextBeat * 60000000/120);
+    queue_time_usec = g_State.TimeLineMicros();
 #else
    if ( g_LinkStartTime.count() < 0 )
    {
@@ -218,7 +219,7 @@ void queue_next_step(int queueId)
 
    if ( g_State.RunState() || gDeferStop-- > 0 )
    {
-        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeat);
+        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
         if ( g_ListBuilder.RealTimeRecord() )
             nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
    }
@@ -227,7 +228,7 @@ void queue_next_step(int queueId)
        return;
 
 #ifdef MA_BLUE
-   double tempo = 120.0;
+   double tempo = g_State.Tempo();
 #else
    double tempo = timeline.tempo();
 #endif
@@ -293,19 +294,12 @@ void queue_next_step(int queueId)
 
 }
 
-void midi_action(int queueId)
+void handle_midi_event(snd_seq_event_t *ev, int queueId)
 {
-    snd_seq_event_t *ev;
-
-    // static ListBuilder listBuilder;
-
     static int otherEvents = 0; // Just for interest.
 
-    do
+    switch (ev->type)
     {
-        g_Sequencer.EventInput(&ev);
-        switch (ev->type)
-        {
         case SND_SEQ_EVENT_ECHO:
             // This is our 'tick', so schedule everything
             // that should happen next, including the
@@ -315,8 +309,8 @@ void midi_action(int queueId)
 
         case SND_SEQ_EVENT_NOTEON:
         case SND_SEQ_EVENT_NOTEOFF:
-           if ( g_ListBuilder.HandleMidi(ev) )
-           {
+            if ( g_ListBuilder.HandleMidi(ev) )
+            {
                // HandleMidi() only returns true in QUICK entry
                // mode, where midi input alone is used to manage
                // notelist updates.
@@ -325,21 +319,32 @@ void midi_action(int queueId)
                g_ListBuilder.Clear();
                set_status(STAT_POS_2, "");
                update_pattern_panel();
-           }
-           else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
-           {
+            }
+            else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
+            {
                show_listbuilder_status();
-           }
+            }
             break;
-            default:
-                otherEvents += 1;
-                break;
-        }
-#ifdef MA_BLUE
-        // Todo MA_BLUE: How does event allocation work?
-#else
+
+        default:
+            otherEvents += 1;
+            break;
+    }
+}
+
+#if !defined(MA_BLUE)
+void read_midi_ALSA(int queueId)
+{
+
+    static int otherEvents = 0; // Just for interest.
+
+    do
+    {
+        snd_seq_event_t *ev;
+        g_Sequencer.EventInput(&ev);
+        handle_midi_event(ev);
         snd_seq_free_event(ev);
-#endif
     }
     while ( g_Sequencer.EventInputPending() );
 }
+#endif

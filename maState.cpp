@@ -17,10 +17,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
 #include "maState.h"
 
 extern State g_State;  // Global State instance.
-
 
 State::State():
     m_CurrentStepValue(16.0),
@@ -45,7 +45,11 @@ State::~State()
 void State::Step(double stepValueMultiplier)
 {
     m_LastUsedStepValue = m_CurrentStepValue;
-    m_Beat += 4.0 * stepValueMultiplier / m_LastUsedStepValue;
+    double beatInc = 4.0 * stepValueMultiplier / m_LastUsedStepValue;
+    m_Beat += beatInc;
+#if defined(MA_BLUE)
+    m_TimeLineMicros += beatInc * 60000000 / m_Tempo;
+#endif
 //    m_Beat += 4 / m_CurrentStepValue;
 }
 
@@ -92,4 +96,18 @@ bool State::NewQuantumPending()
     else
         return false;
 }
+
+bool State::PhaseIsZero()
+{
+    return lround(1000.0 * m_Phase) == 0;
+}
+
+#if defined(MA_BLUE)
+double State::BeatFromEvent(snd_seq_event_t *ev)
+{
+    uint64_t tDelta = ev->time.time.tv_sec * 1000000 + ev->time.time.tv_nsec / 1000 - m_TimeLineMicros;
+
+    return m_Beat + tDelta * m_Tempo;
+}
+#endif
 

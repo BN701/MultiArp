@@ -139,6 +139,14 @@
 		<Unit filename="platform_Linux/maAlsaSequencer.h" />
 		<Unit filename="platform_Linux/maAlsaSequencerQueue.cpp" />
 		<Unit filename="platform_Linux/maAlsaSequencerQueue.h" />
+		<Unit filename="platform_Linux/maAlsaTestSupport.cpp">
+			<Option target="Debug (Blue)" />
+			<Option target="Release (Blue)" />
+		</Unit>
+		<Unit filename="platform_Linux/maAlsaTestSupport.h">
+			<Option target="Debug (Blue)" />
+			<Option target="Release (Blue)" />
+		</Unit>
 		<Unit filename="platform_Linux/maCairoUI.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />

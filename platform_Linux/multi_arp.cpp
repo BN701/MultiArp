@@ -156,28 +156,70 @@ int main(int argc, char *argv[])
 
     bool keep_going = true;
 
+    int loopCount = 0;
     while ( keep_going )
     {
+        loopCount++;
+
         auto elapsed = chrono::high_resolution_clock::now() - start;
         uint64_t microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
 
+        bool callStep = false;
+        bool gotEvent = false;
         while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(microseconds) )
         {
+            gotEvent = true;
             switch (ev->type)
             {
                 case SND_SEQ_EVENT_ECHO:
                     // This is our 'tick', so schedule everything
                     // that should happen next, including the
                     // next tick.
-                    queue_next_step(0);
+//                    queue_next_step(0);
+                    fprintf(stderr, "%12i - Tick, in loop, deferring ...\n", loopCount);
+                    callStep = true;
                     break;
                 case SND_SEQ_EVENT_NOTEON:
+                    fprintf(stderr, "%12i - Note on.\n", loopCount);
+                    alsa_midi_write_event(ev);
+                    break;
                 case SND_SEQ_EVENT_NOTEOFF:
+                    fprintf(stderr, "%12i - Note off.\n", loopCount);
                     alsa_midi_write_event(ev);
                     break;
             }
             g_Sequencer.PopEvent();
         }
+
+        if ( callStep )
+        {
+            fprintf(stderr, "%12i - Tick, deferred, pre-step.\n", loopCount);
+            queue_next_step(0);
+#if 1
+            for ( auto it = g_Sequencer.EventQueue().begin(); it != g_Sequencer.EventQueue().end(); it++ )
+            {
+                const char *evName;
+                switch (it->type)
+                {
+                    case SND_SEQ_EVENT_NOTEON:
+                        evName = "Note On";
+                        break;
+                    case SND_SEQ_EVENT_NOTEOFF:
+                        evName = "Note Off";
+                        break;
+                    case SND_SEQ_EVENT_ECHO:
+                        evName = "Echo";
+                        break;
+                }
+                fprintf(stderr, "\t\tQueue: %s %i:%i\n", evName, it->time.time.tv_sec, it->time.time.tv_nsec);
+            }
+#endif
+
+            fprintf(stderr, "%12i - Tick, deferred, post-step.\n", loopCount);
+        }
+
+        if ( gotEvent )
+            fprintf(stderr, "\n");
 
         if ( poll(pfd, 2, 1) > 0 )
         {

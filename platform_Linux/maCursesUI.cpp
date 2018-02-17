@@ -496,10 +496,10 @@ void CursesUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 void CursesUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiInputMode)
 {
     char text[100];
-    snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Link Quantum:%5.2f     %s",
+    snprintf(text, 100, "Multi Arp - Midi:%02i, Step:%5.2f, Tempo: %5.1f, Link Quantum:%5.2f     %s",
                midiChannel,
                stepValue,
-               120,
+               tempo,
                quantum,
                runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
 

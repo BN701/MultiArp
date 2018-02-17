@@ -165,7 +165,7 @@ struct Pattern
     void SetRealTimeQuantum(std::string & token);
     void SetRealTimeStartPhase(std::string & token);
     void StartRealTimeEcho(std::vector<std::string>::iterator token, std::vector<std::string>::iterator last);
-    void AddListFromString(std::vector<int>::size_type index, std::string s);
+    bool AddStepListFromString(std::vector<int>::size_type index, std::string s);
     void SetFieldsFromString(std::string s);
 
     void ReplaceList(StepList & noteList);

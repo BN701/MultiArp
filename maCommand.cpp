@@ -62,6 +62,7 @@ enum command_t
     C_EXIT,
     C_HELP,
     C_RESET_SCREEN,
+    C_CRASH_TEST,
 
     C_RUN,
     C_STOP,
@@ -179,6 +180,8 @@ unordered_map<string, command_t> gCommandList =
 #endif
     {"help", C_HELP},
     {"cls", C_RESET_SCREEN},
+
+    {"crash", C_CRASH_TEST},
 
     {"label", C_SET_LABEL},
     {"name", C_SET_LABEL},
@@ -542,6 +545,11 @@ bool do_command(string commandString)
         case C_RESET_SCREEN:
             g_TextUI.ResetScreen();
             set_top_line();
+            break;
+
+        case C_CRASH_TEST:
+            while (true)
+                ;
             break;
 
 

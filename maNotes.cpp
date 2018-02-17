@@ -51,7 +51,7 @@ unordered_map<int, string> mapNumbersToNotes =
 unordered_map<string, int> mapNotesToNumbers =
 {
 
-    {"R", -1}, {"Rest", -1}, {"-", -1},
+    {"R", -1}, {"Rest", -1}, {"r", -1}, {"rest", -1}, {"-", -1},
 
     {"B#0", 0},{"C0", 0},
     {"C#0", 1},{"Db0", 1},
@@ -273,7 +273,7 @@ string Note::ToString(bool fullFormat)
     return buffer;
 }
 
-void Note::FromString(string s)
+bool Note::NoteFromString(string s)
 {
 
     // We may have leading white space, which will throw the map look-up,
@@ -283,7 +283,11 @@ void Note::FromString(string s)
     vector<string> tokens = split(s.c_str(), ' ');
 
     if ( tokens.size() >= 1 )
+    {
+        if ( mapNotesToNumbers.count(tokens.at(0)) == 0 )
+            return false;
         m_NoteNumber = mapNotesToNumbers.at(tokens.at(0));
+    }
     else
         m_NoteNumber = -1;
 
@@ -306,6 +310,7 @@ void Note::FromString(string s)
     else
         m_Length = 0.0;
 
+    return true;
 }
 
 void Note::SetStatus()
@@ -485,7 +490,7 @@ string Cluster::ToString(bool fullFormat)
     return result;
 }
 
-void Cluster::FromString(string s)
+bool Cluster::ClusterFromString(string s)
 {
     replace( s.begin(), s.end(), '/', ' ');         // Support both spacers.
     vector<string> noteStrings = split(s.c_str());
@@ -493,28 +498,17 @@ void Cluster::FromString(string s)
     if ( noteStrings.size() == 0 )
     {
         // Empty notes are rests, so leave the note list empty.
-        return;
+        return true;
     }
 
     for ( vector<string>::iterator it = noteStrings.begin(); it != noteStrings.end(); it++ )
     {
         Note n;
-#ifndef MA_BLUE
-        try
-        {
-#endif
-            n.FromString(*it);
+        if ( n.NoteFromString(*it) )
             m_Notes.push_back(n);
-#ifndef MA_BLUE
-        }
-        catch (...)
-        {
-            // Do nothing with this, we just want to
-            // carry on and try the next note.
-        }
-#endif
-
     }
+
+    return ! m_Notes.empty();
 }
 
 Cluster * StepList::Step()
@@ -788,13 +782,13 @@ string StepList::ToStringForDisplay2(int & offset, int & length, unsigned width)
     return result;
 }
 
-void StepList::FromString(string s)
+bool StepList::StepListFromString(string s)
 {
     vector<string> chordStrings = split(s.c_str(), ',', true);
 
     if ( chordStrings.size() == 0 )
 #ifdef MA_BLUE
-        return;
+        return false;
 #else
         throw string("Note List parse error: nothing found.");
 #endif
@@ -804,9 +798,11 @@ void StepList::FromString(string s)
     for ( vector<string>::iterator it = chordStrings.begin(); it != chordStrings.end(); it++ )
     {
         Cluster chord;
-        chord.FromString(*it);
-        m_Clusters.push_back(chord);
+        if ( chord.ClusterFromString(*it) )
+            m_Clusters.push_back(chord);
     }
+
+    return !m_Clusters.empty();
 }
 
 void StepList::SetStatus()
@@ -1388,7 +1384,8 @@ void RealTimeList::FromString(string s)
     for ( vector<string>::iterator it = tokens.begin() + 1; it != tokens.end(); it++ )
     {
         Note note;
-        note.FromString(*it);
+        if ( !note.NoteFromString(*it) )
+            continue;
 
         // Check for existing entries and adjust start time if found.
 

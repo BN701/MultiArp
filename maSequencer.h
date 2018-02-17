@@ -101,6 +101,7 @@ class Sequencer
 //            snd_seq_set_client_name(m_SeqHandle, name);
 //        }
 
+        std::forward_list<snd_seq_event_t> & EventQueue() { return m_EventQueue; }
     private:
 
 //        snd_seq_t *m_SeqHandle;

@@ -228,6 +228,7 @@ unordered_map<int, const char *> attribute_strings =
     {BaseUI::attr_normal, "\033[0m"},
     {BaseUI::attr_bold, "\033[1m"},
     {BaseUI::attr_underline, "\033[4m"},
+    {BaseUI::attr_blink, "\033[5m"},
     {BaseUI::attr_reverse, "\033[7m"}
 };
 

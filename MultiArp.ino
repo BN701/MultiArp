@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <avr/wdt.h>
+
 #include "maAnsiUI.h"
 #include "maCommand.h"
 #include "maListBuilder.h"
@@ -26,14 +28,74 @@ extern "C"{
     int _write(){return -1;}
 }
 
-vector<string> words = {"Progress ...", "         ... bar ...", "                 ... here."};
+// Watchdog things
 
-unordered_map<string, int> testMap =
+void startup_early_hook()
 {
-    {"Progress ...", 1},
-    {"         ... bar ...", 7},
-    {"                 ... here.", 400}
-};
+    WDOG_TOVALL = (1000); // The next 2 lines sets the time-out value. This is the value that the watchdog timer compare itself to.
+    WDOG_TOVALH = 0;
+    WDOG_STCTRLH = (WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_WDOGEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN); // Enable WDG
+    //WDOG_PRESC = 0; // prescaler
+}
+
+volatile int deliberateStall = 0;
+volatile uint8_t dogCount = 0;
+IntervalTimer wdTimer;
+
+
+void DogHandler()
+{
+    // Can we just grab the programcounter first, every time,
+    // but only do something with it if we think there's a problem.
+
+#if 0
+  // Setup a pointer to the program counter. It goes in a register so we
+  // don't mess up the stack.
+  uint8_t upStack = (uint8_t*)SP;
+
+  // The stack pointer on the AVR micro points to the next available location
+  // so we want to go back one location to get the first byte of the address
+  // pushed onto the stack when the interrupt was triggered. There will be
+  // PROGRAM_COUNTER_SIZE bytes there.
+  ++upStack;
+//void CApplicationMonitor::WatchdogInterruptHandler(uint8_t *puProgramAddress)
+//  CApplicationMonitorHeader Header;
+//
+//  LoadHeader(Header);
+//  memcpy(m_CrashReport.m_auAddress, puProgramAddress, PROGRAM_COUNTER_SIZE);
+//  SaveCurrentReport(Header.m_uNextReport);
+
+#endif
+
+//  Serial.print("Kicking the dog! ");
+//  Serial.println(dogCount++);
+    if ( dogCount > 0 )
+    {
+        static bool firstTime = true;
+        if ( firstTime )
+        {
+            Serial.print("\033[12;20H !!! Main loop stopped ... !!! ");
+            // Adding (reverse) attribute here seems to affect other writes.
+//            Serial.print("\033[12;25H\033[5m Main loop stopped ... !!! ");
+            // First time doesn't work. We seem to need second or third
+            // attempt before anything appears.
+//            firstTime = false;
+        }
+        deliberateStall = 0;
+//        if ( dogCount % 8 == 0 )
+        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    }
+//    else
+//        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    noInterrupts();
+    WDOG_REFRESH = 0xA602;
+    WDOG_REFRESH = 0xB480;
+    interrupts();
+    dogCount ++;
+}
+
+
+
 
 Sequencer g_Sequencer;
 ListBuilder g_ListBuilder;
@@ -73,13 +135,23 @@ uint64_t UpdateSysTimeMicros()
     return g_SysTimeMicros = (static_cast<uint64_t>(time_wraps) << 32) + current_u;
 }
 
-
 void setup()
 {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+    digitalWrite(LED_BUILTIN, LOW);
+
     g_PatternStore.SetFocus();
 
     Serial.begin(115200);
     delay(1000); // Do this else the following print() is missed.
+    // You have about 6 secs to open the serial monitor before a watchdog reset
+    while(!Serial);
+    delay(100);
+//    printResetType();
+    wdTimer.begin(DogHandler, 500000); // kick the dog every 500msec
+
     g_TextUI.FWriteXY(0, 0, "Hello, world ...");
     delay(1000);
 
@@ -89,9 +161,16 @@ void setup()
 
 }
 
-void loop() {
+int loopCount = 0;
+
+void loop()
+{
+    dogCount = 0;
 
     UpdateSysTimeMicros();
+
+//    if ( ++loopCount % 50000 == 0 )
+//        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
     // User input ...
 
@@ -163,8 +242,11 @@ void loop() {
 
     // Midi send queue ...
 
-    uint8_t midiChannel = g_Sequencer.MidiChannel();
+    uint8_t midiChannel = g_Sequencer.MidiChannel() + 1; // usbMIDI not zero based, it seems.
     bool callStep = false;
+    bool sendNow = false;
+
+    int eventsProcessed = 0;
     while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(g_SysTimeMicros) )
     {
         switch (ev->type)
@@ -174,22 +256,35 @@ void loop() {
                 // that should happen next, including the
                 // next tick.
                 callStep = true;    // Defer until we've sent out all other midi.
+                digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 //                queue_next_step(0);
                 break;
             case SND_SEQ_EVENT_NOTEON:
+//                digitalWrite(LED_BUILTIN, HIGH);
                 usbMIDI.sendNoteOn(ev->data.note.note, ev->data.note.velocity, midiChannel);
-                usbMIDI.send_now();
+                sendNow = true;
                 break;
             case SND_SEQ_EVENT_NOTEOFF:
+//                digitalWrite(LED_BUILTIN, LOW);
                 usbMIDI.sendNoteOff(ev->data.note.note, ev->data.note.velocity, midiChannel);
-                usbMIDI.send_now();
+                sendNow = true;
                 break;
         }
         g_Sequencer.PopEvent();
+        eventsProcessed++;
     }
 
     if ( callStep )
+    {
+//        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
         queue_next_step(0);
+    }
+
+    if ( sendNow )
+    {
+        g_TextUI.FWriteXY(4, 8, "Events: %i", eventsProcessed);
+        usbMIDI.send_now();
+    }
 
 #if 0
     // Occasional debug code ...

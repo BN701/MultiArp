@@ -313,7 +313,7 @@ bool Pattern::FromString(string s, int & updates)
 #else
                 throw string("Pattern::FromString(), Step parameter list is empty.");
 #endif
-            AddListFromString(index, s.substr(pos));
+            AddStepListFromString(index, s.substr(pos));
             updates += 1;
             return true;
         }
@@ -327,7 +327,7 @@ bool Pattern::FromString(string s, int & updates)
 #else
                 throw string("Pattern::FromString(), Step parameter list is empty.");
 #endif
-            AddListFromString(index, s.substr(pos));
+            AddStepListFromString(index, s.substr(pos));
             updates += 1;
             return true;
         }
@@ -380,20 +380,29 @@ bool Pattern::FromString(string s, int & updates)
 #endif
 }
 
-void Pattern::AddListFromString(vector<StepList>::size_type index, string s)
+bool Pattern::AddStepListFromString(vector<StepList>::size_type index, string s)
 {
     if ( index < 0 )
 #ifdef MA_BLUE
-        return;
+        return false;
 #else
         throw string("Pattern::AddListFromString(), invalid list index.");
 #endif
 
+    auto prevListSize = m_StepListSet.size();
+
     if ( index >= m_StepListSet.size() )
         m_StepListSet.resize(index + 1);
 
-//    m_StepListSet.at(index).Clear();
-    m_StepListSet.at(index).FromString(s);
+    if ( m_StepListSet.at(index).StepListFromString(s) )
+        return true;
+
+    // If initialization fails and we end up with an empty list,
+    // set the list back to its previous size. (Destructors
+    // are called by this process.)
+
+    m_StepListSet.resize(prevListSize);
+    return false;
 }
 
 void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum)

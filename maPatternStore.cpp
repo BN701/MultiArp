@@ -747,7 +747,7 @@ void PatternStore::DeleteCurrentRealTimeList()
 
 string PatternStore::ListManager(string commandString, vector<string> & tokens)
 {
-    int index;
+    uint16_t index;
 
     // We're guaranteed to have at least a second token.
     // (The calling routine doesn't call if there's only one.)
@@ -762,7 +762,8 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
         m_Patterns.at(m_PosEdit).NewList();
         return "Empty list created.";
     }
-    else if ( tokens[1] == "delete")
+
+    if ( tokens[1] == "delete" || tokens[1] == "del" )
     {
         if ( m_Patterns.empty() || m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
             return "Nothing to delete.";
@@ -770,26 +771,15 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
         return "Current list deleted.";
     }
 
-
     // For everything else, we need a list index and that should
     // be the next token.
 
-#ifndef MA_BLUE
-    try
-    {
-#endif
-        index = strtol(tokens.at(1).c_str(), NULL, 0) - 1;
+    index = strtol(tokens.at(1).c_str(), NULL, 0);
 
-        if ( index < 0 )
-            return "List cannot be less than zero.";
+    if ( index <= 0 )
+        return "List index is bad or missing.";
 
-#ifndef MA_BLUE
-    }
-    catch ( invalid_argument e )
-    {
-        return "List number not valid.";
-    }
-#endif
+    index -= 1;
 
     // If we just have a list index, display list and set list pointer
     // to this index, then return.
@@ -811,8 +801,16 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
 
     if ( tokens.at(2) == "clear" )
     {
-        m_Patterns.at(m_PosEdit).m_StepListSet.at(index).Clear();
-        return "List cleared.";
+        if ( m_Patterns.empty() )
+            return "Pattern List is empty.";
+
+        if ( index < m_Patterns.at(m_PosEdit).m_StepListSet.size() )
+        {
+            m_Patterns.at(m_PosEdit).m_StepListSet.at(index).Clear();
+            return "List cleared.";
+        }
+        else
+            return "List doesn't exist.";
     }
 
     // If we get to here, expect an actual note list.
@@ -821,9 +819,10 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
         m_Patterns.emplace_back();
 
     int pos = tokens.at(0).size() + tokens.at(1).size() + 1;
-    m_Patterns.at(m_PosEdit).AddListFromString(index, commandString.substr(pos));
-
-    return "List updated.";
+    if ( m_Patterns.at(m_PosEdit).AddStepListFromString(index, commandString.substr(pos)) )
+        return "List updated.";
+    else
+        return "Nothing changed.";
 }
 
 

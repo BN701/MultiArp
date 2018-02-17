@@ -79,7 +79,7 @@ struct Note : public CursorKeys
     {}
 
     std::string ToString(bool fullFormat = true);
-    void FromString(std::string);
+    bool NoteFromString(std::string);
 
     static const char * NoteNameOnly(int n); // Expose the notes/numbers look up table.
     static std::string NoteString(int n); // Expose the notes/numbers look up table.
@@ -153,7 +153,7 @@ struct Cluster : public CursorKeys
     int StepsTillNextNote() { return m_StepLength; }
 
     std::string ToString(bool fullFormat = true);
-    void FromString(std::string s);
+    bool ClusterFromString(std::string s);
 
     virtual void SetStatus();
     protected:
@@ -240,7 +240,7 @@ struct StepList : public CursorKeys
     std::string ToString(bool fullFormat = true);
     std::string ToStringForDisplay(int & offset, int & length);
     std::string ToStringForDisplay2(int & offset, int & length, unsigned width = 80);
-    void FromString(std::string s);
+    bool StepListFromString(std::string s);
 
 //    bool PlayPositionInfo(int & offset,  int & length);
 

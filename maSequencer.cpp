@@ -19,6 +19,7 @@
 
 #include "maSequencer.h"
 
+#include <cstdio>
 #include <cstring>
 
 Sequencer::Sequencer()
@@ -43,23 +44,21 @@ uint64_t EventTimeToMicros(snd_seq_event_t & ev)
 
 snd_seq_event_t * Sequencer::GetEvent(uint64_t t)
 {
-    if ( !m_EventQueue.empty() )
-    {
-        snd_seq_event_t * ev = & m_EventQueue.front();
+    if ( m_EventQueue.empty() )
+        return NULL;
 
-        if ( EventTimeToMicros(*ev) <= t )
-            return ev;
-    }
-
-    return NULL;
+    if ( EventTimeToMicros(m_EventQueue.front()) <= t )
+        return & m_EventQueue.front();
+    else
+        return NULL;
 }
 
 
 void Sequencer::PopEvent()
 {
     m_EventQueue.pop_front();
-
-
+    if ( !m_EventQueue.empty() )
+        m_tQueueHead = EventTimeToMicros(m_EventQueue.front());
 }
 
 void Sequencer::SetScheduleTime(uint64_t t)
@@ -82,7 +81,7 @@ bool Sequencer::ScheduleEvent(snd_seq_event_t & ev)
     if ( m_EventQueue.empty() || t <= m_tQueueHead )
     {
         m_tQueueHead = t;
-        m_EventQueue.emplace_front(ev);
+        m_EventQueue.push_front(ev);
     }
 //    else if ( t >= m_tQueueTail )
 //    {
@@ -101,7 +100,7 @@ bool Sequencer::ScheduleEvent(snd_seq_event_t & ev)
             lastIt = it;
         }
         if ( lastIt != m_EventQueue.end() )
-            m_EventQueue.emplace_after(lastIt, ev);
+            m_EventQueue.insert_after(lastIt, ev);
     }
 
     return true;

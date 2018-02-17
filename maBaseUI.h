@@ -130,7 +130,8 @@ class BaseUI
             attr_normal = 0,
             attr_bold = 1,
             attr_underline = 2,
-            attr_reverse = 4
+            attr_reverse = 4,
+            attr_blink = 8
         };
 
         enum window_area_t

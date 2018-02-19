@@ -885,7 +885,7 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
         if ( i == m_PosEdit )
         {
             result += " -> ";
-//             highlights.push_back(PosInfo2(row, 1, 2));
+            // highlights.push_back(PosInfo2(row, 1, 2));
         }
         else
             result += "    ";
@@ -931,13 +931,13 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
         if ( i == m_PosRealTimeEdit )
         {
             result += " -> ";
-            highlights.push_back(PosInfo2(row, 1, 2));
+            // highlights.push_back(PosInfo2(row, 1, 2));
         }
         else
             result += "    ";
-        highlights.push_back(PosInfo2(row, 4, 5));
+        // highlights.push_back(PosInfo2(row, 4, 5));
         result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
-        highlights.push_back(PosInfo2(row++, offset + 4, length));
+        // highlights.push_back(PosInfo2(row++, offset + 4, length));
         result += '\n';
     }
 

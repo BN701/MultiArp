@@ -192,8 +192,20 @@ void AnsiUI::SendSaveAndHideCursor()
 //    };
 //}
 
-void AnsiUI::ClearArea(window_area_t area)
+void AnsiUI::ClearArea(window_area_t area, int firstRow)
 {
+    WindowRect R = AreaToWindowRect(area);
+
+    string pad;
+    pad.insert(0, R.m_iWidth, ' ');
+
+    int col = 0;
+    int row = 0;
+
+    R.MapToFullScreen(col, row);
+    for ( int r = firstRow; r < R.m_iHeight; r++ )
+        WriteXY(col, row + r, pad.c_str());
+
 //    WINDOW * window = AreaToWindow(area);
 //    wmove(window, 0, 0);
 //    wclrtobot(window);

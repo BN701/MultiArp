@@ -81,7 +81,7 @@ class AnsiUI : public BaseUI
         }
         void HighlightLastWrite(uint16_t col, uint16_t len, uint16_t colour = 0, text_attribute_t attr = attr_reverse);
         void Highlight(window_area_t area, int row, int col, int len, int colour, text_attribute_t attr = attr_normal);
-        void ClearArea(window_area_t area);
+        void ClearArea(window_area_t area, int firstRow = 0);
         void PlaceCursor(int row, int col);
         void PlaceCursorXY(int col, int row)
         {

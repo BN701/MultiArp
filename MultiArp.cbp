@@ -104,12 +104,6 @@
 		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
 		<Unit filename="maCommand.h" />
-		<Unit filename="maCrashStuff.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="Debug (Blue)" />
-			<Option target="Release (Blue)" />
-		</Unit>
 		<Unit filename="maCursesUI.h" />
 		<Unit filename="maCursorKeys.cpp" />
 		<Unit filename="maCursorKeys.h" />

@@ -24,7 +24,11 @@
 #include <chrono>
 #include <forward_list>
 
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 #include "alsa_types.h"
+#else
+#include <alsa/asoundlib.h>
+#endif
 
 class Sequencer
 {

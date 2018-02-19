@@ -18,6 +18,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
+
+#include "maBaseUI.h"
 #include "maListBuilder.h"
 
 #ifdef MA_BLUE
@@ -156,11 +158,11 @@ std::string ListBuilder::ToString()
 }
 
 
-bool ListBuilder::HandleKeybInput(int c)
+bool ListBuilder::HandleKeybInput(int key)
 {
-    switch (c)
+    switch (key)
     {
-        case 10:
+        case BaseUI::key_return:
             switch ( m_MidiInputMode )
             {
             case MIDI_INPUT_REAL_TIME:
@@ -173,11 +175,11 @@ bool ListBuilder::HandleKeybInput(int c)
                 return false;
             }
 
-        case 32:
+        case BaseUI::key_space:
             m_StepList.Add();
             return true;
 
-        case KEY_BACKSPACE:
+        case BaseUI::key_backspace:
             switch ( m_MidiInputMode )
             {
             case MIDI_INPUT_REAL_TIME:

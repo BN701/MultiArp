@@ -586,21 +586,28 @@ bool do_command(string commandString)
             }
 #if defined(MA_BLUE)
             iTemp = strtol(tokens[1].c_str(), NULL, 0);
+            if ( iTemp == 0 )
+            {
+               set_status(STAT_POS_2, "Invalid pattern number.");
+               break;
+            }
 #else
             iTemp = stoi(tokens[1].c_str());
 #endif
-           if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
-           {
-               set_status(STAT_POS_2,"Requested pattern number out of range at the moment.");
+            iTemp -= 1;
+            if ( ! g_PatternStore.ValidPosition(iTemp) )
+            {
+               set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
                break;
-           }
+            }
             set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
-           g_PatternStore.SetNewPatternPending(iTemp);
+            g_PatternStore.SetNewPatternPending(iTemp);
             break;
 
         case C_EDIT :
             if ( tokens.size() < 2 )
             {
+                // No value specified, just open the menu.
                 g_PatternStore.SetFocus();
                 g_PatternStore.SetStatus();
                 show_status_after_navigation();
@@ -609,10 +616,16 @@ bool do_command(string commandString)
             {
 #if defined(MA_BLUE)
                 iTemp = strtol(tokens[1].c_str(), NULL, 0);
+                if ( iTemp == 0 )
+                {
+                   set_status(STAT_POS_2, "Invalid pattern number.");
+                   break;
+                }
 #else
                 iTemp = stoi(tokens[1].c_str());
 #endif
-                if ( ! g_PatternStore.ValidPosition(iTemp - 1) )
+                iTemp -= 1;
+                if ( ! g_PatternStore.ValidPosition(iTemp) )
                 {
                     set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
                     break;
@@ -1151,7 +1164,6 @@ bool do_command(string commandString)
             show_status();
             break;
 
-
        case C_TRIGS:
            if ( firstParameter > 0 )
            {
@@ -1208,7 +1220,7 @@ bool do_command(string commandString)
             iTemp = stoi(tokens[0]);
 #endif
             // Function returns a format string. Too obfuscated?
-           set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp).c_str(), iTemp);
+            set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp - 1).c_str(), iTemp);
             break;
         default :
             break;
@@ -1482,17 +1494,17 @@ bool handle_key_input(BaseUI::key_command_t key)
             result = do_command(commandString);
             commandString.clear();
         }
-else if ( g_ListBuilder.HandleKeybInput(10) )
-{
-    if ( g_ListBuilder.RealTimeRecord() )
-        g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
-    else
-        g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-    g_ListBuilder.Clear();
-    update_pattern_panel();
-    set_status(STAT_POS_2, "");
-}
-        else if ( CursorKeys::RouteKey(BaseUI::key_return) )
+        else if ( g_ListBuilder.HandleKeybInput(key) )
+        {
+            if ( g_ListBuilder.RealTimeRecord() )
+                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+            else
+                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+            g_ListBuilder.Clear();
+            update_pattern_panel();
+            set_status(STAT_POS_2, "");
+        }
+        else if ( CursorKeys::RouteKey(key) )
         {
             show_status_after_navigation();
         }
@@ -1504,7 +1516,7 @@ else if ( g_ListBuilder.HandleKeybInput(10) )
         if ( commandString.empty() )
         {
 #ifdef MA_BLUE
-           if ( g_ListBuilder.HandleKeybInput(32) )
+           if ( g_ListBuilder.HandleKeybInput(key) )
 #else
             if ( g_ListBuilder.HandleKeybInput(' ') )
 #endif
@@ -1532,9 +1544,9 @@ else if ( g_ListBuilder.HandleKeybInput(10) )
     case BaseUI::key_backspace: // XK_BackSpace:
         if ( commandString.size() > 0 )
             commandString.pop_back();
-       else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_backspace) )
+       else if ( g_ListBuilder.HandleKeybInput(key) )
            show_listbuilder_status();
-        else if ( CursorKeys::RouteKey(BaseUI::key_backspace) )
+        else if ( CursorKeys::RouteKey(key) )
             show_status_after_navigation();
         place_cursor(COMMAND_HOME + commandString.size());
         set_status(COMMAND_HOME, commandString.c_str());

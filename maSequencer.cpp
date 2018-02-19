@@ -18,6 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "maSequencer.h"
+#include "maUtility.h"
 
 #include <cstdio>
 #include <cstring>
@@ -30,16 +31,6 @@ Sequencer::Sequencer()
 Sequencer::~Sequencer()
 {
     //dtor
-}
-
-uint64_t AlsaTimeStampToMicros(snd_seq_timestamp & t)
-{
-    return static_cast<uint64_t>(t.time.tv_sec) * 1000000 + t.time.tv_nsec/1000;
-}
-
-uint64_t EventTimeToMicros(snd_seq_event_t & ev)
-{
-    return AlsaTimeStampToMicros(ev.time);
 }
 
 snd_seq_event_t * Sequencer::GetEvent(uint64_t t)

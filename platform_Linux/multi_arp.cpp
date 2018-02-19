@@ -165,10 +165,10 @@ int main(int argc, char *argv[])
         uint64_t microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
 
         bool callStep = false;
-        bool gotEvent = false;
+//        bool gotEvent = false;
         while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(microseconds) )
         {
-            gotEvent = true;
+//            gotEvent = true;
             switch (ev->type)
             {
                 case SND_SEQ_EVENT_ECHO:
@@ -176,15 +176,15 @@ int main(int argc, char *argv[])
                     // that should happen next, including the
                     // next tick.
 //                    queue_next_step(0);
-                    fprintf(stderr, "%12i - Tick, in loop, deferring ...\n", loopCount);
+//                    fprintf(stderr, "%12i - Tick, in loop, deferring ...\n", loopCount);
                     callStep = true;
                     break;
                 case SND_SEQ_EVENT_NOTEON:
-                    fprintf(stderr, "%12i - Note on.\n", loopCount);
+//                    fprintf(stderr, "%12i - Note on.\n", loopCount);
                     alsa_midi_write_event(ev);
                     break;
                 case SND_SEQ_EVENT_NOTEOFF:
-                    fprintf(stderr, "%12i - Note off.\n", loopCount);
+//                    fprintf(stderr, "%12i - Note off.\n", loopCount);
                     alsa_midi_write_event(ev);
                     break;
             }
@@ -193,9 +193,9 @@ int main(int argc, char *argv[])
 
         if ( callStep )
         {
-            fprintf(stderr, "%12i - Tick, deferred, pre-step.\n", loopCount);
             queue_next_step(0);
-#if 1
+#if 0
+            fprintf(stderr, "%12i - Tick, deferred, pre-step.\n", loopCount);
             for ( auto it = g_Sequencer.EventQueue().begin(); it != g_Sequencer.EventQueue().end(); it++ )
             {
                 const char *evName;
@@ -213,15 +213,15 @@ int main(int argc, char *argv[])
                 }
                 fprintf(stderr, "\t\tQueue: %s %i:%i\n", evName, it->time.time.tv_sec, it->time.time.tv_nsec);
             }
+            fprintf(stderr, "%12i - Tick, deferred, post-step.\n", loopCount);
 #endif
 
-            fprintf(stderr, "%12i - Tick, deferred, post-step.\n", loopCount);
         }
 
-        if ( gotEvent )
-            fprintf(stderr, "\n");
+//        if ( gotEvent )
+//            fprintf(stderr, "\n");
 
-        if ( poll(pfd, 2, 1) > 0 )
+        if ( poll(pfd, 2, 1) > 0 )  // Short time out, 1 msec, still longer than MCU loop
         {
             bool keyDataValid = false;
             BaseUI::key_command_t key;
@@ -249,6 +249,8 @@ int main(int argc, char *argv[])
                     {
                         snd_seq_event_t *ev;
                         alsa_midi_read_input(& ev);
+                        ev->time.time.tv_sec = microseconds/1000000;
+                        ev->time.time.tv_nsec = (microseconds % 1000000) * 1000;
                         handle_midi_event(ev);
                         alsa_midi_free_event(ev);
                     }

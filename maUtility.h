@@ -23,6 +23,12 @@
 #include <vector>
 #include <string>
 
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+#include "alsa_types.h"
+#else
+#include <alsa/asoundlib.h>
+#endif
+
 
 std::vector<std::string> split(const char *str, char c = ' ', bool wantEmptyTokens = false);
 std::string find_token(std::string s, const char * name);
@@ -41,6 +47,8 @@ double tidy_3(double val);
 bool equals(double val1, double val2, int dp = 3);
 bool equals_3(double val1, double val2);
 
+uint64_t EventTimeToMicros(snd_seq_event_t & ev);
+uint64_t AlsaTimeStampToMicros(snd_seq_timestamp & t);
 
 
 

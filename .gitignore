@@ -7,6 +7,7 @@ bin/
 *.log
 *.bmarks
 *.hex
+log*.txt
 
 # Prerequisites
 *.d

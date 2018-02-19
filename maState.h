@@ -23,11 +23,12 @@
 #include<inttypes.h>
 #include<string>
 
-#if defined(MA_BLUE)
-#include "alsa_types.h"
-#endif
+//#if defined(MA_BLUE)
+//#include "alsa_types.h"
+//#endif
 
 #include "maTranslateTable.h"
+#include "maUtility.h"
 
 class State
 {

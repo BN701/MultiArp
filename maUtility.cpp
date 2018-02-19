@@ -210,6 +210,18 @@ std::string get_clipboard()
 }
 #endif
 
+uint64_t AlsaTimeStampToMicros(snd_seq_timestamp & t)
+{
+    return static_cast<uint64_t>(t.time.tv_sec) * 1000000 + t.time.tv_nsec/1000;
+}
+
+uint64_t EventTimeToMicros(snd_seq_event_t & ev)
+{
+    return AlsaTimeStampToMicros(ev.time);
+}
+
+
+
 int64_t gcd(int64_t a, int64_t b)
 {
     for (;;)

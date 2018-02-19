@@ -282,7 +282,7 @@ void loop()
 
     if ( sendNow )
     {
-        g_TextUI.FWriteXY(4, 8, "Events: %i", eventsProcessed);
+//        g_TextUI.FWriteXY(4, 8, "Events: %i", eventsProcessed);
         usbMIDI.send_now();
     }
 

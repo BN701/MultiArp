@@ -105,8 +105,9 @@ bool State::PhaseIsZero()
 #if defined(MA_BLUE)
 double State::BeatFromEvent(snd_seq_event_t *ev)
 {
-    uint64_t tDelta = ev->time.time.tv_sec * 1000000 + ev->time.time.tv_nsec / 1000 - m_TimeLineMicros;
-
+//    uint64_t tMicros = static_cast<int64_t>(ev->time.time.tv_sec) * 1000000 + ev->time.time.tv_nsec / 1000;
+    uint64_t tMicros = EventTimeToMicros(*ev);
+    double tDelta = (tMicros - m_TimeLineMicros)/60000000.0;
     return m_Beat + tDelta * m_Tempo;
 }
 #endif

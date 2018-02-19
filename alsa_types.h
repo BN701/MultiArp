@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 typedef unsigned char snd_seq_event_type_t;
 
 typedef struct snd_seq_real_time {
@@ -64,5 +65,5 @@ typedef struct snd_seq_event {
 #define SND_SEQ_EVENT_NOTEOFF   7
 #define SND_SEQ_EVENT_ECHO     50
 
-
+#endif
 #endif // ALSA_TYPES_H_INCLUDED

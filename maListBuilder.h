@@ -20,7 +20,7 @@
 #ifndef LISTBUILDER_H
 #define LISTBUILDER_H
 
-#ifdef MA_BLUE
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 
 #include "alsa_types.h"
 

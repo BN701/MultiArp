@@ -117,21 +117,3 @@ When the sequencer is running, type the number of the pattern that you want to p
 If  ***pattern chain*** mode is active, the number will be interpreted as a stage in the pattern chain, and new stage will become active when the beat reaches the end of the current *quantum*. This overrides the stage that would otherwise play and is useful, for instance, when you want to jump away from a chain stage that is marked for indefinite repeat.
 
 This is the one case where you use the command line without typing a command.
-
----
-
-
-
-```
-{"help", C_HELP},
-
-
-
-
-
-
-{"misc", C_HELP_1},
-{"pattern", C_HELP_3},
-{"control", C_HELP_2}
-};
-```

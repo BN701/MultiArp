@@ -899,22 +899,22 @@ bool do_command(string commandString)
             }
             break;
         case C_MIDI_REAL_TIME:
-           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_REAL_TIME);
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_REAL_TIME);
             set_status(STAT_POS_2, "Midi Input set to REAL TIME.");
             set_top_line();
             break;
         case C_MIDI_STEP:
-           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_STEP);
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_STEP);
             set_status(STAT_POS_2, "Midi Input set to STEP mode.");
             set_top_line();
             break;
         case C_MIDI_QUICK:
-           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_QUICK);
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_QUICK);
             set_status(STAT_POS_2, "Midi Input set to QUICK mode.");
             set_top_line();
             break;
         case C_MIDI_OFF:
-           g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
             set_status(STAT_POS_2, "Midi Input OFF.");
             set_top_line();
             break;
@@ -1456,13 +1456,13 @@ bool handle_key_input(BaseUI::key_command_t key)
     {
 #if !defined(MA_BLUE) || defined(MA_BLUE_PC)
     case BaseUI::key_ctrl_a: // 0xE6: // Ctrl-A
-       copy_clipboard(globals_to_string() + g_PatternStore.ToString());
+        copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
         set_status(COMMAND_HOME, "");
         break;
 
     case BaseUI::key_ctrl_c: // 0xA2:  // Ctrl-C, Copy
-       copy_clipboard(g_PatternStore.EditPatternToString());
+        copy_clipboard(g_PatternStore.EditPatternToString());
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         set_status(COMMAND_HOME, "");
         break;

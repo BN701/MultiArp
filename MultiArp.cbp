@@ -104,6 +104,8 @@
 		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
 		<Unit filename="maCommand.h" />
+		<Unit filename="maControl.cpp" />
+		<Unit filename="maControl.h" />
 		<Unit filename="maCursesUI.h" />
 		<Unit filename="maCursorKeys.cpp" />
 		<Unit filename="maCursorKeys.h" />

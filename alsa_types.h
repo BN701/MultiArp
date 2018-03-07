@@ -34,6 +34,13 @@ struct snd_seq_ev_note {
 	unsigned int duration;		/* only for SNDRV_SEQ_EVENT_NOTE */
 };
 
+typedef struct snd_seq_ev_ctrl {
+	unsigned char channel;		/**< channel number */
+	unsigned char unused[3];	/**< reserved */
+	unsigned int param;		/**< control parameter */
+	signed int value;		/**< control value */
+} snd_seq_ev_ctrl_t;
+
 typedef struct snd_seq_event {
 	snd_seq_event_type_t type;	/* event type */
 	unsigned char flags;		/* event flags */
@@ -48,7 +55,7 @@ typedef struct snd_seq_event {
 
 	union {				/* event data... */
 		struct snd_seq_ev_note note;
-//		struct snd_seq_ev_ctrl control;
+		struct snd_seq_ev_ctrl control;
 //		struct snd_seq_ev_raw8 raw8;
 //		struct snd_seq_ev_raw32 raw32;
 //		struct snd_seq_ev_ext ext;
@@ -63,6 +70,7 @@ typedef struct snd_seq_event {
 
 #define SND_SEQ_EVENT_NOTEON    6
 #define SND_SEQ_EVENT_NOTEOFF   7
+#define SND_SEQ_EVENT_CONTROLLER 10
 #define SND_SEQ_EVENT_ECHO     50
 
 #endif

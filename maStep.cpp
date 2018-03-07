@@ -42,6 +42,7 @@ extern AlsaSequencer g_Sequencer;
 
 #endif // MA_BLUE
 
+#include "maControl.h"
 #include "maCursorKeys.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
@@ -294,6 +295,8 @@ void queue_next_step(int queueId)
 
 }
 
+
+
 void handle_midi_event(snd_seq_event_t *ev, int queueId)
 {
     static int otherEvents = 0; // Just for interest.
@@ -326,6 +329,10 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
             }
             break;
 
+        case SND_SEQ_EVENT_CONTROLLER:
+            handle_midi_control_event(ev->data.control.param, ev->data.control.value);
+            break;
+
         default:
             otherEvents += 1;
             break;
@@ -342,7 +349,7 @@ void read_midi_ALSA(int queueId)
     {
         snd_seq_event_t *ev;
         g_Sequencer.EventInput(&ev);
-        handle_midi_event(ev);
+        handle_midi_event(ev, queueId);
         snd_seq_free_event(ev);
     }
     while ( g_Sequencer.EventInputPending() );

@@ -258,9 +258,6 @@ int main(int argc, char *argv[])
                 }
             }
         }
-
-        // Pop this in here so we don't drive the CPU hot by fast looping.
-//        std::this_thread::sleep_for(chrono::milliseconds(1));
     }
 
 #else

@@ -312,7 +312,13 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
 
         case SND_SEQ_EVENT_NOTEON:
         case SND_SEQ_EVENT_NOTEOFF:
-            if ( g_ListBuilder.HandleMidi(ev) )
+            if ( !g_State.RecState() )
+            {
+                Note n;   // Something to show what's coming in.
+                n.m_NoteNumber = ev->data.note.note;
+                set_status(STAT_POS_2, "Midi: %s", n.ToString(false).c_str());
+            }
+            else if ( g_ListBuilder.HandleMidi(ev) )
             {
                // HandleMidi() only returns true in QUICK entry
                // mode, where midi input alone is used to manage
@@ -342,7 +348,6 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
 #if !defined(MA_BLUE)
 void read_midi_ALSA(int queueId)
 {
-
     static int otherEvents = 0; // Just for interest.
 
     do

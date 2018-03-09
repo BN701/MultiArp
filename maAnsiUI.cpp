@@ -513,16 +513,19 @@ void AnsiUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 //    wrefresh(panel);
 }
 
+const char * g_midiModeNames[] = {"Q ", "S ", "RT"};
 
-void AnsiUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiInputMode)
+void AnsiUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int recState, int midiInputMode)
 {
     char text[100];
-    snprintf(text, 100, "MultiArp - Midi:%02i, Step:%5.2f, Tempo:%5.2f, Quantum:%5.2f   %s",
+    snprintf(text, 100, "MultiArp - Midi:%02i/%s Tempo:%5.2f  Step:%5.2f  Quantum:%5.2f   << %s %s >>",
                midiChannel,
-               stepValue,
+               g_midiModeNames[midiInputMode],
                tempo,
+               stepValue,
                quantum,
-               runState != 0 ? "<<   RUN   >>" : "<<   ---   >>");
+               runState != 0 ? "RUN" : "---",
+               recState != 0 ? "REC" : "---");
 
     Text(whole_screen, 0, 0, text, NULL, attr_bold);
 

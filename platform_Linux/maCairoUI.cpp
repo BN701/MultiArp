@@ -303,6 +303,7 @@ unordered_map<int, BaseUI::key_command_t> g_xcbSymbolToBaseUIKey =
 {
     {XK_Insert, BaseUI::key_insert},
     {XK_Delete, BaseUI::key_delete},
+    {XK_BackSpace, BaseUI::key_backspace},
     {XK_Down, BaseUI::key_down},
     {XK_Up, BaseUI::key_up},
     {XK_Left, BaseUI::key_left},
@@ -785,7 +786,9 @@ void CairoUI::Text(window_area_t area, int row, int col, const char * text, text
     Refresh(r);
 }
 
-void CairoUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiInputMode)
+const char * g_midiInputModes[] = {"Q", "S", "RT"};
+
+void CairoUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int recState, int midiInputMode)
 {
     if ( !m_Enabled )
     {
@@ -803,22 +806,26 @@ void CairoUI::SetTopLine(int midiChannel, double stepValue, double tempo, double
     cairo_font_extents_t fe;
 	cairo_font_extents (cr, &fe);
 
-
 	// Fill (clear) background rectangle
 
-	switch ( midiInputMode )
-	{
-        case 1: // Quick
-        case 2: // Full
-            cairo_set_source_rgb(cr, 0.75, 0.3, 0.2);
-            break;
-        case 3: // Real time
-            cairo_set_source_rgb(cr, 0.75, 0, 0);
-            break;
-        default:
-            cairo_set_source_rgb(cr, 0.4, 0.4, 0.4);
-            break;
-    }
+	if ( recState )
+        cairo_set_source_rgb(cr, 0.75, 0, 0);
+    else
+        cairo_set_source_rgb(cr, 0.4, 0.4, 0.4);
+
+//	switch ( midiInputMode )
+//	{
+//        case 1: // Quick
+//        case 2: // Full
+//            cairo_set_source_rgb(cr, 0.75, 0.3, 0.2);
+//            break;
+//        case 3: // Real time
+//            cairo_set_source_rgb(cr, 0.75, 0, 0);
+//            break;
+//        default:
+//            cairo_set_source_rgb(cr, 0.4, 0.4, 0.4);
+//            break;
+//    }
 
     cairo_rectangle (cr, rUpdate.m_dX, rUpdate.m_dY, rUpdate.m_dWidth, rUpdate.m_dHeight );
     cairo_fill (cr);
@@ -842,8 +849,8 @@ void CairoUI::SetTopLine(int midiChannel, double stepValue, double tempo, double
 //	y = m_GridSize/2 + fe.ascent;
 	y = m_GridSize + fe.ascent - fe.height/2;
 
-	vector<const char*> labels = {"Midi", "Step", "Link Quantum"};
-	vector<double> widths = {3, 5, 10, 5};
+	vector<const char*> labels = {"", "BPM", "Step", "LQ"};
+	vector<double> widths = {1, 6, 5, 6, 5};
 
 	double xBase = 0;
 	auto w = widths.begin();
@@ -871,15 +878,18 @@ void CairoUI::SetTopLine(int midiChannel, double stepValue, double tempo, double
         switch (i)
         {
             case 0:
-                snprintf(value, 10, "%02i", midiChannel);
+                snprintf(value, 10, "%02i/%s", midiChannel, g_midiInputModes[midiInputMode]);
                 break;
             case 1:
-                snprintf(value, 10, "%5.2f", stepValue);
+                snprintf(value, 10, "%3.0f", tempo);
                 break;
             case 2:
-                snprintf(value, 10, "%5.2f", quantum);
+                snprintf(value, 10, "%5.2f", stepValue);
                 break;
             case 3:
+                snprintf(value, 10, "%5.2f", quantum);
+                break;
+            case 4:
                 snprintf(value, 10, "%s", "Run");
                 // cairo_set_font_size (cr, 1.5 * m_FontHeight);
                 // y -= m_FontHeight/4;

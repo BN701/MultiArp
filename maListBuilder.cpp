@@ -77,11 +77,11 @@ void ListBuilder::SetMidiInputMode( int val )
         m_MidiInputMode = val;
         m_MidiInputModeChanged = true;
 
-        if ( m_MidiInputMode == MIDI_INPUT_OFF )
-        {
+//        if ( m_MidiInputMode == MIDI_INPUT_OFF )
+//        {
             m_StepList.Clear();
             m_Captured.Clear();
-        }
+//        }
     }
 }
 
@@ -153,7 +153,8 @@ std::string ListBuilder::ToString()
             return m_StepList.ToString(false);
 
         default:
-            return m_Activity.ToString(false);
+//            return m_Activity.ToString(false);
+            return "";
     }
 }
 
@@ -377,7 +378,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
             return m_openNotes == 0; // Tell calling function we have a complete notelist.
 
         default:
-            m_Activity.m_NoteNumber = ev->data.note.note;
+//            m_Activity.m_NoteNumber = ev->data.note.note;
             return false;
     }
 

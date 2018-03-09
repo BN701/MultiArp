@@ -70,6 +70,7 @@ enum command_t
     C_RESET,
     C_SET_RESETONPATTERNCHANGE,
     C_RESET_BEAT,
+    C_REC_TOGGLE,
 
     C_SET_LABEL,
 
@@ -110,7 +111,7 @@ enum command_t
     C_MIDI_REAL_TIME,
     C_MIDI_STEP,
     C_MIDI_QUICK,
-    C_MIDI_OFF,
+//    C_MIDI_OFF,
 
     C_CUE,              // Set the next pattern to play
     C_EDIT,             // Set focus for copy/paste
@@ -203,6 +204,7 @@ unordered_map<string, command_t> gCommandList =
     {"stop", C_STOP},
     {"stop now", C_HALT},
     {"halt", C_HALT},
+    {"rec", C_REC_TOGGLE},
 
     {"reset", C_RESET},
     {"reset beat", C_RESET_BEAT},
@@ -275,8 +277,8 @@ unordered_map<string, command_t> gCommandList =
     {"midi quick", C_MIDI_QUICK},
     {"midi q", C_MIDI_QUICK},
     {"m q", C_MIDI_QUICK},
-    {"midi off", C_MIDI_OFF},
-    {"m off", C_MIDI_OFF},
+//    {"midi off", C_MIDI_OFF},
+//    {"m off", C_MIDI_OFF},
 
     {"edit", C_EDIT},
     {"e", C_EDIT},
@@ -538,6 +540,12 @@ bool do_command(string commandString)
             g_State.SetNewRunStatePending(false, 1);
             break;
 
+        case C_REC_TOGGLE:
+            g_State.SetRecState(!g_State.RecState());
+            set_status(STAT_POS_2, "Record: %s", g_State.RecState() ? "ON" : "Off");
+            set_top_line();
+            break;
+
         case C_HALT:
             g_State.SetRunState(false);
             break;
@@ -581,7 +589,7 @@ bool do_command(string commandString)
         case C_CUE  :
             if ( tokens.size() < 2 )
             {
-                set_status(STAT_POS_2,"Hint: play nn, where 'nn' is pattern number.");
+                set_status(STAT_POS_2, "Hint: play nn, where 'nn' is pattern number.");
                 break;
             }
 #if defined(MA_BLUE)
@@ -913,11 +921,11 @@ bool do_command(string commandString)
             set_status(STAT_POS_2, "Midi Input set to QUICK mode.");
             set_top_line();
             break;
-        case C_MIDI_OFF:
-            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
-            set_status(STAT_POS_2, "Midi Input OFF.");
-            set_top_line();
-            break;
+//        case C_MIDI_OFF:
+//            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
+//            set_status(STAT_POS_2, "Midi Input OFF.");
+//            set_top_line();
+//            break;
 
         case C_QUANTUM :
             if ( tokens.size() < 2 )
@@ -1488,6 +1496,7 @@ bool handle_key_input(BaseUI::key_command_t key)
         update_pattern_panel();
         break;
 #endif
+
     case BaseUI::key_return: // Enter
         if ( !commandString.empty() )
         {
@@ -1515,11 +1524,7 @@ bool handle_key_input(BaseUI::key_command_t key)
     case BaseUI::key_space: // XK_space: // Space bar.
         if ( commandString.empty() )
         {
-#ifdef MA_BLUE
-           if ( g_ListBuilder.HandleKeybInput(key) )
-#else
-            if ( g_ListBuilder.HandleKeybInput(' ') )
-#endif
+            if ( g_ListBuilder.HandleKeybInput(key) )
                 show_listbuilder_status();
         }
         else
@@ -1544,7 +1549,7 @@ bool handle_key_input(BaseUI::key_command_t key)
     case BaseUI::key_backspace: // XK_BackSpace:
         if ( commandString.size() > 0 )
             commandString.pop_back();
-       else if ( g_ListBuilder.HandleKeybInput(key) )
+        else if ( g_ListBuilder.HandleKeybInput(key) )
            show_listbuilder_status();
         else if ( CursorKeys::RouteKey(key) )
             show_status_after_navigation();

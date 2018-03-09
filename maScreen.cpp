@@ -26,10 +26,21 @@
 #include "maSequencer.h"
 extern Sequencer g_Sequencer;
 #else
+
 #include "platform_Linux/maAlsaSequencer.h"
 #include "platform_Linux/maAlsaSequencerQueue.h"
+// Global ALSA Sequencer instance.
 extern AlsaSequencer g_Sequencer;
+
+#define LINK_PLATFORM_LINUX
+#include <ableton/Link.hpp>
+
+// Global Link instance.
+
+extern ableton::Link g_Link;
+
 #endif // MA_BLUE
+
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maState.h"
@@ -38,7 +49,6 @@ extern AlsaSequencer g_Sequencer;
 
 using namespace std;
 
-// Global ALSA Sequencer instance.
 
 extern ListBuilder g_ListBuilder;
 extern PatternStore g_PatternStore;
@@ -92,18 +102,20 @@ void set_top_line()
 #if defined(MA_BLUE)
                         g_State.Tempo(),
 #else
-                        120,
+                        g_Link.captureAppTimeline().tempo(),
 #endif
                         g_State.Quantum(),
                         g_State.RunState(),
+                        g_State.RecState(),
                         g_ListBuilder.MidiInputMode() );
 
 #ifndef MA_BLUE
     g_CairoUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
                         g_State.CurrentStepValue(),
-                        120,
+                        g_Link.captureAppTimeline().tempo(),
                         g_State.Quantum(),
                         g_State.RunState(),
+                        g_State.RecState(),
                         g_ListBuilder.MidiInputMode() );
 #endif
 }
@@ -265,9 +277,9 @@ void update_pattern_panel()
             g_TextUI.ClearArea(BaseUI::big_panel);
             text = g_PatternStore.CurrentPlayPattern().Display(2, highlights, 25, 79);
             g_TextUI.Text(BaseUI::big_panel, 0, 0, text.c_str(), & highlights);
-#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
+//#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
             highlights.clear();
-#endif
+//#endif
             showTrigProgress = true;
             break;
         case BaseUI::two:
@@ -275,9 +287,9 @@ void update_pattern_panel()
             text = g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79);
             g_TextUI.Text(BaseUI::big_panel, 0, 0, text.c_str(), & highlights);
             showTrigProgress = true;
-#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
+//#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
             highlights.clear();
-#endif
+//#endif
             break;
         case BaseUI::three:
             layout_pattern_extra_panel(g_PatternStore.TranslateTableForPlay().Diags().InOutPairs());
@@ -288,7 +300,7 @@ void update_pattern_panel()
             break;
         }
 
-#if !defined(MA_BLUE) // || defined(MA_BLUE_PC)
+#if 0
         switch ( g_TextUI.BigPanelPage() )
         {
         case BaseUI::one:
@@ -316,6 +328,9 @@ void update_pattern_panel()
         if ( showTrigProgress )
             g_TextUI.Highlight(BaseUI::big_panel, 0, 4, g_PatternStore.CurrentPlayPattern().TrigPlayPosition() + 1,
                 CP_PATTERN_LIST_PANEL, BaseUI::attr_underline);
+#endif
+
+#if !defined(MA_BLUE) // || defined(MA_BLUE_PC)
     }
     catch (... /*string s*/)
     {

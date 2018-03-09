@@ -57,6 +57,8 @@ class State
 
         void SetRunState(bool val) { m_RunState = val; }
         bool RunState() { return m_RunState; }
+        void SetRecState(bool val) { m_RecState = val; }
+        bool RecState() { return m_RecState; }
         void SetNewRunStatePending(bool val, int defer = 0);
         bool NewRunStatePending();
 
@@ -79,7 +81,8 @@ class State
         double m_CurrentStepValue;
         double m_LastUsedStepValue;
         double m_Quantum;
-        bool m_RunState;
+        bool m_RunState = false;
+        bool m_RecState = false;
         double m_Beat;
         double m_Phase;
         int m_PatternReset;

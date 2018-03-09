@@ -37,7 +37,7 @@
 
 enum midi_input_modes_t
 {
-    MIDI_INPUT_OFF = 0,
+//    MIDI_INPUT_OFF = 0,
     MIDI_INPUT_QUICK,
     MIDI_INPUT_STEP,
     MIDI_INPUT_REAL_TIME,
@@ -87,9 +87,9 @@ class ListBuilder
 #ifndef MA_BLUE
         ableton::Link * m_Link = NULL;
 #endif // MA_BLUE
-        int m_MidiInputMode = MIDI_INPUT_OFF;
+        int m_MidiInputMode = MIDI_INPUT_STEP;
         int m_openNotes = 0;
-        Note m_Activity;   // Something to show what's coming in.
+//        Note m_Activity;   // Something to show what's coming in.
         Cluster m_Captured;
         StepList m_StepList;
         bool m_MidiInputModeChanged;

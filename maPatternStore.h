@@ -183,29 +183,30 @@ struct PatternStore : public CursorKeys
 
     double LastRealTimeBeat();
 
-    int AddEmptyPattern(std::vector<std::string>::iterator token, std::vector<std::string>::iterator stop)
-    {
-        m_Patterns.push_back(m_DefaultPattern);
-        m_Patterns.back().NewList();
-
-        std::string label;
-        if ( token != stop )
-            while ( true )
-            {
-                label += *token;
-                if ( ++token == stop )
-                    break;
-                label += ' ';
-            }
-
-        m_Patterns.back().SetLabel(label.c_str());
-
-        if ( m_EditPosFollowsPlay )
-            return m_Patterns.size() - 1;
-        else
-            return m_PosEdit = m_Patterns.size() - 1;
-
-    }
+    int AddEmptyPattern(std::vector<std::string> & tokens, int firstToken);
+//    int AddEmptyPattern(std::vector<std::string>::iterator token, std::vector<std::string>::iterator stop)
+//    {
+//        m_Patterns.push_back(m_DefaultPattern);
+//        m_Patterns.back().NewList();
+//
+//        std::string label;
+//        if ( token != stop )
+//            while ( true )
+//            {
+//                label += *token;
+//                if ( ++token == stop )
+//                    break;
+//                label += ' ';
+//            }
+//
+//        m_Patterns.back().SetLabel(label.c_str());
+//
+//        if ( m_EditPosFollowsPlay )
+//            return m_Patterns.size() - 1;
+//        else
+//            return m_PosEdit = m_Patterns.size() - 1;
+//
+//    }
 
     int CopyCurrentPattern()
     {

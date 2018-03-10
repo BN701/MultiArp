@@ -20,6 +20,8 @@
 #ifndef MACOMMAND_H_INCLUDED
 #define MACOMMAND_H_INCLUDED
 
+#include <map>
+#include <stack>
 #include <string>
 
 #ifdef MA_BLUE
@@ -44,7 +46,183 @@ void do_command_line(int argc, char *argv[]);
 #include "maCursorKeys.h"
 #include "maBaseUI.h"
 
-bool do_command(std::string commandList);
+enum command_t
+{
+    C_NONE,
+    C_MENU,
+    C_EXIT,
+    C_HELP,
+    C_RESET_SCREEN,
+    C_CRASH_TEST,
+
+    C_RUN,
+    C_STOP,
+    C_HALT,
+    C_RESET,
+    C_SET_RESETONPATTERNCHANGE,
+    C_RESET_BEAT,
+    C_REC_TOGGLE,
+
+    C_SET_LABEL,
+
+    C_TRIGS, // Open the trig menu on current pattern or enter a list.
+    C_TRIGS_ARPEGGIO,
+
+    C_STEPVAL,
+    C_QUANTUM,
+    C_GATELENGTH,
+    C_GATE_HOLD,
+    C_GATE_NORMAL,
+    C_VELOCITY,
+    C_TRANSPOSE,
+    C_TEMPO,
+
+    C_SCALE,
+    C_SCALE_FROM_LIST,
+    C_SCALE_SHOW,
+    C_SCALE_HELP,
+    C_SCALE_CONTROLS,
+    C_SETROOT,
+
+    C_PAGE_ONE,
+    C_PAGE_TWO,
+    C_PAGE_THREE,
+    C_PAGE_HOLD,
+
+    C_FEEL,
+    C_FEEL_HELP,
+    C_FEEL_NEW,
+    C_FEEL_ADD,
+    C_FEEL_REMOVE,
+    C_FEEL_RESPACE,
+    C_FEEL_ON,
+    C_FEEL_OFF,
+
+    C_MIDI,
+    C_MIDI_REAL_TIME,
+    C_MIDI_STEP,
+    C_MIDI_QUICK,
+//    C_MIDI_OFF,
+
+    C_CUE,              // Set the next pattern to play
+    C_EDIT,             // Set focus for copy/paste
+    C_EDIT_CURSOR_LOCK,
+    C_EDIT_CURSOR_UNLOCK,
+    C_EDIT_CURSOR_LOCK_STATUS,
+    C_NEW,              // Create new (empty) pattern.
+    C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
+    C_DELETE,           // Delete pattern and reduce size of pattern list.
+    C_CLEAR,            // Clear pattern but leave empty entry in pattern list.
+    C_UNDO,             // Restore deleted or cleared pattern to end of the pattern list.
+    C_STATUS,           // Display current stats.
+
+    C_PATTERN_CHAIN,    // Set pattern chain mode.
+    C_PATTERN_CHAIN_OFF,
+    C_PATTERN_CHAIN_NATURAL,
+    C_PATTERN_CHAIN_QUANTUM,
+    C_PATTERN_CHAIN_CLEAR,
+    C_PATTERN_CHAIN_NEW,
+    C_PATTERN_CHAIN_DELETE,
+    C_PATTERN_CHAIN_JUMP,
+    C_PATTERN_CHAIN_HELP,
+
+    C_STORE,
+    C_STORE_STEP,
+    C_STORE_GATE,
+    C_STORE_VELOCITY,
+    C_STORE_SCALE,
+    C_STORE_ALL,
+    C_STORE_HELP,
+    C_LOAD,
+    C_LOAD_STEP,
+    C_LOAD_GATE,
+    C_LOAD_VELOCITY,
+    C_LOAD_SCALE,
+    C_LOAD_ALL,
+
+    C_USE,
+    C_USE_GLOBAL_PLAYDATA,
+    C_USE_PATTERN_PLAYDATA,
+    C_USE_HELP,
+
+    C_LIST,             // Note list commands.
+    C_LIST_IMPORT,      // Import from midi file.
+
+    C_LIST_RT,          // Real time list commands.
+    C_LIST_RT_DELETE,
+    C_LIST_RT_RATE,     // Set playback multipliers for real time lists
+    C_LIST_RT_QUANTUM,  // Set quantum for real time lists.
+    C_LIST_RT_START_PHASE,
+    C_LIST_RT_ECHO,     // Create drifting echo of notes in current list.
+
+    C_HELP_1,
+    C_HELP_2,
+    C_HELP_3,
+    C_HELP_4,
+
+    C_NUM_COMMANDS
+};
+
+
+enum command_menu_id_t
+{
+    C_MENU_ID_NONE,
+    C_MENU_ID_TOP,
+
+    C_MENU_ID_PATTERN,
+//    C_MENU_ID_PATTERN_NEW,
+//    C_MENU_ID_PATTERN_COPY,
+//    C_MENU_ID_PATTERN_DELETE,
+
+    C_MENU_ID_MIDI_MODE,
+//    C_MENU_ID_MIDI_QUICK,
+//    C_MENU_ID_MIDI_STEP,
+//    C_MENU_ID_MIDI_REALTIME,
+//
+    C_MENU_ID_TRIGS,
+    C_MENU_ID_LIST,
+    C_MENU_ID_GLOBAL
+};
+
+struct CommandMenuItem
+{
+//    command_menu_id_t m_Parent;
+    bool m_SubMenu;
+    int m_Command;
+    const char * m_Label;
+    const char * m_ParameterString;
+};
+
+
+class CommandMenu
+{
+    public:
+        bool Active() { return m_Active; }
+        void Open(int menu = C_MENU_ID_TOP);
+        void Show();
+        void Choose(int i);
+        bool HandleKey(BaseUI::key_command_t key);
+        void ClearAll();
+
+    private:
+        static std::multimap<int, CommandMenuItem> m_MenuItems;
+
+        bool m_Active = false;
+        int m_MenuPos = 0;
+        int m_Choices = 0;
+
+        std::vector<CommandMenuItem *> m_MenuStack;
+        std::pair <std::multimap<int, CommandMenuItem>::iterator, std::multimap<int, CommandMenuItem>::iterator> m_CurrentMenu;
+        std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
+        std::string m_MenuString;
+
+        int InitMenuPos(int menu);
+};
+
+
+
+bool do_command(std::string commandList, int directCommand = C_NONE);
+//void do_command_menu(command_menu_id_t menu = C_MENU_ID_TOP);
 
 //bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym);
 bool handle_key_input(BaseUI::key_command_t key);

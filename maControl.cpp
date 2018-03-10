@@ -96,27 +96,30 @@ void control(control_message_t message, int value)
     switch (message)
     {
         case CM_MIDI_RUN:
-            if ( g_State.RunState() )
-            {
-                g_State.SetPatternReset(RESET_ALL);
-                set_status(STAT_POS_2, "All patterns will be reset.");
-            }
-            else
-            {
-                g_State.SetNewRunStatePending(true);
-                set_status(STAT_POS_2, "Starting ...");
-            }
+            do_command("", C_RUN);
+//            if ( g_State.RunState() )
+//            {
+//                g_State.SetPatternReset(RESET_ALL);
+//                set_status(STAT_POS_2, "All patterns will be reset.");
+//            }
+//            else
+//            {
+//                g_State.SetNewRunStatePending(true);
+//                set_status(STAT_POS_2, "Starting ...");
+//            }
             break;
 
         case CM_MIDI_STOP:
-            g_State.SetNewRunStatePending(false, 1);
-            set_status(STAT_POS_2, "Stopping ...");
+            do_command("", C_STOP);
+//            g_State.SetNewRunStatePending(false, 1);
+//            set_status(STAT_POS_2, "Stopping ...");
             break;
 
         case CM_MIDI_REC:
-            g_State.SetRecState(!g_State.RecState());
-            set_status(STAT_POS_2, "Record: %s", g_State.RecState() ? "ON" : "Off");
-            set_top_line();
+            do_command("", C_REC_TOGGLE);
+//            g_State.SetRecState(!g_State.RecState());
+//            set_status(STAT_POS_2, "Record: %s", g_State.RecState() ? "ON" : "Off");
+//            set_top_line();
             break;
 
         case CM_MIDI_REST:

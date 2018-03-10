@@ -215,6 +215,45 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
+int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
+{
+    m_Patterns.push_back(m_DefaultPattern);
+    m_Patterns.back().NewList();
+
+//    std::string label;
+//    if ( token != stop )
+//        while ( true )
+//        {
+//            label += *token;
+//            if ( ++token == stop )
+//                break;
+//            label += ' ';
+//        }
+//
+//    m_Patterns.back().SetLabel(label.c_str());
+
+    if ( ! tokens.empty() && firstToken >= 0 )
+    {
+        string label;
+        auto token = tokens.begin() + firstToken;
+        while ( token != tokens.end() )
+        {
+            label += *token;
+            if ( ++token == tokens.end() )
+                break;
+            label += ' ';
+        }
+        m_Patterns.back().SetLabel(label.c_str());
+    }
+
+
+    if ( m_EditPosFollowsPlay )
+        return m_Patterns.size() - 1;
+    else
+        return m_PosEdit = m_Patterns.size() - 1;
+
+}
+
 StepList & PatternStore::CurrentEditStepList()
 {
 #ifdef MA_BLUE

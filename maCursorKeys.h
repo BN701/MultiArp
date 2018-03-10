@@ -38,40 +38,6 @@ class CursorKeys
         CursorKeys(const CursorKeys & val);
         virtual ~CursorKeys();
 
-//        enum key_type_t
-//        {
-//            no_key,
-//            enter,
-//            back_space,
-//            escape,
-//            ins,
-//            del,
-//            shift_delete,
-//            ctrl_delete,
-//            tab,
-//            shift_tab,
-//            up,
-//            down,
-//            left,
-//            right,
-//            shift_page_up,
-//            shift_page_down,
-//            alt_page_up,
-//            alt_page_down,
-//            ctrl_down,
-//            ctrl_up,
-//            ctrl_left,
-//            ctrl_right,
-//            shift_down,
-//            shift_up,
-//            shift_left,
-//            shift_right,
-//            ctrl_shift_left,
-//            ctrl_shift_right,
-//            ctrl_shift_up,
-//            ctrl_shift_down
-//        };
-
         enum follow_up_action_t
         {
             none,

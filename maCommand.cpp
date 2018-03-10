@@ -56,129 +56,17 @@ extern PatternStore g_PatternStore;
 extern AnsiUI g_TextUI;
 extern ListBuilder g_ListBuilder;
 
-enum command_t
-{
-    C_NONE,
-    C_EXIT,
-    C_HELP,
-    C_RESET_SCREEN,
-    C_CRASH_TEST,
+CommandMenu g_CommandMenu;
 
-    C_RUN,
-    C_STOP,
-    C_HALT,
-    C_RESET,
-    C_SET_RESETONPATTERNCHANGE,
-    C_RESET_BEAT,
-    C_REC_TOGGLE,
-
-    C_SET_LABEL,
-
-    C_TRIGS, // Open the trig menu on current pattern or enter a list.
-    C_TRIGS_ARPEGGIO,
-
-    C_STEPVAL,
-    C_QUANTUM,
-    C_GATELENGTH,
-    C_GATE_HOLD,
-    C_GATE_NORMAL,
-    C_VELOCITY,
-    C_TRANSPOSE,
-    C_TEMPO,
-
-    C_SCALE,
-    C_SCALE_FROM_LIST,
-    C_SCALE_SHOW,
-    C_SCALE_HELP,
-    C_SCALE_CONTROLS,
-    C_SETROOT,
-
-    C_PAGE_ONE,
-    C_PAGE_TWO,
-    C_PAGE_THREE,
-    C_PAGE_HOLD,
-
-    C_FEEL,
-    C_FEEL_HELP,
-    C_FEEL_NEW,
-    C_FEEL_ADD,
-    C_FEEL_REMOVE,
-    C_FEEL_RESPACE,
-    C_FEEL_ON,
-    C_FEEL_OFF,
-
-    C_MIDI,
-    C_MIDI_REAL_TIME,
-    C_MIDI_STEP,
-    C_MIDI_QUICK,
-//    C_MIDI_OFF,
-
-    C_CUE,              // Set the next pattern to play
-    C_EDIT,             // Set focus for copy/paste
-    C_EDIT_CURSOR_LOCK,
-    C_EDIT_CURSOR_UNLOCK,
-    C_EDIT_CURSOR_LOCK_STATUS,
-    C_NEW,              // Create new (empty) pattern.
-    C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
-    C_DELETE,           // Delete pattern and reduce size of pattern list.
-    C_CLEAR,            // Clear pattern but leave empty entry in pattern list.
-    C_UNDO,             // Restore deleted or cleared pattern to end of the pattern list.
-    C_STATUS,           // Display current stats.
-
-    C_PATTERN_CHAIN,    // Set pattern chain mode.
-    C_PATTERN_CHAIN_OFF,
-    C_PATTERN_CHAIN_NATURAL,
-    C_PATTERN_CHAIN_QUANTUM,
-    C_PATTERN_CHAIN_CLEAR,
-    C_PATTERN_CHAIN_NEW,
-    C_PATTERN_CHAIN_DELETE,
-    C_PATTERN_CHAIN_JUMP,
-    C_PATTERN_CHAIN_HELP,
-
-    C_STORE,
-    C_STORE_STEP,
-    C_STORE_GATE,
-    C_STORE_VELOCITY,
-    C_STORE_SCALE,
-    C_STORE_ALL,
-    C_STORE_HELP,
-    C_LOAD,
-    C_LOAD_STEP,
-    C_LOAD_GATE,
-    C_LOAD_VELOCITY,
-    C_LOAD_SCALE,
-    C_LOAD_ALL,
-
-    C_USE,
-    C_USE_GLOBAL_PLAYDATA,
-    C_USE_PATTERN_PLAYDATA,
-    C_USE_HELP,
-
-    C_LIST,             // Note list commands.
-    C_LIST_IMPORT,      // Import from midi file.
-
-    C_LIST_RT,          // Real time list commands.
-    C_LIST_RT_DELETE,
-    C_LIST_RT_RATE,     // Set playback multipliers for real time lists
-    C_LIST_RT_QUANTUM,  // Set quantum for real time lists.
-    C_LIST_RT_START_PHASE,
-    C_LIST_RT_ECHO,     // Create drifting echo of notes in current list.
-
-    C_HELP_1,
-    C_HELP_2,
-    C_HELP_3,
-    C_HELP_4,
-
-    C_NUM_COMMANDS
-};
-
-
-unordered_map<string, command_t> gCommandList =
+unordered_map<string, command_t> g_CommandList =
 {
 #if !defined(MA_BLUE) || defined(MA_BLUE_PC)
     {"exit", C_EXIT},
     {"quit", C_EXIT},
 #endif
+
+    {"/", C_MENU},
+
     {"help", C_HELP},
     {"cls", C_RESET_SCREEN},
 
@@ -377,15 +265,15 @@ command_t command_from_string(string commandName)
         *i = tolower(*i);
     }
 
-    if ( gCommandList.count(commandName) == 1 )
-        command = gCommandList[commandName];
+    if ( g_CommandList.count(commandName) == 1 )
+        command = g_CommandList[commandName];
     else
         command = C_NONE;
 #else
     try
     {
        transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
-       command = gCommandList.at(commandName);
+       command = g_CommandList.at(commandName);
     }
     catch ( out_of_range const & e )
     {
@@ -497,28 +385,39 @@ void do_help(string topicName)
 }
 
 
-bool do_command(string commandString)
+bool do_command(string commandString, int directCommand)
 {
     bool bResult = true;
-
-    vector<string> tokens = split(commandString.c_str());
-
-    if ( tokens.empty() )
-        return bResult;
-
     command_t command;
-
-    // Try for combinations first. Hopefully this makes the following switch
-    // statement easier to read (though longer).
-
     int firstParameter = -1;
-    for ( int i = tokens.size(); i >= 0; i-- )
+
+    // 'tokens' will either contain the entire command string, or just
+    // the parameters for a direct command (from a menu).
+
+    vector<string> tokens = split(commandString.c_str());;
+
+    if ( directCommand != C_NONE )
     {
-        if ( command = command_from_string(tokens, i), command != C_NONE )
+        command = (command_t) directCommand;
+        if ( ! tokens.empty() )
+            firstParameter = 0;
+    }
+    else
+    {
+        if ( tokens.empty() )
+            return bResult;
+
+        // Try for combinations first. Hopefully this makes the following switch
+        // statement easier to read (though longer).
+
+        for ( int i = tokens.size(); i >= 0; i-- )
         {
-            if ( static_cast<unsigned>(i) < tokens.size() )
-                firstParameter = i;
-            break;
+            if ( command = command_from_string(tokens, i), command != C_NONE )
+            {
+                if ( static_cast<unsigned>(i) < tokens.size() )
+                    firstParameter = i;
+                break;
+            }
         }
     }
 
@@ -532,12 +431,27 @@ bool do_command(string commandString)
         switch ( command )
         {
 
+        case C_MENU:
+            g_CommandMenu.Open(C_MENU_ID_TOP);
+            break;
+
         case C_RUN :
-            g_State.SetNewRunStatePending(true);
+//            g_State.SetNewRunStatePending(true);
+            if ( g_State.RunState() )
+            {
+                g_State.SetPatternReset(RESET_ALL);
+                set_status(STAT_POS_2, "All patterns will be reset.");
+            }
+            else
+            {
+                g_State.SetNewRunStatePending(true);
+                set_status(STAT_POS_2, "Starting ...");
+            }
             break;
 
         case C_STOP :
             g_State.SetNewRunStatePending(false, 1);
+            set_status(STAT_POS_2, "Stopping ...");
             break;
 
         case C_REC_TOGGLE:
@@ -658,20 +572,26 @@ bool do_command(string commandString)
            break;
 
        case C_NEW :
-           g_PatternStore.AddEmptyPattern(tokens.begin() + 1, tokens.end());
+           g_PatternStore.AddEmptyPattern(tokens, firstParameter);
+           // g_PatternStore.AddEmptyPattern(tokens.begin() + firstParameter, tokens.end());
            // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
            set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
            update_pattern_status_panel();
            break;
 
        case C_COPY :
+           if ( g_PatternStore.Empty() )
+           {
+               set_status(STAT_POS_2, "Nothing to copy.");
+               break;
+           }
            g_PatternStore.CopyCurrentPattern();
            set_status(STAT_POS_2, "Current pattern copied at position %i.", g_PatternStore.m_Patterns.size());
            update_pattern_status_panel();
            break;
 
        case C_DELETE :
-           if ( g_PatternStore.PatternCount() == 0 )
+           if ( g_PatternStore.Empty() )
            {
                set_status(STAT_POS_2, "Nothing to delete.");
                break;
@@ -1448,7 +1368,10 @@ bool handle_key_input(BaseUI::key_command_t key)
         g_TextUI.SendRestoreCursor();
 #endif
 
-    bool result = true;
+    if ( g_CommandMenu.HandleKey(key) )
+    {
+        return true;
+    }
 
     if ( key > BaseUI::key_menu_control )
     {
@@ -1458,6 +1381,7 @@ bool handle_key_input(BaseUI::key_command_t key)
         return true;
     }
 
+    bool result = true;
     static string commandString;
 
     switch (key)
@@ -1496,6 +1420,19 @@ bool handle_key_input(BaseUI::key_command_t key)
         update_pattern_panel();
         break;
 #endif
+
+    case static_cast<BaseUI::key_command_t>('/'):
+        if ( commandString.empty() )
+        {
+            g_CommandMenu.Open();
+        }
+        else
+        {
+            commandString += '/';
+            place_cursor(COMMAND_HOME + commandString.size());
+            set_status(COMMAND_HOME, commandString.c_str());
+        }
+        break;
 
     case BaseUI::key_return: // Enter
         if ( !commandString.empty() )
@@ -1610,3 +1547,166 @@ bool handle_key_input(BaseUI::key_command_t key)
     return result;
 }
 
+
+multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
+{
+    {C_MENU_ID_TOP, {true, C_MENU_ID_MIDI_MODE, "Midi Capture", ""}},
+    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
+    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
+    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
+
+    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
+    {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
+    {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
+    {C_MENU_ID_PATTERN, {false, C_NEW, "New", ""}},
+};
+
+int CommandMenu::InitMenuPos(int menu)
+{
+    switch (menu)
+    {
+        case C_MENU_ID_MIDI_MODE:
+            m_MenuPos = g_ListBuilder.MidiInputMode();
+            break;
+
+        default:
+            m_MenuPos = 0;
+            break;
+    }
+
+    return m_MenuPos;
+}
+
+void CommandMenu::Open(int menu)
+{
+    m_Active = true;
+    m_MenuString = "";
+    m_CurrentMenu = m_MenuItems.equal_range(menu);
+    m_FieldPositions.clear();
+    InitMenuPos(menu);
+
+    int i = 1;
+    m_Choices = 0;
+
+    for (auto it = m_CurrentMenu.first; it != m_CurrentMenu.second; it++, i++)
+    {
+        char prefix[20];
+        snprintf(prefix, 20, "%s%i) ", i == 1 ? "" : " ", i);
+        m_MenuString += prefix;
+        int pos = m_MenuString.size();
+        m_MenuString += it->second.m_Label;
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_MenuString.size() - pos));
+        m_Choices += 1;
+    }
+
+    // Only do this once.
+
+    string title = "Menu";
+    for ( auto it = m_MenuStack.begin(); it != m_MenuStack.end(); it++ )
+    {
+        title += " >";
+        title += (*it)->m_Label;
+    }
+    set_status(STAT_POS_2, title.c_str());
+
+    Show();
+
+}
+
+void CommandMenu::Show()
+{
+    set_status(COMMAND_HOME, m_MenuString.c_str());
+    g_TextUI.HighlightLastWrite(m_FieldPositions[m_MenuPos].offset, m_FieldPositions[m_MenuPos].length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+}
+
+void CommandMenu::ClearAll()
+{
+    m_MenuStack.clear();
+    m_Active = false;
+}
+
+void CommandMenu::Choose(int choice)
+{
+    int i = 0;
+    auto it = m_CurrentMenu.first;
+    while ( it != m_CurrentMenu.second && i < choice )
+    {
+        it++;
+        i++;
+    }
+    if ( it != m_CurrentMenu.second )
+    {
+        CommandMenuItem & item = it->second;
+        if ( item.m_SubMenu )
+        {
+            m_MenuStack.push_back(&item);
+            Open(item.m_Command);
+        }
+        else
+        {
+            set_status(COMMAND_HOME, "");
+            do_command(item.m_ParameterString, item.m_Command);
+            ClearAll();
+        }
+    }
+}
+
+bool CommandMenu::HandleKey(BaseUI::key_command_t key)
+{
+    if ( ! m_Active )
+        return false;
+
+    switch ((int) key)
+    {
+        case '/':
+            set_status(STAT_POS_2, "");
+            set_status(COMMAND_HOME, "");
+            ClearAll();
+            break;
+
+        case BaseUI::key_return:
+            Choose(m_MenuPos);
+            break;
+
+        case BaseUI::key_backspace:
+            if ( m_MenuStack.empty() )
+                break;
+            m_MenuStack.pop_back();
+            if ( ! m_MenuStack.empty() )
+                Open(m_MenuStack.back()->m_Command);
+            else
+                Open();
+            break;
+
+        case BaseUI::key_left:
+            if ( m_MenuPos  > 0 )
+            {
+                m_MenuPos -= 1;
+                Show();
+            }
+            break;
+
+        case BaseUI::key_right:
+            if ( m_MenuPos < m_Choices - 1 )
+            {
+                m_MenuPos += 1;
+                Show();
+            }
+            break;
+
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+            Choose(key - '1');
+            break;
+        default:
+            break;
+    }
+
+    return true;
+}

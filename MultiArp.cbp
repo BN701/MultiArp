@@ -99,14 +99,12 @@
 		<Unit filename="maAnsiUI.h" />
 		<Unit filename="maBaseUI.cpp" />
 		<Unit filename="maBaseUI.h" />
-		<Unit filename="maCairoUI.h" />
 		<Unit filename="maChainLink.cpp" />
 		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
 		<Unit filename="maCommand.h" />
 		<Unit filename="maControl.cpp" />
 		<Unit filename="maControl.h" />
-		<Unit filename="maCursesUI.h" />
 		<Unit filename="maCursorKeys.cpp" />
 		<Unit filename="maCursorKeys.h" />
 		<Unit filename="maFeelMap.cpp" />

@@ -41,99 +41,100 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
 {
     // Add in step based events, if any, and step position.
 
-    if ( ! m_StepListSet.empty() )
-    {
-        unsigned loopCheck = 0;
-
-        if ( m_TrigList.Empty() )
-        {
-            if ( m_Pos >= m_StepListSet.size() )
-                m_Pos = 0;
-
-            m_LastRequestedPos = m_Pos;
-
-            Cluster * result = m_StepListSet[m_Pos++].Step();
-
-            if ( result != NULL )
-            {
-                cluster.SetStepsTillNextNote(result->StepsTillNextNote());
-                cluster += *result;
-            }
-        }
-        else while ( loopCheck < m_TrigList.Size() ) // Loop only if skipping entries.
-        {
-            TrigListItem * trigItem = m_TrigList.Step();
-
-            if ( trigItem->Skip() )
-            {
-                loopCheck += 1;
-                continue;
-            }
-
-            if ( trigItem->Mute() )
-                break;
-
-            stepValueMultiplier = trigItem->Multiplier();
-
-            repeater = trigItem->Repeater();
-
-            for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
-            {
-                // Just ignore list number if list doesn't exist.
-
-                if ( static_cast<unsigned>(*it) < m_StepListSet.size() )
-                {
-                    m_LastRequestedPos = *it;
-
-                    Cluster * result = m_StepListSet.at(*it).Step();
-
-                    if ( result != NULL )
-                    {
-                        cluster.SetStepsTillNextNote(result->StepsTillNextNote());
-                        cluster += *result;
-                    }
-                }
-            }
-
-            break;
-        }
-    }
-
-    // All notes collected so far are from step lists, so they won't have any
-    // phase start times set. Fix that now ...
-
-    cluster.SetPhaseAllNotes(phase);
-
-    // Collect any real time events.
-
-    if ( ! m_RealTimeSet.empty() )
-    {
-        for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
-            it->Step2(cluster, phase, stepValue, m_RealTimeBeat);
-
-        if ( lround(1000.0 * m_RealTimeBeat) > 0 )
-        {
-            m_RealTimeComplete = true;
-            for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
-                m_RealTimeComplete &= it->PhazeIsZero();
-            if ( m_RealTimeComplete )
-                m_RealTimeBeat = 0;
-        }
-    }
-
-    m_LastRealTimeBeat = m_RealTimeBeat;
-    m_RealTimeBeat += 4.0 / stepValue;
+// TODO:LG
+//    if ( ! m_StepListSet.empty() )
+//    {
+//        unsigned loopCheck = 0;
+//
+//        if ( m_TrigList.Empty() )
+//        {
+//            if ( m_Pos >= m_StepListSet.size() )
+//                m_Pos = 0;
+//
+//            m_LastRequestedPos = m_Pos;
+//
+//            Cluster * result = m_StepListSet[m_Pos++].Step();
+//
+//            if ( result != NULL )
+//            {
+//                cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+//                cluster += *result;
+//            }
+//        }
+//        else while ( loopCheck < m_TrigList.Size() ) // Loop only if skipping entries.
+//        {
+//            TrigListItem * trigItem = m_TrigList.Step();
+//
+//            if ( trigItem->Skip() )
+//            {
+//                loopCheck += 1;
+//                continue;
+//            }
+//
+//            if ( trigItem->Mute() )
+//                break;
+//
+//            stepValueMultiplier = trigItem->Multiplier();
+//
+//            repeater = trigItem->Repeater();
+//
+//            for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
+//            {
+//                // Just ignore list number if list doesn't exist.
+//
+//                if ( static_cast<unsigned>(*it) < m_StepListSet.size() )
+//                {
+//                    m_LastRequestedPos = *it;
+//
+//                    Cluster * result = m_StepListSet.at(*it).Step();
+//
+//                    if ( result != NULL )
+//                    {
+//                        cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+//                        cluster += *result;
+//                    }
+//                }
+//            }
+//
+//            break;
+//        }
+//    }
+//
+//    // All notes collected so far are from step lists, so they won't have any
+//    // phase start times set. Fix that now ...
+//
+//    cluster.SetPhaseAllNotes(phase);
+//
+//    // Collect any real time events.
+//
+//    if ( ! m_RealTimeSet.empty() )
+//    {
+//        for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
+//            it->Step2(cluster, phase, stepValue, m_RealTimeBeat);
+//
+//        if ( lround(1000.0 * m_RealTimeBeat) > 0 )
+//        {
+//            m_RealTimeComplete = true;
+//            for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
+//                m_RealTimeComplete &= it->PhazeIsZero();
+//            if ( m_RealTimeComplete )
+//                m_RealTimeBeat = 0;
+//        }
+//    }
+//
+//    m_LastRealTimeBeat = m_RealTimeBeat;
+//    m_RealTimeBeat += 4.0 / stepValue;
 }
 
 bool Pattern::AllListsComplete()
 {
     bool bResult = true;
+// TODO:LG
+//    if ( ! m_RealTimeComplete && ! m_RealTimeSet.empty() )
+//        return false;
 
-    if ( ! m_RealTimeComplete && ! m_RealTimeSet.empty() )
-        return false;
-
-    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
-        bResult &= it->Complete();
+//    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+//        bResult &= it->Complete();
 
 
     return bResult;
@@ -215,25 +216,26 @@ string Pattern::ToString(const char * prefix)
     result += m_TrigList.ToString(prefix);
     result += "\n";
 
-    int index = 1;
-    for ( vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++, index++ )
-    {
-        char buffer[20];
-        snprintf(buffer, 200, "Step List %i ", index);
-        result += buffer;
-        result += (*i).ToString();
-        result += "\n";
-    }
-
-    index = 1;
-    for ( vector<RealTimeList>::iterator i = m_RealTimeSet.begin(); i != m_RealTimeSet.end(); i++, index++ )
-    {
-        char buffer[20];
-        snprintf(buffer, 200, "Real Time List %i ", index);
-        result += buffer;
-        result += (*i).ToString();
-        result += "\n";
-    }
+// TODO:LG
+//    int index = 1;
+//    for ( vector<StepList>::iterator i = m_StepListSet.begin(); i != m_StepListSet.end(); i++, index++ )
+//    {
+//        char buffer[20];
+//        snprintf(buffer, 200, "Step List %i ", index);
+//        result += buffer;
+//        result += (*i).ToString();
+//        result += "\n";
+//    }
+//
+//    index = 1;
+//    for ( vector<RealTimeList>::iterator i = m_RealTimeSet.begin(); i != m_RealTimeSet.end(); i++, index++ )
+//    {
+//        char buffer[20];
+//        snprintf(buffer, 200, "Real Time List %i ", index);
+//        result += buffer;
+//        result += (*i).ToString();
+//        result += "\n";
+//    }
 
     return result;
 }
@@ -388,26 +390,27 @@ bool Pattern::AddStepListFromString(vector<StepList>::size_type index, string s)
 #else
         throw string("Pattern::AddListFromString(), invalid list index.");
 #endif
-
-    auto prevListSize = m_StepListSet.size();
-
-    if ( index >= m_StepListSet.size() )
-        m_StepListSet.resize(index + 1);
-
-    if ( m_StepListSet.at(index).StepListFromString(s) )
-        return true;
-
-    // If initialization fails and we end up with an empty list,
-    // set the list back to its previous size. (Destructors
-    // are called by this process.)
-
-    m_StepListSet.resize(prevListSize);
-    return false;
+// TODO:LG
+//    auto prevListSize = m_StepListSet.size();
+//
+//    if ( index >= m_StepListSet.size() )
+//        m_StepListSet.resize(index + 1);
+//
+//    if ( m_StepListSet.at(index).StepListFromString(s) )
+//        return true;
+//
+//    // If initialization fails and we end up with an empty list,
+//    // set the list back to its previous size. (Destructors
+//    // are called by this process.)
+//
+//    m_StepListSet.resize(prevListSize);
+//    return false;
 }
 
 void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum)
 {
-    m_RealTimeSet.emplace_back(realTimeList, quantum);
+// TODO:LG
+//    m_RealTimeSet.emplace_back(realTimeList, quantum);
 }
 
 void Pattern::AddRealTimeListFromString(vector<RealTimeList>::size_type index, string s)
@@ -419,10 +422,11 @@ void Pattern::AddRealTimeListFromString(vector<RealTimeList>::size_type index, s
         throw string("Pattern::AddListFromString(), invalid list index.");
 #endif
 
-    if ( index >= m_RealTimeSet.size() )
-        m_RealTimeSet.resize(index + 1);
-
-    m_RealTimeSet.at(index).FromString(s);
+// TODO:LG
+//    if ( index >= m_RealTimeSet.size() )
+//        m_RealTimeSet.resize(index + 1);
+//
+//    m_RealTimeSet.at(index).FromString(s);
 }
 
 #ifndef MA_BLUE
@@ -478,8 +482,9 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
 
         if ( ! builder.RealTimeList().empty() )
         {
-            m_RealTimeSet.emplace_back(builder.RealTimeList());
-            m_PosRealTimeEdit = m_RealTimeSet.size() - 1;
+// TODO:LG
+//            m_RealTimeSet.emplace_back(builder.RealTimeList());
+//            m_PosRealTimeEdit = m_RealTimeSet.size() - 1;
             importedTracks += 1;
         }
     }
@@ -487,8 +492,9 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
     // TODO: This is fine if we're loading a pattern from empty, but is this
     //       OK if there are already lists in the pattern?
 
-    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList ++ )
-        rtList->RaiseQuantumAtCapture(captureQuantum);
+// TODO:LG
+//    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList ++ )
+//        rtList->RaiseQuantumAtCapture(captureQuantum);
 
     if ( importedTracks == 0 )
         throw string("Something went wrong, nothing imported.");
@@ -497,110 +503,113 @@ void Pattern::AddRealTimeListFromMidiFile(string s)
 
 void Pattern::SetRealTimeMultipliers(vector<string>::iterator token, vector<string>::iterator end)
 {
-    if ( m_RealTimeSet.empty() )
-#ifdef MA_BLUE
-        return;
-#else
-        throw string("Pattern::SetRealTimeMultipliers() - No RealTime lists present.");
-#endif
-
-    double rate = 1.0;
-    double increment = 0.0;
-
-#ifndef MA_BLUE
-    try
-    {
-#endif
-        // Token should point to rate.
-
-        rate = strtod(token->c_str(), NULL);
-
-        // Now look for optional step increment.
-
-        if ( ++token != end )
-            increment = strtod(token->c_str(), NULL);
-#ifndef MA_BLUE
-    }
-    catch (...)
-    {
-        throw string("Pattern::SetRealTimeMultipliers() - There's something wrong with the parameter list.");
-    }
-#endif
-
-    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++, rate += increment)
-        rtList->SetMultiplier(rate);
+// TODO:LG
+//    if ( m_RealTimeSet.empty() )
+//#ifdef MA_BLUE
+//        return;
+//#else
+//        throw string("Pattern::SetRealTimeMultipliers() - No RealTime lists present.");
+//#endif
+//
+//    double rate = 1.0;
+//    double increment = 0.0;
+//
+//#ifndef MA_BLUE
+//    try
+//    {
+//#endif
+//        // Token should point to rate.
+//
+//        rate = strtod(token->c_str(), NULL);
+//
+//        // Now look for optional step increment.
+//
+//        if ( ++token != end )
+//            increment = strtod(token->c_str(), NULL);
+//#ifndef MA_BLUE
+//    }
+//    catch (...)
+//    {
+//        throw string("Pattern::SetRealTimeMultipliers() - There's something wrong with the parameter list.");
+//    }
+//#endif
+//
+//    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++, rate += increment)
+//        rtList->SetMultiplier(rate);
 }
 
 void Pattern::SetRealTimeQuantum(string & token)
 {
-    if ( m_RealTimeSet.empty() )
-#ifdef MA_BLUE
-        return;
-#else
-        throw string("Pattern::SetRealTimeQuantum() - No RealTime lists present.");
-#endif
-
-    double quantum;
-
-#ifdef MA_BLUE
-    quantum = strtod(token.c_str(), NULL);
-    if ( errno != 0 )
-        return;
-#else
-    try
-    {
-        quantum = stod(token.c_str());
-    }
-    catch (...)
-    {
-        throw string("Pattern::SetRealTimeQuantum() - There's something wrong with the parameter list.");
-    }
-#endif
-
-    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
-        rtList->SetQuantum(quantum);
+// TODO:LG
+//    if ( m_RealTimeSet.empty() )
+//#ifdef MA_BLUE
+//        return;
+//#else
+//        throw string("Pattern::SetRealTimeQuantum() - No RealTime lists present.");
+//#endif
+//
+//    double quantum;
+//
+//#ifdef MA_BLUE
+//    quantum = strtod(token.c_str(), NULL);
+//    if ( errno != 0 )
+//        return;
+//#else
+//    try
+//    {
+//        quantum = stod(token.c_str());
+//    }
+//    catch (...)
+//    {
+//        throw string("Pattern::SetRealTimeQuantum() - There's something wrong with the parameter list.");
+//    }
+//#endif
+//
+//    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
+//        rtList->SetQuantum(quantum);
 }
 
 
 void Pattern::SetRealTimeStartPhase(string & token)
 {
-    if ( m_RealTimeSet.empty() )
-#ifdef MA_BLUE
-        return;
-#else
-        throw string("Pattern::SetRealTimeStartPhase() - No RealTime lists present.");
-#endif
-
-    double phase;
-
-#ifdef MA_BLUE
-    phase = strtod(token.c_str(), NULL)/100;
-    if ( errno != 0 )
-        return;
-#else
-    try
-    {
-        phase = stod(token.c_str())/100;
-    }
-    catch (...)
-    {
-        throw string("Pattern::SetRealTimePhase() - There's something wrong with the parameter list.");
-    }
-#endif
-
-    // Calculate an overall pattern phase length using current list phaselengths.
-
-    vector<int64_t> phaseLengths;
-
-    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
-        phaseLengths.push_back(rtList->PhaseLength());
-
-    int64_t patternPhaseLength = std::accumulate(phaseLengths.begin(), phaseLengths.end(), 1, lcm);
-
-    // Convert to a start beat value and reset all positions. Subsequent resets will also use this value.
-
-    m_RealTimeBeatStart = phase * static_cast<double>(patternPhaseLength)/1000;
-    ResetPosition();
+// TODO:LG
+//    if ( m_RealTimeSet.empty() )
+//#ifdef MA_BLUE
+//        return;
+//#else
+//        throw string("Pattern::SetRealTimeStartPhase() - No RealTime lists present.");
+//#endif
+//
+//    double phase;
+//
+//#ifdef MA_BLUE
+//    phase = strtod(token.c_str(), NULL)/100;
+//    if ( errno != 0 )
+//        return;
+//#else
+//    try
+//    {
+//        phase = stod(token.c_str())/100;
+//    }
+//    catch (...)
+//    {
+//        throw string("Pattern::SetRealTimePhase() - There's something wrong with the parameter list.");
+//    }
+//#endif
+//
+//    // Calculate an overall pattern phase length using current list phaselengths.
+//
+//    vector<int64_t> phaseLengths;
+//
+//    for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++)
+//        phaseLengths.push_back(rtList->PhaseLength());
+//
+//    int64_t patternPhaseLength = std::accumulate(phaseLengths.begin(), phaseLengths.end(), 1, lcm);
+//
+//    // Convert to a start beat value and reset all positions. Subsequent resets will also use this value.
+//
+//    m_RealTimeBeatStart = phase * static_cast<double>(patternPhaseLength)/1000;
+//    ResetPosition();
 }
 
 enum rt_echo_parameter_t
@@ -624,75 +633,79 @@ unordered_map<string, rt_echo_parameter_t> rt_echo_parameter_lookup =
 
 void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::iterator last)
 {
-    if ( m_RealTimeSet.empty() )
-#ifdef MA_BLUE
-        return;
-#else
-        throw string("Pattern::StartRealTimeEcho() - No RealTime lists present.");
-#endif
-
-    double inc = 0;
-    double target = 0;
-    int interval = 0;
-
-#ifndef MA_BLUE
-    try
-    {
-#endif
-        for(; token != last; token++ )
-        {
-            switch(rt_echo_parameter_lookup.at(token->c_str()))
-            {
-            case rte_increment:
-//                inc = stod(*(++token));
-                inc = strtod((++token)->c_str(), NULL);
-                break;
-            case rte_target:
-//                target = stod(*(++token));
-                target = strtod((++token)->c_str(), NULL);
-                break;
-            case rte_interval:
-//                interval = stoi(*(++token));
-                interval = strtol((++token)->c_str(), NULL, 0);
-                break;
-            default:
-                break;
-            }
-        }
-#ifndef MA_BLUE
-    }
-    catch (...)
-    {
-        throw string("Pattern::StartRealTimeEcho() - There's something wrong with the parameter list.");
-    }
-#endif
-
-    if ( equals_3(inc, 0) )
-#ifdef MA_BLUE
-        return;
-#else
-        throw string("Increment must be set for other parameters to have and effect.");
-#endif
-
-    auto rtList = m_RealTimeSet.begin() + m_PosEdit;
-
-    if ( rtList != m_RealTimeSet.end() )
-        rtList->BeginEcho(inc, target, interval);
+// TODO:LG
+//    if ( m_RealTimeSet.empty() )
+//#ifdef MA_BLUE
+//        return;
+//#else
+//        throw string("Pattern::StartRealTimeEcho() - No RealTime lists present.");
+//#endif
+//
+//    double inc = 0;
+//    double target = 0;
+//    int interval = 0;
+//
+//#ifndef MA_BLUE
+//    try
+//    {
+//#endif
+//        for(; token != last; token++ )
+//        {
+//            switch(rt_echo_parameter_lookup.at(token->c_str()))
+//            {
+//            case rte_increment:
+////                inc = stod(*(++token));
+//                inc = strtod((++token)->c_str(), NULL);
+//                break;
+//            case rte_target:
+////                target = stod(*(++token));
+//                target = strtod((++token)->c_str(), NULL);
+//                break;
+//            case rte_interval:
+////                interval = stoi(*(++token));
+//                interval = strtol((++token)->c_str(), NULL, 0);
+//                break;
+//            default:
+//                break;
+//            }
+//        }
+//#ifndef MA_BLUE
+//    }
+//    catch (...)
+//    {
+//        throw string("Pattern::StartRealTimeEcho() - There's something wrong with the parameter list.");
+//    }
+//#endif
+//
+//    if ( equals_3(inc, 0) )
+//#ifdef MA_BLUE
+//        return;
+//#else
+//        throw string("Increment must be set for other parameters to have and effect.");
+//#endif
+//
+//    auto rtList = m_RealTimeSet.begin() + m_PosEdit;
+//
+//    if ( rtList != m_RealTimeSet.end() )
+//        rtList->BeginEcho(inc, target, interval);
 }
 
 int Pattern::NewList()
 {
-    m_StepListSet.emplace_back();
-    m_PosEdit = m_StepListSet.size() - 1;
+// TODO:LG
+//    m_StepListSet.emplace_back();
+//    m_PosEdit = m_StepListSet.size() - 1;
     return m_PosEdit;
 }
 
 void Pattern::ReplaceList(StepList & noteList)
 {
-    if ( m_PosEdit >= m_StepListSet.size() )
-        m_StepListSet.resize(m_PosEdit + 1);
+// TODO:LG
 
-    m_StepListSet.at(m_PosEdit) = noteList;
+//    if ( m_PosEdit >= m_StepListSet.size() )
+//        m_StepListSet.resize(m_PosEdit + 1);
+//
+//    m_StepListSet.at(m_PosEdit) = noteList;
 }
 
 
@@ -724,58 +737,60 @@ string Pattern::Label(size_t width)
 
 void Pattern::DeleteCurrentList()
 {
-    if ( m_StepListSet.empty() )
-        return;
-
-    m_StepListSet.erase(m_StepListSet.begin() + m_PosEdit);
-
-    if ( m_StepListSet.empty() )
-    {
-        m_PosEdit = 0;
-        m_Pos = 0;
-        return;
-    }
-
-    // If the play pointer is above the pattern that was deleted,
-    // move it down to keep it with the pattern it points at.
-    //
-    // Or, if the play pointer was pointing at the last pattern in
-    // the list and that was deleted, it needs to point to the item
-    // that's now at the end of the list.
-    //
-    // (If it was pointing at the pattern that was deleted, it now
-    // points to the one that took its place.)
-
-    if ( m_Pos > m_PosEdit || m_Pos == m_StepListSet.size() )
-        m_Pos -= 1;
-
-    // The edit pointer stays in place and now points to next in
-    // list (unless it was already at the end of the list).
-
-    if ( m_PosEdit == m_StepListSet.size() )
-        m_PosEdit -= 1;
-
+// TODO:LG
+//    if ( m_StepListSet.empty() )
+//        return;
+//
+//    m_StepListSet.erase(m_StepListSet.begin() + m_PosEdit);
+//
+//    if ( m_StepListSet.empty() )
+//    {
+//        m_PosEdit = 0;
+//        m_Pos = 0;
+//        return;
+//    }
+//
+//    // If the edit pointer is above the list that was deleted,
+//    // move it down to keep it with the list it points at.
+//    //
+//    // Or, if the edit pointer was pointing at the last list in
+//    // the list and that was deleted, it needs to point to the item
+//    // that's now at the end of the list.
+//    //
+//    // (If it was pointing at the list that was deleted, it now
+//    // points to the one that took its place.)
+//
+//    if ( m_Pos > m_PosEdit || m_Pos == m_StepListSet.size() )
+//        m_Pos -= 1;
+//
+//    // The edit pointer stays in place and now points to next in
+//    // list (unless it was already at the end of the list).
+//
+//    if ( m_PosEdit == m_StepListSet.size() )
+//        m_PosEdit -= 1;
+//
 }
 
 void Pattern::DeleteCurrentRealTimeList()
 {
-    if ( m_RealTimeSet.empty() )
-        return;
-
-    m_RealTimeSet.erase(m_RealTimeSet.begin() + m_PosRealTimeEdit);
-
-    if ( m_RealTimeSet.empty() )
-    {
-        m_PosRealTimeEdit = 0;
-        return;
-    }
-
-    // The edit pointer stays in place and now points to next in
-    // list (unless it was already at the end of the list).
-
-    if ( m_PosRealTimeEdit == m_RealTimeSet.size() )
-        m_PosRealTimeEdit -= 1;
-
+// TODO:LG
+//    if ( m_RealTimeSet.empty() )
+//        return;
+//
+//    m_RealTimeSet.erase(m_RealTimeSet.begin() + m_PosRealTimeEdit);
+//
+//    if ( m_RealTimeSet.empty() )
+//    {
+//        m_PosRealTimeEdit = 0;
+//        return;
+//    }
+//
+//    // The edit pointer stays in place and now points to next in
+//    // list (unless it was already at the end of the list).
+//
+//    if ( m_PosRealTimeEdit == m_RealTimeSet.size() )
+//        m_PosRealTimeEdit -= 1;
+//
 }
 
 void Pattern::StoreStepValue( double val )
@@ -858,88 +873,89 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
 
     displayRows -= row;
 
-    int limitStep = m_StepListSet.size();
-    int limitRealTime = m_RealTimeSet.size();
-
-    if ( limitStep > 0 && limitRealTime > 0 )
-        displayRows -= 1; // Allow for spacer row.
-
-    while ( limitStep + limitRealTime > displayRows )
-    {
-        if ( limitRealTime >= limitStep )
-            limitRealTime -= 1;
-        else
-            limitStep -= 1;
-    }
-
-    // Step Lists
-
-    while ( m_DisplayStartStep > m_PosEdit )
-        m_DisplayStartStep -= 1;
-
-    while ( m_DisplayStartStep + limitStep <= m_PosEdit )
-        m_DisplayStartStep += 1;
-
-    for ( unsigned i = m_DisplayStartStep; i < m_DisplayStartStep + limitStep; i++ )
-    {
-        if ( i == m_PosEdit )
-        {
-            result += " -> ";
-            // highlights.push_back(PosInfo2(row, 1, 2));
-        }
-        else
-            result += "    ";
-        switch(mode)
-        {
-        case 1:
-            highlights.push_back(PosInfo2(row, centre, 4));
-            line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
-            result += Centre(line, centre, width, offset);
-            if ( length > 0 )
-                highlights.push_back(PosInfo2(row++, offset + 4, length));
-            break;
-        case 2:
-            line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
-            if ( length > 0 )
-                highlights.push_back(PosInfo2(row++, offset + 4, length));
-            line += '\n';
-            result += line;
-            break;
-        default:
-            break;
-        }
-    }
-
-    // Add spacer if both kinds of list are present.
-
-    if ( limitStep > 0 && limitRealTime > 0 )
-    {
-        result += '\n';
-        row += 1;
-    }
-
-    // Realtime Lists
-
-    while ( m_DisplayStartRealTime > m_PosRealTimeEdit )
-        m_DisplayStartRealTime -= 1;
-
-    while ( m_DisplayStartRealTime + limitRealTime <= m_PosRealTimeEdit )
-        m_DisplayStartRealTime += 1;
-
-    for ( unsigned i = m_DisplayStartRealTime; i < m_DisplayStartRealTime + limitRealTime; i++ )
-    {
-        if ( i == m_PosRealTimeEdit )
-        {
-            result += " -> ";
-            // highlights.push_back(PosInfo2(row, 1, 2));
-        }
-        else
-            result += "    ";
-        // highlights.push_back(PosInfo2(row, 4, 5));
-        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
-        // highlights.push_back(PosInfo2(row++, offset + 4, length));
-        result += '\n';
-    }
+// TODO:LG
+//    int limitStep = m_StepListSet.size();
+//    int limitRealTime = m_RealTimeSet.size();
+//
+//    if ( limitStep > 0 && limitRealTime > 0 )
+//        displayRows -= 1; // Allow for spacer row.
+//
+//    while ( limitStep + limitRealTime > displayRows )
+//    {
+//        if ( limitRealTime >= limitStep )
+//            limitRealTime -= 1;
+//        else
+//            limitStep -= 1;
+//    }
+//
+//    // Step Lists
+//
+//    while ( m_DisplayStartStep > m_PosEdit )
+//        m_DisplayStartStep -= 1;
+//
+//    while ( m_DisplayStartStep + limitStep <= m_PosEdit )
+//        m_DisplayStartStep += 1;
+//
+//    for ( unsigned i = m_DisplayStartStep; i < m_DisplayStartStep + limitStep; i++ )
+//    {
+//        if ( i == m_PosEdit )
+//        {
+//            result += " -> ";
+//            // highlights.push_back(PosInfo2(row, 1, 2));
+//        }
+//        else
+//            result += "    ";
+//        switch(mode)
+//        {
+//        case 1:
+//            highlights.push_back(PosInfo2(row, centre, 4));
+//            line = m_StepListSet.at(i).ToStringForDisplay(offset, length);
+//            result += Centre(line, centre, width, offset);
+//            if ( length > 0 )
+//                highlights.push_back(PosInfo2(row++, offset + 4, length));
+//            break;
+//        case 2:
+//            line = m_StepListSet.at(i).ToStringForDisplay2(offset, length, width);
+//            if ( length > 0 )
+//                highlights.push_back(PosInfo2(row++, offset + 4, length));
+//            line += '\n';
+//            result += line;
+//            break;
+//        default:
+//            break;
+//        }
+//    }
+//
+//    // Add spacer if both kinds of list are present.
+//
+//    if ( limitStep > 0 && limitRealTime > 0 )
+//    {
+//        result += '\n';
+//        row += 1;
+//    }
+//
+//    // Realtime Lists
+//
+//    while ( m_DisplayStartRealTime > m_PosRealTimeEdit )
+//        m_DisplayStartRealTime -= 1;
+//
+//    while ( m_DisplayStartRealTime + limitRealTime <= m_PosRealTimeEdit )
+//        m_DisplayStartRealTime += 1;
+//
+//    for ( unsigned i = m_DisplayStartRealTime; i < m_DisplayStartRealTime + limitRealTime; i++ )
+//    {
+//        if ( i == m_PosRealTimeEdit )
+//        {
+//            result += " -> ";
+//            // highlights.push_back(PosInfo2(row, 1, 2));
+//        }
+//        else
+//            result += "    ";
+//        // highlights.push_back(PosInfo2(row, 4, 5));
+//        result += m_RealTimeSet.at(i).ToStringForDisplay(offset, length);
+//        // highlights.push_back(PosInfo2(row++, offset + 4, length));
+//        result += '\n';
+//    }
 
     return result;
 }

@@ -19,6 +19,7 @@
 
 #include <cmath>
 
+
 using namespace std;
 
 #ifdef MA_BLUE

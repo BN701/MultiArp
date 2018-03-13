@@ -93,8 +93,6 @@
 		<Unit filename="alsa_types.h">
 			<Option target="Debug (Blue)" />
 		</Unit>
-		<Unit filename="maAlsaSequencer.h" />
-		<Unit filename="maAlsaSequencerQueue.h" />
 		<Unit filename="maAnsiUI.cpp" />
 		<Unit filename="maAnsiUI.h" />
 		<Unit filename="maBaseUI.cpp" />
@@ -103,6 +101,8 @@
 		<Unit filename="maChainLink.h" />
 		<Unit filename="maCommand.cpp" />
 		<Unit filename="maCommand.h" />
+		<Unit filename="maCommandMenu.cpp" />
+		<Unit filename="maCommandMenu.h" />
 		<Unit filename="maControl.cpp" />
 		<Unit filename="maControl.h" />
 		<Unit filename="maCursorKeys.cpp" />

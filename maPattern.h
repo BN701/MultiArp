@@ -27,6 +27,9 @@
 #include "maCursorKeys.h"
 #include "maFeelMap.h"
 #include "maNotes.h"
+#include "maListGroup.h"
+#include "maRealTimeList.h"
+#include "maStepList.h"
 #include "maTranslateTable.h"
 #include "maTrigList.h"
 
@@ -40,8 +43,10 @@ struct Pattern
 
 //    std::vector<int> m_Trigs;
 
-    std::vector<StepList> m_StepListSet;
-    std::vector<RealTimeList> m_RealTimeSet;
+//    std::vector<StepList> m_StepListSet;
+//    std::vector<RealTimeList> m_RealTimeSet;
+
+    std::vector<ListGroup> m_ListGroups;
 
     std::string m_Label;
 
@@ -76,8 +81,9 @@ struct Pattern
     bool GateHold() { return m_GateHold; }
     unsigned char Velocity() { return m_Velocity; }
 
-    StepList & StepListForEdit() { return m_StepListSet.at(m_PosEdit); }
-    RealTimeList & RTListForEdit() { return m_RealTimeSet.at(m_PosRealTimeEdit); }
+//    StepList & StepListForEdit() { return m_StepListSet.at(m_PosEdit); }
+//    RealTimeList & RTListForEdit() { return m_RealTimeSet.at(m_PosRealTimeEdit); }
+    ListGroup & ListGroupForEdit() { return m_ListGroups.at(m_PosEdit); }
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
     TrigList & PatternTrigList() { return m_TrigList; }
@@ -98,8 +104,9 @@ struct Pattern
     void Clear()
     {
         m_Label.clear();
-        m_StepListSet.clear();
-        m_RealTimeSet.clear();
+//        m_StepListSet.clear();
+//        m_RealTimeSet.clear();
+        m_ListGroups.clear();
         ResetPosition();
         m_TranslateTable.Reset();
         m_TrigList.Clear();
@@ -113,27 +120,30 @@ struct Pattern
 
     void SetEditPos( std::vector<int>::size_type p )
     {
-        if ( p >= 0 && p < m_StepListSet.size() )
+//        if ( p >= 0 && p < m_StepListSet.size() )
+//            m_PosEdit = p;
+        if ( p >= 0 && p < m_ListGroups.size() )
             m_PosEdit = p;
     }
 
-    void SetRealTimeEditPos( std::vector<int>::size_type p )
-    {
-        if ( p >= 0 && p < m_RealTimeSet.size() )
-            m_PosRealTimeEdit = p;
-    }
+//    void SetRealTimeEditPos( std::vector<int>::size_type p )
+//    {
+//        if ( p >= 0 && p < m_RealTimeSet.size() )
+//            m_PosRealTimeEdit = p;
+//    }
 
     void SetStepValue( double val ) { m_StepValue = val; }
-    int StepListCount() { return m_StepListSet.size(); }
-    int RealTimeListCount() { return m_RealTimeSet.size(); }
+//    int StepListCount() { return m_StepListSet.size(); }
+    int ListGroupCount() { return m_ListGroups.size(); }
+//    int RealTimeListCount() { return m_RealTimeSet.size(); }
     int TrigListCount() { return m_TrigList.Size(); }
     void ResetPosition()
     {
         m_Pos = 0;
         m_TrigList.ResetPosition();
 
-        for ( auto stepList = m_StepListSet.begin(); stepList != m_StepListSet.end(); stepList++ )
-            stepList->ResetPosition();
+        for ( auto group = m_ListGroups.begin(); group != m_ListGroups.end(); group++ )
+            group->ResetPosition();
 
         m_RealTimeBeat = m_RealTimeBeatStart;
         m_RealTimeComplete = false;
@@ -177,8 +187,8 @@ struct Pattern
 
     void UpEditPos() { SetEditPos( m_PosEdit + 1); }
     void DownEditPos() { SetEditPos( m_PosEdit - 1); }
-    void UpRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit + 1); }
-    void DownRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit - 1); }
+//    void UpRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit + 1); }
+//    void DownRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit - 1); }
 
 };
 

@@ -227,7 +227,8 @@ void update_edit_panels(bool refreshList)
     char text[100];
     Pattern & p = g_PatternStore.CurrentEditPattern();
 
-    snprintf(text, 100, "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
+// TODO:LG
+//    snprintf(text, 100, "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
     g_TextUI.Text(BaseUI::edit_summary_panel, 0, 1, text);
 
     snprintf(text, 100, "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),

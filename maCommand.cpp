@@ -18,6 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "maCommand.h"
+#include "maCommandMenu.h"
 
 #include <algorithm>
 #include <cstring>
@@ -51,12 +52,12 @@ using namespace std;
 #ifndef MA_BLUE
 #endif
 
-extern State g_State;
-extern PatternStore g_PatternStore;
 extern AnsiUI g_TextUI;
+extern CommandMenu g_CommandMenu;
 extern ListBuilder g_ListBuilder;
+extern PatternStore g_PatternStore;
+extern State g_State;
 
-CommandMenu g_CommandMenu;
 
 unordered_map<string, command_t> g_CommandList =
 {
@@ -756,32 +757,32 @@ bool do_command(string commandString, int directCommand)
             show_status_after_navigation();
             break;
         case C_FEEL_OFF:
-           g_PatternStore.FeelMapForEdit().SetActive(false);
+            g_PatternStore.FeelMapForEdit().SetActive(false);
             show_status_after_navigation();
             break;
         case C_FEEL_NEW:
-           g_PatternStore.FeelMapForEdit().New(tokens);
+            g_PatternStore.FeelMapForEdit().New(tokens);
             show_status_after_navigation();
             break;
         case C_FEEL_ADD:
-           g_PatternStore.FeelMapForEdit().Add();
+            g_PatternStore.FeelMapForEdit().Add();
             show_status_after_navigation();
             break;
         case C_FEEL_REMOVE:
-           g_PatternStore.FeelMapForEdit().Remove();
+            g_PatternStore.FeelMapForEdit().Remove();
             show_status_after_navigation();
             break;
         case C_FEEL_RESPACE:
-           g_PatternStore.FeelMapForEdit().Respace();
+            g_PatternStore.FeelMapForEdit().Respace();
             show_status_after_navigation();
             break;
 
         case C_SCALE:
-           g_PatternStore.TranslateTableForEdit().SetStatus();    // This automatically sets focus.
+            g_PatternStore.TranslateTableForEdit().SetStatus();    // This automatically sets focus.
             show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:
-           g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditStepList());
+//            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditStepList());
             show_translation_map_status();
             break;
         case C_SCALE_SHOW:
@@ -1007,8 +1008,8 @@ bool do_command(string commandString, int directCommand)
                 set_status(STAT_POS_2, "Hint: list new|delete|n [clear|: n1, n2 ,...]");
                 break;
             }
-           set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
-           update_pattern_panel();
+            set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
+            update_pattern_panel();
             break;
 
 #ifndef MA_BLUE
@@ -1025,60 +1026,66 @@ bool do_command(string commandString, int directCommand)
 #endif
 
        case C_LIST_RT:
-           g_PatternStore.CurrentEditRealTimeList().SetStatus();
-           g_PatternStore.CurrentEditRealTimeList().SetFocus();
-           show_status_after_navigation();
+// TODO:LG
+//           g_PatternStore.CurrentEditRealTimeList().SetStatus();
+//           g_PatternStore.CurrentEditRealTimeList().SetFocus();
+//           show_status_after_navigation();
            break;
 
        case C_LIST_RT_DELETE:
-           g_PatternStore.DeleteCurrentRealTimeList();
-           g_PatternStore.SetFocus();
-           g_PatternStore.SetStatus();
-           show_status_after_navigation();
+// TODO:LG
+//           g_PatternStore.DeleteCurrentRealTimeList();
+//           g_PatternStore.SetFocus();
+//           g_PatternStore.SetStatus();
+//           show_status_after_navigation();
            break;
 
        case C_LIST_RT_RATE:
-           if ( firstParameter > 0 )
-           {
-               g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens.begin() + firstParameter, tokens.end());
-               set_status(STAT_POS_2, "Pattern %i: Real Time playback rates set.", g_PatternStore.CurrentEditPatternID());
-               show_status_after_navigation();
-           }
-           else
-               set_status(STAT_POS_2, "help: real time rate \"rate\" [\"step\"]");
+// TODO:LG
+//           if ( firstParameter > 0 )
+//           {
+//               g_PatternStore.CurrentEditPattern().SetRealTimeMultipliers(tokens.begin() + firstParameter, tokens.end());
+//               set_status(STAT_POS_2, "Pattern %i: Real Time playback rates set.", g_PatternStore.CurrentEditPatternID());
+//               show_status_after_navigation();
+//           }
+//           else
+//               set_status(STAT_POS_2, "help: real time rate \"rate\" [\"step\"]");
            break;
 
        case C_LIST_RT_QUANTUM:
-           if ( firstParameter > 0 )
-           {
-               g_PatternStore.CurrentEditPattern().SetRealTimeQuantum(tokens.at(firstParameter));
-               set_status(STAT_POS_2, "Pattern %i: loop length (quantum) set for Real Timelists.", g_PatternStore.CurrentEditPatternID());
-               show_status_after_navigation();
-           }
-           else
-               set_status(STAT_POS_2, "help: real time quantum [q]");
+// TODO:LG
+//           if ( firstParameter > 0 )
+//           {
+//               g_PatternStore.CurrentEditPattern().SetRealTimeQuantum(tokens.at(firstParameter));
+//               set_status(STAT_POS_2, "Pattern %i: loop length (quantum) set for Real Timelists.", g_PatternStore.CurrentEditPatternID());
+//               show_status_after_navigation();
+//           }
+//           else
+//               set_status(STAT_POS_2, "help: real time quantum [q]");
            break;
 
        case C_LIST_RT_START_PHASE:
-           if ( firstParameter > 0 )
-           {
-               g_PatternStore.CurrentEditPattern().SetRealTimeStartPhase(tokens.at(firstParameter));
-               set_status(STAT_POS_2, "Pattern %i: start phase set for Real Time lists.", g_PatternStore.CurrentEditPatternID());
-               show_status_after_navigation();
-           }
-           else
-               set_status(STAT_POS_2, "help: real time phase [0..99%]");
+// TODO:LG
+//           if ( firstParameter > 0 )
+//           {
+//               g_PatternStore.CurrentEditPattern().SetRealTimeStartPhase(tokens.at(firstParameter));
+//               set_status(STAT_POS_2, "Pattern %i: start phase set for Real Time lists.", g_PatternStore.CurrentEditPatternID());
+//               show_status_after_navigation();
+//           }
+//           else
+//               set_status(STAT_POS_2, "help: real time phase [0..99%]");
            break;
 
        case C_LIST_RT_ECHO:
-           if ( firstParameter > 0 )
-           {
-               g_PatternStore.CurrentEditPattern().StartRealTimeEcho(tokens.begin() + firstParameter, tokens.end());
-               set_status(STAT_POS_2, "Pattern %i: started echo on current Real Time list.", g_PatternStore.CurrentEditPatternID());
-               show_status_after_navigation();
-           }
-           else
-               set_status(STAT_POS_2, "help: real time echo inc[rement] n.nn int[erval] n t[arget] nn%");
+// TODO:LG
+//           if ( firstParameter > 0 )
+//           {
+//               g_PatternStore.CurrentEditPattern().StartRealTimeEcho(tokens.begin() + firstParameter, tokens.end());
+//               set_status(STAT_POS_2, "Pattern %i: started echo on current Real Time list.", g_PatternStore.CurrentEditPatternID());
+//               show_status_after_navigation();
+//           }
+//           else
+//               set_status(STAT_POS_2, "help: real time echo inc[rement] n.nn int[erval] n t[arget] nn%");
            break;
 
         case C_HELP :
@@ -1548,165 +1555,3 @@ bool handle_key_input(BaseUI::key_command_t key)
 }
 
 
-multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
-{
-    {C_MENU_ID_TOP, {true, C_MENU_ID_MIDI_MODE, "Midi Capture", ""}},
-    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
-    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
-    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
-
-    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
-    {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
-    {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
-    {C_MENU_ID_PATTERN, {false, C_NEW, "New", ""}},
-};
-
-int CommandMenu::InitMenuPos(int menu)
-{
-    switch (menu)
-    {
-        case C_MENU_ID_MIDI_MODE:
-            m_MenuPos = g_ListBuilder.MidiInputMode();
-            break;
-
-        default:
-            m_MenuPos = 0;
-            break;
-    }
-
-    return m_MenuPos;
-}
-
-void CommandMenu::Open(int menu)
-{
-    m_Active = true;
-    m_MenuString = "";
-    m_CurrentMenu = m_MenuItems.equal_range(menu);
-    m_FieldPositions.clear();
-    InitMenuPos(menu);
-
-    int i = 1;
-    m_Choices = 0;
-
-    for (auto it = m_CurrentMenu.first; it != m_CurrentMenu.second; it++, i++)
-    {
-        char prefix[20];
-        snprintf(prefix, 20, "%s%i) ", i == 1 ? "" : " ", i);
-        m_MenuString += prefix;
-        int pos = m_MenuString.size();
-        m_MenuString += it->second.m_Label;
-        m_FieldPositions.emplace_back(pos, static_cast<int>(m_MenuString.size() - pos));
-        m_Choices += 1;
-    }
-
-    // Only do this once.
-
-    string title = "Menu";
-    for ( auto it = m_MenuStack.begin(); it != m_MenuStack.end(); it++ )
-    {
-        title += " >";
-        title += (*it)->m_Label;
-    }
-    set_status(STAT_POS_2, title.c_str());
-
-    Show();
-
-}
-
-void CommandMenu::Show()
-{
-    set_status(COMMAND_HOME, m_MenuString.c_str());
-    g_TextUI.HighlightLastWrite(m_FieldPositions[m_MenuPos].offset, m_FieldPositions[m_MenuPos].length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
-}
-
-void CommandMenu::ClearAll()
-{
-    m_MenuStack.clear();
-    m_Active = false;
-}
-
-void CommandMenu::Choose(int choice)
-{
-    int i = 0;
-    auto it = m_CurrentMenu.first;
-    while ( it != m_CurrentMenu.second && i < choice )
-    {
-        it++;
-        i++;
-    }
-    if ( it != m_CurrentMenu.second )
-    {
-        CommandMenuItem & item = it->second;
-        if ( item.m_SubMenu )
-        {
-            m_MenuStack.push_back(&item);
-            Open(item.m_Command);
-        }
-        else
-        {
-            set_status(COMMAND_HOME, "");
-            do_command(item.m_ParameterString, item.m_Command);
-            ClearAll();
-        }
-    }
-}
-
-bool CommandMenu::HandleKey(BaseUI::key_command_t key)
-{
-    if ( ! m_Active )
-        return false;
-
-    switch ((int) key)
-    {
-        case '/':
-            set_status(STAT_POS_2, "");
-            set_status(COMMAND_HOME, "");
-            ClearAll();
-            break;
-
-        case BaseUI::key_return:
-            Choose(m_MenuPos);
-            break;
-
-        case BaseUI::key_backspace:
-            if ( m_MenuStack.empty() )
-                break;
-            m_MenuStack.pop_back();
-            if ( ! m_MenuStack.empty() )
-                Open(m_MenuStack.back()->m_Command);
-            else
-                Open();
-            break;
-
-        case BaseUI::key_left:
-            if ( m_MenuPos  > 0 )
-            {
-                m_MenuPos -= 1;
-                Show();
-            }
-            break;
-
-        case BaseUI::key_right:
-            if ( m_MenuPos < m_Choices - 1 )
-            {
-                m_MenuPos += 1;
-                Show();
-            }
-            break;
-
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-            Choose(key - '1');
-            break;
-        default:
-            break;
-    }
-
-    return true;
-}

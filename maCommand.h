@@ -164,60 +164,6 @@ enum command_t
 };
 
 
-enum command_menu_id_t
-{
-    C_MENU_ID_NONE,
-    C_MENU_ID_TOP,
-
-    C_MENU_ID_PATTERN,
-//    C_MENU_ID_PATTERN_NEW,
-//    C_MENU_ID_PATTERN_COPY,
-//    C_MENU_ID_PATTERN_DELETE,
-
-    C_MENU_ID_MIDI_MODE,
-//    C_MENU_ID_MIDI_QUICK,
-//    C_MENU_ID_MIDI_STEP,
-//    C_MENU_ID_MIDI_REALTIME,
-//
-    C_MENU_ID_TRIGS,
-    C_MENU_ID_LIST,
-    C_MENU_ID_GLOBAL
-};
-
-struct CommandMenuItem
-{
-//    command_menu_id_t m_Parent;
-    bool m_SubMenu;
-    int m_Command;
-    const char * m_Label;
-    const char * m_ParameterString;
-};
-
-
-class CommandMenu
-{
-    public:
-        bool Active() { return m_Active; }
-        void Open(int menu = C_MENU_ID_TOP);
-        void Show();
-        void Choose(int i);
-        bool HandleKey(BaseUI::key_command_t key);
-        void ClearAll();
-
-    private:
-        static std::multimap<int, CommandMenuItem> m_MenuItems;
-
-        bool m_Active = false;
-        int m_MenuPos = 0;
-        int m_Choices = 0;
-
-        std::vector<CommandMenuItem *> m_MenuStack;
-        std::pair <std::multimap<int, CommandMenuItem>::iterator, std::multimap<int, CommandMenuItem>::iterator> m_CurrentMenu;
-        std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
-        std::string m_MenuString;
-
-        int InitMenuPos(int menu);
-};
 
 
 

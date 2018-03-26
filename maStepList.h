@@ -20,9 +20,10 @@
 #ifndef MASTEPLIST_H_INCLUDED
 #define MASTEPLIST_H_INCLUDED
 
-#include <vector>
-#include <string>
+#include <memory>
 #include <map>
+#include <string>
+#include <vector>
 
 #include "maCursorKeys.h"
 
@@ -44,6 +45,8 @@ struct StepList : public CursorKeys
         m_LastRequestedPos(0),
         m_Complete(false)
     {
+        m_DisplayObjectType = dot_step_list;
+        m_PopUpMenuID = C_MENU_ID_STEPLIST;
         m_Help = "S-Left/Right: insert cluster, C-Left/Right: copy cluster, S-Del: delete";
     }
 
@@ -115,5 +118,6 @@ struct StepList : public CursorKeys
 
 };
 
+typedef std::shared_ptr<StepList> StepListPtr;
 
 #endif // MANOTES_H_INCLUDED

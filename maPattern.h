@@ -20,9 +20,10 @@
 #ifndef MAPATTERN_H_INCLUDED
 #define MAPATTERN_H_INCLUDED
 
-#include <vector>
-#include <string>
+#include <list>
 #include <map>
+#include <string>
+#include <vector>
 
 #include "maCursorKeys.h"
 #include "maFeelMap.h"
@@ -33,11 +34,11 @@
 #include "maTranslateTable.h"
 #include "maTrigList.h"
 
-struct Pattern
+struct Pattern : public CursorKeys
 {
     static Pattern EmptyPattern;
     std::vector<StepList>::size_type m_Pos;
-    std::vector<StepList>::size_type m_PosEdit;
+//    std::vector<StepList>::size_type m_PosEdit;
     std::vector<RealTimeList>::size_type m_PosRealTimeEdit;
     std::vector<StepList>::size_type m_LastRequestedPos;
 
@@ -46,7 +47,12 @@ struct Pattern
 //    std::vector<StepList> m_StepListSet;
 //    std::vector<RealTimeList> m_RealTimeSet;
 
-    std::vector<ListGroup> m_ListGroups;
+    std::vector<ListGroup *> m_ListGroups;
+    std::list<CursorKeys *> m_DisplayList;
+    std::list<CursorKeys *>::iterator m_PosCursor;
+    // int m_PosCursor = 0;
+
+    std::list<CursorKeys *>::iterator CursorPos() { return m_PosCursor; }
 
     std::string m_Label;
 
@@ -83,14 +89,16 @@ struct Pattern
 
 //    StepList & StepListForEdit() { return m_StepListSet.at(m_PosEdit); }
 //    RealTimeList & RTListForEdit() { return m_RealTimeSet.at(m_PosRealTimeEdit); }
-    ListGroup & ListGroupForEdit() { return m_ListGroups.at(m_PosEdit); }
+//    ListGroup & ListGroupForEdit() { return *m_ListGroups.at(m_PosEdit); }
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
     TrigList & PatternTrigList() { return m_TrigList; }
 
+    void SetStatus();
+
     Pattern():
         m_Pos(0),
-        m_PosEdit(0),
+//        m_PosEdit(0),
         m_PosRealTimeEdit(0),
         m_LastRequestedPos(0),
         m_StepValue(16),
@@ -98,15 +106,43 @@ struct Pattern
         m_GateHold(false),
         m_Velocity(64)
     {
-        // NewList();
+        m_PopUpMenuID = C_MENU_ID_PATTERN;
+        m_DisplayList.push_back(this);
+        m_PosCursor = m_DisplayList.begin();
     }
+
+    Pattern(const Pattern & p):
+        m_Pos(p.m_Pos),
+        m_PosCursor(p.m_PosCursor),
+        m_StepValue(p.m_StepValue),
+        m_Gate(p.m_Gate),
+        m_GateHold(p.m_GateHold),
+        m_Velocity(p.m_Velocity),
+        m_Label(p.m_Label)
+    {
+        m_PopUpMenuID = p.m_PopUpMenuID;
+        m_DisplayList.push_back(this);
+        m_PosCursor = m_DisplayList.begin();
+
+        for ( auto lg = p.m_ListGroups.begin(); lg != p.m_ListGroups.end(); lg++ )
+        {
+            m_ListGroups.push_back(*lg);
+            m_DisplayList.push_back(m_ListGroups.back());
+        }
+
+    }
+
 
     void Clear()
     {
         m_Label.clear();
 //        m_StepListSet.clear();
 //        m_RealTimeSet.clear();
-        m_ListGroups.clear();
+        while ( ! m_ListGroups.empty() )
+        {
+            delete m_ListGroups.back();
+            m_ListGroups.pop_back();
+        }
         ResetPosition();
         m_TranslateTable.Reset();
         m_TrigList.Clear();
@@ -118,13 +154,25 @@ struct Pattern
 
     void SetLabel(const char * label) { m_Label = label; }
 
-    void SetEditPos( std::vector<int>::size_type p )
+//    void SetCursorPos( int p )
+//    {
+////        if ( p >= 0 && p < m_StepListSet.size() )
+////            m_PosEdit = p;
+//        if ( p >= 0 && p < m_DisplayList.size() )
+//            m_PosCursor = p;
+//    }
+
+    command_menu_id_t PopUpMenuID()
     {
-//        if ( p >= 0 && p < m_StepListSet.size() )
-//            m_PosEdit = p;
-        if ( p >= 0 && p < m_ListGroups.size() )
-            m_PosEdit = p;
+        // If there's a legitimate reason for coming here
+        // when the display list is empty we'll add a
+        // check. Otherwise, let it crash and solve it
+        // in the debugger.
+
+        return (*m_PosCursor)->PopUpMenuID();
     }
+
+    std::string StepListManager(command_t command);
 
 //    void SetRealTimeEditPos( std::vector<int>::size_type p )
 //    {
@@ -143,7 +191,7 @@ struct Pattern
         m_TrigList.ResetPosition();
 
         for ( auto group = m_ListGroups.begin(); group != m_ListGroups.end(); group++ )
-            group->ResetPosition();
+            (*group)->ResetPosition();
 
         m_RealTimeBeat = m_RealTimeBeatStart;
         m_RealTimeComplete = false;
@@ -179,14 +227,25 @@ struct Pattern
     void SetFieldsFromString(std::string s);
 
     void ReplaceList(StepList & noteList);
-    int NewList();
+    void NewListGroup(ListGroup::list_group_type type);
     void DeleteCurrentList();
     void DeleteCurrentRealTimeList();
 
     bool AllListsComplete();
 
-    void UpEditPos() { SetEditPos( m_PosEdit + 1); }
-    void DownEditPos() { SetEditPos( m_PosEdit - 1); }
+//    void UpCursorPos() { SetCursorPos( m_PosCursor + 1); }
+    void UpCursorPos()
+    {
+        if ( m_PosCursor != --m_DisplayList.end())
+            m_PosCursor++;
+    }
+
+    void DownCursorPos()
+    {
+        if ( m_PosCursor != m_DisplayList.begin() )
+            m_PosCursor--;
+    }
+
 //    void UpRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit + 1); }
 //    void DownRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit - 1); }
 

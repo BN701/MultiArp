@@ -56,8 +56,8 @@ void show_listbuilder_status();
 void show_status_after_navigation();
 
 void update_edit_panels(bool refreshList = false);
-void update_pattern_panel();
-void update_pattern_panel_2();
+void update_big_panel();
+void update_big_panel_2();
 void update_pattern_status_panel();
 void update_progress_bar();
 

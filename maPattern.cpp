@@ -126,6 +126,44 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
 //    m_RealTimeBeat += 4.0 / stepValue;
 }
 
+string Pattern::StepListManager(command_t command)
+{
+
+    switch ( command )
+    {
+        case C_LIST_NEW:
+        {
+            // Get the current object (dynamic_cast checks for correct object type).
+            StepListGroup * pStepListGroup = dynamic_cast<StepListGroup*>(*m_PosCursor);
+            if ( pStepListGroup == NULL )
+                return "Pattern Step List Manager: Not a step list group.";
+            StepList *pStepList = pStepListGroup->NewStepList().get();
+            do {
+                m_PosCursor++;
+            } while ( m_PosCursor != m_DisplayList.end() && (*m_PosCursor)->CheckType(dot_step_list) );
+            // insert() doesn't seem to mind if position is at end of list,
+            // but I'd like to see it confirmed somewhere.
+            m_DisplayList.insert(m_PosCursor, pStepList);
+            m_PosCursor--;
+            break;
+        }
+        case C_LIST_EDIT:
+        {
+            StepList * pStepList = dynamic_cast<StepList*>(*m_PosCursor);
+            if ( pStepList == NULL )
+                return "Pattern Step List Manager: Not a step list.";
+            (*m_PosCursor)->SetFocus();
+            break;
+        }
+        default:
+            return "Pattern Step List Manager: Doesn't handle this command.";
+    }
+
+    return "";
+
+}
+
+
 bool Pattern::AllListsComplete()
 {
     bool bResult = true;
@@ -169,7 +207,32 @@ unordered_map<pat_element_names_t, const char *> pat_element_names = {
     {pat_name_velocity, "Vel"}
 };
 
+void Pattern::SetStatus()
+{
+    int pos = 0;
+    char buff[50];
 
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    snprintf(buff, 50, "Pattern %s", m_Label.c_str());
+    m_Status = buff;
+
+//    m_Status += " Midi: ";
+//    pos = m_Status.size();
+//    snprintf(buff, 50, "%02i", m_MidiChannel);
+//    m_Status += buff;
+//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+//    m_Status += " Step: ";
+//    pos = m_Status.size();
+//    snprintf(buff, 50, "%05.2f", m_Step);
+//    m_Status += buff;
+//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+//    if ( !m_FieldPositions.empty() )
+//        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+}
 
 string Pattern::ToString(const char * prefix)
 {
@@ -404,7 +467,7 @@ bool Pattern::AddStepListFromString(vector<StepList>::size_type index, string s)
 //    // are called by this process.)
 //
 //    m_StepListSet.resize(prevListSize);
-//    return false;
+    return false;
 }
 
 void Pattern::AddRealTimeList(std::map<double,Note> realTimeList, double quantum)
@@ -690,12 +753,26 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
 //        rtList->BeginEcho(inc, target, interval);
 }
 
-int Pattern::NewList()
+void Pattern::NewListGroup(ListGroup::list_group_type type)
 {
-// TODO:LG
 //    m_StepListSet.emplace_back();
 //    m_PosEdit = m_StepListSet.size() - 1;
-    return m_PosEdit;
+
+    switch (type)
+    {
+        case ListGroup::lgtype_step:
+            m_ListGroups.push_back(new StepListGroup());
+            break;
+        case ListGroup::lgtype_realtime:
+            m_ListGroups.push_back(new RTListGroup());
+            break;
+    }
+
+    m_DisplayList.push_back(m_ListGroups.back());
+
+    m_PosCursor = --m_DisplayList.end();
+
+//    return m_PosCursor;
 }
 
 void Pattern::ReplaceList(StepList & noteList)

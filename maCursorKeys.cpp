@@ -21,6 +21,8 @@
 #include "maCursorKeys.h"
 
 CursorKeys * CursorKeys::m_Focus = NULL;
+bool CursorKeys::m_RedrawDisplay = false;
+int CursorKeys::m_ObjectCount = 0;
 
 CursorKeys::CursorKeys()
 {

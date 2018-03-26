@@ -42,8 +42,16 @@
 
 #endif // MA_BLUE
 
-#include "maCursorKeys.h"
+//#include "maCursorKeys.h"
 #include "maBaseUI.h"
+
+struct screen_pos_t
+{
+    int offset;
+    int length;
+    screen_pos_t(int ofs = 0, int len = 0) { offset = ofs; length = len; }
+};
+
 
 enum command_menu_id_t
 {
@@ -54,7 +62,11 @@ enum command_menu_id_t
     C_MENU_ID_NEW,
     C_MENU_ID_PATTERN,
     C_MENU_ID_TOP,
-    C_MENU_ID_TRIGS
+    C_MENU_ID_TRIGS,
+    C_MENU_ID_STEPGROUP,
+    C_MENU_ID_RTGROUP,
+    C_MENU_ID_STEPLIST,
+    C_MENU_ID_RTLIST
 };
 
 struct CommandMenuItem

@@ -111,6 +111,8 @@
 		<Unit filename="maFeelMap.h" />
 		<Unit filename="maListBuilder.cpp" />
 		<Unit filename="maListBuilder.h" />
+		<Unit filename="maListGroup.cpp" />
+		<Unit filename="maListGroup.h" />
 		<Unit filename="maNotes.cpp" />
 		<Unit filename="maNotes.h" />
 		<Unit filename="maPattern.cpp" />
@@ -119,6 +121,8 @@
 		<Unit filename="maPatternChain.h" />
 		<Unit filename="maPatternStore.cpp" />
 		<Unit filename="maPatternStore.h" />
+		<Unit filename="maRealTime.cpp" />
+		<Unit filename="maRealTimeList.h" />
 		<Unit filename="maScreen.cpp" />
 		<Unit filename="maScreen.h" />
 		<Unit filename="maSequencer.cpp" />
@@ -127,6 +131,8 @@
 		<Unit filename="maState.h" />
 		<Unit filename="maStep.cpp" />
 		<Unit filename="maStep.h" />
+		<Unit filename="maStepList.cpp" />
+		<Unit filename="maStepList.h" />
 		<Unit filename="maTranslateTable.cpp" />
 		<Unit filename="maTranslateTable.h" />
 		<Unit filename="maTrigList.cpp" />

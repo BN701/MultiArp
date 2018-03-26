@@ -90,7 +90,7 @@ PatternStore g_PatternStore;
 
 AnsiUI g_TextUI;
 #ifndef MA_BLUE
-CairoUI g_CairoUI(true);
+CairoUI g_CairoUI(false);
 #endif
 
 State g_State;

@@ -61,19 +61,29 @@ CommandMenu g_CommandMenu;
 
 multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
-    {C_MENU_ID_TOP, {true, C_MENU_ID_NEW, "New", ""}},
-    {C_MENU_ID_NEW, {false, C_NONE, "Step List", "list new"}},
-    {C_MENU_ID_NEW, {false, C_NEW, "Pattern", ""}},
-
+    {C_MENU_ID_TOP, {false, C_NEW, "New Pattern", ""}},
     {C_MENU_ID_TOP, {true, C_MENU_ID_MIDI_MODE, "Midi Capture", ""}},
+
+    {C_MENU_ID_PATTERN, {false, C_NEW_STEP_GROUP, "New Step Group", ""}},
+    {C_MENU_ID_PATTERN, {false, C_NEW_RT_GROUP, "New RT Group", ""}},
+    {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
+    {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
+    {C_MENU_ID_PATTERN, {false, C_NEW, "New", ""}},
+
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
 
-    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
-    {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
-    {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
-    {C_MENU_ID_PATTERN, {false, C_NEW, "New", ""}},
+    {C_MENU_ID_STEPGROUP, {false, C_LIST_NEW, "New List", ""}},
+    {C_MENU_ID_STEPGROUP, {false, C_NONE, "Delete", ""}},
+
+    {C_MENU_ID_STEPLIST, {false, C_LIST_EDIT, "Edit", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_LIST_DELETE, "Delete", ""}},
+
+    {C_MENU_ID_RTGROUP, {false, C_NONE, "New List", ""}},
+    {C_MENU_ID_RTGROUP, {false, C_NONE, "Delete", ""}},
+    {C_MENU_ID_RTLIST, {false, C_NONE, "Edit", ""}},
+    {C_MENU_ID_RTLIST, {false, C_NONE, "Delete", ""}},
 };
 
 int CommandMenu::InitMenuPos(int menu)

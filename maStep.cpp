@@ -83,7 +83,7 @@ void do_UI_updates()
 
     // Every step ...
 
-    update_pattern_panel();
+//    update_big_panel();
     update_progress_bar();
 }
 
@@ -328,7 +328,7 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
                g_ListBuilder.Clear();
                set_status(STAT_POS_2, "");
-               update_pattern_panel();
+               update_big_panel();
             }
             else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
             {

@@ -110,6 +110,8 @@ enum command_t
     C_EDIT_CURSOR_UNLOCK,
     C_EDIT_CURSOR_LOCK_STATUS,
     C_NEW,              // Create new (empty) pattern.
+    C_NEW_STEP_GROUP,
+    C_NEW_RT_GROUP,
     C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
     C_DELETE,           // Delete pattern and reduce size of pattern list.
     C_CLEAR,            // Clear pattern but leave empty entry in pattern list.
@@ -146,6 +148,9 @@ enum command_t
     C_USE_HELP,
 
     C_LIST,             // Note list commands.
+    C_LIST_NEW,
+    C_LIST_EDIT,
+    C_LIST_DELETE,
     C_LIST_IMPORT,      // Import from midi file.
 
     C_LIST_RT,          // Real time list commands.

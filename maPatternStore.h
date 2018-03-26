@@ -25,6 +25,7 @@
 #include <map>
 
 #include "maChainLink.h"
+#include "maCommand.h"
 #include "maCursorKeys.h"
 #include "maFeelMap.h"
 #include "maNotes.h"
@@ -79,8 +80,8 @@ struct PatternStore : public CursorKeys
         m_NewPatternPending(false),
         m_NewPattern(-1),
         m_PatternChanged(false),
-        m_UsePatternPlayData(false),
-        m_PatternStoreFocus(psf_pattern)
+        m_UsePatternPlayData(false)
+//        m_PatternStoreFocus(psf_pattern)
     {
         // m_PatternChain = {0, 0, 0, 1};
     };
@@ -383,17 +384,17 @@ struct PatternStore : public CursorKeys
     }
 
     protected:
-        enum pattern_store_menu_focus_t
-        {
-            psf_pattern,
-            psf_list,
-            psf_rt_list,
-            psf_trig_list,
-            num_psf_menu_focus_modes
-        };
+//        enum pattern_store_menu_focus_t
+//        {
+//            psf_pattern,
+//            psf_list,
+//            psf_rt_list,
+//            psf_trig_list,
+//            num_psf_menu_focus_modes
+//        };
 
         virtual bool HandleKey(BaseUI::key_command_t k);
-        pattern_store_menu_focus_t m_PatternStoreFocus;
+//        pattern_store_menu_focus_t m_PatternStoreFocus;
 
 };
 

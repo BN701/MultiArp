@@ -71,21 +71,21 @@ void PatternStore::SetStatus()
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ", Step List ";
-    pos = m_Status.size();
-    if ( !m_Patterns.at(m_PosEdit).m_ListGroups.empty() )
-    {
-        snprintf(buff, 100, format,
-            m_Patterns.at(m_PosEdit).m_PosEdit + 1,
-            m_Patterns.at(m_PosEdit).m_ListGroups.size());
-        m_Status += buff;
-    }
-    else
-    {
-        m_Status += "-/-";
-    }
-    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-
+//    m_Status += ", Step List ";
+//    pos = m_Status.size();
+//    if ( !m_Patterns.at(m_PosEdit).m_ListGroups.empty() )
+//    {
+//        snprintf(buff, 100, format,
+//            m_Patterns.at(m_PosEdit).m_PosEdit + 1,
+//            m_Patterns.at(m_PosEdit).m_ListGroups.size());
+//        m_Status += buff;
+//    }
+//    else
+//    {
+//        m_Status += "-/-";
+//    }
+//    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+//
 //    m_Status += ", Real Time List ";
 //    pos = m_Status.size();
 //    if ( !m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
@@ -101,113 +101,157 @@ void PatternStore::SetStatus()
 //    }
 //    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ", ";
-    pos = m_Status.size();
-    m_Status += "Trig List";
-    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+//    m_Status += ", ";
+//    pos = m_Status.size();
+//    m_Status += "Trig List";
+//    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Highlights.push_back(m_FieldPositions.at(m_PatternStoreFocus));
+//    m_Highlights.push_back(m_FieldPositions.at(m_PatternStoreFocus));
+    m_Highlights.push_back(m_FieldPositions.at(0));
 }
 
+//bool PatternStore::HandleKey(BaseUI::key_command_t k)
+//{
+//    int temp;
+//
+//    switch ( k )
+//    {
+//    case BaseUI::key_return:
+//        switch ( m_PatternStoreFocus )
+//        {
+//        case psf_pattern:
+//            // TODO: Set current pattern (not Pattern Chain mode).
+//            break;
+//
+//        case psf_list:
+////            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).StepListCount() > 0 )
+//            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
+//            {
+//// TODO:LG
+////                StepList & s = m_Patterns.at(m_PosEdit).ListGroupForEdit();
+////                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
+////                s.SetFocus();
+////                s.SetStatus();
+////                s.SetReturnFocus(this);
+//            }
+//            break;
+//
+////        case psf_rt_list:
+////            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
+////            {
+////                RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
+////                r.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
+////                r.SetFocus();
+////                r.SetStatus();
+////                r.SetReturnFocus(this);
+////            }
+////            break;
+//
+//        case psf_trig_list:
+//            if ( !m_Patterns.empty() )
+//            {
+//                TrigList & t = m_Patterns.at(m_PosEdit).PatternTrigList();
+//                t.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
+//                t.SetFocus();
+//                t.SetStatus();
+//                t.SetReturnFocus(this);
+//            }
+//            break;
+//
+//        default:
+//            break;
+//        }
+//        break;
+//
+//    case BaseUI::key_left:
+//        temp = static_cast<int>(m_PatternStoreFocus) - 1;
+//        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
+//            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
+//        break;
+//
+//    case BaseUI::key_right:
+//        temp = static_cast<int>(m_PatternStoreFocus) + 1;
+//        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
+//            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
+//        break;
+//
+//    case BaseUI::key_up:
+//        switch ( m_PatternStoreFocus )
+//        {
+//        case psf_pattern:
+//            DownEditPos();
+//            break;
+//        case psf_list:
+//            DownListPos();
+//            break;
+//        case psf_rt_list:
+//// TODO:LG
+////            DownRTListPos();
+//            break;
+//        default:
+//            break;
+//        }
+//        break;
+//
+//    case BaseUI::key_down:
+//        switch ( m_PatternStoreFocus )
+//        {
+//        case psf_pattern:
+//            UpEditPos();
+//            break;
+//        case psf_list:
+//            UpListPos();
+//            break;
+//        case psf_rt_list:
+//// TODO:LG
+////            UpRTListPos();
+//            break;
+//        default:
+//            break;
+//        }
+//        break;
+//
+//    default:
+//        return false;
+//    }
+//
+//    SetStatus();
+//
+//    return true;
+//}
+//
 bool PatternStore::HandleKey(BaseUI::key_command_t k)
 {
-    int temp;
-
     switch ( k )
     {
     case BaseUI::key_return:
-        switch ( m_PatternStoreFocus )
+        if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
         {
-        case psf_pattern:
-            // TODO: Set current pattern (not Pattern Chain mode).
-            break;
-
-        case psf_list:
-//            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).StepListCount() > 0 )
-            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
-            {
 // TODO:LG
 //                StepList & s = m_Patterns.at(m_PosEdit).ListGroupForEdit();
 //                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
 //                s.SetFocus();
 //                s.SetStatus();
 //                s.SetReturnFocus(this);
-            }
-            break;
-
-//        case psf_rt_list:
-//            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
-//            {
-//                RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
-//                r.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
-//                r.SetFocus();
-//                r.SetStatus();
-//                r.SetReturnFocus(this);
-//            }
-//            break;
-
-        case psf_trig_list:
-            if ( !m_Patterns.empty() )
-            {
-                TrigList & t = m_Patterns.at(m_PosEdit).PatternTrigList();
-                t.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
-                t.SetFocus();
-                t.SetStatus();
-                t.SetReturnFocus(this);
-            }
-            break;
-
-        default:
-            break;
         }
         break;
 
+
+
     case BaseUI::key_left:
-        temp = static_cast<int>(m_PatternStoreFocus) - 1;
-        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
-            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
         break;
 
     case BaseUI::key_right:
-        temp = static_cast<int>(m_PatternStoreFocus) + 1;
-        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
-            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
         break;
 
     case BaseUI::key_up:
-        switch ( m_PatternStoreFocus )
-        {
-        case psf_pattern:
-            DownEditPos();
-            break;
-        case psf_list:
-            DownListPos();
-            break;
-        case psf_rt_list:
-// TODO:LG
-//            DownRTListPos();
-            break;
-        default:
-            break;
-        }
+        DownListPos();
+        SetRedrawDisplay();
         break;
 
     case BaseUI::key_down:
-        switch ( m_PatternStoreFocus )
-        {
-        case psf_pattern:
-            UpEditPos();
-            break;
-        case psf_list:
-            UpListPos();
-            break;
-        case psf_rt_list:
-// TODO:LG
-//            UpRTListPos();
-            break;
-        default:
-            break;
-        }
+        UpListPos();
+        SetRedrawDisplay();
         break;
 
     default:
@@ -224,7 +268,7 @@ const char * numbers[] = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", 
 int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 {
     m_Patterns.push_back(m_DefaultPattern);
-    m_Patterns.back().NewList();
+//    m_Patterns.back().NewList();
 
 //    std::string label;
 //    if ( token != stop )
@@ -344,13 +388,13 @@ Pattern & PatternStore::CurrentEditPattern()
 void PatternStore::UpListPos()
 {
     if ( !m_Patterns.empty() )
-        m_Patterns[m_PosEdit].UpEditPos();
+        m_Patterns[m_PosEdit].UpCursorPos();
 }
 
 void PatternStore::DownListPos()
 {
     if ( !m_Patterns.empty() )
-        m_Patterns[m_PosEdit].DownEditPos();
+        m_Patterns[m_PosEdit].DownCursorPos();
 }
 
 //void PatternStore::UpRTListPos()
@@ -432,19 +476,19 @@ string PatternStore::PatternStatusEdit()
     result += buf;
 
 //    if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
-    if (  ! m_Patterns.at(m_PosEdit).m_ListGroups.empty() )
-    {
-        snprintf(buf, 80, ", List " U_FORMAT, m_Patterns.at(m_PosEdit).m_PosEdit + 1);
-        result += buf;
-
-//        int listCount = m_Patterns.at(m_PosEdit).m_StepListSet.size();
-        int listCount = m_Patterns.at(m_PosEdit).m_ListGroups.size();
-        if ( listCount > 1 )
-        {
-            snprintf(buf, 80, " of %i", listCount);
-            result += buf;
-        }
-    }
+//    if (  ! m_Patterns.at(m_PosEdit).m_ListGroups.empty() )
+//    {
+//        snprintf(buf, 80, ", List " U_FORMAT, m_Patterns.at(m_PosEdit).m_PosEdit + 1);
+//        result += buf;
+//
+////        int listCount = m_Patterns.at(m_PosEdit).m_StepListSet.size();
+//        int listCount = m_Patterns.at(m_PosEdit).m_ListGroups.size();
+//        if ( listCount > 1 )
+//        {
+//            snprintf(buf, 80, " of %i", listCount);
+//            result += buf;
+//        }
+//    }
 
     if ( m_EditPosFollowsPlay )
         result += ", following play pos";
@@ -819,7 +863,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
         if ( m_Patterns.empty() )
             m_Patterns.emplace_back();
 
-        m_Patterns.at(m_PosEdit).NewList();
+//        m_Patterns.at(m_PosEdit).NewList();
         return "Empty list created.";
     }
 
@@ -845,49 +889,49 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
     // If we just have a list index, display list and set list pointer
     // to this index, then return.
 
-    if ( tokens.size() == 2 )
-    {
-        m_Patterns.at(m_PosEdit).SetEditPos(index);
-// TODO:LG
-//        string temp = "L " + tokens.at(1) + " - " + m_Patterns.at(m_PosEdit).m_StepListSet.at(index).ToString(false);
-        string temp = "Not implemented yet.";
-        if ( temp.size() > 60 )
-        {
-            temp.resize(57);
-            temp += "...";
-        }
-        return temp;
-    }
-
-    // At this point we have at least three tokens and we
-    // know the list index is good.
-
-    if ( tokens.at(2) == "clear" )
-    {
-        if ( m_Patterns.empty() )
-            return "Pattern List is empty.";
-
-//        if ( index < m_Patterns.at(m_PosEdit).m_StepListSet.size() )
-        if ( index < m_Patterns.at(m_PosEdit).m_ListGroups.size() )
-        {
-// TODO:LG
-//            m_Patterns.at(m_PosEdit).m_StepListSet.at(index).Clear();
-            return "List cleared.";
-        }
-        else
-            return "List doesn't exist.";
-    }
-
-    // If we get to here, expect an actual note list.
-
-    if ( m_Patterns.empty() )
-        m_Patterns.emplace_back();
-
-    int pos = tokens.at(0).size() + tokens.at(1).size() + 1;
-    if ( m_Patterns.at(m_PosEdit).AddStepListFromString(index, commandString.substr(pos)) )
-        return "List updated.";
-    else
-        return "Nothing changed.";
+//    if ( tokens.size() == 2 )
+//    {
+//        m_Patterns.at(m_PosEdit).SetEditPos(index);
+//// TODO:LG
+////        string temp = "L " + tokens.at(1) + " - " + m_Patterns.at(m_PosEdit).m_StepListSet.at(index).ToString(false);
+//        string temp = "Not implemented yet.";
+//        if ( temp.size() > 60 )
+//        {
+//            temp.resize(57);
+//            temp += "...";
+//        }
+//        return temp;
+//    }
+//
+//    // At this point we have at least three tokens and we
+//    // know the list index is good.
+//
+//    if ( tokens.at(2) == "clear" )
+//    {
+//        if ( m_Patterns.empty() )
+//            return "Pattern List is empty.";
+//
+////        if ( index < m_Patterns.at(m_PosEdit).m_StepListSet.size() )
+//        if ( index < m_Patterns.at(m_PosEdit).m_ListGroups.size() )
+//        {
+//// TODO:LG
+////            m_Patterns.at(m_PosEdit).m_StepListSet.at(index).Clear();
+//            return "List cleared.";
+//        }
+//        else
+//            return "List doesn't exist.";
+//    }
+//
+//    // If we get to here, expect an actual note list.
+//
+//    if ( m_Patterns.empty() )
+//        m_Patterns.emplace_back();
+//
+//    int pos = tokens.at(0).size() + tokens.at(1).size() + 1;
+//    if ( m_Patterns.at(m_PosEdit).AddStepListFromString(index, commandString.substr(pos)) )
+//        return "List updated.";
+//    else
+//        return "Nothing changed.";
 }
 
 

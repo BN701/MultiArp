@@ -140,7 +140,7 @@ void control(control_message_t message, int value)
                 else
                     g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
                 g_ListBuilder.Clear();
-                update_pattern_panel();
+                update_big_panel();
                 set_status(STAT_POS_2, "");
             }
             break;

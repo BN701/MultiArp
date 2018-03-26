@@ -433,7 +433,10 @@ bool do_command(string commandString, int directCommand)
         {
 
         case C_MENU:
-            g_CommandMenu.Open(C_MENU_ID_TOP);
+            if ( !g_PatternStore.Empty() )
+                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
+            else
+                g_CommandMenu.Open(C_MENU_ID_TOP);
             break;
 
         case C_RUN :
@@ -1002,6 +1005,27 @@ bool do_command(string commandString, int directCommand)
             set_status(STAT_POS_2, "use g[lobal]|p[attern]");
             break;
 
+        case C_NEW_STEP_GROUP:
+        case C_NEW_RT_GROUP:
+            if ( g_PatternStore.Empty() )
+            {
+                set_status(STAT_POS_2, "You need to create an empty pattern first.");
+                break;
+            }
+            switch ( command )
+            {
+                case C_NEW_STEP_GROUP:
+                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_step);
+                    break;
+                case C_NEW_RT_GROUP:
+                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime);
+                    break;
+                default:
+                    break;
+            }
+            update_big_panel();
+            break;
+
         case C_LIST:
             if ( tokens.size() < 2 )
             {
@@ -1009,7 +1033,13 @@ bool do_command(string commandString, int directCommand)
                 break;
             }
             set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
-            update_pattern_panel();
+            update_big_panel();
+            break;
+
+        case C_LIST_NEW:
+        case C_LIST_EDIT:
+            set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command));
+            update_big_panel();
             break;
 
 #ifndef MA_BLUE
@@ -1021,7 +1051,7 @@ bool do_command(string commandString, int directCommand)
             }
             g_PatternStore.UpdatePatternFromMidiFile(commandString);
             set_status(STAT_POS_2, "File imported to Real Time list.");
-            update_pattern_panel();
+            update_big_panel();
             break;
 #endif
 
@@ -1424,14 +1454,15 @@ bool handle_key_input(BaseUI::key_command_t key)
 #endif
         update_pattern_status_panel();
         update_edit_panels();
-        update_pattern_panel();
+        update_big_panel();
         break;
 #endif
 
     case static_cast<BaseUI::key_command_t>('/'):
         if ( commandString.empty() )
         {
-            g_CommandMenu.Open();
+            do_command("", C_MENU);
+//            g_CommandMenu.Open();
         }
         else
         {
@@ -1454,7 +1485,7 @@ bool handle_key_input(BaseUI::key_command_t key)
             else
                 g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
             g_ListBuilder.Clear();
-            update_pattern_panel();
+            update_big_panel();
             set_status(STAT_POS_2, "");
         }
         else if ( CursorKeys::RouteKey(key) )

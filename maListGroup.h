@@ -28,10 +28,19 @@
 #include "maRealTimeList.h"
 #include "maStepList.h"
 
-class ListGroup
+class ListGroup : public CursorKeys
 {
     public:
+        enum list_group_type
+        {
+            lgtype_step = 0,
+            lgtype_realtime
+        };
+
         void ResetPosition();
+        void SetStatus();
+
+        void NewListGroup();
 
     protected:
         enum list_group_t
@@ -48,7 +57,16 @@ class ListGroup
 class StepListGroup : public ListGroup
 {
     public:
-        std::vector<StepList> m_StepListSet;
+        std::vector<StepListPtr> m_StepListSet;
+
+        StepListGroup()
+        {
+            m_Type = lt_step;
+            m_PopUpMenuID = C_MENU_ID_STEPGROUP;
+        }
+
+        StepListPtr NewStepList();
+
 
 };
 
@@ -56,5 +74,12 @@ class RTListGroup : public ListGroup
 {
     public:
         std::vector<RealTimeList> m_RealTimeSet;
+
+        RTListGroup()
+        {
+            m_Type = lt_realtime;
+            m_PopUpMenuID = C_MENU_ID_RTGROUP;
+        }
 };
+
 #endif // MALISTGROUP_H_INCLUDED

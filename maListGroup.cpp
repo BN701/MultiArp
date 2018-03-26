@@ -36,3 +36,40 @@
 void ListGroup::ResetPosition()
 {
 }
+
+const char * g_LGTypeNames[] = {"Step", "Real Time"};
+
+void ListGroup::SetStatus()
+{
+    int pos = 0;
+    char buff[50];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    snprintf(buff, 50, "%s %i", g_LGTypeNames[m_Type], m_ItemID);
+    m_Status = buff;
+
+    m_Status += " Midi: ";
+    pos = m_Status.size();
+    snprintf(buff, 50, "%02i", m_MidiChannel);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += " Step: ";
+    pos = m_Status.size();
+    snprintf(buff, 50, "%05.2f", m_Step);
+    m_Status += buff;
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+//    if ( !m_FieldPositions.empty() )
+//        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+}
+
+StepListPtr StepListGroup::NewStepList()
+{
+    m_StepListSet.emplace_back(new StepList());
+    return m_StepListSet.back();
+//    m_PosEdit = m_StepListSet.size() - 1;
+
+}

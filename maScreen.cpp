@@ -259,8 +259,32 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
     pairs.clear();
 }
 
+void update_big_panel()
+{
+    g_TextUI.ClearArea(BaseUI::big_panel);
 
-void update_pattern_panel()
+    if ( g_PatternStore.Empty() )
+        return;
+
+    static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
+
+    Pattern & p = g_PatternStore.CurrentEditPattern();
+
+
+    int row = 0;
+    auto cursor = p.CursorPos();
+
+    for ( auto line = p.m_DisplayList.begin(); line != p.m_DisplayList.end(); line++, row++ )
+    {
+        char text[60];
+        (*line)->SetStatus();
+        snprintf(text, 60, "%s%s", line == cursor ? " -> " : "    ", (*line)->StatusString().c_str());
+        g_TextUI.Text(BaseUI::big_panel, row, 0, text, & highlights);
+    }
+
+}
+
+void update_big_panel_v1()
 {
     if ( g_TextUI.BigPanelHold() )
         return;
@@ -352,14 +376,7 @@ void show_status_after_navigation()
 {
     const int width = 72;
 
-    // Call this after any change to focus or navigation involving
-    // objects derived from CursorKeys. All objects share the same
-    // static pointer to the object in focus, and calling Status()
-    // on any of them will retrieve the status string for the object
-    // that currently has focus.
-
     static int adjustOffset = 0;
-//    string status = g_CursorKeys.Status();
     string status = CursorKeys::Status();
 
     // Although I started off with a mechanism which allows for multiple
@@ -398,6 +415,9 @@ void show_status_after_navigation()
 //        g_TextUI.Highlight(BaseUI::whole_screen, STAT_POS_MENU + highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
         g_TextUI.HighlightLastWrite(highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
     g_TextUI.SendRestoreCursor();
+
+    if ( CursorKeys::RedrawDisplay () )
+        update_big_panel();
 
 }
 

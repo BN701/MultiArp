@@ -24,12 +24,14 @@
 #include <vector>
 
 #include "maBaseUI.h"
-struct screen_pos_t
-{
-    int offset;
-    int length;
-    screen_pos_t(int ofs = 0, int len = 0) { offset = ofs; length = len; }
-};
+#include "maCommandMenu.h"
+
+//struct screen_pos_t
+//{
+//    int offset;
+//    int length;
+//    screen_pos_t(int ofs = 0, int len = 0) { offset = ofs; length = len; }
+//};
 
 class CursorKeys
 {
@@ -43,6 +45,16 @@ class CursorKeys
             none,
             update_pattern_browser,
             num_follow_up_actions
+        };
+
+        enum display_object_type_t  // Hopefully just use these for sanity checks.
+        {
+            dot_base,
+            dot_pattern,
+            dot_step_list_group,
+            dot_rt_list_group,
+            dot_step_list,
+            dot_rt_list
         };
 
         int ItemID() { return m_ItemID; }
@@ -71,6 +83,8 @@ class CursorKeys
         virtual void SetFocus() { m_Focus = & (*this); }
         void InitFocus() { m_Focus = NULL; }
 
+        std::string & StatusString() { return m_Status; }
+
         static bool MenuActive();
 //        static bool RouteKey(key_type_t k);
         static bool RouteKey(BaseUI::key_command_t k);
@@ -87,12 +101,31 @@ class CursorKeys
             return t;
         }
 
+        command_menu_id_t PopUpMenuID()
+        {
+            return m_PopUpMenuID;
+        }
+
+        bool CheckType(display_object_type_t type) { return m_DisplayObjectType == type; }
+
+        static void SetRedrawDisplay() { m_RedrawDisplay = true; }
+        static bool RedrawDisplay()
+        {
+            if ( m_RedrawDisplay )
+            {
+                m_RedrawDisplay = false;
+                return true;
+            }
+            else
+                return false;
+        }
+
     protected:
         static CursorKeys * m_Focus;
 
 //        virtual bool HandleKey(key_type_t k) { return false; };
 
-        std::string m_Status;
+        std::string m_Status = "Not set";
         std::string m_Help;
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.
@@ -104,7 +137,15 @@ class CursorKeys
 
         int m_ItemID = -1;
 
+        command_menu_id_t m_PopUpMenuID = C_MENU_ID_NONE;
+        display_object_type_t m_DisplayObjectType = dot_base;
+
     private:
+
+        int m_ObjectID = m_ObjectCount++;
+
+        static bool m_RedrawDisplay;
+        static int m_ObjectCount;
 };
 
 #endif // CURSORKEYS_H

@@ -26,7 +26,7 @@
 
 
 #include "maBaseUI.h"
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
 // Color Pair uses
 
@@ -67,7 +67,7 @@ class CursesUI : public BaseUI
         void ClearArea(window_area_t area);
         void PlaceCursor(int row, int col);
 
-//        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
+//        void KeyInput(ItemMenu::key_type_t & curKey, xcb_keysym_t & sym);
         key_command_t KeyInput();
 
         void SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int midiMode);
@@ -80,8 +80,8 @@ class CursesUI : public BaseUI
         WINDOW * m_BigPanel = NULL;             // Botton half of screen, used for all sorts.
         WINDOW * m_SmallPanel = NULL;           // Pattern Status, or pattern chain. Under progress bar, to the left.
         WINDOW * m_ProgressPanel = NULL;        // Extra progress panel, to the right of Pattern Status
-        WINDOW * m_EditListPanel = NULL;        // Pattern List, under command line.
-        WINDOW * m_EditSummaryPanel = NULL;     // Pattern Summary, under command line to the right of Pattern List
+        WINDOW * m_PatternListPanel = NULL;        // Pattern List, under command line.
+        WINDOW * m_PatternListSummaryPanel = NULL;     // Pattern Summary, under command line to the right of Pattern List
         WINDOW * m_BigPanelExtra = NULL;        // Overwrites pattern list and summary when in Big Panel is in Page 3 mode.
 
 };

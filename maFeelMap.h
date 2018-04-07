@@ -22,9 +22,9 @@
 
 #include <vector>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
-class FeelMap : public CursorKeys
+class FeelMap : public ItemMenu
 {
     public:
         FeelMap();
@@ -35,7 +35,7 @@ class FeelMap : public CursorKeys
         bool SetActive(bool val)
         {
             m_Active = val;
-            SetStatus();
+//            SetStatus();
             return m_Active;
         }
 
@@ -44,7 +44,7 @@ class FeelMap : public CursorKeys
         virtual void SetStatus();
         virtual void SetFocus()
         {
-            CursorKeys::SetFocus();
+            ItemMenu::SetFocus();
             // SetStatus();
         }
 

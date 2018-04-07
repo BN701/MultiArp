@@ -140,21 +140,25 @@ string Pattern::StepListManager(command_t command)
             StepList *pStepList = pStepListGroup->NewStepList().get();
             do {
                 m_PosCursor++;
-            } while ( m_PosCursor != m_DisplayList.end() && (*m_PosCursor)->CheckType(dot_step_list) );
+            } while ( m_PosCursor != m_MenuList.end() && (*m_PosCursor)->CheckType(dot_step_list) );
             // insert() doesn't seem to mind if position is at end of list,
             // but I'd like to see it confirmed somewhere.
-            m_DisplayList.insert(m_PosCursor, pStepList);
-            m_PosCursor--;
+            m_PosCursor = pStepList->MenuInsert(&m_MenuList, --m_PosCursor);
+//            m_MenuList.insert(m_PosCursor, pStepList);
+//            m_PosCursor--;
             break;
         }
-        case C_LIST_EDIT:
-        {
-            StepList * pStepList = dynamic_cast<StepList*>(*m_PosCursor);
-            if ( pStepList == NULL )
-                return "Pattern Step List Manager: Not a step list.";
-            (*m_PosCursor)->SetFocus();
-            break;
-        }
+//        case C_LIST_EDIT:
+//        {
+//            StepList * pStepList = dynamic_cast<StepList*>(*m_PosCursor);
+//            if ( pStepList == NULL )
+//                return "Pattern Step List Manager: Not a step list.";
+//            (*m_PosCursor)->SetFocus();
+//            (*m_PosCursor)->SetDisplayPos(21, 4);
+//            (*m_PosCursor)->SetReturnFocus(this);
+//
+//            break;
+//        }
         default:
             return "Pattern Step List Manager: Doesn't handle this command.";
     }
@@ -768,10 +772,13 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
             break;
     }
 
-    m_DisplayList.push_back(m_ListGroups.back());
+    m_PosCursor = m_ListGroups.back()->MenuInsert(&m_MenuList, --m_MenuList.end());
 
-    m_PosCursor = --m_DisplayList.end();
-
+//    m_MenuList.push_back(m_ListGroups.back());
+//
+//    m_PosCursor = --m_MenuList.end();
+//    (*m_PosCursor)->SetMenuListInfo(&m_MenuList, m_PosCursor);
+//
 //    return m_PosCursor;
 }
 

@@ -21,11 +21,11 @@
 #ifndef TRIGLIST_H
 #define TRIGLIST_H
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maTrigListItem.h"
 
 
-class TrigList : public CursorKeys
+class TrigList : public ItemMenu
 {
     public:
         TrigList();

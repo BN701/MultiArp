@@ -197,6 +197,8 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
             c.SetItemID(m_PosEdit + 1);
             c.SetFocus();
             c.SetStatus();
+            c.SetDisplayPos(m_DisplayRow + 1, m_DisplayCol + 4);
+            c.MenuInsert(m_MenuList, m_MenuPos);
             c.SetReturnFocus(this);
         }
         break;
@@ -216,14 +218,14 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
             m_PosEdit += 1;
         break;
 
-    case BaseUI::key_up:
-    case BaseUI::key_down:
-        if ( m_ReturnFocus != NULL )
-        {
-            m_ReturnFocus->HandleKey(k);
-            m_ReturnFocus->HandleKey(BaseUI::key_return);
-        }
-        return true;
+//    case BaseUI::key_up:
+//    case BaseUI::key_down:
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(k);
+//            m_ReturnFocus->HandleKey(BaseUI::key_return);
+//        }
+//        return true;
 
     case BaseUI::key_ctrl_left:
         if ( !m_Clusters.empty() )
@@ -278,7 +280,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

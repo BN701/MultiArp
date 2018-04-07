@@ -273,7 +273,7 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

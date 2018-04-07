@@ -215,7 +215,7 @@ bool RealTimeListParams::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_RTParamsFocus == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }
@@ -396,7 +396,7 @@ bool RealTimeList::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_RTListFocus == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

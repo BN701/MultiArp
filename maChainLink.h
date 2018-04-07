@@ -22,11 +22,11 @@
 
 //#include <string>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
 class PatternChain;
 
-class ChainLink : public CursorKeys
+class ChainLink : public ItemMenu
 {
     public:
         ChainLink();
@@ -49,7 +49,7 @@ class ChainLink : public CursorKeys
         virtual void SetStatus();
         virtual void SetFocus()
         {
-            CursorKeys::SetFocus();
+            ItemMenu::SetFocus();
             // SetStatus();
         }
 

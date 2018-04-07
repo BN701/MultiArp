@@ -37,7 +37,7 @@
 #endif
 
 #include "maBaseUI.h"
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maNotes.h"
 
 // Color Pair uses
@@ -95,7 +95,7 @@ class AnsiUI : public BaseUI
         void SendRestoreCursor();       // the terminal doesn't maintain a stack of positions.
         void SendSaveAndHideCursor();
 
-//        void KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym);
+//        void KeyInput(ItemMenu::key_type_t & curKey, xcb_keysym_t & sym);
         key_command_t KeyInput();
 
         void SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int recState, int midiMode);

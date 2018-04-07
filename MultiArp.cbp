@@ -105,10 +105,10 @@
 		<Unit filename="maCommandMenu.h" />
 		<Unit filename="maControl.cpp" />
 		<Unit filename="maControl.h" />
-		<Unit filename="maCursorKeys.cpp" />
-		<Unit filename="maCursorKeys.h" />
 		<Unit filename="maFeelMap.cpp" />
 		<Unit filename="maFeelMap.h" />
+		<Unit filename="maItemMenu.cpp" />
+		<Unit filename="maItemMenu.h" />
 		<Unit filename="maListBuilder.cpp" />
 		<Unit filename="maListBuilder.h" />
 		<Unit filename="maListGroup.cpp" />

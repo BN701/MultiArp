@@ -140,8 +140,8 @@ class BaseUI
             big_panel,             // Botton half of screen, used for all sorts.
             small_panel,           // Pattern Status, or pattern chain. Under progress bar, to the left.
             progress_panel,        // Extra progress panel, to the right of Pattern Status
-            edit_list_panel,       // Pattern List, under command line.
-            edit_summary_panel,    // Pattern Summary, under command line to the right of Pattern List
+            pattern_list_panel,       // Pattern List, under command line.
+            pattern_list_summary_panel,    // Pattern Summary, under command line to the right of Pattern List
             big_panel_extra        // Overwrites pattern list and summary when in Big Panel is in Page 3 mode.
        };
 
@@ -161,7 +161,7 @@ class BaseUI
         virtual void MoveCursorToHome() {}
         virtual void SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int recState, int midiMode) = 0;
         virtual void Progress(double progress, double stepWidth, double beat,
-            int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano) = 0;
+        int pattern_progress, double rtBeat, unsigned int queueSecs, unsigned int queueNano) = 0;
 
         void SetBigPanelPage( big_panel_page_t val ) { m_BigPanelPage = val; }
         void NextBigPanelPage( int direction );
@@ -171,6 +171,8 @@ class BaseUI
 
         void MapToFullScreen(window_area_t area, int & row, int & col);
         WindowRect & AreaToWindowRect(window_area_t area);
+
+        int BaseRow(window_area_t area);
 
         static const char * KeyName(key_command_t key);
 
@@ -182,8 +184,8 @@ class BaseUI
         WindowRect m_WholeScreen = WindowRect(25, 80, 0, 0);
         WindowRect m_SmallPanel = WindowRect(4, 56, 2, 4);
         WindowRect m_ProgressPanel = WindowRect(2, 15, 3, 61);
-        WindowRect m_EditListPanel = WindowRect(4, 20, 8, 4);
-        WindowRect m_EditSummaryPanel = WindowRect(4, 52, 8, 24);
+        WindowRect m_PatternListPanel = WindowRect(4, 20, 8, 4);
+        WindowRect m_PatternListSummaryPanel = WindowRect(4, 52, 8, 24);
         WindowRect m_BigPanel = WindowRect(11, 80, 12, 0);
         WindowRect m_BigPanelExtra = WindowRect(4, 72, 8, 4);
 

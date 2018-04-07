@@ -375,7 +375,7 @@ bool TranslateTable::HandleKey(BaseUI::key_command_t k)
         return false;
     }
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

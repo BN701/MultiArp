@@ -24,7 +24,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maNotes.h"
 
 enum accidentals_mode_t
@@ -140,7 +140,7 @@ struct TranslateDiags
     void ResetPairs() { m_InOutPairs.clear(); }
 };
 
-class TranslateTable : public CursorKeys
+class TranslateTable : public ItemMenu
 {
     public:
         TranslateTable();
@@ -202,7 +202,7 @@ class TranslateTable : public CursorKeys
         virtual void SetStatus();
         virtual void SetFocus()
         {
-            CursorKeys::SetFocus();
+            ItemMenu::SetFocus();
             // SetStatus();
         }
 

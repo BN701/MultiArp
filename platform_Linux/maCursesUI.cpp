@@ -175,16 +175,16 @@ CursesUI::CursesUI()
 
     m_SmallPanel = newwin(4, 56, 2, 4);
     m_ProgressPanel = newwin(2, 15, 3, 61);
-    m_EditListPanel = newwin(4, 20, 8, 4);
-    m_EditSummaryPanel = newwin(4, 52, 8, 24);
+    m_PatternListPanel = newwin(4, 20, 8, 4);
+    m_PatternListSummaryPanel = newwin(4, 52, 8, 24);
     m_BigPanel = newwin(11, 80, 12, 0);
     m_BigPanelExtra = newwin(4, 72, 8, 4);
 
     bkgd(COLOR_PAIR(CP_MAIN));
     wbkgd(m_SmallPanel, COLOR_PAIR(CP_SMALL_PANEL_BKGND));
     wbkgd(m_ProgressPanel, COLOR_PAIR(CP_SMALL_PANEL_2_BKGND));
-    wbkgd(m_EditListPanel, COLOR_PAIR(CP_LIST_PANEL_BKGND));
-    wbkgd(m_EditSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
+    wbkgd(m_PatternListPanel, COLOR_PAIR(CP_LIST_PANEL_BKGND));
+    wbkgd(m_PatternListSummaryPanel, COLOR_PAIR(CP_SUMMARY_PANEL_BKGND));
     wbkgd(m_BigPanel, COLOR_PAIR(CP_PATTERN_LIST_PANEL));
     wbkgd(m_BigPanelExtra, COLOR_PAIR(CP_PIANO_WHITE_KEY));
 }
@@ -220,10 +220,10 @@ WINDOW * CursesUI::AreaToWindow(window_area_t area)
             return m_SmallPanel;
         case progress_panel:
             return m_ProgressPanel;
-        case edit_list_panel:
-            return m_EditListPanel;
-        case edit_summary_panel:
-            return m_EditSummaryPanel;
+        case pattern_list_panel:
+            return m_PatternListPanel;
+        case pattern_list_summary_panel:
+            return m_PatternListSummaryPanel;
         case big_panel_extra:
             return m_BigPanelExtra;
         default:
@@ -546,37 +546,37 @@ unordered_map<int, BaseUI::key_command_t> g_CursesToBaseUIKeyMap =
     {KEY_CSDOWN, BaseUI::key_ctrl_shift_down}
 };
 
-//unordered_map<int, CursorKeys::key_type_t> g_CursorKeyMap =
+//unordered_map<int, ItemMenu::key_type_t> g_CursorKeyMap =
 //{
-//    {KEY_INSERT, CursorKeys::ins},
-//    {KEY_DELETE, CursorKeys::del},
-//    {KEY_SDELETE, CursorKeys::shift_delete},
-//    {KEY_CDELETE, CursorKeys::ctrl_delete},
-//    {KEY_TAB, CursorKeys::tab},
-//    {KEY_SHTAB, CursorKeys::shift_tab},
-//    {KEY_DOWN, CursorKeys::down},
-//    {KEY_UP, CursorKeys::up},
-//    {KEY_LEFT, CursorKeys::left},
-//    {KEY_RIGHT, CursorKeys::right},
-//    {KEY_SPGUP, CursorKeys::shift_page_up},
-//    {KEY_SPGDOWN, CursorKeys::shift_page_down},
-//    {KEY_APGUP, CursorKeys::alt_page_up},
-//    {KEY_APGDOWN, CursorKeys::alt_page_down},
-//    {KEY_CDOWN, CursorKeys::ctrl_down},
-//    {KEY_CUP, CursorKeys::ctrl_up},
-//    {KEY_CLEFT, CursorKeys::ctrl_left},
-//    {KEY_CRIGHT, CursorKeys::ctrl_right},
-//    {KEY_SDOWN, CursorKeys::shift_down},
-//    {KEY_SUP, CursorKeys::shift_up},
-//    {KEY_SLEFT, CursorKeys::shift_left},
-//    {KEY_SRIGHT, CursorKeys::shift_right},
-//    {KEY_CSLEFT, CursorKeys::ctrl_shift_left},
-//    {KEY_CSRIGHT, CursorKeys::ctrl_shift_right},
-//    {KEY_CSUP, CursorKeys::ctrl_shift_up},
-//    {KEY_CSDOWN, CursorKeys::ctrl_shift_down}
+//    {KEY_INSERT, ItemMenu::ins},
+//    {KEY_DELETE, ItemMenu::del},
+//    {KEY_SDELETE, ItemMenu::shift_delete},
+//    {KEY_CDELETE, ItemMenu::ctrl_delete},
+//    {KEY_TAB, ItemMenu::tab},
+//    {KEY_SHTAB, ItemMenu::shift_tab},
+//    {KEY_DOWN, ItemMenu::down},
+//    {KEY_UP, ItemMenu::up},
+//    {KEY_LEFT, ItemMenu::left},
+//    {KEY_RIGHT, ItemMenu::right},
+//    {KEY_SPGUP, ItemMenu::shift_page_up},
+//    {KEY_SPGDOWN, ItemMenu::shift_page_down},
+//    {KEY_APGUP, ItemMenu::alt_page_up},
+//    {KEY_APGDOWN, ItemMenu::alt_page_down},
+//    {KEY_CDOWN, ItemMenu::ctrl_down},
+//    {KEY_CUP, ItemMenu::ctrl_up},
+//    {KEY_CLEFT, ItemMenu::ctrl_left},
+//    {KEY_CRIGHT, ItemMenu::ctrl_right},
+//    {KEY_SDOWN, ItemMenu::shift_down},
+//    {KEY_SUP, ItemMenu::shift_up},
+//    {KEY_SLEFT, ItemMenu::shift_left},
+//    {KEY_SRIGHT, ItemMenu::shift_right},
+//    {KEY_CSLEFT, ItemMenu::ctrl_shift_left},
+//    {KEY_CSRIGHT, ItemMenu::ctrl_shift_right},
+//    {KEY_CSUP, ItemMenu::ctrl_shift_up},
+//    {KEY_CSDOWN, ItemMenu::ctrl_shift_down}
 //};
 //
-//void CursesUI::KeyInput(CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
+//void CursesUI::KeyInput(ItemMenu::key_type_t & curKey, xcb_keysym_t & sym)
 //{
 //#ifdef MA_BLUE
 //    int c = 0;
@@ -599,7 +599,7 @@ unordered_map<int, BaseUI::key_command_t> g_CursesToBaseUIKeyMap =
 //        // at least discourage using Alt-Enter or Esc all round.
 //
 ////    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
-////        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
+////        if ( g_CursorKeys.RouteKey(ItemMenu::escape) )
 ////        {
 ////            show_status_after_navigation();
 ////        }
@@ -696,7 +696,7 @@ BaseUI::key_command_t CursesUI::KeyInput()
         // at least discourage using Alt-Enter or Esc all round.
 
 //    case 27: // Alt-Enter sends this without a delay, otherwise it takes about a second to arrive.
-//        if ( g_CursorKeys.RouteKey(CursorKeys::escape) )
+//        if ( g_CursorKeys.RouteKey(ItemMenu::escape) )
 //        {
 //            show_status_after_navigation();
 //        }

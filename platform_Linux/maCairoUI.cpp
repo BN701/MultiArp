@@ -265,38 +265,38 @@ void CairoUI::Refresh(Rectangle & r, bool useDouble)
 // Use these two maps to search for X Unicode symbols and raw state/keycode combinations
 // that are used purely for menu navigation.
 
-//unordered_map<int, CursorKeys::key_type_t> g_xcbSymbolToCursorKey =
+//unordered_map<int, ItemMenu::key_type_t> g_xcbSymbolToCursorKey =
 //{
-//    {XK_Insert, CursorKeys::ins},
-//    {XK_Delete, CursorKeys::del},
-//    {XK_Down, CursorKeys::down},
-//    {XK_Up, CursorKeys::up},
-//    {XK_Left, CursorKeys::left},
-//    {XK_Right, CursorKeys::right},
-//    {XK_Escape, CursorKeys::escape}
+//    {XK_Insert, ItemMenu::ins},
+//    {XK_Delete, ItemMenu::del},
+//    {XK_Down, ItemMenu::down},
+//    {XK_Up, ItemMenu::up},
+//    {XK_Left, ItemMenu::left},
+//    {XK_Right, ItemMenu::right},
+//    {XK_Escape, ItemMenu::escape}
 //};
 
 // Key values are constructed from (state << 8) + keycode
-//unordered_map<int, CursorKeys::key_type_t> g_xcbKeycodeToCursorKey =
+//unordered_map<int, ItemMenu::key_type_t> g_xcbKeycodeToCursorKey =
 //{
-//    {0x0170, CursorKeys::shift_page_up},
-//    {0x0175, CursorKeys::shift_page_down},
-//    {0x0870, CursorKeys::alt_page_up},
-//    {0x0875, CursorKeys::alt_page_down},
-//    {0x0474, CursorKeys::ctrl_down},
-//    {0x046F, CursorKeys::ctrl_up},
-//    {0x0471, CursorKeys::ctrl_left},
-//    {0x0472, CursorKeys::ctrl_right},
-//    {0x0174, CursorKeys::shift_down},
-//    {0x016F, CursorKeys::shift_up},
-//    {0x0171, CursorKeys::shift_left},
-//    {0x0172, CursorKeys::shift_right},
-//    {0x0571, CursorKeys::ctrl_shift_left},
-//    {0x0572, CursorKeys::ctrl_shift_right},
-//    {0x056F, CursorKeys::ctrl_shift_up},
-//    {0x0574, CursorKeys::ctrl_shift_down},
-//    {0x0177, CursorKeys::shift_delete},
-//    {0x0477, CursorKeys::ctrl_delete}
+//    {0x0170, ItemMenu::shift_page_up},
+//    {0x0175, ItemMenu::shift_page_down},
+//    {0x0870, ItemMenu::alt_page_up},
+//    {0x0875, ItemMenu::alt_page_down},
+//    {0x0474, ItemMenu::ctrl_down},
+//    {0x046F, ItemMenu::ctrl_up},
+//    {0x0471, ItemMenu::ctrl_left},
+//    {0x0472, ItemMenu::ctrl_right},
+//    {0x0174, ItemMenu::shift_down},
+//    {0x016F, ItemMenu::shift_up},
+//    {0x0171, ItemMenu::shift_left},
+//    {0x0172, ItemMenu::shift_right},
+//    {0x0571, ItemMenu::ctrl_shift_left},
+//    {0x0572, ItemMenu::ctrl_shift_right},
+//    {0x056F, ItemMenu::ctrl_shift_up},
+//    {0x0574, ItemMenu::ctrl_shift_down},
+//    {0x0177, ItemMenu::shift_delete},
+//    {0x0477, ItemMenu::ctrl_delete}
 //};
 
 unordered_map<int, BaseUI::key_command_t> g_xcbSymbolToBaseUIKey =
@@ -364,11 +364,11 @@ string show_modifiers (uint32_t mask)
 
 
 
-//bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, CursorKeys::key_type_t & curKey, xcb_keysym_t  & sym)
+//bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, ItemMenu::key_type_t & curKey, xcb_keysym_t  & sym)
 //{
 //    bool result = true;
 //
-//    curKey = CursorKeys::no_key;
+//    curKey = ItemMenu::no_key;
 //
 //    sym = GetKeysym(keycode, state);
 //
@@ -388,7 +388,7 @@ string show_modifiers (uint32_t mask)
 //    }
 //    else
 //    {
-//        // Look for raw decodes that map to CursorKeys.
+//        // Look for raw decodes that map to ItemMenu.
 //
 //        try
 //        {
@@ -479,7 +479,7 @@ bool CairoUI::KeyInput(uint8_t keycode, uint16_t state, BaseUI::key_command_t & 
     }
     else
     {
-        // Look for raw decodes that map to CursorKeys.
+        // Look for raw decodes that map to ItemMenu.
 
         try
         {
@@ -585,7 +585,7 @@ unordered_map<int, const char *> event_names =
     {XCB_GE_GENERIC, "XCB_GE_GENERIC"}
 };
 
-//bool CairoUI::PollEvents(bool & gotKeyData, CursorKeys::key_type_t & curKey, xcb_keysym_t & sym)
+//bool CairoUI::PollEvents(bool & gotKeyData, ItemMenu::key_type_t & curKey, xcb_keysym_t & sym)
 bool CairoUI::PollEvents(bool & gotKeyData, BaseUI::key_command_t & key)
 {
     bool result = true;

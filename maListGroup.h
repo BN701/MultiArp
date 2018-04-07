@@ -24,11 +24,11 @@
 #include <string>
 #include <map>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maRealTimeList.h"
 #include "maStepList.h"
 
-class ListGroup : public CursorKeys
+class ListGroup : public ItemMenu
 {
     public:
         enum list_group_type
@@ -63,6 +63,8 @@ class StepListGroup : public ListGroup
         {
             m_Type = lt_step;
             m_PopUpMenuID = C_MENU_ID_STEPGROUP;
+            m_DisplayCol = 2;
+
         }
 
         StepListPtr NewStepList();
@@ -79,6 +81,7 @@ class RTListGroup : public ListGroup
         {
             m_Type = lt_realtime;
             m_PopUpMenuID = C_MENU_ID_RTGROUP;
+            m_DisplayCol = 2;
         }
 };
 

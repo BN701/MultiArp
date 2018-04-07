@@ -26,7 +26,7 @@
 
 #include "maChainLink.h"
 #include "maCommand.h"
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maFeelMap.h"
 #include "maNotes.h"
 #include "maPattern.h"
@@ -46,7 +46,7 @@
 
 // class State;
 
-struct PatternStore : public CursorKeys
+struct PatternStore : public ItemMenu
 {
     std::vector<int>::size_type m_PosPlay;
     std::vector<int>::size_type m_PosEdit;
@@ -379,9 +379,12 @@ struct PatternStore : public CursorKeys
     virtual void SetStatus();
     virtual void SetFocus()
     {
-        CursorKeys::SetFocus();
+        ItemMenu::SetFocus();
         // SetStatus();
     }
+
+    void OpenCurrentItemMenu();
+
 
     protected:
 //        enum pattern_store_menu_focus_t

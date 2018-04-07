@@ -148,7 +148,7 @@ void update_progress_bar()
 // If Pattern Chains active, show pattern chain status. Otherwise
 // show pattern store status summary.
 // Called from queue_next_step() when phase zero to catch pattern chain updates.
-// Called from update_edit_panels() to catch any pattern store changes.
+// Called from update_pattern_list_panels() to catch any pattern store changes.
 
 void update_pattern_status_panel()
 {
@@ -181,7 +181,7 @@ void update_pattern_status_panel()
     g_TextUI.Highlight(BaseUI::small_panel, 1 + rowSelect, 5 + 12 * (selection % 4), 12, CP_PATTERN_CHAIN_HIGHLIGHT);
 }
 
-void update_edit_panels(bool refreshList)
+void update_pattern_list_panels(bool refreshList)
 {
     update_pattern_status_panel();
 
@@ -196,8 +196,8 @@ void update_edit_panels(bool refreshList)
 
     if ( g_PatternStore.Empty() )
     {
-        g_TextUI.ClearArea(BaseUI::edit_list_panel);
-        g_TextUI.ClearArea(BaseUI::edit_summary_panel);
+        g_TextUI.ClearArea(BaseUI::pattern_list_panel);
+        g_TextUI.ClearArea(BaseUI::pattern_list_summary_panel);
         return;
     }
 
@@ -214,26 +214,26 @@ void update_edit_panels(bool refreshList)
     while ( selection < listStart )
         listStart -= 1;
 
-    g_TextUI.ClearArea(BaseUI::edit_list_panel);
+    g_TextUI.ClearArea(BaseUI::pattern_list_panel);
 
     g_TextUI.SetTextRowHighlight(selection - listStart);
-    g_TextUI.Text(BaseUI::edit_list_panel, 0, 0, g_PatternStore.PatternSelectionList(listStart, rows).c_str());
-    g_TextUI.Highlight(BaseUI::edit_list_panel, selection - listStart, 0, 20, CP_SUMMARY_PANEL_BKGND);
+    g_TextUI.Text(BaseUI::pattern_list_panel, 0, 0, g_PatternStore.PatternSelectionList(listStart, rows).c_str());
+    g_TextUI.Highlight(BaseUI::pattern_list_panel, selection - listStart, 0, 20, CP_SUMMARY_PANEL_BKGND);
 
     // Summary Panel
 
-    g_TextUI.ClearArea(BaseUI::edit_summary_panel);
+    g_TextUI.ClearArea(BaseUI::pattern_list_summary_panel);
 
     char text[100];
     Pattern & p = g_PatternStore.CurrentEditPattern();
 
 // TODO:LG
 //    snprintf(text, 100, "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
-    g_TextUI.Text(BaseUI::edit_summary_panel, 0, 1, text);
+    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 0, 1, text);
 
     snprintf(text, 100, "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
         p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
-    g_TextUI.Text(BaseUI::edit_summary_panel, 1, 1, text);
+    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 1, 1, text);
 
     TranslateTable & table = p.PatternTranslateTable();
 
@@ -243,12 +243,12 @@ void update_edit_panels(bool refreshList)
             table.ShiftName(),
             table.RootName().c_str(),
             table.ScaleName());
-    g_TextUI.Text(BaseUI::edit_summary_panel, 2, 1, text);
+    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 2, 1, text);
 
     snprintf(text, 100, "Premap %s, Accidentals %s",
             table.PremapModeName(),
             table.AccidentalsModeName());
-    g_TextUI.Text(BaseUI::edit_summary_panel, 3, 1, text);
+    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 3, 1, text);
 
 }
 
@@ -257,31 +257,6 @@ void layout_pattern_extra_panel(vector<InOutPair> & pairs)
     g_TextUI.ShowNoteTransforms(pairs);
 
     pairs.clear();
-}
-
-void update_big_panel()
-{
-    g_TextUI.ClearArea(BaseUI::big_panel);
-
-    if ( g_PatternStore.Empty() )
-        return;
-
-    static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
-
-    Pattern & p = g_PatternStore.CurrentEditPattern();
-
-
-    int row = 0;
-    auto cursor = p.CursorPos();
-
-    for ( auto line = p.m_DisplayList.begin(); line != p.m_DisplayList.end(); line++, row++ )
-    {
-        char text[60];
-        (*line)->SetStatus();
-        snprintf(text, 60, "%s%s", line == cursor ? " -> " : "    ", (*line)->StatusString().c_str());
-        g_TextUI.Text(BaseUI::big_panel, row, 0, text, & highlights);
-    }
-
 }
 
 void update_big_panel_v1()
@@ -376,8 +351,11 @@ void show_status_after_navigation()
 {
     const int width = 72;
 
+    if ( ItemMenu::RedrawMenuList() )
+        update_big_panel();
+
     static int adjustOffset = 0;
-    string status = CursorKeys::Status();
+    string status = ItemMenu::Status();
 
     // Although I started off with a mechanism which allows for multiple
     // highlights, so far I've only ever set one at a time. Now that I
@@ -389,13 +367,13 @@ void show_status_after_navigation()
     if ( status.size() < width )
         adjustOffset = 0;
 
-    vector<screen_pos_t> & highlights = CursorKeys::GetHighlights();
+    vector<screen_pos_t> & highlights = ItemMenu::GetHighlights();
 
     if ( !highlights.empty() )
     {
         screen_pos_t cursor = highlights.front();
 
-        if ( CursorKeys::FirstField() )
+        if ( ItemMenu::FirstField() )
         {
             // Make sure whole string scrolls into view on the left.
             cursor.length += cursor.offset;
@@ -408,16 +386,46 @@ void show_status_after_navigation()
             adjustOffset = cursor.offset + cursor.length - width;
     }
 
-    set_status(STAT_POS_MENU, status.substr(adjustOffset, width).c_str());
-
     g_TextUI.SendSaveCursor();
+
+    int row, col;
+    if ( ItemMenu::DisplayPos(row, col) )
+        set_status(row, col, "* %s", status.substr(adjustOffset, width - 2).c_str());
+    else
+        set_status(STAT_POS_MENU, "* %s", status.substr(adjustOffset, width - 2).c_str());
+
     for ( size_t i = 0; i < highlights.size(); i++ )
 //        g_TextUI.Highlight(BaseUI::whole_screen, STAT_POS_MENU + highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
-        g_TextUI.HighlightLastWrite(highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+        g_TextUI.HighlightLastWrite(highlights.at(i).offset - adjustOffset + 2, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+
     g_TextUI.SendRestoreCursor();
 
-    if ( CursorKeys::RedrawDisplay () )
-        update_big_panel();
+}
+
+void update_big_panel()
+{
+    g_TextUI.ClearArea(BaseUI::big_panel);
+
+    if ( g_PatternStore.Empty() )
+        return;
+
+    static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
+
+    Pattern & p = g_PatternStore.CurrentEditPattern();
+
+
+    int row = 0;
+    auto cursor = p.CursorPos();
+
+    for ( auto line = p.m_MenuList.begin(); line != p.m_MenuList.end(); line++, row++ )
+    {
+        char text[60];
+        (*line)->SetStatus();
+        (*line)->SetDisplayRow(g_TextUI.BaseRow(BaseUI::big_panel) + row);
+        string pad((*line)->DisplayCol(), ' ');
+        snprintf(text, 60, "%s%s%s", line == cursor ? " -> " : "    ", pad.c_str(), (*line)->StatusString().c_str());
+        g_TextUI.Text(BaseUI::big_panel, row, 0, text, & highlights);
+    }
 
 }
 

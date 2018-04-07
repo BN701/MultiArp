@@ -25,9 +25,9 @@
 #include <string>
 #include <vector>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
-struct StepList : public CursorKeys
+struct StepList : public ItemMenu
 {
     std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
     std::vector<Cluster>::size_type m_LastRequestedPos;     // Last position for which note info was requested.
@@ -47,6 +47,7 @@ struct StepList : public CursorKeys
     {
         m_DisplayObjectType = dot_step_list;
         m_PopUpMenuID = C_MENU_ID_STEPLIST;
+        m_DisplayCol = 4;
         m_Help = "S-Left/Right: insert cluster, C-Left/Right: copy cluster, S-Del: delete";
     }
 

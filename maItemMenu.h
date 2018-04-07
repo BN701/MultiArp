@@ -20,6 +20,7 @@
 #ifndef CURSORKEYS_H
 #define CURSORKEYS_H
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -33,12 +34,17 @@
 //    screen_pos_t(int ofs = 0, int len = 0) { offset = ofs; length = len; }
 //};
 
-class CursorKeys
+class ItemMenu;
+
+typedef std::list<ItemMenu *> menu_list_t;
+typedef std::list<ItemMenu *>::iterator menu_list_cursor_t;
+
+class ItemMenu
 {
     public:
-        CursorKeys();
-        CursorKeys(const CursorKeys & val);
-        virtual ~CursorKeys();
+        ItemMenu();
+        ItemMenu(const ItemMenu & val);
+        virtual ~ItemMenu();
 
         enum follow_up_action_t
         {
@@ -60,13 +66,13 @@ class CursorKeys
         int ItemID() { return m_ItemID; }
         void SetItemID( int val ) { m_ItemID = val; }
 
-        virtual void SetReturnFocus( CursorKeys * val ) { m_ReturnFocus = val; }
+        virtual void SetReturnFocus( ItemMenu * val ) { m_ReturnFocus = val; }
         void ReturnFocus()
         {
             if ( m_ReturnFocus != NULL )
             {
                 m_ReturnFocus->SetFocus();
-                m_ReturnFocus->SetStatus();
+//                m_ReturnFocus->SetStatus();
             }
             m_ReturnFocus = NULL;
         }
@@ -86,13 +92,13 @@ class CursorKeys
         std::string & StatusString() { return m_Status; }
 
         static bool MenuActive();
-//        static bool RouteKey(key_type_t k);
         static bool RouteKey(BaseUI::key_command_t k);
-        static std::string & Status();
+        static std::string & Status(bool setStatus = true);
         static std::string & Help();
         static bool FirstField();
         static std::vector<screen_pos_t> & GetHighlights();
         static std::vector<screen_pos_t> & GetFieldPositions();
+        static bool DisplayPos(int & row, int & col);
 
         follow_up_action_t FollowUp()
         {
@@ -108,22 +114,65 @@ class CursorKeys
 
         bool CheckType(display_object_type_t type) { return m_DisplayObjectType == type; }
 
-        static void SetRedrawDisplay() { m_RedrawDisplay = true; }
-        static bool RedrawDisplay()
+        void SetDisplayPos(int row, int col)
         {
-            if ( m_RedrawDisplay )
+            m_DisplayRow = row;
+            m_DisplayCol = col;
+        }
+
+        void SetDisplayRow(int row) { m_DisplayRow = row; }
+
+        int DisplayCol() { return m_DisplayCol; }
+
+        static void SetRedrawMenuList() { m_RedrawMenuList = true; }
+        static bool RedrawMenuList()
+        {
+            if ( m_RedrawMenuList )
             {
-                m_RedrawDisplay = false;
+                m_RedrawMenuList = false;
                 return true;
             }
             else
                 return false;
         }
 
+        void SetMenuListInfo(menu_list_t * menu, menu_list_cursor_t cursor)
+        {
+            m_MenuList = menu;
+            m_MenuPos = cursor;
+        }
+
+        menu_list_cursor_t MenuInsert(menu_list_t * menu, menu_list_cursor_t pos)
+        {
+            // This assumes that any one instance of ItemMenu can only
+            // be a member of one menu list. (There are many menu lists, however.
+            // At the moment there's one for each Pattern.)
+
+            m_MenuList = menu;
+            m_MenuPos = m_MenuList->insert(++pos, this);
+            m_RedrawMenuList = true;
+            return m_MenuPos;
+        }
+
     protected:
-        static CursorKeys * m_Focus;
+        static ItemMenu * m_Focus;
 
 //        virtual bool HandleKey(key_type_t k) { return false; };
+
+        bool GetDisplayPos(int & row, int & col)    // Non-static
+        {
+            if ( m_DisplayRow > -1 && m_DisplayCol > -1 )
+            {
+                row = m_DisplayRow;
+                col = m_DisplayCol;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        int m_DisplayRow = -1;
+        int m_DisplayCol = -1;
 
         std::string m_Status = "Not set";
         std::string m_Help;
@@ -133,18 +182,21 @@ class CursorKeys
         bool m_FirstField = true;
         follow_up_action_t m_FollowUp = none;
 
-        CursorKeys * m_ReturnFocus = NULL;
+        ItemMenu * m_ReturnFocus = NULL;
 
         int m_ItemID = -1;
 
         command_menu_id_t m_PopUpMenuID = C_MENU_ID_NONE;
         display_object_type_t m_DisplayObjectType = dot_base;
 
+        menu_list_t * m_MenuList;
+        menu_list_cursor_t m_MenuPos;
+
     private:
 
         int m_ObjectID = m_ObjectCount++;
 
-        static bool m_RedrawDisplay;
+        static bool m_RedrawMenuList;
         static int m_ObjectCount;
 };
 

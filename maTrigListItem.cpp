@@ -729,7 +729,7 @@ bool TrigListItem::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_TrigListItemFocus == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

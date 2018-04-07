@@ -43,7 +43,7 @@
 void do_command_line(int argc, char *argv[]);
 #endif // MA_BLUE
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maBaseUI.h"
 
 enum command_t
@@ -106,6 +106,7 @@ enum command_t
 
     C_CUE,              // Set the next pattern to play
     C_EDIT,             // Set focus for copy/paste
+    C_EDIT_ITEM,
     C_EDIT_CURSOR_LOCK,
     C_EDIT_CURSOR_UNLOCK,
     C_EDIT_CURSOR_LOCK_STATUS,
@@ -175,7 +176,7 @@ enum command_t
 bool do_command(std::string commandList, int directCommand = C_NONE);
 //void do_command_menu(command_menu_id_t menu = C_MENU_ID_TOP);
 
-//bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym);
+//bool handle_key_input(ItemMenu::key_type_t curKey, xcb_keysym_t sym);
 bool handle_key_input(BaseUI::key_command_t key);
 
 //#define RESET_NONE 0

@@ -134,7 +134,7 @@ void FeelMap::New(vector<string> & tokens)
     else
         m_EditPoint = 0;
 
-    SetStatus();
+//    SetStatus();
 }
 
 void FeelMap::Add()
@@ -146,7 +146,7 @@ void FeelMap::Add()
 
     m_Points = m_StretchPoints.size() - 1;
     m_EditPoint += 1;
-    SetStatus();
+//    SetStatus();
 }
 
 void FeelMap::Remove()
@@ -160,7 +160,7 @@ void FeelMap::Remove()
     m_Points = m_StretchPoints.size() - 1;
     if ( m_EditPoint == m_Points )
         m_EditPoint -= 1;
-    SetStatus();
+//    SetStatus();
 }
 
 void FeelMap::Respace()
@@ -171,7 +171,7 @@ void FeelMap::Respace()
     for ( int i = 0; i < m_Points + 1; i++ )
         m_StretchPoints.at(i) = double(i)/(m_Points);
 
-    SetStatus();
+//    SetStatus();
 }
 
 string FeelMap::ToString(const char * prefix)
@@ -259,7 +259,7 @@ bool FeelMap::HandleKey(BaseUI::key_command_t k)
         {
             m_StretchPoints.push_back(0.0);
             m_StretchPoints.push_back(1.0);
-            SetStatus();
+//            SetStatus();
         }
         return true;
     }
@@ -270,7 +270,7 @@ bool FeelMap::HandleKey(BaseUI::key_command_t k)
         {
             m_EditPoint = 0;
             Add();
-            SetStatus();
+//            SetStatus();
         }
         return true;
     }
@@ -344,7 +344,7 @@ bool FeelMap::HandleKey(BaseUI::key_command_t k)
         return false;
     }
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

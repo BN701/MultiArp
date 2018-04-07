@@ -37,7 +37,7 @@ extern Sequencer g_Sequencer;
 extern AlsaSequencer g_Sequencer;
 #endif // MA_BLUE
 
-//#include "maCursorKeys.h"
+//#include "maItemMenu.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -77,7 +77,7 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_STEPGROUP, {false, C_LIST_NEW, "New List", ""}},
     {C_MENU_ID_STEPGROUP, {false, C_NONE, "Delete", ""}},
 
-    {C_MENU_ID_STEPLIST, {false, C_LIST_EDIT, "Edit", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_EDIT_ITEM, "Edit", ""}},
     {C_MENU_ID_STEPLIST, {false, C_LIST_DELETE, "Delete", ""}},
 
     {C_MENU_ID_RTGROUP, {false, C_NONE, "New List", ""}},

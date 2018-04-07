@@ -17,8 +17,8 @@ BaseUI::BaseUI()
 
 //    m_SmallPanel = newwin(4, 56, 2, 4);
 //    m_ProgressPanel = newwin(2, 15, 3, 61);
-//    m_EditListPanel = newwin(4, 20, 8, 4);
-//    m_EditSummaryPanel = newwin(4, 52, 8, 24);
+//    m_PatternListPanel = newwin(4, 20, 8, 4);
+//    m_PatternListSummaryPanel = newwin(4, 52, 8, 24);
 //    m_BigPanel = newwin(11, 80, 12, 0);
 //    m_BigPanelExtra = newwin(4, 72, 8, 4);
 
@@ -39,15 +39,20 @@ WindowRect & BaseUI::AreaToWindowRect(window_area_t area)
             return m_SmallPanel;
         case progress_panel:
             return m_ProgressPanel;
-        case edit_list_panel:
-            return m_EditListPanel;
-        case edit_summary_panel:
-            return m_EditSummaryPanel;
+        case pattern_list_panel:
+            return m_PatternListPanel;
+        case pattern_list_summary_panel:
+            return m_PatternListSummaryPanel;
         case big_panel_extra:
             return m_BigPanelExtra;
         default:
             return m_WholeScreen;
     }
+}
+
+int BaseUI::BaseRow(window_area_t area)
+{
+    return AreaToWindowRect(area).m_iY;
 }
 
 void BaseUI::MapToFullScreen(window_area_t area, int & row, int & col)

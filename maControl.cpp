@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 #include "maCommand.h"
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -168,10 +168,10 @@ void control(control_message_t message, int value)
                         return;
                 }
 
-                CursorKeys::RouteKey(key);
+                ItemMenu::RouteKey(key);
                 show_status_after_navigation();
-                update_edit_panels();
-                }
+                update_pattern_list_panels();
+            }
             break;
 
         default:

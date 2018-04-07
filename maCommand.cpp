@@ -37,7 +37,7 @@ extern Sequencer g_Sequencer;
 extern AlsaSequencer g_Sequencer;
 #endif // MA_BLUE
 
-//#include "maCursorKeys.h"
+//#include "maItemMenu.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -375,8 +375,8 @@ void do_help(string topicName)
             break;
 
         case C_NONE :
-            if ( CursorKeys::MenuActive() )
-                set_status(STAT_POS_2, CursorKeys::Help().c_str());
+            if ( ItemMenu::MenuActive() )
+                set_status(STAT_POS_2, ItemMenu::Help().c_str());
             else
                 set_status(STAT_POS_2, "Topics: 'control', 'pattern', 'misc' or try a command name");
             break;
@@ -562,6 +562,11 @@ bool do_command(string commandString, int directCommand)
             }
             break;
 
+        case C_EDIT_ITEM:
+            g_PatternStore.OpenCurrentItemMenu();
+            show_status_after_navigation();
+            break;
+
        case C_EDIT_CURSOR_LOCK:
            g_PatternStore.SetEditFocusFollowsPlay(true);
            set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
@@ -576,12 +581,14 @@ bool do_command(string commandString, int directCommand)
            break;
 
        case C_NEW :
-           g_PatternStore.AddEmptyPattern(tokens, firstParameter);
-           // g_PatternStore.AddEmptyPattern(tokens.begin() + firstParameter, tokens.end());
-           // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
-           set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
-           update_pattern_status_panel();
-           break;
+            g_PatternStore.AddEmptyPattern(tokens, firstParameter);
+            // g_PatternStore.AddEmptyPattern(tokens.begin() + firstParameter, tokens.end());
+            // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
+            set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
+            update_pattern_status_panel();
+            show_status_after_navigation();
+            update_big_panel();
+            break;
 
        case C_COPY :
            if ( g_PatternStore.Empty() )
@@ -1037,7 +1044,7 @@ bool do_command(string commandString, int directCommand)
             break;
 
         case C_LIST_NEW:
-        case C_LIST_EDIT:
+//        case C_LIST_EDIT:
             set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command));
             update_big_panel();
             break;
@@ -1210,7 +1217,7 @@ bool do_command(string commandString, int directCommand)
     // is nearly impossible, so might as well just do it every
     // time.
 
-    update_edit_panels(true);
+    update_pattern_list_panels(true);
     commandString = "";
     return bResult;
 }
@@ -1390,11 +1397,13 @@ void load_from_string(string s, int & created, int & updated )
 
 }
 
-//bool handle_key_input(CursorKeys::key_type_t curKey, xcb_keysym_t sym)
+//bool handle_key_input(ItemMenu::key_type_t curKey, xcb_keysym_t sym)
 
 
 bool handle_key_input(BaseUI::key_command_t key)
 {
+    static string commandString;
+
 #if 1
         g_TextUI.SendSaveCursor();
         if ( key < BaseUI::key_none)
@@ -1405,21 +1414,24 @@ bool handle_key_input(BaseUI::key_command_t key)
         g_TextUI.SendRestoreCursor();
 #endif
 
+    // If command menu is open it eats all keys.
+
     if ( g_CommandMenu.HandleKey(key) )
     {
         return true;
     }
 
-    if ( key > BaseUI::key_menu_control )
+    // Look for menu key (currently '/') to open command menu, but only if
+    // we haven't already started a command string.
+
+    if ( commandString.empty() && key == static_cast<BaseUI::key_command_t>('/') )
     {
-        CursorKeys::RouteKey(key);
-        show_status_after_navigation();
-        update_edit_panels();
+        do_command("", C_MENU);
         return true;
     }
 
     bool result = true;
-    static string commandString;
+    bool keyUsed = false;
 
     switch (key)
     {
@@ -1428,12 +1440,14 @@ bool handle_key_input(BaseUI::key_command_t key)
         copy_clipboard(globals_to_string() + g_PatternStore.ToString());
         set_status(STAT_POS_2, "All Data copied to clipboard ...");
         set_status(COMMAND_HOME, "");
+        keyUsed = true;
         break;
 
     case BaseUI::key_ctrl_c: // 0xA2:  // Ctrl-C, Copy
         copy_clipboard(g_PatternStore.EditPatternToString());
         set_status(STAT_POS_2, "Edit Pattern copied to clipboard ...");
         set_status(COMMAND_HOME, "");
+        keyUsed = true;
         break;
 
     case BaseUI::key_ctrl_v: // 0xAD2: // Ctrl-V, Paste
@@ -1453,30 +1467,32 @@ bool handle_key_input(BaseUI::key_command_t key)
         }
 #endif
         update_pattern_status_panel();
-        update_edit_panels();
+        update_pattern_list_panels();
         update_big_panel();
+        keyUsed = true;
         break;
 #endif
 
-    case static_cast<BaseUI::key_command_t>('/'):
-        if ( commandString.empty() )
-        {
-            do_command("", C_MENU);
-//            g_CommandMenu.Open();
-        }
-        else
-        {
-            commandString += '/';
-            place_cursor(COMMAND_HOME + commandString.size());
-            set_status(COMMAND_HOME, commandString.c_str());
-        }
-        break;
+//    case static_cast<BaseUI::key_command_t>('/'):
+//        if ( commandString.empty() )
+//        {
+//            do_command("", C_MENU);
+////            g_CommandMenu.Open();
+//        }
+//        else
+//        {
+//            commandString += '/';
+//            place_cursor(COMMAND_HOME + commandString.size());
+//            set_status(COMMAND_HOME, commandString.c_str());
+//        }
+//        break;
 
     case BaseUI::key_return: // Enter
         if ( !commandString.empty() )
         {
             result = do_command(commandString);
             commandString.clear();
+            keyUsed = true;
         }
         else if ( g_ListBuilder.HandleKeybInput(key) )
         {
@@ -1487,26 +1503,51 @@ bool handle_key_input(BaseUI::key_command_t key)
             g_ListBuilder.Clear();
             update_big_panel();
             set_status(STAT_POS_2, "");
+            keyUsed = true;
         }
-        else if ( CursorKeys::RouteKey(key) )
+//        else if ( ItemMenu::RouteKey(key) )
+//        {
+//            show_status_after_navigation();
+//        }
+        if ( keyUsed )
         {
-            show_status_after_navigation();
+            place_cursor(COMMAND_HOME);
+            set_status(COMMAND_HOME, "");
         }
-        place_cursor(COMMAND_HOME);
-        set_status(COMMAND_HOME, "");
+        break;
+
+    case BaseUI::key_backspace: // XK_BackSpace:
+        if ( !commandString.empty() )
+        {
+            commandString.pop_back();
+            keyUsed = true;
+        }
+        else if ( g_ListBuilder.HandleKeybInput(key) )
+        {
+           show_listbuilder_status();
+            keyUsed = true;
+        }
+//        else if ( ItemMenu::RouteKey(key) )
+//            show_status_after_navigation();
+        if ( keyUsed )
+        {
+            place_cursor(COMMAND_HOME + commandString.size());
+            set_status(COMMAND_HOME, commandString.c_str());
+        }
         break;
 
     case BaseUI::key_space: // XK_space: // Space bar.
-        if ( commandString.empty() )
-        {
-            if ( g_ListBuilder.HandleKeybInput(key) )
-                show_listbuilder_status();
-        }
-        else
+        if ( !commandString.empty() )
         {
             commandString += ' ';
             place_cursor(COMMAND_HOME + commandString.size());
             set_status(COMMAND_HOME, commandString.c_str());
+            keyUsed = true;
+        }
+        else if ( g_ListBuilder.HandleKeybInput(key) )
+        {
+            show_listbuilder_status();
+            keyUsed = true;
         }
         break;
 
@@ -1514,23 +1555,14 @@ bool handle_key_input(BaseUI::key_command_t key)
     case BaseUI::key_tab: // XK_Tab:
         place_cursor(COMMAND_HOME + commandString.size());
         g_TextUI.NextBigPanelPage(1);
+        keyUsed = true;
         break;
 
     case BaseUI::key_shift_tab: // XK_ISO_Left_Tab:   // Shift-Tab
         g_TextUI.NextBigPanelPage(-1);
+        keyUsed = true;
         break;
 #endif
-
-    case BaseUI::key_backspace: // XK_BackSpace:
-        if ( commandString.size() > 0 )
-            commandString.pop_back();
-        else if ( g_ListBuilder.HandleKeybInput(key) )
-           show_listbuilder_status();
-        else if ( CursorKeys::RouteKey(key) )
-            show_status_after_navigation();
-        place_cursor(COMMAND_HOME + commandString.size());
-        set_status(COMMAND_HOME, commandString.c_str());
-        break;
 
     default:
 
@@ -1539,6 +1571,7 @@ bool handle_key_input(BaseUI::key_command_t key)
             commandString += key;
             place_cursor(COMMAND_HOME + commandString.size());
             set_status(COMMAND_HOME, commandString.c_str());
+            keyUsed = true;
         }
 #if 0
         else if ( true )
@@ -1581,6 +1614,15 @@ bool handle_key_input(BaseUI::key_command_t key)
 #endif
         break;
     }
+
+    if ( ! keyUsed && ItemMenu::RouteKey(key) )
+    {
+        show_status_after_navigation();
+//        update_pattern_list_panels();
+//        update_big_panel();
+        return true;
+    }
+
 
     return result;
 }

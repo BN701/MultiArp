@@ -433,7 +433,7 @@ bool Note::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_NoteEditFocus == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }
@@ -596,6 +596,8 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             n.SetItemID(m_PosEdit + 1);
             n.SetFocus();
             n.SetStatus();
+            n.SetDisplayPos(m_DisplayRow + 1, m_DisplayCol + 4);
+            n.MenuInsert(m_MenuList, m_MenuPos);
             n.SetReturnFocus(this);
         }
         break;
@@ -615,21 +617,21 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             m_PosEdit += 1;
         break;
 
-    case BaseUI::key_up:
-        if ( m_ReturnFocus != NULL )
-        {
-            m_ReturnFocus->HandleKey(BaseUI::key_right);
-            m_ReturnFocus->HandleKey(BaseUI::key_return);
-        }
-        return true;
-
-    case BaseUI::key_down:
-        if ( m_ReturnFocus != NULL )
-        {
-            m_ReturnFocus->HandleKey(BaseUI::key_left);
-            m_ReturnFocus->HandleKey(BaseUI::key_return);
-        }
-        return true;
+//    case BaseUI::key_up:
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(BaseUI::key_right);
+//            m_ReturnFocus->HandleKey(BaseUI::key_return);
+//        }
+//        return true;
+//
+//    case BaseUI::key_down:
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(BaseUI::key_left);
+//            m_ReturnFocus->HandleKey(BaseUI::key_return);
+//        }
+//        return true;
 
     case BaseUI::key_ctrl_left:
         if ( !m_Notes.empty() )
@@ -684,7 +686,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

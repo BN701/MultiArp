@@ -44,7 +44,7 @@ extern AlsaSequencer g_Sequencer;
 #endif // MA_BLUE
 
 #include "maControl.h"
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
 #include "maScreen.h"
@@ -70,7 +70,7 @@ void do_UI_updates()
    if ( g_PatternStore.PatternChanged(true) )
    {
        set_top_line();
-       update_edit_panels();
+       update_pattern_list_panels();
        set_status(STAT_POS_2, "Pattern changed ...");
    }
 

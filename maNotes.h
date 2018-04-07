@@ -24,7 +24,7 @@
 #include <string>
 #include <map>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
 #define PLAY_DATA_STEP 0x01
 #define PLAY_DATA_GATE 0x02
@@ -53,7 +53,7 @@ struct PosInfo2 : public PosInfo
     {}
 };
 
-struct Note : public CursorKeys
+struct Note : public ItemMenu
 {
 
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
@@ -107,7 +107,7 @@ struct Note : public CursorKeys
 
 };
 
-struct Cluster : public CursorKeys
+struct Cluster : public ItemMenu
 {
     std::vector<Note> m_Notes;
     int m_StepLength = 0;           // This will be filled in at some point to indicate how many rests follow.

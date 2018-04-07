@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
 struct ArpeggioStage
 {
@@ -78,7 +78,7 @@ struct ArpeggioStage
 };
 
 
-class TrigRepeater// : public CursorKeys
+class TrigRepeater// : public ItemMenu
 {
     public:
         enum decay_mode_t
@@ -134,7 +134,7 @@ class TrigRepeater// : public CursorKeys
 
 };
 
-class TrigListItem : public CursorKeys
+class TrigListItem : public ItemMenu
 {
     public:
         TrigListItem();

@@ -220,20 +220,29 @@ void PatternStore::SetStatus()
 //    return true;
 //}
 //
+
+void PatternStore::OpenCurrentItemMenu()
+{
+    if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
+    {
+        ItemMenu & menu = **CurrentEditPattern().CursorPos();
+        menu.SetFocus();
+        menu.SetReturnFocus(this);
+    }
+}
+
 bool PatternStore::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
     case BaseUI::key_return:
-        if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
-        {
 // TODO:LG
 //                StepList & s = m_Patterns.at(m_PosEdit).ListGroupForEdit();
 //                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
 //                s.SetFocus();
 //                s.SetStatus();
 //                s.SetReturnFocus(this);
-        }
+        OpenCurrentItemMenu();
         break;
 
 
@@ -246,19 +255,19 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
 
     case BaseUI::key_up:
         DownListPos();
-        SetRedrawDisplay();
+        SetRedrawMenuList();
         break;
 
     case BaseUI::key_down:
         UpListPos();
-        SetRedrawDisplay();
+        SetRedrawMenuList();
         break;
 
     default:
         return false;
     }
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

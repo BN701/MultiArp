@@ -24,10 +24,10 @@
 #include <vector>
 
 #include "maChainLink.h"
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
 
-class PatternChain : public CursorKeys
+class PatternChain : public ItemMenu
 {
     public:
         enum pattern_chain_mode_t
@@ -72,7 +72,7 @@ class PatternChain : public CursorKeys
         {
             m_Chain.clear();
             m_PosEdit = 0;
-            SetStatus();
+//            SetStatus();
         }
 
         void New();
@@ -102,7 +102,7 @@ class PatternChain : public CursorKeys
         virtual void SetStatus();
         virtual void SetFocus()
         {
-            CursorKeys::SetFocus();
+            ItemMenu::SetFocus();
             // SetStatus();
         }
 

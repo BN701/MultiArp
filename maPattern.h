@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 #include "maFeelMap.h"
 #include "maNotes.h"
 #include "maListGroup.h"
@@ -34,7 +34,7 @@
 #include "maTranslateTable.h"
 #include "maTrigList.h"
 
-struct Pattern : public CursorKeys
+struct Pattern : public ItemMenu
 {
     static Pattern EmptyPattern;
     std::vector<StepList>::size_type m_Pos;
@@ -48,11 +48,11 @@ struct Pattern : public CursorKeys
 //    std::vector<RealTimeList> m_RealTimeSet;
 
     std::vector<ListGroup *> m_ListGroups;
-    std::list<CursorKeys *> m_DisplayList;
-    std::list<CursorKeys *>::iterator m_PosCursor;
+    std::list<ItemMenu *> m_MenuList;
+    std::list<ItemMenu *>::iterator m_PosCursor;
     // int m_PosCursor = 0;
 
-    std::list<CursorKeys *>::iterator CursorPos() { return m_PosCursor; }
+    std::list<ItemMenu *>::iterator CursorPos() { return m_PosCursor; }
 
     std::string m_Label;
 
@@ -107,8 +107,9 @@ struct Pattern : public CursorKeys
         m_Velocity(64)
     {
         m_PopUpMenuID = C_MENU_ID_PATTERN;
-        m_DisplayList.push_back(this);
-        m_PosCursor = m_DisplayList.begin();
+        m_DisplayCol = 0;
+        m_MenuList.push_back(this);
+        m_PosCursor = m_MenuList.begin();
     }
 
     Pattern(const Pattern & p):
@@ -121,13 +122,14 @@ struct Pattern : public CursorKeys
         m_Label(p.m_Label)
     {
         m_PopUpMenuID = p.m_PopUpMenuID;
-        m_DisplayList.push_back(this);
-        m_PosCursor = m_DisplayList.begin();
+        m_DisplayCol = p.m_DisplayCol;
+        m_MenuList.push_back(this);
+        m_PosCursor = m_MenuList.begin();
 
         for ( auto lg = p.m_ListGroups.begin(); lg != p.m_ListGroups.end(); lg++ )
         {
             m_ListGroups.push_back(*lg);
-            m_DisplayList.push_back(m_ListGroups.back());
+            m_MenuList.push_back(m_ListGroups.back());
         }
 
     }
@@ -158,7 +160,7 @@ struct Pattern : public CursorKeys
 //    {
 ////        if ( p >= 0 && p < m_StepListSet.size() )
 ////            m_PosEdit = p;
-//        if ( p >= 0 && p < m_DisplayList.size() )
+//        if ( p >= 0 && p < m_MenuList.size() )
 //            m_PosCursor = p;
 //    }
 
@@ -236,13 +238,13 @@ struct Pattern : public CursorKeys
 //    void UpCursorPos() { SetCursorPos( m_PosCursor + 1); }
     void UpCursorPos()
     {
-        if ( m_PosCursor != --m_DisplayList.end())
+        if ( m_PosCursor != --m_MenuList.end())
             m_PosCursor++;
     }
 
     void DownCursorPos()
     {
-        if ( m_PosCursor != m_DisplayList.begin() )
+        if ( m_PosCursor != m_MenuList.begin() )
             m_PosCursor--;
     }
 

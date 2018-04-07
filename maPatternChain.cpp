@@ -187,7 +187,7 @@ void PatternChain::New()
         if ( it->Jump() >= static_cast<int>(m_PosEdit) )
             it->SetJump(it->Jump() + 1 );
 
-    SetStatus();
+//    SetStatus();
 }
 
 void PatternChain::Delete()
@@ -209,7 +209,7 @@ void PatternChain::Delete()
     if ( m_PosPlay >= m_Chain.size() )
         m_PosPlay = m_Chain.size() - 1;
 
-    SetStatus();
+//    SetStatus();
 }
 
 #if defined(MA_BLUE)
@@ -314,7 +314,7 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
             link.SetFocus();
             link.SetStatus();
             link.SetParent(this);       // Specific pointer to PatternChain.
-            link.SetReturnFocus(this);  // Generic return pointer to CursorKeys object.
+            link.SetReturnFocus(this);  // Generic return pointer to ItemMenu object.
         }
         break;
     case BaseUI::key_left:
@@ -390,7 +390,7 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_MenuFocus == 0;
 
-    SetStatus();
+//    SetStatus();
 
     return true;
 }

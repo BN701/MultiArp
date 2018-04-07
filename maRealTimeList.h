@@ -24,9 +24,9 @@
 #include <string>
 #include <map>
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
-struct RealTimeListParams : public CursorKeys
+struct RealTimeListParams : public ItemMenu
 {
     enum rtp_window_mode_t
     {
@@ -65,7 +65,7 @@ struct RealTimeListParams : public CursorKeys
 };
 
 
-struct RealTimeList : public CursorKeys
+struct RealTimeList : public ItemMenu
 {
     static RealTimeList EmptyList;
     std::map<double,Note> m_RealTimeList;
@@ -120,7 +120,7 @@ struct RealTimeList : public CursorKeys
 
         virtual bool HandleKey(BaseUI::key_command_t k);
         int m_RTListFocus = 0;
-        int m_SubMenus = 1; // How many submenu items will there be in the CursorKeys menu?
+        int m_SubMenus = 1; // How many submenu items will there be in the ItemMenu menu?
 
         RealTimeListParams m_Params;
 

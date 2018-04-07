@@ -18,13 +18,13 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#include "maCursorKeys.h"
+#include "maItemMenu.h"
 
-CursorKeys * CursorKeys::m_Focus = NULL;
-bool CursorKeys::m_RedrawDisplay = false;
-int CursorKeys::m_ObjectCount = 0;
+ItemMenu * ItemMenu::m_Focus = NULL;
+bool ItemMenu::m_RedrawMenuList = false;
+int ItemMenu::m_ObjectCount = 0;
 
-CursorKeys::CursorKeys()
+ItemMenu::ItemMenu()
 {
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
     if ( SP_CURSORKEYS )
@@ -33,14 +33,14 @@ CursorKeys::CursorKeys()
     //ctor
 }
 
-CursorKeys::CursorKeys(const CursorKeys & val)
+ItemMenu::ItemMenu(const ItemMenu & val)
 {
     // Explicitly avoid copying any pointers to other menus,
     // nothing else to be done. (Members appear to be initialized
     // according to their declarations. i.e. set to NULL, etc.)
 }
 
-CursorKeys::~CursorKeys()
+ItemMenu::~ItemMenu()
 {
     //dtor
 
@@ -48,13 +48,12 @@ CursorKeys::~CursorKeys()
         m_Focus = NULL;
 }
 
-bool CursorKeys::MenuActive()
+bool ItemMenu::MenuActive()
 {
     return m_Focus != NULL;
 }
 
-//bool CursorKeys::RouteKey(key_type_t k)
-bool CursorKeys::RouteKey(BaseUI::key_command_t k)
+bool ItemMenu::RouteKey(BaseUI::key_command_t k)
 {
     if ( m_Focus != NULL )
         return m_Focus->HandleKey(k);
@@ -64,15 +63,19 @@ bool CursorKeys::RouteKey(BaseUI::key_command_t k)
 
 std::string g_EmptyStatus;
 
-std::string & CursorKeys::Status()
+std::string & ItemMenu::Status(bool setStatus)
 {
     if ( m_Focus != NULL )
+    {
+        if ( setStatus )
+            m_Focus->SetStatus();
         return m_Focus->m_Status;
+    }
     else
         return g_EmptyStatus;
 }
 
-std::string & CursorKeys::Help()
+std::string & ItemMenu::Help()
 {
     if ( m_Focus != NULL )
         return m_Focus->m_Help;
@@ -80,7 +83,7 @@ std::string & CursorKeys::Help()
         return g_EmptyStatus;
 }
 
-bool CursorKeys::FirstField()
+bool ItemMenu::FirstField()
 {
     if ( m_Focus != NULL )
         return m_Focus->m_FirstField;
@@ -93,7 +96,7 @@ bool CursorKeys::FirstField()
 std::vector<screen_pos_t> g_FieldPositions;
 std::vector<screen_pos_t> g_Highlights;
 
-std::vector<screen_pos_t> & CursorKeys::GetHighlights()
+std::vector<screen_pos_t> & ItemMenu::GetHighlights()
 {
     if ( m_Focus != NULL )
         return m_Focus->m_Highlights;
@@ -106,10 +109,18 @@ std::vector<screen_pos_t> & CursorKeys::GetHighlights()
     // be empty.
 }
 
-std::vector<screen_pos_t> & CursorKeys::GetFieldPositions()
+std::vector<screen_pos_t> & ItemMenu::GetFieldPositions()
 {
     if ( m_Focus != NULL )
         return m_Focus->m_FieldPositions;
     else
         return g_FieldPositions;
+}
+
+bool ItemMenu::DisplayPos(int & row, int & col)
+{
+    if ( m_Focus != NULL )
+        return m_Focus->GetDisplayPos(row, col);
+    else
+        return false;
 }

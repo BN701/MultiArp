@@ -134,18 +134,13 @@ string Pattern::StepListManager(command_t command)
         case C_LIST_NEW:
         {
             // Get the current object (dynamic_cast checks for correct object type).
-            StepListGroup * pStepListGroup = dynamic_cast<StepListGroup*>(*m_PosCursor);
+            StepListGroup * pStepListGroup = dynamic_cast<StepListGroup*>(m_MenuList.CurrentItem());
             if ( pStepListGroup == NULL )
                 return "Pattern Step List Manager: Not a step list group.";
             StepList *pStepList = pStepListGroup->NewStepList().get();
-            do {
-                m_PosCursor++;
-            } while ( m_PosCursor != m_MenuList.end() && (*m_PosCursor)->CheckType(dot_step_list) );
-            // insert() doesn't seem to mind if position is at end of list,
-            // but I'd like to see it confirmed somewhere.
-            m_PosCursor = pStepList->MenuInsert(&m_MenuList, --m_PosCursor);
-//            m_MenuList.insert(m_PosCursor, pStepList);
-//            m_PosCursor--;
+            pStepList->SetVisible(m_Visible);
+            menu_list_cursor_t pos = m_MenuList.FindFirstNonMatching(BaseUI::dot_step_list);
+            m_MenuList.Insert(pos, pStepList);
             break;
         }
 //        case C_LIST_EDIT:
@@ -219,8 +214,13 @@ void Pattern::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 50, "Pattern %s", m_Label.c_str());
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 50, "[Pattern %s]", m_Label.c_str());
+    else
+        snprintf(buff, 50, " Pattern %s ", m_Label.c_str());
+
+    InitStatus();
+    m_Status += buff;
 
 //    m_Status += " Midi: ";
 //    pos = m_Status.size();
@@ -237,6 +237,46 @@ void Pattern::SetStatus()
 //    if ( !m_FieldPositions.empty() )
 //        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
+
+bool Pattern::HandleKey(BaseUI::key_command_t k)
+{
+    switch ( k )
+    {
+    case BaseUI::key_return:
+        m_MenuList.OpenCurrentItem(this);
+        break;
+
+    case BaseUI::key_backspace:
+        ReturnFocus();
+        break;
+
+    case BaseUI::key_left:
+        break;
+
+    case BaseUI::key_right:
+        break;
+
+    case BaseUI::key_up:
+    case BaseUI::key_ctrl_up:
+        DownCursorPos();
+//        SetRedrawMenuList();
+        break;
+
+    case BaseUI::key_down:
+    case BaseUI::key_ctrl_down:
+        UpCursorPos();
+//        SetRedrawMenuList();
+        break;
+
+    default:
+        return false;
+    }
+
+//    SetStatus();
+
+    return true;
+}
+
 
 string Pattern::ToString(const char * prefix)
 {
@@ -772,14 +812,11 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
             break;
     }
 
-    m_PosCursor = m_ListGroups.back()->MenuInsert(&m_MenuList, --m_MenuList.end());
 
-//    m_MenuList.push_back(m_ListGroups.back());
-//
-//    m_PosCursor = --m_MenuList.end();
-//    (*m_PosCursor)->SetMenuListInfo(&m_MenuList, m_PosCursor);
-//
-//    return m_PosCursor;
+    ItemMenu * m = m_ListGroups.back();
+    m_MenuList.Insert(m_MenuList.m_Items.end(), m);
+    m->SetVisible(m_Visible);
+    m->SetRedraw();
 }
 
 void Pattern::ReplaceList(StepList & noteList)

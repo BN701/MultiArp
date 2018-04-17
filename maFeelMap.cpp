@@ -215,7 +215,9 @@ void FeelMap::SetStatus()
 {
     char buff[200];
 
-    m_Status = "Feel: ";
+    InitStatus();
+    m_Status += "Feel: ";
+
     m_FieldPositions.clear();
     m_Highlights.clear();
 

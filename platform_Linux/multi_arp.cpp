@@ -334,6 +334,8 @@ int main(int argc, char *argv[])
                 if ( pfd[i].revents > 0 )
                     read_midi_ALSA(queueId);
             }
+
+            update_item_menus();
         }
     }
 #endif

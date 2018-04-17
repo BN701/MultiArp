@@ -765,12 +765,13 @@ void TranslateTable::SetStatus()
 {
     char buff[200];
 
-    m_Status.clear();
     m_FieldPositions.clear();
     m_Highlights.clear();
 
     int pos = 0;
     snprintf(buff, 200, "Chr': %2i", m_Transpose);
+
+    InitStatus();
     m_Status += buff;
     m_FieldPositions.emplace_back(5, static_cast<int>(m_Status.size()) - 5);
 

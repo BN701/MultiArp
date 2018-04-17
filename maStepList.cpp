@@ -165,8 +165,13 @@ void StepList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 200, "[Step List %i] ", m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 200, "[Step List %i] ", m_ItemID);
+    else
+        snprintf(buff, 200, " Step List %i  ", m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
 
     for ( unsigned i = 0; i < m_Clusters.size(); i++ )
@@ -196,10 +201,10 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
             Cluster & c = m_Clusters.at(m_PosEdit);
             c.SetItemID(m_PosEdit + 1);
             c.SetFocus();
-            c.SetStatus();
-            c.SetDisplayPos(m_DisplayRow + 1, m_DisplayCol + 4);
-            c.MenuInsert(m_MenuList, m_MenuPos);
             c.SetReturnFocus(this);
+            c.SetDisplayIndent(m_MenuListIndent + 2);
+            c.SetVisible(m_Visible);
+            MenuInsert(m_MenuPos, & c);
         }
         break;
 
@@ -218,14 +223,24 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
             m_PosEdit += 1;
         break;
 
-//    case BaseUI::key_up:
-//    case BaseUI::key_down:
-//        if ( m_ReturnFocus != NULL )
-//        {
-//            m_ReturnFocus->HandleKey(k);
-//            m_ReturnFocus->HandleKey(BaseUI::key_return);
-//        }
-//        return true;
+    case BaseUI::key_ctrl_up:
+    case BaseUI::key_ctrl_down:
+        if ( m_ReturnFocus != NULL )
+        {
+            m_ReturnFocus->HandleKey(k);
+            m_ReturnFocus->HandleKey(BaseUI::key_return);
+        }
+        return true;
+
+    case BaseUI::key_up:
+    case BaseUI::key_down:
+    case BaseUI::key_shift_up:
+    case BaseUI::key_shift_down:
+        if ( !m_Clusters.empty() )
+        {
+            m_Clusters.at(m_PosEdit).HandleKey(k);
+        }
+        break;
 
     case BaseUI::key_ctrl_left:
         if ( !m_Clusters.empty() )
@@ -280,7 +295,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-//    SetStatus();
+    SetRedraw();
 
     return true;
 }

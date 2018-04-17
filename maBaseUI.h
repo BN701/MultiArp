@@ -19,6 +19,8 @@ void EepromStore(uint8_t value);
 #define SP_UTILS_SPLIT      30
 #endif
 
+#include <map>
+
 struct InOutPair;
 
 class Rectangle
@@ -39,17 +41,32 @@ class Rectangle
         m_iY(y),
         m_iWidth(width),
         m_iHeight(height)
-    {};
+    {}
 
     Rectangle(double x, double y, double width, double height):
         m_dX(x),
         m_dY(y),
         m_dWidth(width),
         m_dHeight(height)
-    {};
+    {}
 
     void ScaleD2I(double scale = 1.0);
 };
+
+class MenuListDisplayInfo : public Rectangle
+{
+    public:
+        int m_ScrollStart = 0;
+        int m_ScrollHeight;
+        int m_PreviousListSize = 0;
+
+        MenuListDisplayInfo(int x, int y, int width, int height):
+            Rectangle(x, y, width, height),
+            m_ScrollHeight(height)
+        {}
+};
+
+typedef std::map<int, MenuListDisplayInfo> dot_position_table_t;
 
 class WindowRect : public Rectangle
 {
@@ -125,6 +142,18 @@ class BaseUI
             key_alt_page_down,
         };
 
+        enum display_object_type_t  // Hopefully just use these for sanity checks.
+        {
+            dot_base,
+            dot_pattern_store,
+            dot_pattern,
+            dot_pattern_menu_list,
+            dot_step_list_group,
+            dot_rt_list_group,
+            dot_step_list,
+            dot_rt_list
+        };
+
         enum text_attribute_t
         {
             attr_normal = 0,
@@ -175,6 +204,8 @@ class BaseUI
         int BaseRow(window_area_t area);
 
         static const char * KeyName(key_command_t key);
+
+        virtual bool GetDisplayInfo(int dot, MenuListDisplayInfo * & displayInfo) = 0;
 
     protected:
 

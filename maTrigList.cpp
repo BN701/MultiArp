@@ -45,7 +45,11 @@ void TrigList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "[Trig List] ";
+    InitStatus();
+    if ( m_GotFocus )
+        m_Status += "[Trig List] ";
+    else
+        m_Status += " Trig List  ";
 
 //    for ( int i = 0; i < m_TrigItems.size(); i++ )
     for ( auto it = m_TrigItems.begin(); it < m_TrigItems.end(); it++ )

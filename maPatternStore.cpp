@@ -52,12 +52,15 @@ using namespace std;
 void PatternStore::SetStatus()
 {
     size_t pos = 0;
-    m_Status.clear();
     m_Highlights.clear();
     m_FieldPositions.clear();
 
+    InitStatus();
     if ( m_Patterns.empty() )
+    {
+        m_Status = "Hit the menu key and create a pattern ...";
         return;
+    }
 
     char buff[100];
 #if defined(MA_BLUE)
@@ -65,7 +68,10 @@ void PatternStore::SetStatus()
 #else
     const char * format = "%lu/%lu";
 #endif
-    m_Status = "Pattern ";
+    if ( m_GotFocus )
+        m_Status += "[Pattern] ";
+    else
+        m_Status += " Pattern  ";
     pos = m_Status.size();
     snprintf(buff, 100, format, m_PosEdit + 1, m_Patterns.size());
     m_Status += buff;
@@ -221,16 +227,6 @@ void PatternStore::SetStatus()
 //}
 //
 
-void PatternStore::OpenCurrentItemMenu()
-{
-    if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
-    {
-        ItemMenu & menu = **CurrentEditPattern().CursorPos();
-        menu.SetFocus();
-        menu.SetReturnFocus(this);
-    }
-}
-
 bool PatternStore::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
@@ -242,7 +238,15 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
 //                s.SetFocus();
 //                s.SetStatus();
 //                s.SetReturnFocus(this);
-        OpenCurrentItemMenu();
+        if ( !m_Patterns.empty() )
+        {
+            ItemMenu & m = m_Patterns.at(m_PosEdit);
+    //        m.SetItemID(m_PosEdit + 1);
+            m.SetFocus();
+    //        m.SetStatus();
+            m.SetReturnFocus(this);
+    //        OpenCurrentItemMenu();
+        }
         break;
 
 
@@ -254,13 +258,15 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_up:
-        DownListPos();
-        SetRedrawMenuList();
+        UpEditPos();
+//        DownListPos();
+//        SetRedrawMenuList();
         break;
 
     case BaseUI::key_down:
-        UpListPos();
-        SetRedrawMenuList();
+        DownEditPos();
+//        UpListPos();
+//        SetRedrawMenuList();
         break;
 
     default:
@@ -277,6 +283,8 @@ const char * numbers[] = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", 
 int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 {
     m_Patterns.push_back(m_DefaultPattern);
+    SetRedraw();
+
 //    m_Patterns.back().NewList();
 
 //    std::string label;
@@ -315,13 +323,17 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
         }
     }
 
-    m_Patterns.back().SetLabel(label.c_str());
+    Pattern & p = m_Patterns.back();
 
+    p.SetVisible(true);
+    p.SetLabel(label.c_str());
 
-    if ( m_EditPosFollowsPlay )
-        return m_Patterns.size() - 1;
-    else
-        return m_PosEdit = m_Patterns.size() - 1;
+//    if ( m_EditPosFollowsPlay )
+//        return m_Patterns.size() - 1;
+//    else
+//        return m_PosEdit = m_Patterns.size() - 1;
+
+    return m_PosEdit = m_Patterns.size() - 1;
 
 }
 
@@ -394,18 +406,18 @@ Pattern & PatternStore::CurrentEditPattern()
     return m_Patterns.at(m_PosEdit);
 }
 
-void PatternStore::UpListPos()
-{
-    if ( !m_Patterns.empty() )
-        m_Patterns[m_PosEdit].UpCursorPos();
-}
-
-void PatternStore::DownListPos()
-{
-    if ( !m_Patterns.empty() )
-        m_Patterns[m_PosEdit].DownCursorPos();
-}
-
+//void PatternStore::UpListPos()
+//{
+//    if ( !m_Patterns.empty() )
+//        m_Patterns[m_PosEdit].UpCursorPos();
+//}
+//
+//void PatternStore::DownListPos()
+//{
+//    if ( !m_Patterns.empty() )
+//        m_Patterns[m_PosEdit].DownCursorPos();
+//}
+//
 //void PatternStore::UpRTListPos()
 //{
 //    if ( !m_Patterns.empty() )

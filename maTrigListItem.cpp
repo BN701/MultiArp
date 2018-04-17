@@ -484,7 +484,11 @@ void TrigListItem::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    m_Status = "[Trig] ";
+    InitStatus();
+    if ( m_GotFocus )
+        m_Status += "[Trig] ";
+    else
+        m_Status += " Trig  ";
 
     pos = m_Status.size();
     m_Status += TrigMaskToString();

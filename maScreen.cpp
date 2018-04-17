@@ -349,10 +349,12 @@ void show_status()
 
 void show_status_after_navigation()
 {
+    return;
+
     const int width = 72;
 
-    if ( ItemMenu::RedrawMenuList() )
-        update_big_panel();
+//    if ( ItemMenu::RedrawMenuList() )
+//        update_big_panel();
 
     static int adjustOffset = 0;
     string status = ItemMenu::Status();
@@ -390,9 +392,9 @@ void show_status_after_navigation()
 
     int row, col;
     if ( ItemMenu::DisplayPos(row, col) )
-        set_status(row, col, "* %s", status.substr(adjustOffset, width - 2).c_str());
+        set_status(row, col, status.substr(adjustOffset, width).c_str());
     else
-        set_status(STAT_POS_MENU, "* %s", status.substr(adjustOffset, width - 2).c_str());
+        set_status(STAT_POS_MENU, status.substr(adjustOffset, width).c_str());
 
     for ( size_t i = 0; i < highlights.size(); i++ )
 //        g_TextUI.Highlight(BaseUI::whole_screen, STAT_POS_MENU + highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
@@ -402,29 +404,100 @@ void show_status_after_navigation()
 
 }
 
+void update_item_menus()
+{
+    if ( ItemMenu::RedrawList().empty() )
+        return;
+
+    // One loop for each UI interested in this.
+
+    for ( auto it = ItemMenu::RedrawList().begin(); it != ItemMenu::RedrawList().end(); it++ )
+    {
+        ItemMenu * menuItem = *it;
+        menuItem->SetStatus();
+        Rectangle clearArea = {0, 0, 0, 0};   // Fill this in if an area of screen needs to be cleared first.
+        int row, col, width;
+
+        if ( !menuItem->GetDisplayInfo(g_TextUI, row, col, width, clearArea) )  // Returns false means item not visible.
+            continue;
+
+        if ( clearArea.m_iHeight > 0 )
+            g_TextUI.ClearArea(&clearArea);
+
+        static int adjustOffset = 0;
+        string status = menuItem->StatusString();
+
+        // Although I started off with a mechanism which allows for multiple
+        // highlights, so far I've only ever set one at a time. Now that I
+        // need to handle long strings and need to make sure the highlight
+        // is visible I'm relying on there only being one highlight and using
+        // that to position the whole string within the available width. Any
+        // highlights set after the first may end up off screen.
+
+        if ( status.size() < width )
+            adjustOffset = 0;
+
+        vector<screen_pos_t> & highlights = menuItem->ItemHighlights();
+
+        if ( !highlights.empty() )
+        {
+            screen_pos_t cursor = highlights.front();
+
+            if ( menuItem->FirstField() )
+            {
+                // Make sure whole string scrolls into view on the left.
+                cursor.length += cursor.offset;
+                cursor.offset = 0;
+            }
+
+            if ( cursor.offset < adjustOffset )
+                adjustOffset = cursor.offset;
+            else if ( cursor.offset + cursor.length - adjustOffset >= width )
+                adjustOffset = cursor.offset + cursor.length - width;
+        }
+
+        set_status(row, col, status.substr(adjustOffset, width).c_str());
+
+        for ( auto h = highlights.begin(); h != highlights.end(); h++ )
+            g_TextUI.HighlightLastWrite(h->offset - adjustOffset, h->length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+    }
+
+    // Then clear the 'dirty' list.
+
+    ItemMenu::ClearRedrawList();
+}
+
 void update_big_panel()
 {
+
+    return;
+
     g_TextUI.ClearArea(BaseUI::big_panel);
 
     if ( g_PatternStore.Empty() )
         return;
 
-    static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
+//    static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
 
-    Pattern & p = g_PatternStore.CurrentEditPattern();
+    MenuList & menus = g_PatternStore.CurrentEditPattern().m_MenuList;
 
-
-    int row = 0;
-    auto cursor = p.CursorPos();
-
-    for ( auto line = p.m_MenuList.begin(); line != p.m_MenuList.end(); line++, row++ )
+    for ( auto it = menus.m_Items.begin(); it != menus.m_Items.end(); it++ )
     {
-        char text[60];
-        (*line)->SetStatus();
-        (*line)->SetDisplayRow(g_TextUI.BaseRow(BaseUI::big_panel) + row);
-        string pad((*line)->DisplayCol(), ' ');
-        snprintf(text, 60, "%s%s%s", line == cursor ? " -> " : "    ", pad.c_str(), (*line)->StatusString().c_str());
-        g_TextUI.Text(BaseUI::big_panel, row, 0, text, & highlights);
+        ItemMenu & menuItem = **it;
+        menuItem.SetStatus();
+        Rectangle clearArea = {0, 0, 0, 0};
+        int row, col, width;
+        if ( menuItem.GetDisplayInfo(g_TextUI, row, col, width, clearArea) )
+        {
+            g_TextUI.MapToFullScreen(BaseUI::big_panel, row, col);
+            set_status(row, col, menuItem.StatusString().c_str());
+        }
+        else
+            set_status(STAT_POS_MENU, menuItem.StatusString().c_str());
+//        char text[60];
+//        string pad((*menuItem)->DisplayIndent(), ' ');
+//        snprintf(text, 60, "%s%s%s", menuItem == cursor ? " -> " : "    ", pad.c_str(), (*menuItem)->StatusString().c_str());
+//        g_TextUI.Text(BaseUI::big_panel, row, 0, text, & highlights);
     }
 
 }

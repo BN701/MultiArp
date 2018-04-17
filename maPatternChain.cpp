@@ -272,7 +272,11 @@ void PatternChain::SetStatus()
     int pos = 0;
     char buff[20];
 
-    m_Status = "[Chain]";
+    InitStatus();
+    if ( m_GotFocus )
+        m_Status += "[Chain]";
+    else
+        m_Status += " Chain ";
     m_FieldPositions.clear();
     m_Highlights.clear();
 

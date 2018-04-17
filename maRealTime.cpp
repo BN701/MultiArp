@@ -90,8 +90,13 @@ void RealTimeListParams::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 200, "[RT List %i] ", m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 200, "[RT List %i] ", m_ItemID);
+    else
+        snprintf(buff, 200, " RT List %i  ", m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
     m_Status += " Loop - ";
 
@@ -268,8 +273,13 @@ void RealTimeList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 200, "[RT List %i] ", m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 200, "[RT List %i] ", m_ItemID);
+    else
+        snprintf(buff, 200, " RT List %i  ", m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
     pos = m_Status.size();
     m_Status += "Params";

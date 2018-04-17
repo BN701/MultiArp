@@ -433,10 +433,14 @@ bool do_command(string commandString, int directCommand)
         {
 
         case C_MENU:
-            if ( !g_PatternStore.Empty() )
-                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
-            else
+//            if ( !g_PatternStore.Empty() )
+//                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
+//            else
+//                g_CommandMenu.Open(C_MENU_ID_TOP);
+            if ( g_PatternStore.HasFocus() )
                 g_CommandMenu.Open(C_MENU_ID_TOP);
+            else
+                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
             break;
 
         case C_RUN :
@@ -563,8 +567,8 @@ bool do_command(string commandString, int directCommand)
             break;
 
         case C_EDIT_ITEM:
-            g_PatternStore.OpenCurrentItemMenu();
-            show_status_after_navigation();
+//            g_PatternStore.OpenCurrentItemMenu();
+//            show_status_after_navigation();
             break;
 
        case C_EDIT_CURSOR_LOCK:

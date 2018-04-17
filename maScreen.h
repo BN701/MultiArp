@@ -59,5 +59,7 @@ void update_pattern_list_panels(bool refreshList = false);
 void update_big_panel();
 void update_pattern_status_panel();
 void update_progress_bar();
+void update_item_menus();
+
 
 #endif // MASCREEN_H_INCLUDED

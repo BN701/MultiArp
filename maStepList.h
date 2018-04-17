@@ -45,9 +45,9 @@ struct StepList : public ItemMenu
         m_LastRequestedPos(0),
         m_Complete(false)
     {
-        m_DisplayObjectType = dot_step_list;
+        m_DisplayObjectType = BaseUI::dot_step_list;
         m_PopUpMenuID = C_MENU_ID_STEPLIST;
-        m_DisplayCol = 4;
+        m_MenuListIndent = 4;
         m_Help = "S-Left/Right: insert cluster, C-Left/Right: copy cluster, S-Del: delete";
     }
 

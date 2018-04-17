@@ -47,8 +47,13 @@ void ListGroup::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 50, "%s %i", g_LGTypeNames[m_Type], m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 50, "[%s %i]", g_LGTypeNames[m_Type], m_ItemID);
+    else
+        snprintf(buff, 50, " %s %i ", g_LGTypeNames[m_Type], m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
     m_Status += " Midi: ";
     pos = m_Status.size();
@@ -66,10 +71,57 @@ void ListGroup::SetStatus()
 //        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
+bool ListGroup::HandleKey(BaseUI::key_command_t k)
+{
+    switch ( k )
+    {
+    case BaseUI::key_return:
+        break;
+
+    case BaseUI::key_backspace:
+    case BaseUI::key_escape:
+        ReturnFocus();
+        break;
+
+    case BaseUI::key_left:
+        break;
+
+    case BaseUI::key_right:
+        break;
+
+//    case BaseUI::key_up:
+//    case BaseUI::key_down:
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(k);
+//            m_ReturnFocus->HandleKey(BaseUI::key_return);
+//        }
+//        return true;
+
+    case BaseUI::key_ctrl_left:
+        break;
+
+    case BaseUI::key_ctrl_right:
+        break;
+
+    case BaseUI::key_shift_left:
+        break;
+
+    case BaseUI::key_shift_right:
+        break;
+
+    case BaseUI::key_shift_delete:
+        break;
+
+    default:
+        return false;
+    }
+
+    return true;
+}
+
 StepListPtr StepListGroup::NewStepList()
 {
     m_StepListSet.emplace_back(new StepList());
     return m_StepListSet.back();
-//    m_PosEdit = m_StepListSet.size() - 1;
-
 }

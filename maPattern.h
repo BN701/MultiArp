@@ -48,11 +48,11 @@ struct Pattern : public ItemMenu
 //    std::vector<RealTimeList> m_RealTimeSet;
 
     std::vector<ListGroup *> m_ListGroups;
-    std::list<ItemMenu *> m_MenuList;
-    std::list<ItemMenu *>::iterator m_PosCursor;
+    MenuList m_MenuList;
+//    std::list<ItemMenu *>::iterator m_PosCursor;
     // int m_PosCursor = 0;
 
-    std::list<ItemMenu *>::iterator CursorPos() { return m_PosCursor; }
+    menu_list_cursor_t CursorPos() { return m_MenuList.m_Cursor; }
 
     std::string m_Label;
 
@@ -104,34 +104,39 @@ struct Pattern : public ItemMenu
         m_StepValue(16),
         m_Gate(0.5),
         m_GateHold(false),
-        m_Velocity(64)
+        m_Velocity(64),
+        m_MenuList(this, &m_Visible)
     {
         m_PopUpMenuID = C_MENU_ID_PATTERN;
-        m_DisplayCol = 0;
-        m_MenuList.push_back(this);
-        m_PosCursor = m_MenuList.begin();
+        m_MenuList.Add(this);
+        m_MenuList.Select(m_MenuPos);
+        m_MenuListIndent = 0;
+        m_DisplayObjectType = BaseUI::dot_pattern;
+        m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_menu_list;
     }
 
     Pattern(const Pattern & p):
         m_Pos(p.m_Pos),
-        m_PosCursor(p.m_PosCursor),
         m_StepValue(p.m_StepValue),
         m_Gate(p.m_Gate),
         m_GateHold(p.m_GateHold),
         m_Velocity(p.m_Velocity),
-        m_Label(p.m_Label)
+        m_Label(p.m_Label),
+        m_MenuList(this, &m_Visible)
     {
+        m_Visible = false;
         m_PopUpMenuID = p.m_PopUpMenuID;
-        m_DisplayCol = p.m_DisplayCol;
-        m_MenuList.push_back(this);
-        m_PosCursor = m_MenuList.begin();
+        m_MenuList.Add(this);
+        m_MenuList.Select(m_MenuPos);
+        m_MenuListIndent = p.m_MenuListIndent;
+        m_DisplayObjectType = p.m_DisplayObjectType;
+        m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
 
         for ( auto lg = p.m_ListGroups.begin(); lg != p.m_ListGroups.end(); lg++ )
         {
             m_ListGroups.push_back(*lg);
-            m_MenuList.push_back(m_ListGroups.back());
+            m_MenuList.m_Items.push_back(m_ListGroups.back());
         }
-
     }
 
 
@@ -154,7 +159,18 @@ struct Pattern : public ItemMenu
         m_Velocity = 64;
     }
 
-    void SetLabel(const char * label) { m_Label = label; }
+    void SetLabel(const char * label)
+    {
+        m_Label = label;
+        SetRedraw();
+    }
+
+    virtual void SetRedraw()
+    {
+        if ( m_Visible )
+            for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
+                m_RedrawList.push_back(*it);
+    }
 
 //    void SetCursorPos( int p )
 //    {
@@ -171,7 +187,7 @@ struct Pattern : public ItemMenu
         // check. Otherwise, let it crash and solve it
         // in the debugger.
 
-        return (*m_PosCursor)->PopUpMenuID();
+        return (*m_MenuList.m_Cursor)->PopUpMenuID();
     }
 
     std::string StepListManager(command_t command);
@@ -235,18 +251,23 @@ struct Pattern : public ItemMenu
 
     bool AllListsComplete();
 
-//    void UpCursorPos() { SetCursorPos( m_PosCursor + 1); }
-    void UpCursorPos()
-    {
-        if ( m_PosCursor != --m_MenuList.end())
-            m_PosCursor++;
-    }
+    protected:
+        virtual bool HandleKey(BaseUI::key_command_t k);
 
-    void DownCursorPos()
-    {
-        if ( m_PosCursor != m_MenuList.begin() )
-            m_PosCursor--;
-    }
+//    void UpCursorPos() { SetCursorPos( m_PosCursor + 1); }
+        void UpCursorPos()
+        {
+            m_MenuList.UpCursorPos();
+//        if ( m_PosCursor != --m_MenuList.end())
+//            m_PosCursor++;
+        }
+
+        void DownCursorPos()
+        {
+            m_MenuList.DownCursorPos();
+//        if ( m_PosCursor != m_MenuList.begin() )
+//            m_PosCursor--;
+        }
 
 //    void UpRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit + 1); }
 //    void DownRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit - 1); }

@@ -39,6 +39,7 @@ class ListGroup : public ItemMenu
 
         void ResetPosition();
         void SetStatus();
+        bool HandleKey(BaseUI::key_command_t k);
 
         void NewListGroup();
 
@@ -63,7 +64,7 @@ class StepListGroup : public ListGroup
         {
             m_Type = lt_step;
             m_PopUpMenuID = C_MENU_ID_STEPGROUP;
-            m_DisplayCol = 2;
+            m_MenuListIndent = 2;
 
         }
 
@@ -81,7 +82,7 @@ class RTListGroup : public ListGroup
         {
             m_Type = lt_realtime;
             m_PopUpMenuID = C_MENU_ID_RTGROUP;
-            m_DisplayCol = 2;
+            m_MenuListIndent = 2;
         }
 };
 

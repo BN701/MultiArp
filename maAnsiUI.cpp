@@ -192,6 +192,16 @@ void AnsiUI::SendSaveAndHideCursor()
 //    };
 //}
 
+void AnsiUI::ClearArea(Rectangle * rect)
+{
+    if ( rect != NULL )
+    {
+        string pad(rect->m_iWidth, ' ');
+        for ( int r = 0; r < rect->m_iHeight; r++ )
+            WriteXY(rect->m_iX, rect->m_iY + r, pad.c_str());
+    }
+}
+
 void AnsiUI::ClearArea(window_area_t area, int firstRow)
 {
     WindowRect R = AreaToWindowRect(area);
@@ -205,11 +215,6 @@ void AnsiUI::ClearArea(window_area_t area, int firstRow)
     R.MapToFullScreen(col, row);
     for ( int r = firstRow; r < R.m_iHeight; r++ )
         WriteXY(col, row + r, pad.c_str());
-
-//    WINDOW * window = AreaToWindow(area);
-//    wmove(window, 0, 0);
-//    wclrtobot(window);
-//    wrefresh(window);
 }
 
 
@@ -704,3 +709,22 @@ BaseUI::key_command_t AnsiUI::KeyInput()
 
     return key;
 }
+
+// These rectangles are initialized as {x, y, w, h }
+dot_position_table_t g_AnsiUI_DOT_Positions =
+{
+    { BaseUI::dot_pattern_store, {4, 1, 60, 1} },
+    { BaseUI::dot_pattern_menu_list, {0, 12, 60, 10} }
+};
+
+bool AnsiUI::GetDisplayInfo(int dot, MenuListDisplayInfo * & info)
+{
+    if ( g_AnsiUI_DOT_Positions.count(dot) != 0 )
+    {
+        info = & g_AnsiUI_DOT_Positions.at(dot);
+        return true;
+    }
+    else
+        return false;
+}
+

@@ -55,6 +55,8 @@ struct PosInfo2 : public PosInfo
 
 struct Note : public ItemMenu
 {
+    friend class StepList;
+    friend class Cluster;
 
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
     int m_NoteVelocity;      // -1 indicates not set (so use value from elsewhere)
@@ -109,6 +111,8 @@ struct Note : public ItemMenu
 
 struct Cluster : public ItemMenu
 {
+    friend class StepList;
+
     std::vector<Note> m_Notes;
     int m_StepLength = 0;           // This will be filled in at some point to indicate how many rests follow.
 

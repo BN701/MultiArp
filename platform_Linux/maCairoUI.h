@@ -53,6 +53,8 @@ class CairoUI : public BaseUI
         void Refresh(int x, int y, int width, int height);
         void Refresh(Rectangle & r, bool useDouble = false);
 
+        virtual bool GetDisplayInfo(int dot, MenuListDisplayInfo * & displayInfo);
+
     private:
         bool m_Enabled = true;
         int m_Width = 800;          // These could be FP and we calculate pixel values on the fly.

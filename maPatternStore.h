@@ -83,7 +83,9 @@ struct PatternStore : public ItemMenu
         m_UsePatternPlayData(false)
 //        m_PatternStoreFocus(psf_pattern)
     {
-        // m_PatternChain = {0, 0, 0, 1};
+        m_DisplayObjectType = BaseUI::dot_pattern_store;
+        m_Visible = true;
+        SetRedraw();
     };
 
     bool Empty() { return m_Patterns.empty(); }
@@ -317,8 +319,12 @@ struct PatternStore : public ItemMenu
     {
         if ( p >= 0 && p < m_Patterns.size() )
         {
+            m_Patterns[m_PosEdit].SetVisible(false);
             m_PosEdit = p;
             m_EditPosFollowsPlay = false;
+            SetRedraw();
+            m_Patterns[m_PosEdit].SetVisible(true);
+            m_Patterns[m_PosEdit].SetRedraw();
         }
     }
 

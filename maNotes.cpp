@@ -325,8 +325,13 @@ void Note::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 200, "[Note %i] ", m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 200, "[Note %i] ", m_ItemID);
+    else
+        snprintf(buff, 200, " Note %i  ", m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
     pos = m_Status.size();
     m_Status += ToString(false);
@@ -365,9 +370,14 @@ bool Note::HandleKey(BaseUI::key_command_t k)
 
     switch ( k )
     {
-    case BaseUI::key_return:
+//    case BaseUI::key_return:
     case BaseUI::key_backspace:
     case BaseUI::key_escape:
+        if ( m_MenuList != NULL )
+        {
+            m_MenuList->m_Container->SetRedraw();
+            m_MenuList->Remove(m_MenuPos);
+        }
         ReturnFocus();
         break;
 
@@ -433,7 +443,7 @@ bool Note::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_NoteEditFocus == 0;
 
-//    SetStatus();
+    SetRedraw();
 
     return true;
 }
@@ -568,8 +578,13 @@ void Cluster::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 50, "[Cluster %i] ", m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 50, "[Cluster %i] ", m_ItemID);
+    else
+        snprintf(buff, 50, " Cluster %i  ", m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
     for ( unsigned i = 0; i < m_Notes.size(); i++ )
     {
@@ -595,15 +610,20 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             Note & n = m_Notes.at(m_PosEdit);
             n.SetItemID(m_PosEdit + 1);
             n.SetFocus();
-            n.SetStatus();
-            n.SetDisplayPos(m_DisplayRow + 1, m_DisplayCol + 4);
-            n.MenuInsert(m_MenuList, m_MenuPos);
             n.SetReturnFocus(this);
+            n.SetDisplayIndent(m_MenuListIndent + 2);
+            n.SetVisible(m_Visible);
+            MenuInsert(m_MenuPos, &n);
         }
         break;
 
     case BaseUI::key_backspace:
     case BaseUI::key_escape:
+        if ( m_MenuList != NULL )
+        {
+            m_MenuList->m_Container->SetRedraw();
+            m_MenuList->Remove(m_MenuPos);
+        }
         ReturnFocus();
         break;
 
@@ -615,6 +635,18 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_right:
         if ( m_PosEdit < m_Notes.size() - 1 )
             m_PosEdit += 1;
+        break;
+
+    case BaseUI::key_up:
+    case BaseUI::key_down:
+    case BaseUI::key_shift_up:
+    case BaseUI::key_shift_down:
+        if ( m_Notes.empty() )
+        {
+            m_Notes.emplace_back();
+            m_PosEdit = 0;
+        }
+        m_Notes.at(m_PosEdit).HandleKey(k);
         break;
 
 //    case BaseUI::key_up:
@@ -686,7 +718,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-//    SetStatus();
+    SetRedraw();
 
     return true;
 }

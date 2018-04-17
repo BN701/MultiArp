@@ -156,8 +156,13 @@ void ChainLink::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    snprintf(buff, 50, "[Chain Slot %02i] ", m_ItemID);
-    m_Status = buff;
+    if ( m_GotFocus )
+        snprintf(buff, 50, "[Chain Slot %02i] ", m_ItemID);
+    else
+        snprintf(buff, 50, " Chain Slot %02i  ", m_ItemID);
+
+    InitStatus();
+    m_Status += buff;
 
     m_Status += "Pattern ";
     pos = m_Status.size();

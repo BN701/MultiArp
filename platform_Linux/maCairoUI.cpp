@@ -1056,4 +1056,16 @@ void CairoUI::Progress(double progress, double stepWidth, double beat, int patte
     cairo_destroy(cr);
 }
 
+// These are rectangles: {x, y, w, h }
+dot_position_table_t g_CairoUI_DOT_Positions =
+{
+    { BaseUI::dot_pattern_store, {4, 4, 60, 1} }
+};
+
+bool CairoUI::GetDisplayInfo(int dot, MenuListDisplayInfo * & displayInfo)
+{
+
+}
+
+
 #endif // MA_BLUE

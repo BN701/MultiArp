@@ -52,6 +52,7 @@ class MenuList
         menu_list_cursor_t Remove(menu_list_cursor_t pos);
         menu_list_cursor_t Select(menu_list_cursor_t pos);
 
+        void OpenCurrentItem();
         void OpenCurrentItem(ItemMenu * returnFocus);
         bool GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo);
 
@@ -63,8 +64,8 @@ class MenuList
             m_Visible(vis)
         {}
 
-        void DownCursorPos();
-        void UpCursorPos();
+        bool DownCursorPos();
+        bool UpCursorPos();
 
         bool m_SelectionChanged = false;
         bool * m_Visible = NULL;

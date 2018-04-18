@@ -88,28 +88,30 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos)
     m_SelectionChanged = true;
 }
 
-void MenuList::UpCursorPos()
+bool MenuList::UpCursorPos()
 {
     if ( m_Cursor == --m_Items.end() )
-        return;
+        return false;
 
     (*m_Cursor)->SetRedraw();
     m_Cursor++;
     (*m_Cursor)->SetRedraw();
 
     m_SelectionChanged = true;
+    return true;
 }
 
-void MenuList::DownCursorPos()
+bool MenuList::DownCursorPos()
 {
     if ( m_Cursor == m_Items.begin() )
-        return;
+        return false;
 
     (*m_Cursor)->SetRedraw();
     m_Cursor--;
     (*m_Cursor)->SetRedraw();
 
     m_SelectionChanged = true;
+    return true;
 }
 
 
@@ -120,6 +122,15 @@ menu_list_cursor_t MenuList::FindFirstNonMatching(int type)
         result++;
     } while ( result != m_Items.end() && (*result)->CheckType(type) );
     return result;
+}
+
+void MenuList::OpenCurrentItem()
+{
+    if ( !m_Items.empty() )
+    {
+        ItemMenu & menu = **m_Cursor;
+        menu.SetFocus();
+    }
 }
 
 void MenuList::OpenCurrentItem(ItemMenu * returnFocus)
@@ -194,7 +205,7 @@ void ItemMenu::InitStatus()
 
     if ( m_MenuList != NULL )
     {
-        if ( m_MenuList->m_Container->m_GotFocus && m_MenuList->m_Cursor == m_MenuPos )
+        if ( /* m_MenuList->m_Container->m_GotFocus && */ m_MenuList->m_Cursor == m_MenuPos )
             m_Status = " -> ";
         m_Status.resize(m_MenuListIndent + 4, ' ');
     }

@@ -1127,7 +1127,7 @@ const char * Interval(int n)
     if ( n >= 0 )
         return tt_intervals[n % 12];
     else
-        return "-";
+        return "~";
 }
 
 string TranslateDiags::UpdateLog()

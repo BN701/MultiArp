@@ -183,7 +183,7 @@ void StepList::SetStatus()
         if ( !c.Empty() )
             m_Status += c.ToString(false);
         else
-            m_Status += "(Empty)";
+            m_Status += "~";
         m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
     }
 
@@ -224,12 +224,18 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_ctrl_up:
+        if ( m_MenuList != NULL && m_MenuList->DownCursorPos() )
+            m_MenuList->OpenCurrentItem();
+        return true;
+
     case BaseUI::key_ctrl_down:
-        if ( m_ReturnFocus != NULL )
-        {
-            m_ReturnFocus->HandleKey(k);
-            m_ReturnFocus->HandleKey(BaseUI::key_return);
-        }
+        if ( m_MenuList != NULL && m_MenuList->UpCursorPos() )
+            m_MenuList->OpenCurrentItem();
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->HandleKey(k);
+////            m_ReturnFocus->HandleKey(BaseUI::key_return);
+//        }
         return true;
 
     case BaseUI::key_up:

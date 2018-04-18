@@ -89,14 +89,20 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_right:
         break;
 
-//    case BaseUI::key_up:
-//    case BaseUI::key_down:
+    case BaseUI::key_ctrl_up:
+        if ( m_MenuList != NULL && m_MenuList->DownCursorPos() )
+            m_MenuList->OpenCurrentItem();
+        return true;
+
+    case BaseUI::key_ctrl_down:
+        if ( m_MenuList != NULL && m_MenuList->UpCursorPos() )
+            m_MenuList->OpenCurrentItem();
 //        if ( m_ReturnFocus != NULL )
 //        {
 //            m_ReturnFocus->HandleKey(k);
-//            m_ReturnFocus->HandleKey(BaseUI::key_return);
+////            m_ReturnFocus->HandleKey(BaseUI::key_return);
 //        }
-//        return true;
+        return true;
 
     case BaseUI::key_ctrl_left:
         break;

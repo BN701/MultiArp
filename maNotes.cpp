@@ -55,7 +55,7 @@ unordered_map<int, string> mapNumbersToNotes =
 unordered_map<string, int> mapNotesToNumbers =
 {
 
-    {"R", -1}, {"Rest", -1}, {"r", -1}, {"rest", -1}, {"-", -1},
+    {"R", -1}, {"Rest", -1}, {"r", -1}, {"rest", -1}, {"-", -1}, {"~", -1},
 
     {"B#0", 0},{"C0", 0},
     {"C#0", 1},{"Db0", 1},
@@ -223,7 +223,7 @@ const char * Note::NoteNameOnly(int n)
     if ( n >= 0 )
         return mapNumbersToNotes.at(n % 12).c_str();
     else
-        return "-";
+        return "~";
 }
 
 string Note::NoteString(int n)
@@ -235,7 +235,7 @@ string Note::NoteString(int n)
         return buffer;
     }
     else
-        return "-";
+        return "~";
 }
 
 int Note::NoteNumberFromString(string note)
@@ -261,7 +261,7 @@ int Note::NoteNumberFromString(string note)
 string Note::ToString(bool fullFormat)
 {
     if ( m_NoteNumber == -1 )
-        return "-";
+        return "~";
 
     char buffer[25];
     if ( fullFormat && m_NoteVelocity >= 0 )

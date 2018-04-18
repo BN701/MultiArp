@@ -256,16 +256,32 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_right:
         break;
 
-    case BaseUI::key_up:
+//    case BaseUI::key_up:
+//        DownCursorPos();
+//        break;
+//
+//    case BaseUI::key_down:
+//        UpCursorPos();
+//        break;
+
+//    case BaseUI::key_up:
     case BaseUI::key_ctrl_up:
         DownCursorPos();
-//        SetRedrawMenuList();
+        m_MenuList.OpenCurrentItem();
+//        if ( m_MenuList.m_Cursor == m_MenuPos )
+//            m_MenuList.OpenCurrentItem(m_ReturnFocus);
+//        else
+//            m_MenuList.OpenCurrentItem(this);
         break;
 
-    case BaseUI::key_down:
+//    case BaseUI::key_down:
     case BaseUI::key_ctrl_down:
         UpCursorPos();
-//        SetRedrawMenuList();
+        m_MenuList.OpenCurrentItem();
+//        if ( m_MenuList.m_Cursor == m_MenuPos )
+//            m_MenuList.OpenCurrentItem(m_ReturnFocus);
+//        else
+//            m_MenuList.OpenCurrentItem(this);
         break;
 
     default:

@@ -232,20 +232,14 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
     switch ( k )
     {
     case BaseUI::key_return:
-// TODO:LG
-//                StepList & s = m_Patterns.at(m_PosEdit).ListGroupForEdit();
-//                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
-//                s.SetFocus();
-//                s.SetStatus();
-//                s.SetReturnFocus(this);
         if ( !m_Patterns.empty() )
         {
-            ItemMenu & m = m_Patterns.at(m_PosEdit);
-    //        m.SetItemID(m_PosEdit + 1);
-            m.SetFocus();
-    //        m.SetStatus();
-            m.SetReturnFocus(this);
-    //        OpenCurrentItemMenu();
+            MenuList & m = m_Patterns.at(m_PosEdit).m_MenuList;
+            if ( !m.m_Items.empty() )
+            {
+                (*m.m_Cursor)->SetFocus();
+                (*m.m_Cursor)->SetReturnFocus(this);
+            }
         }
         break;
 
@@ -327,6 +321,7 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 
     p.SetVisible(true);
     p.SetLabel(label.c_str());
+    p.SetReturnFocus(this);
 
 //    if ( m_EditPosFollowsPlay )
 //        return m_Patterns.size() - 1;

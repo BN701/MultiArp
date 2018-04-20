@@ -58,17 +58,20 @@ class ListGroup : public ItemMenu
 class StepListGroup : public ListGroup
 {
     public:
-        std::vector<StepListPtr> m_StepListSet;
+//        std::vector<StepListPtr> m_StepListSet;
+        std::vector<StepList> m_StepListSet;
 
         StepListGroup()
         {
+            m_DisplayObjectType = BaseUI::dot_step_list_group;
             m_Type = lt_step;
             m_PopUpMenuID = C_MENU_ID_STEPGROUP;
-            m_MenuListIndent = 2;
+            m_MenuListIndent = 0;
 
         }
 
-        StepListPtr NewStepList();
+//        StepListPtr NewStepList();
+        StepList * NewStepList();
 
 
 };
@@ -80,6 +83,7 @@ class RTListGroup : public ListGroup
 
         RTListGroup()
         {
+            m_DisplayObjectType = BaseUI::dot_rt_list_group;
             m_Type = lt_realtime;
             m_PopUpMenuID = C_MENU_ID_RTGROUP;
             m_MenuListIndent = 2;

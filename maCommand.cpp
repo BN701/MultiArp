@@ -173,7 +173,7 @@ unordered_map<string, command_t> g_CommandList =
     {"e", C_EDIT},
     {"cue", C_CUE},
     {"play", C_CUE},
-    {"new", C_NEW},
+    {"new", C_NEW_PATTERN},
     {"copy", C_COPY},
     {"delete", C_DELETE},
     {"del", C_DELETE},
@@ -338,7 +338,7 @@ void do_help(string topicName)
             set_status(STAT_POS_2, "Set focus for copy/paste and other operations.");
             break;
 
-        case C_NEW :
+        case C_NEW_PATTERN :
             set_status(STAT_POS_2, "Create new (empty) pattern.");
             break;
 
@@ -584,7 +584,7 @@ bool do_command(string commandString, int directCommand)
            set_status(STAT_POS_2, "Edit focus %s.", g_PatternStore.EditFocusFollowsPlay() ? "locked" : "unlocked");
            break;
 
-       case C_NEW :
+       case C_NEW_PATTERN :
             g_PatternStore.AddEmptyPattern(tokens, firstParameter);
             // g_PatternStore.AddEmptyPattern(tokens.begin() + firstParameter, tokens.end());
             // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
@@ -1050,7 +1050,7 @@ bool do_command(string commandString, int directCommand)
         case C_LIST_NEW:
 //        case C_LIST_EDIT:
             set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command));
-            update_big_panel();
+//            update_big_panel();
             break;
 
 #ifndef MA_BLUE

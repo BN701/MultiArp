@@ -110,7 +110,7 @@ enum command_t
     C_EDIT_CURSOR_LOCK,
     C_EDIT_CURSOR_UNLOCK,
     C_EDIT_CURSOR_LOCK_STATUS,
-    C_NEW,              // Create new (empty) pattern.
+    C_NEW_PATTERN,              // Create new (empty) pattern.
     C_NEW_STEP_GROUP,
     C_NEW_RT_GROUP,
     C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.

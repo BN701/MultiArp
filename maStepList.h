@@ -119,6 +119,6 @@ struct StepList : public ItemMenu
 
 };
 
-typedef std::shared_ptr<StepList> StepListPtr;
+//typedef std::shared_ptr<StepList> StepListPtr;
 
 #endif // MANOTES_H_INCLUDED

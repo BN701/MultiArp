@@ -78,7 +78,9 @@ struct Note : public ItemMenu
         m_NoteVelocity(v),
         m_Phase(0),
         m_Length(0)
-    {}
+    {
+        m_DisplayObjectType = BaseUI::dot_note;
+    }
 
     std::string ToString(bool fullFormat = true);
     bool NoteFromString(std::string);
@@ -119,6 +121,7 @@ struct Cluster : public ItemMenu
     Cluster():
         m_StepLength(1)
     {
+        m_DisplayObjectType = BaseUI::dot_step_list;
         m_Help = "S-Left/Right: insert note, C-Left/Right: copy note, S-Del: delete";
     }
 

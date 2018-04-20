@@ -137,7 +137,8 @@ string Pattern::StepListManager(command_t command)
             StepListGroup * pStepListGroup = dynamic_cast<StepListGroup*>(m_MenuList.CurrentItem());
             if ( pStepListGroup == NULL )
                 return "Pattern Step List Manager: Not a step list group.";
-            StepList *pStepList = pStepListGroup->NewStepList().get();
+//            StepList *pStepList = pStepListGroup->NewStepList().get();
+            StepList *pStepList = pStepListGroup->NewStepList();
             pStepList->SetVisible(m_Visible);
             menu_list_cursor_t pos = m_MenuList.FindFirstNonMatching(BaseUI::dot_step_list);
             m_MenuList.Insert(pos, pStepList);
@@ -243,11 +244,11 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
     switch ( k )
     {
     case BaseUI::key_return:
-        m_MenuList.OpenCurrentItem(this);
+//        m_MenuList.OpenCurrentItem(this);
         break;
 
     case BaseUI::key_backspace:
-        ReturnFocus();
+//        ReturnFocus();
         break;
 
     case BaseUI::key_left:
@@ -266,22 +267,24 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
 
 //    case BaseUI::key_up:
     case BaseUI::key_ctrl_up:
-        DownCursorPos();
-        m_MenuList.OpenCurrentItem();
-//        if ( m_MenuList.m_Cursor == m_MenuPos )
-//            m_MenuList.OpenCurrentItem(m_ReturnFocus);
-//        else
-//            m_MenuList.OpenCurrentItem(this);
+//        DownCursorPos();
+//        m_MenuList.OpenCurrentItem();
+
+////        if ( m_MenuList.m_Cursor == m_MenuPos )
+////            m_MenuList.OpenCurrentItem(m_ReturnFocus);
+////        else
+////            m_MenuList.OpenCurrentItem(this);
         break;
 
 //    case BaseUI::key_down:
     case BaseUI::key_ctrl_down:
-        UpCursorPos();
-        m_MenuList.OpenCurrentItem();
-//        if ( m_MenuList.m_Cursor == m_MenuPos )
-//            m_MenuList.OpenCurrentItem(m_ReturnFocus);
-//        else
-//            m_MenuList.OpenCurrentItem(this);
+//        UpCursorPos();
+//        m_MenuList.OpenCurrentItem();
+
+////        if ( m_MenuList.m_Cursor == m_MenuPos )
+////            m_MenuList.OpenCurrentItem(m_ReturnFocus);
+////        else
+////            m_MenuList.OpenCurrentItem(this);
         break;
 
     default:
@@ -828,11 +831,10 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
             break;
     }
 
-
     ItemMenu * m = m_ListGroups.back();
-    m_MenuList.Insert(m_MenuList.m_Items.end(), m);
     m->SetVisible(m_Visible);
-    m->SetRedraw();
+    m_MenuList.Insert(m_MenuList.m_Items.end(), m, true);   // Insert & select
+//    m->SetRedraw();
 }
 
 void Pattern::ReplaceList(StepList & noteList)

@@ -121,7 +121,7 @@
 		<Unit filename="maPatternChain.h" />
 		<Unit filename="maPatternStore.cpp" />
 		<Unit filename="maPatternStore.h" />
-		<Unit filename="maRealTime.cpp" />
+		<Unit filename="maRealTimeList.cpp" />
 		<Unit filename="maRealTimeList.h" />
 		<Unit filename="maScreen.cpp" />
 		<Unit filename="maScreen.h" />

@@ -52,8 +52,8 @@ class MenuList
         menu_list_cursor_t Remove(menu_list_cursor_t pos);
         menu_list_cursor_t Select(menu_list_cursor_t pos);
 
-        void OpenCurrentItem();
-        void OpenCurrentItem(ItemMenu * returnFocus);
+//        void OpenCurrentItem();
+//        void OpenCurrentItem(ItemMenu * returnFocus);
         bool GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo);
 
         ItemMenu * CurrentItem() { return *m_Cursor; }
@@ -74,6 +74,7 @@ class MenuList
 
 class ItemMenu
 {
+    friend class MenuList;
     public:
         ItemMenu();
         ItemMenu(const ItemMenu & val);
@@ -86,17 +87,6 @@ class ItemMenu
             num_follow_up_actions
         };
 
-//        enum display_object_type_t  // Hopefully just use these for sanity checks.
-//        {
-//            dot_base,
-//            dot_pattern,
-//            dot_pattern_menu_list,
-//            dot_step_list_group,
-//            dot_rt_list_group,
-//            dot_step_list,
-//            dot_rt_list
-//        };
-
         int ItemID() { return m_ItemID; }
         void SetItemID( int val ) { m_ItemID = val; }
 
@@ -107,7 +97,6 @@ class ItemMenu
             {
                 m_ReturnFocus->SetFocus();
                 m_ReturnFocus = NULL;
-//                m_GotFocus = true;
             }
         }
 
@@ -116,9 +105,7 @@ class ItemMenu
         // to the active menu instance.
 
         virtual void SetStatus() {};
-//        virtual void SetStatus() = 0;
         virtual bool HandleKey(BaseUI::key_command_t k) { return false; };
-//        virtual bool HandleKey(BaseUI::key_command_t k) = 0;
 
         virtual void SetFocus()
         {
@@ -179,35 +166,7 @@ class ItemMenu
 
         void ClearMenuList() { m_MenuList = NULL; }
 
-//        static void SetRedrawMenuList() { m_RedrawMenuList = true; }
-//        static bool RedrawMenuList()
-//        {
-//            if ( m_RedrawMenuList )
-//            {
-//                m_RedrawMenuList = false;
-//                return true;
-//            }
-//            else
-//                return false;
-//        }
-
         bool GetDisplayInfo(BaseUI & display, int & row, int & col, int & width, Rectangle & clearArea);
-//        bool GetDisplayInfo(int & row, int & col)    // Non-static
-//        {
-//            if ( m_MenuListRow == -1 || m_MenuListIndent == -1 )
-//                return false;
-//
-//            row = m_MenuListRow;
-//            col = m_MenuListIndent;
-//
-//            if ( m_MenuList != NULL )
-//            {
-//                row += m_MenuList->m_BaseRow - m_MenuList->m_ScrollStart;
-//                col += m_MenuList->m_BaseCol;
-//            }
-//
-//            return true;
-//        }
 
         static void ClearRedrawList() { m_RedrawList.clear(); }
         static std::list<ItemMenu *> & RedrawList() { return m_RedrawList; }
@@ -223,29 +182,29 @@ class ItemMenu
 
     protected:
         static ItemMenu * m_Focus;
+        static std::list<ItemMenu*> m_RedrawList;
 
-//        virtual bool HandleKey(key_type_t k) { return false; };
-
+        bool m_GotFocus = false;
+        bool m_Visible = false;
         int m_MenuListRow = 0;
         int m_MenuListIndent = 0;
         command_menu_id_t m_PopUpMenuID = C_MENU_ID_NONE;
+        bool m_FirstField = true;
+        follow_up_action_t m_FollowUp = none;
+        ItemMenu * m_ReturnFocus = NULL;
+
         BaseUI::display_object_type_t m_DisplayObjectType = BaseUI::dot_base;
 
         std::string m_Status = "Not set";
         std::string m_Help;
-        std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
-        std::vector<screen_pos_t> m_Highlights; // Offset/length.
-
-        bool m_FirstField = true;
-        follow_up_action_t m_FollowUp = none;
-
-        ItemMenu * m_ReturnFocus = NULL;
 
         int m_ItemID = -1;
 
-//        menu_list_t * m_MenuList;
         MenuList * m_MenuList = NULL;
         menu_list_cursor_t m_MenuPos;
+
+        std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
+        std::vector<screen_pos_t> m_Highlights; // Offset/length.
 
         void MenuInsert(menu_list_cursor_t pos, ItemMenu * item)
         {
@@ -255,18 +214,14 @@ class ItemMenu
             }
         }
 
-        bool m_GotFocus = false;
-        bool m_Visible = false;
-
         void InitStatus();
 
-        static std::list<ItemMenu*> m_RedrawList;
     private:
 
-        int m_ObjectID = m_ObjectCount++;
+//        int m_ObjectID = m_ObjectCount++;
 
 //        static bool m_RedrawMenuList;
-        static int m_ObjectCount;
+//        static int m_ObjectCount;
 };
 
 #endif // CURSORKEYS_H

@@ -24,7 +24,7 @@ ItemMenu * ItemMenu::m_Focus = NULL;
 std::list<ItemMenu*> ItemMenu::m_RedrawList;
 
 //bool ItemMenu::m_RedrawMenuList = false;
-int ItemMenu::m_ObjectCount = 0;
+//int ItemMenu::m_ObjectCount = 0;
 
 menu_list_cursor_t MenuList::Add(ItemMenu * item, bool select)
 {
@@ -84,65 +84,67 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos)
     if ( m_Cursor != m_Items.end() )
         (*m_Cursor)->SetRedraw();
     m_Cursor = pos;
+
     (*m_Cursor)->SetRedraw();
     m_SelectionChanged = true;
+
+    (*m_Cursor)->SetFocus();
+    (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
 }
 
 bool MenuList::UpCursorPos()
 {
-    if ( m_Cursor == --m_Items.end() )
-        return false;
-
-    (*m_Cursor)->SetRedraw();
-    m_Cursor++;
-    (*m_Cursor)->SetRedraw();
-
-    m_SelectionChanged = true;
-    return true;
+    menu_list_cursor_t pos = m_Cursor;
+    pos++;
+    if ( pos != m_Items.end() )
+        Select(pos);
+    return m_SelectionChanged;
 }
 
 bool MenuList::DownCursorPos()
 {
     if ( m_Cursor == m_Items.begin() )
         return false;
-
-    (*m_Cursor)->SetRedraw();
-    m_Cursor--;
-    (*m_Cursor)->SetRedraw();
-
-    m_SelectionChanged = true;
-    return true;
+    menu_list_cursor_t pos = m_Cursor;
+    Select(--pos);
+    return m_SelectionChanged;
 }
 
 
 menu_list_cursor_t MenuList::FindFirstNonMatching(int type)
 {
     menu_list_cursor_t result = m_Cursor;
-    do {
+    while (true)
+    {
         result++;
-    } while ( result != m_Items.end() && (*result)->CheckType(type) );
+        if ( result == m_Items.end() )
+            break;
+        if ( !(*result)->CheckType(type) )
+            break;
+    }
+
     return result;
 }
 
-void MenuList::OpenCurrentItem()
-{
-    if ( !m_Items.empty() )
-    {
-        ItemMenu & menu = **m_Cursor;
-        menu.SetFocus();
-    }
-}
-
-void MenuList::OpenCurrentItem(ItemMenu * returnFocus)
-{
-    if ( !m_Items.empty() )
-    {
-        ItemMenu & menu = **m_Cursor;
-        menu.SetFocus();
-        menu.SetReturnFocus(returnFocus);
-    }
-}
-
+//void MenuList::OpenCurrentItem()
+//{
+//    if ( !m_Items.empty() )
+//    {
+//        ItemMenu & menu = **m_Cursor;
+//        menu.SetFocus();
+//    }
+//}
+//
+//void MenuList::OpenCurrentItem(ItemMenu * returnFocus)
+//{
+//    if ( !m_Items.empty() )
+//    {
+//        ItemMenu & menu = **m_Cursor;
+//        menu.SetFocus();
+//        menu.SetReturnFocus(returnFocus);
+//    }
+//}
+//
 bool MenuList::GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo)    // Non-static
 {
     return display.GetDisplayInfo(m_DisplayObjectType, displayInfo);
@@ -157,11 +159,30 @@ ItemMenu::ItemMenu()
     //ctor
 }
 
-ItemMenu::ItemMenu(const ItemMenu & val)
+ItemMenu::ItemMenu(const ItemMenu & m):
+    m_GotFocus(m.m_GotFocus),
+    m_Visible(m.m_Visible),
+    m_MenuListRow(m.m_MenuListRow),
+    m_MenuListIndent(m.m_MenuListIndent),
+    m_PopUpMenuID(m.m_PopUpMenuID),
+    m_FirstField(m.m_FirstField),
+    m_FollowUp(m.m_FollowUp),
+    m_ReturnFocus(m.m_ReturnFocus),
+    m_DisplayObjectType(m.m_DisplayObjectType),
+    m_Status(m.m_Status),
+    m_Help(m.m_Help),
+    m_ItemID(m.m_ItemID),
+    m_MenuList(m.m_MenuList),
+    m_MenuPos(m.m_MenuPos)
 {
     // Explicitly avoid copying any pointers to other menus,
     // nothing else to be done. (Members appear to be initialized
     // according to their declarations. i.e. set to NULL, etc.)
+
+    if ( m_MenuList != NULL )
+    {
+        *m_MenuPos = this;
+    }
 }
 
 ItemMenu::~ItemMenu()
@@ -316,16 +337,25 @@ bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & widt
         displayInfo->m_PreviousListSize = listSize;
     }
     else
-        display.GetDisplayInfo(m_DisplayObjectType, displayInfo);
-
-    if ( displayInfo != NULL )
     {
-        col += displayInfo->m_iX;
-        row += displayInfo->m_iY;
-        width = displayInfo->m_iWidth;
-        return true;
+        display.GetDisplayInfo(m_DisplayObjectType, displayInfo);
+        if ( displayInfo == NULL )
+            return false;
+
+        // If display area more than one line in height, set an area to be cleared.
+        if ( displayInfo->m_iHeight > 1 )
+        {
+            clearArea = *displayInfo;
+            clearArea.m_iY += 1;
+            clearArea.m_iHeight -= 1;
+        }
     }
-    else
-        return false;
+
+
+    col += displayInfo->m_iX;
+    row += displayInfo->m_iY;
+    width = displayInfo->m_iWidth;
+
+    return true;
 }
 

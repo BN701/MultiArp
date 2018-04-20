@@ -61,14 +61,14 @@ CommandMenu g_CommandMenu;
 
 multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
-    {C_MENU_ID_TOP, {false, C_NEW, "New Pattern", ""}},
+    {C_MENU_ID_TOP, {false, C_NEW_PATTERN, "New Pattern", ""}},
     {C_MENU_ID_TOP, {true, C_MENU_ID_MIDI_MODE, "Midi Capture", ""}},
+    {C_MENU_ID_TOP, {false, C_NEW_STEP_GROUP, "New List Set", ""}},
+    {C_MENU_ID_TOP, {false, C_NEW_RT_GROUP, "New Loop Set", ""}},
 
-    {C_MENU_ID_PATTERN, {false, C_NEW_STEP_GROUP, "New Step Group", ""}},
-    {C_MENU_ID_PATTERN, {false, C_NEW_RT_GROUP, "New RT Group", ""}},
     {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
     {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
-    {C_MENU_ID_PATTERN, {false, C_NEW, "New", ""}},
+    {C_MENU_ID_PATTERN, {false, C_NEW_PATTERN, "New", ""}},
 
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},

@@ -90,13 +90,13 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_ctrl_up:
-        if ( m_MenuList != NULL && m_MenuList->DownCursorPos() )
-            m_MenuList->OpenCurrentItem();
+        if ( m_MenuList != NULL )
+            m_MenuList->DownCursorPos();
         return true;
 
     case BaseUI::key_ctrl_down:
-        if ( m_MenuList != NULL && m_MenuList->UpCursorPos() )
-            m_MenuList->OpenCurrentItem();
+        if ( m_MenuList != NULL )
+            m_MenuList->UpCursorPos();
 //        if ( m_ReturnFocus != NULL )
 //        {
 //            m_ReturnFocus->HandleKey(k);
@@ -126,8 +126,10 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
-StepListPtr StepListGroup::NewStepList()
+//StepListPtr StepListGroup::NewStepList()
+StepList * StepListGroup::NewStepList()
 {
-    m_StepListSet.emplace_back(new StepList());
-    return m_StepListSet.back();
+    m_StepListSet.emplace_back();
+//    m_StepListSet.emplace_back(new StepList());
+    return & m_StepListSet.back();
 }

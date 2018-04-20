@@ -714,6 +714,7 @@ BaseUI::key_command_t AnsiUI::KeyInput()
 dot_position_table_t g_AnsiUI_DOT_Positions =
 {
     { BaseUI::dot_pattern_store, {4, 1, 60, 1} },
+    { BaseUI::dot_pattern, {0, 12, 60, 10} },
     { BaseUI::dot_pattern_menu_list, {0, 12, 60, 10} }
 };
 

@@ -151,7 +151,9 @@ class BaseUI
             dot_step_list_group,
             dot_rt_list_group,
             dot_step_list,
-            dot_rt_list
+            dot_rt_list,
+            dot_cluster,
+            dot_note
         };
 
         enum text_attribute_t

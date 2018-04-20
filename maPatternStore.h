@@ -330,6 +330,8 @@ struct PatternStore : public ItemMenu
 
     void UpEditPos() { SetEditPos(m_PosEdit + 1); }
     void DownEditPos() { SetEditPos(m_PosEdit - 1); }
+
+
     void UpListPos();
     void DownListPos();
     void UpRTListPos();

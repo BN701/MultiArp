@@ -108,8 +108,8 @@ struct Pattern : public ItemMenu
         m_MenuList(this, &m_Visible)
     {
         m_PopUpMenuID = C_MENU_ID_PATTERN;
-        m_MenuList.Add(this);
-        m_MenuList.Select(m_MenuPos);
+//        m_MenuList.Add(this);
+//        m_MenuList.Select(m_MenuPos);
         m_MenuListIndent = 0;
         m_DisplayObjectType = BaseUI::dot_pattern;
         m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_menu_list;
@@ -126,8 +126,8 @@ struct Pattern : public ItemMenu
     {
         m_Visible = false;
         m_PopUpMenuID = p.m_PopUpMenuID;
-        m_MenuList.Add(this);
-        m_MenuList.Select(m_MenuPos);
+//        m_MenuList.Add(this);
+//        m_MenuList.Select(m_MenuPos);
         m_MenuListIndent = p.m_MenuListIndent;
         m_DisplayObjectType = p.m_DisplayObjectType;
         m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
@@ -168,8 +168,15 @@ struct Pattern : public ItemMenu
     virtual void SetRedraw()
     {
         if ( m_Visible )
+        {
+            if ( m_MenuList.m_Items.empty() )
+            {
+                m_RedrawList.push_back(this);
+                return;
+            }
             for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
                 m_RedrawList.push_back(*it);
+        }
     }
 
 //    void SetCursorPos( int p )

@@ -235,11 +235,12 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
         if ( !m_Patterns.empty() )
         {
             MenuList & m = m_Patterns.at(m_PosEdit).m_MenuList;
-            if ( !m.m_Items.empty() )
-            {
-                (*m.m_Cursor)->SetFocus();
-                (*m.m_Cursor)->SetReturnFocus(this);
-            }
+            if ( m.m_Items.empty() )
+                return true;
+            if ( m.m_Cursor == m.m_Items.end() )
+                m.Select(m.m_Items.begin());
+//            (*m.m_Cursor)->SetFocus();
+//            (*m.m_Cursor)->SetReturnFocus(this);
         }
         break;
 

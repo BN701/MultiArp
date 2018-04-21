@@ -36,34 +36,23 @@
 
 struct Pattern : public ItemMenu
 {
+    // Statics
+
     static Pattern EmptyPattern;
-    std::vector<StepList>::size_type m_Pos;
+
+    // Variables
+
+    std::vector<StepList>::size_type m_Pos = -1; // Was zero
 //    std::vector<StepList>::size_type m_PosEdit;
-    std::vector<RealTimeList>::size_type m_PosRealTimeEdit;
-    std::vector<StepList>::size_type m_LastRequestedPos;
+    std::vector<RealTimeList>::size_type m_PosRealTimeEdit = -1; // Was zero
+    std::vector<StepList>::size_type m_LastRequestedPos = -1; // Was zero
 
-//    std::vector<int> m_Trigs;
+    std::string m_Label = "Empty Pattern";
 
-//    std::vector<StepList> m_StepListSet;
-//    std::vector<RealTimeList> m_RealTimeSet;
-
-    std::vector<ListGroup *> m_ListGroups;
-    MenuList m_MenuList;
-//    std::list<ItemMenu *>::iterator m_PosCursor;
-    // int m_PosCursor = 0;
-
-    menu_list_cursor_t CursorPos() { return m_MenuList.m_Cursor; }
-
-    std::string m_Label;
-
-    double m_StepValue;
-    double m_Gate;
-    bool m_GateHold;
-    unsigned char m_Velocity;
-
-    FeelMap m_FeelMap;
-    TranslateTable m_TranslateTable;
-    TrigList m_TrigList;
+    double m_StepValue = 16;
+    double m_Gate = 0.5;
+    bool m_GateHold = false;
+    unsigned char m_Velocity = 64;
 
     unsigned m_DisplayStartStep = 0;
     unsigned m_DisplayStartRealTime = 0;
@@ -72,9 +61,35 @@ struct Pattern : public ItemMenu
     double m_LastRealTimeBeat = 0;
     double m_RealTimeBeatStart = 0;
 
-    double LastRealTimeBeat() { return m_LastRealTimeBeat; }
-
     bool m_RealTimeComplete = false;
+
+    // Containers
+
+    std::vector<ListGroup *> m_ListGroups;
+
+//    std::vector<int> m_Trigs;
+
+//    std::vector<StepList> m_StepListSet;
+//    std::vector<RealTimeList> m_RealTimeSet;
+
+//    std::list<ItemMenu *>::iterator m_PosCursor;
+
+    // Embedded objects
+
+    MenuList m_MenuList;
+
+    FeelMap m_FeelMap;
+    TranslateTable m_TranslateTable;
+    TrigList m_TrigList;
+
+    // Functions
+
+    Pattern();
+    Pattern(const Pattern & p);
+    ~Pattern();
+
+    menu_list_cursor_t CursorPos() { return m_MenuList.m_Cursor; }
+    double LastRealTimeBeat() { return m_LastRealTimeBeat; }
 
     void StoreStepValue( double val );
     void StoreGate( double gate);
@@ -96,88 +111,11 @@ struct Pattern : public ItemMenu
 
     void SetStatus();
 
-    Pattern():
-        m_Pos(0),
-//        m_PosEdit(0),
-        m_PosRealTimeEdit(0),
-        m_LastRequestedPos(0),
-        m_StepValue(16),
-        m_Gate(0.5),
-        m_GateHold(false),
-        m_Velocity(64),
-        m_MenuList(this, &m_Visible)
-    {
-        m_PopUpMenuID = C_MENU_ID_PATTERN;
-//        m_MenuList.Add(this);
-//        m_MenuList.Select(m_MenuPos);
-        m_MenuListIndent = 0;
-        m_DisplayObjectType = BaseUI::dot_pattern;
-        m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_menu_list;
-    }
+    void Clear();
 
-    Pattern(const Pattern & p):
-        m_Pos(p.m_Pos),
-        m_StepValue(p.m_StepValue),
-        m_Gate(p.m_Gate),
-        m_GateHold(p.m_GateHold),
-        m_Velocity(p.m_Velocity),
-        m_Label(p.m_Label),
-        m_MenuList(this, &m_Visible)
-    {
-        m_Visible = false;
-        m_PopUpMenuID = p.m_PopUpMenuID;
-//        m_MenuList.Add(this);
-//        m_MenuList.Select(m_MenuPos);
-        m_MenuListIndent = p.m_MenuListIndent;
-        m_DisplayObjectType = p.m_DisplayObjectType;
-        m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
+    void SetLabel(const char * label);
 
-        for ( auto lg = p.m_ListGroups.begin(); lg != p.m_ListGroups.end(); lg++ )
-        {
-            m_ListGroups.push_back(*lg);
-            m_MenuList.m_Items.push_back(m_ListGroups.back());
-        }
-    }
-
-
-    void Clear()
-    {
-        m_Label.clear();
-//        m_StepListSet.clear();
-//        m_RealTimeSet.clear();
-        while ( ! m_ListGroups.empty() )
-        {
-            delete m_ListGroups.back();
-            m_ListGroups.pop_back();
-        }
-        ResetPosition();
-        m_TranslateTable.Reset();
-        m_TrigList.Clear();
-        m_StepValue = 4.0;
-        m_Gate = 0.5;
-        m_GateHold = false;
-        m_Velocity = 64;
-    }
-
-    void SetLabel(const char * label)
-    {
-        m_Label = label;
-        SetRedraw();
-    }
-
-    virtual void SetRedraw()
-    {
-        if ( m_Visible )
-        {
-            if ( m_MenuList.m_Items.empty() )
-            {
-                m_RedrawList.push_back(this);
-                return;
-            }
-            for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
-                m_RedrawList.push_back(*it);
-        }
-    }
+    virtual void SetRedraw();
 
 //    void SetCursorPos( int p )
 //    {
@@ -210,19 +148,7 @@ struct Pattern : public ItemMenu
     int ListGroupCount() { return m_ListGroups.size(); }
 //    int RealTimeListCount() { return m_RealTimeSet.size(); }
     int TrigListCount() { return m_TrigList.Size(); }
-    void ResetPosition()
-    {
-        m_Pos = 0;
-        m_TrigList.ResetPosition();
-
-        for ( auto group = m_ListGroups.begin(); group != m_ListGroups.end(); group++ )
-            (*group)->ResetPosition();
-
-        m_RealTimeBeat = m_RealTimeBeatStart;
-        m_RealTimeComplete = false;
-//        for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++ )
-//            rtList->ResetPosition();
-    }
+    void ResetPosition();
 
     void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue, double globalBeat);
 

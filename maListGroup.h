@@ -37,20 +37,21 @@ class ListGroup : public ItemMenu
             lgtype_realtime
         };
 
+        ListGroup(list_group_type type):
+            m_Type(type)
+        {}
+
+        list_group_type Type() { return m_Type; }
         void ResetPosition();
         void SetStatus();
         bool HandleKey(BaseUI::key_command_t k);
 
-        void NewListGroup();
+        virtual void AddToMenuList(MenuList & m) = 0;
+
+//        void NewListGroup();
 
     protected:
-        enum list_group_t
-        {
-            lt_step,
-            lt_realtime
-        };
-
-        list_group_t m_Type;
+        list_group_type m_Type;
         uint8_t m_MidiChannel = 0;
         double m_Step = 4;
 };
@@ -61,18 +62,13 @@ class StepListGroup : public ListGroup
 //        std::vector<StepListPtr> m_StepListSet;
         std::vector<StepList> m_StepListSet;
 
-        StepListGroup()
-        {
-            m_DisplayObjectType = BaseUI::dot_step_list_group;
-            m_Type = lt_step;
-            m_PopUpMenuID = C_MENU_ID_STEPGROUP;
-            m_MenuListIndent = 0;
-
-        }
+        StepListGroup();
+        StepListGroup(ListGroup * g);
 
 //        StepListPtr NewStepList();
         StepList * NewStepList();
 
+        virtual void AddToMenuList(MenuList & m);
 
 };
 
@@ -81,13 +77,11 @@ class RTListGroup : public ListGroup
     public:
         std::vector<RealTimeList> m_RealTimeSet;
 
-        RTListGroup()
-        {
-            m_DisplayObjectType = BaseUI::dot_rt_list_group;
-            m_Type = lt_realtime;
-            m_PopUpMenuID = C_MENU_ID_RTGROUP;
-            m_MenuListIndent = 2;
-        }
+        RTListGroup();
+        RTListGroup(ListGroup * g);
+
+        virtual void AddToMenuList(MenuList & m);
+
 };
 
 #endif // MALISTGROUP_H_INCLUDED

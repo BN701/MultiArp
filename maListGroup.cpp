@@ -32,6 +32,10 @@
 
 #include "maUtility.h"
 
+//
+//  ListGroup
+//
+///////////////////////////////////////////////////////////
 
 void ListGroup::ResetPosition()
 {
@@ -126,6 +130,24 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
+//
+//  StepListGroup
+//
+////////////////////////////////////////////////////////////////////
+
+StepListGroup::StepListGroup():
+    ListGroup(lgtype_step)
+{
+    m_DisplayObjectType = BaseUI::dot_step_list_group;
+    m_PopUpMenuID = C_MENU_ID_STEPGROUP;
+}
+
+StepListGroup::StepListGroup(ListGroup * g):
+    ListGroup(*g)
+{
+    m_StepListSet = dynamic_cast<StepListGroup*>(g)->m_StepListSet;
+}
+
 //StepListPtr StepListGroup::NewStepList()
 StepList * StepListGroup::NewStepList()
 {
@@ -133,3 +155,39 @@ StepList * StepListGroup::NewStepList()
 //    m_StepListSet.emplace_back(new StepList());
     return & m_StepListSet.back();
 }
+
+void StepListGroup::AddToMenuList(MenuList & m)
+{
+    m.Add(this /*, true*/);   // Insert (& select?)
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        m.Add(&*it);
+}
+
+//
+// RTListGroup
+//
+////////////////////////////////////////////////////////////////////
+
+RTListGroup::RTListGroup():
+    ListGroup(lgtype_realtime)
+{
+    m_DisplayObjectType = BaseUI::dot_rt_list_group;
+    m_PopUpMenuID = C_MENU_ID_RTGROUP;
+}
+
+RTListGroup::RTListGroup(ListGroup * g):
+    ListGroup(*g)
+{
+
+}
+
+void RTListGroup::AddToMenuList(MenuList & m)
+{
+    m.Add(this /*, true*/);   // Insert (& select?)
+    for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
+        m.Add(&*it);
+}
+
+
+
+

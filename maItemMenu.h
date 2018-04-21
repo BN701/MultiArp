@@ -70,6 +70,7 @@ class MenuList
         bool m_SelectionChanged = false;
         bool * m_Visible = NULL;
         ItemMenu * m_Container = NULL;
+
 };
 
 class ItemMenu
@@ -179,6 +180,7 @@ class ItemMenu
 
         void SetVisible(bool val) { m_Visible = val; }
         void SetMenuPos(menu_list_cursor_t pos) { m_MenuPos = pos; }
+//        std::string m_TestString = "Set from ItemMenu class definition.";
 
     protected:
         static ItemMenu * m_Focus;

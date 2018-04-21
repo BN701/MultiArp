@@ -157,6 +157,8 @@ ItemMenu::ItemMenu()
         EepromStore(SP_CURSORKEYS);
 #endif
     //ctor
+
+//    m_TestString = "Set from ItemMenu constructor body.";
 }
 
 ItemMenu::ItemMenu(const ItemMenu & m):
@@ -178,6 +180,8 @@ ItemMenu::ItemMenu(const ItemMenu & m):
     // Explicitly avoid copying any pointers to other menus,
     // nothing else to be done. (Members appear to be initialized
     // according to their declarations. i.e. set to NULL, etc.)
+
+//    m_TestString = "Set from ItemMenu copy constructor body.";
 
     if ( m_MenuList != NULL )
     {

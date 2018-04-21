@@ -36,6 +36,116 @@
 
 using namespace std;
 
+Pattern::Pattern():
+    m_MenuList(this, &m_Visible)
+{
+//    m_TestString = "Set from Pattern Constructor.";
+
+    m_PopUpMenuID = C_MENU_ID_PATTERN;
+//        m_MenuList.Add(this);
+//        m_MenuList.Select(m_MenuPos);
+    m_MenuListIndent = 0;
+    m_DisplayObjectType = BaseUI::dot_pattern;
+    m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_menu_list;
+}
+
+Pattern::~Pattern()
+{
+}
+
+Pattern::Pattern(const Pattern & p):
+    ItemMenu(p),
+    m_Pos(p.m_Pos),
+    m_StepValue(p.m_StepValue),
+    m_Gate(p.m_Gate),
+    m_GateHold(p.m_GateHold),
+    m_Velocity(p.m_Velocity),
+    m_Label(p.m_Label),
+    m_MenuList(this, &m_Visible)    // Initialized, not copied
+{
+
+    m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
+
+    // This is a copy constructor, so we have to copy each List Group
+
+    for ( auto it = p.m_ListGroups.begin(); it != p.m_ListGroups.end(); it++ )
+    {
+        ListGroup * lgNew = NULL;
+        switch( (*it)->Type() )
+        {
+            case ListGroup::lgtype_step:
+                lgNew = new StepListGroup(*it);
+                break;
+            case ListGroup::lgtype_realtime:
+                lgNew = new RTListGroup(*it);
+                break;
+        }
+        if ( lgNew != NULL )
+        {
+            m_ListGroups.push_back(lgNew);
+//            ItemMenu * m = m_ListGroups.back();
+            lgNew->SetVisible(m_Visible);
+            lgNew->AddToMenuList(m_MenuList);
+//            m_MenuList.Add(lgNew /*, true*/);   // Insert (& select?)
+        }
+    }
+}
+
+
+void Pattern::Clear()
+{
+    m_Label.clear();
+//        m_StepListSet.clear();
+//        m_RealTimeSet.clear();
+    while ( ! m_ListGroups.empty() )
+    {
+        delete m_ListGroups.back();
+        m_ListGroups.pop_back();
+    }
+    ResetPosition();
+    m_TranslateTable.Reset();
+    m_TrigList.Clear();
+    m_StepValue = 4.0;
+    m_Gate = 0.5;
+    m_GateHold = false;
+    m_Velocity = 64;
+}
+
+void Pattern::SetLabel(const char * label)
+{
+    m_Label = label;
+    SetRedraw();
+}
+
+void Pattern::SetRedraw()
+{
+    if ( m_Visible )
+    {
+        if ( m_MenuList.m_Items.empty() )
+        {
+            m_RedrawList.push_back(this);
+            return;
+        }
+        for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
+            m_RedrawList.push_back(*it);
+    }
+}
+
+void Pattern::ResetPosition()
+{
+    m_Pos = 0;
+    m_TrigList.ResetPosition();
+
+    for ( auto group = m_ListGroups.begin(); group != m_ListGroups.end(); group++ )
+        (*group)->ResetPosition();
+
+    m_RealTimeBeat = m_RealTimeBeatStart;
+    m_RealTimeComplete = false;
+//        for ( auto rtList = m_RealTimeSet.begin(); rtList != m_RealTimeSet.end(); rtList++ )
+//            rtList->ResetPosition();
+}
+
+
 void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
     double & stepValueMultiplier, double phase, double stepValue, double globalBeat)
 {
@@ -833,8 +943,7 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
 
     ItemMenu * m = m_ListGroups.back();
     m->SetVisible(m_Visible);
-    m_MenuList.Insert(m_MenuList.m_Items.end(), m, true);   // Insert & select
-//    m->SetRedraw();
+    m_MenuList.Add(m, true);   // Insert & select
 }
 
 void Pattern::ReplaceList(StepList & noteList)

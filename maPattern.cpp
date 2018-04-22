@@ -51,6 +51,8 @@ Pattern::Pattern():
 
 Pattern::~Pattern()
 {
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        delete *it;
 }
 
 Pattern::Pattern(const Pattern & p):
@@ -83,10 +85,21 @@ Pattern::Pattern(const Pattern & p):
         if ( lgNew != NULL )
         {
             m_ListGroups.push_back(lgNew);
-//            ItemMenu * m = m_ListGroups.back();
             lgNew->SetVisible(m_Visible);
             lgNew->AddToMenuList(m_MenuList);
-//            m_MenuList.Add(lgNew /*, true*/);   // Insert (& select?)
+        }
+    }
+
+    // Copy the menu list cursor, too.
+
+    if ( !m_MenuList.m_Items.empty() )
+    {
+        m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
+        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Items.end(); it++)
+        {
+            if ( it == p.m_MenuList.m_Cursor )
+                break;
+            m_MenuList.m_Cursor++;
         }
     }
 }

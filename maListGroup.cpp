@@ -139,7 +139,7 @@ StepListGroup::StepListGroup():
     ListGroup(lgtype_step)
 {
     m_DisplayObjectType = BaseUI::dot_step_list_group;
-    m_PopUpMenuID = C_MENU_ID_STEPGROUP;
+    m_PopUpMenuID = C_MENU_ID_SEQUENCE;
 }
 
 StepListGroup::StepListGroup(ListGroup * g):
@@ -172,7 +172,7 @@ RTListGroup::RTListGroup():
     ListGroup(lgtype_realtime)
 {
     m_DisplayObjectType = BaseUI::dot_rt_list_group;
-    m_PopUpMenuID = C_MENU_ID_RTGROUP;
+    m_PopUpMenuID = C_MENU_ID_LOOP;
 }
 
 RTListGroup::RTListGroup(ListGroup * g):

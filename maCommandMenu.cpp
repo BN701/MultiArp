@@ -61,27 +61,53 @@ CommandMenu g_CommandMenu;
 
 multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
-    {C_MENU_ID_TOP, {false, C_NEW_PATTERN, "New Pattern", ""}},
-    {C_MENU_ID_TOP, {true, C_MENU_ID_MIDI_MODE, "Midi Capture", ""}},
-    {C_MENU_ID_TOP, {false, C_NEW_STEP_GROUP, "New List Set", ""}},
-    {C_MENU_ID_TOP, {false, C_NEW_RT_GROUP, "New Loop Set", ""}},
+    // Pattern Store
+    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
+    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Set", ""}},
+    {C_MENU_ID_TOP, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
+    // Pattern Store -> Set
+    {C_MENU_ID_SET, {false, C_NEW_STEP_GROUP, "New Sequence Set", ""}},
+    {C_MENU_ID_SET, {false, C_NEW_RT_GROUP, "New Loop Set", ""}},
+
+    // Pattern Store -> Settings
+    {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
+
+    // Pattern Store -> Pattern
+    {C_MENU_ID_PATTERN, {false, C_NEW_PATTERN, "New", ""}},
     {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
     {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
-    {C_MENU_ID_PATTERN, {false, C_NEW_PATTERN, "New", ""}},
 
+    // Pattern Store -> Settings -> Capture
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
 
-    {C_MENU_ID_STEPGROUP, {false, C_LIST_NEW, "New List", ""}},
-    {C_MENU_ID_STEPGROUP, {false, C_NONE, "Delete", ""}},
+    // Sequence Set
+    {C_MENU_ID_SEQUENCE, {false, C_LIST_NEW, "New Layer", ""}},
+    {C_MENU_ID_SEQUENCE, {true, C_MENU_ID_SET_FULL, "Set", ""}},
+    {C_MENU_ID_SEQUENCE, {true, C_NONE, "Trigs", ""}},
 
-    {C_MENU_ID_STEPLIST, {false, C_EDIT_ITEM, "Edit", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_LIST_DELETE, "Delete", ""}},
+    // Sequence Set -> Set, Loop Set -> Set
+    {C_MENU_ID_SET_FULL, {false, C_NEW_STEP_GROUP, "New Sequence Set", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_NEW_RT_GROUP, "New Loop Set", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_COPY_GROUP, "Copy", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_DELETE_GROUP, "Delete", ""}},
 
-    {C_MENU_ID_RTGROUP, {false, C_NONE, "New List", ""}},
-    {C_MENU_ID_RTGROUP, {false, C_NONE, "Delete", ""}},
+    // Sequence Layer
+    {C_MENU_ID_STEPLIST, {false, C_NONE, "New", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_NONE, "Copy", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_NONE, "Delete", ""}},
+    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_LAYER, "Layer", ""}},
+
+    // Sequence Layer -> Layer
+    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_NEW, "New", ""}},
+    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_COPY, "Copy", ""}},
+    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_DELETE, "Delete", ""}},
+
+    // Layer -> Layer
+    {C_MENU_ID_LOOP, {false, C_NONE, "New List", ""}},
+    {C_MENU_ID_LOOP, {false, C_NONE, "Delete", ""}},
     {C_MENU_ID_RTLIST, {false, C_NONE, "Edit", ""}},
     {C_MENU_ID_RTLIST, {false, C_NONE, "Delete", ""}},
 };

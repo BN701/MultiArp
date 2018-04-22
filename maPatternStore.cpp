@@ -239,8 +239,11 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
                 return true;
             if ( m.m_Cursor == m.m_Items.end() )
                 m.Select(m.m_Items.begin());
-//            (*m.m_Cursor)->SetFocus();
-//            (*m.m_Cursor)->SetReturnFocus(this);
+            else
+            {
+                (*m.m_Cursor)->SetFocus();
+                (*m.m_Cursor)->SetReturnFocus(this);
+            }
         }
         break;
 

@@ -256,12 +256,24 @@ string Pattern::StepListManager(command_t command)
     {
         case C_LIST_NEW:
         {
-            // Get the current object (dynamic_cast checks for correct object type).
-            StepListGroup * pStepListGroup = dynamic_cast<StepListGroup*>(m_MenuList.CurrentItem());
-            if ( pStepListGroup == NULL )
-                return "Pattern Step List Manager: Not a step list group.";
-//            StepList *pStepList = pStepListGroup->NewStepList().get();
-            StepList *pStepList = pStepListGroup->NewStepList();
+            StepListGroup * pGroup = NULL;
+
+            // Get the current group.
+
+            ItemMenu * pItem = m_MenuList.CurrentItem();
+            if ( pItem->CheckType(BaseUI::dot_step_list) )
+            {
+                menu_list_cursor_t pos = m_MenuList.ReverseFind(BaseUI::dot_step_list_group);
+                if ( pos != m_MenuList.m_Items.end() )
+                    pGroup = dynamic_cast<StepListGroup*>(*pos);
+            }
+            else
+                pGroup = dynamic_cast<StepListGroup*>(pItem);
+
+            if ( pGroup == NULL )
+                return "Pattern Step List Manager: Not a step list or step list group.";
+
+            StepList *pStepList = pGroup->NewStepList();
             pStepList->SetVisible(m_Visible);
             menu_list_cursor_t pos = m_MenuList.FindFirstNonMatching(BaseUI::dot_step_list);
             m_MenuList.Insert(pos, pStepList);
@@ -956,7 +968,7 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
 
     ItemMenu * m = m_ListGroups.back();
     m->SetVisible(m_Visible);
-    m_MenuList.Add(m, true);   // Insert & select
+    m_MenuList.Add(m /*, true*/);   // Insert /*& select*/
 }
 
 void Pattern::ReplaceList(StepList & noteList)

@@ -58,6 +58,7 @@ class MenuList
 
         ItemMenu * CurrentItem() { return *m_Cursor; }
         menu_list_cursor_t FindFirstNonMatching(int type);
+        menu_list_cursor_t ReverseFind(int type);
 
         MenuList(ItemMenu * container, bool * vis):
             m_Container(container),
@@ -148,6 +149,7 @@ class ItemMenu
         }
 
         bool CheckType(int type) { return m_DisplayObjectType == type; }
+        BaseUI::display_object_type_t Type() { return m_DisplayObjectType; }
 
         void SetDisplayIndent(int val) { m_MenuListIndent = val; }
         int DisplayIndent() { return m_MenuListIndent; }

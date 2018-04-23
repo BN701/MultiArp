@@ -166,9 +166,9 @@ void StepList::SetStatus()
     m_Highlights.clear();
 
     if ( m_GotFocus )
-        snprintf(buff, 200, "[Step List %i] ", m_ItemID);
+        snprintf(buff, 200, "[List %i] ", m_ItemID);
     else
-        snprintf(buff, 200, " Step List %i  ", m_ItemID);
+        snprintf(buff, 200, " List %i  ", m_ItemID);
 
     InitStatus();
     m_Status += buff;

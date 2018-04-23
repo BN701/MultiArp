@@ -41,7 +41,7 @@ void ListGroup::ResetPosition()
 {
 }
 
-const char * g_LGTypeNames[] = {"Step", "Real Time"};
+const char * g_LGTypeNames[] = {"Sequencer", "Looper"};
 
 void ListGroup::SetStatus()
 {

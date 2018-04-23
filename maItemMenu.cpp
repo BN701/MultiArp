@@ -122,7 +122,23 @@ menu_list_cursor_t MenuList::FindFirstNonMatching(int type)
         if ( !(*result)->CheckType(type) )
             break;
     }
+    return result;
+}
 
+menu_list_cursor_t MenuList::ReverseFind(int type)
+{
+    menu_list_cursor_t result = m_Cursor;
+    while (true)
+    {
+        result--;
+        if ( (*result)->CheckType(type) )
+            break;
+        if ( result == m_Items.begin() )
+        {
+            result = m_Items.end();
+            break;
+        }
+    }
     return result;
 }
 
@@ -177,11 +193,12 @@ ItemMenu::ItemMenu(const ItemMenu & m):
     m_MenuList(m.m_MenuList),
     m_MenuPos(m.m_MenuPos)
 {
-    // Explicitly avoid copying any pointers to other menus,
-    // nothing else to be done. (Members appear to be initialized
-    // according to their declarations. i.e. set to NULL, etc.)
-
 //    m_TestString = "Set from ItemMenu copy constructor body.";
+
+    if ( m_GotFocus )
+    {
+        SetFocus();
+    }
 
     if ( m_MenuList != NULL )
     {
@@ -194,7 +211,11 @@ ItemMenu::~ItemMenu()
     //dtor
 
     if ( m_Focus == this )
-        m_Focus = NULL;
+    {
+        ReturnFocus();
+    }
+
+    m_RedrawList.remove(this);
 }
 
 bool ItemMenu::MenuActive()

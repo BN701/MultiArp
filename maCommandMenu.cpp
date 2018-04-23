@@ -59,16 +59,33 @@ extern ListBuilder g_ListBuilder;
 
 CommandMenu g_CommandMenu;
 
+map<int, const char *> CommandMenu::m_MenuTitles =
+{
+    {C_MENU_ID_NONE, ""},
+    {C_MENU_ID_TOP, "Menu"},
+    {C_MENU_ID_PATTERN, "Pattern"},
+    {C_MENU_ID_SET, "Seq+Loop"},
+    {C_MENU_ID_SET_FULL, "Seq+Loop"},
+    {C_MENU_ID_SETTINGS, "Settings"},
+    {C_MENU_ID_SEQUENCE, "Sequencer"},
+    {C_MENU_ID_LOOP, "Looper"},
+    {C_MENU_ID_MIDI_MODE, "Capture"},
+    {C_MENU_ID_TRIGS, "Trigs"},
+    {C_MENU_ID_STEPLIST, "List"},
+    {C_MENU_ID_STEPLIST_LAYER, "More"},
+    {C_MENU_ID_RTLIST, "Looper"}
+};
+
 multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
     // Pattern Store
     {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
-    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Set", ""}},
+    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Sequencer/Looper", ""}},
     {C_MENU_ID_TOP, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
     // Pattern Store -> Set
-    {C_MENU_ID_SET, {false, C_NEW_STEP_GROUP, "New Sequence Set", ""}},
-    {C_MENU_ID_SET, {false, C_NEW_RT_GROUP, "New Loop Set", ""}},
+    {C_MENU_ID_SET, {false, C_NEW_STEP_GROUP, "New Sequencer", ""}},
+    {C_MENU_ID_SET, {false, C_NEW_RT_GROUP, "New Looper", ""}},
 
     // Pattern Store -> Settings
     {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
@@ -83,29 +100,29 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
 
-    // Sequence Set
-    {C_MENU_ID_SEQUENCE, {false, C_LIST_NEW, "New Layer", ""}},
-    {C_MENU_ID_SEQUENCE, {true, C_MENU_ID_SET_FULL, "Set", ""}},
+    // Sequencer
+    {C_MENU_ID_SEQUENCE, {false, C_LIST_NEW, "New List", ""}},
+    {C_MENU_ID_SEQUENCE, {true, C_MENU_ID_SET_FULL, "Seq/Looper", ""}},
     {C_MENU_ID_SEQUENCE, {true, C_NONE, "Trigs", ""}},
 
-    // Sequence Set -> Set, Loop Set -> Set
-    {C_MENU_ID_SET_FULL, {false, C_NEW_STEP_GROUP, "New Sequence Set", ""}},
-    {C_MENU_ID_SET_FULL, {false, C_NEW_RT_GROUP, "New Loop Set", ""}},
+    // Sequencer -> More
+    {C_MENU_ID_SET_FULL, {false, C_NEW_STEP_GROUP, "New Sequencer", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_NEW_RT_GROUP, "New Looper", ""}},
     {C_MENU_ID_SET_FULL, {false, C_COPY_GROUP, "Copy", ""}},
     {C_MENU_ID_SET_FULL, {false, C_DELETE_GROUP, "Delete", ""}},
 
-    // Sequence Layer
-    {C_MENU_ID_STEPLIST, {false, C_NONE, "New", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_NONE, "Copy", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_NONE, "Delete", ""}},
-    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_LAYER, "Layer", ""}},
+    // List
+    {C_MENU_ID_STEPLIST, {false, C_NONE, "New Step", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_NONE, "Copy Step", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_NONE, "Delete Step", ""}},
+    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_LAYER, "More ...", ""}},
 
-    // Sequence Layer -> Layer
-    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_NEW, "New", ""}},
-    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_COPY, "Copy", ""}},
-    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_DELETE, "Delete", ""}},
+    // List -> More
+    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_NEW, "New List", ""}},
+    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_COPY, "Copy List", ""}},
+    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_DELETE, "Delete List", ""}},
 
-    // Layer -> Layer
+    // Not used (yet)
     {C_MENU_ID_LOOP, {false, C_NONE, "New List", ""}},
     {C_MENU_ID_LOOP, {false, C_NONE, "Delete", ""}},
     {C_MENU_ID_RTLIST, {false, C_NONE, "Edit", ""}},
@@ -128,13 +145,19 @@ int CommandMenu::InitMenuPos(int menu)
     return m_MenuPos;
 }
 
-void CommandMenu::Open(int menu)
+void CommandMenu::Open(int menu, int choice)
 {
     m_Active = true;
     m_MenuString = "";
     m_CurrentMenu = m_MenuItems.equal_range(menu);
     m_FieldPositions.clear();
-    InitMenuPos(menu);
+
+    if ( choice == -1 )
+        InitMenuPos(menu);
+    else
+        m_MenuPos = choice;
+
+    m_CurrentMenuID = menu;
 
     int i = 1;
     m_Choices = 0;
@@ -152,12 +175,13 @@ void CommandMenu::Open(int menu)
 
     // Only do this once.
 
-    string title = "Menu";
+    string title;
     for ( auto it = m_MenuStack.begin(); it != m_MenuStack.end(); it++ )
     {
-        title += " >";
-        title += (*it)->m_Label;
+        title += m_MenuTitles[it->m_ID];
+        title += "/";
     }
+    title += m_MenuTitles[m_CurrentMenuID];
     set_status(STAT_POS_2, title.c_str());
 
     Show();
@@ -190,7 +214,9 @@ void CommandMenu::Choose(int choice)
         CommandMenuItem & item = it->second;
         if ( item.m_SubMenu )
         {
-            m_MenuStack.push_back(&item);
+            m_MenuStack.emplace_back();
+            m_MenuStack.back().m_ID = m_CurrentMenuID;
+            m_MenuStack.back().m_Pos = choice;
             Open(item.m_Command);
         }
         else
@@ -220,13 +246,22 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
             break;
 
         case BaseUI::key_backspace:
-            if ( m_MenuStack.empty() )
-                break;
-            m_MenuStack.pop_back();
+//            if ( m_MenuStack.empty() )
+//                break;
+//            m_MenuStack.pop_back();
             if ( ! m_MenuStack.empty() )
-                Open(m_MenuStack.back()->m_Command);
+            {
+                CommandMenuChoice m = m_MenuStack.back();
+                m_MenuStack.pop_back();
+                Open(m.m_ID, m.m_Pos);
+            }
             else
-                Open();
+//                Open();
+            {
+                set_status(STAT_POS_2, "");
+                set_status(COMMAND_HOME, "");
+                ClearAll();
+            }
             break;
 
         case BaseUI::key_left:

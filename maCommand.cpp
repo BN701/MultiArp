@@ -1049,7 +1049,7 @@ bool do_command(string commandString, int directCommand)
 
         case C_LIST_NEW:
 //        case C_LIST_EDIT:
-            set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command));
+            set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command).c_str());
 //            update_big_panel();
             break;
 

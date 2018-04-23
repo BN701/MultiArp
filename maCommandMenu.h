@@ -66,7 +66,6 @@ enum command_menu_id_t
     C_MENU_ID_MIDI_MODE,
     C_MENU_ID_TRIGS,
     C_MENU_ID_STEPLIST,
-    C_MENU_ID_STEPLIST_SHORT,
     C_MENU_ID_STEPLIST_LAYER,
     C_MENU_ID_RTLIST
 };
@@ -80,25 +79,33 @@ struct CommandMenuItem
     const char * m_ParameterString;
 };
 
+struct CommandMenuChoice
+{
+    int m_ID = -1;
+    int m_Pos = -1;
+};
 
 class CommandMenu
 {
     public:
         bool Active() { return m_Active; }
-        void Open(int menu = C_MENU_ID_TOP);
+        void Open(int menu = C_MENU_ID_TOP, int choice = -1);
         void Show();
         void Choose(int i);
         bool HandleKey(BaseUI::key_command_t key);
         void ClearAll();
 
     private:
+        static std::map<int, const char *> m_MenuTitles;
         static std::multimap<int, CommandMenuItem> m_MenuItems;
 
         bool m_Active = false;
         int m_MenuPos = 0;
         int m_Choices = 0;
+        int m_CurrentMenuID = 0;
 
-        std::vector<CommandMenuItem *> m_MenuStack;
+//        std::vector<CommandMenuItem *> m_MenuStack;
+        std::vector<CommandMenuChoice> m_MenuStack;
         std::pair <std::multimap<int, CommandMenuItem>::iterator, std::multimap<int, CommandMenuItem>::iterator> m_CurrentMenu;
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::string m_MenuString;

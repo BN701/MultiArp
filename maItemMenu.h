@@ -49,8 +49,8 @@ class MenuList
         menu_list_cursor_t Add(ItemMenu * item, bool select = false);    // Wraps push_back().
         menu_list_cursor_t Insert(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
         menu_list_cursor_t InsertAfter(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
-        menu_list_cursor_t Remove(menu_list_cursor_t pos);
-        menu_list_cursor_t Select(menu_list_cursor_t pos);
+        menu_list_cursor_t Remove(menu_list_cursor_t pos, bool setReturnFocus);
+        menu_list_cursor_t Select(menu_list_cursor_t pos, bool setReturnFocus = true);
 
 //        void OpenCurrentItem();
 //        void OpenCurrentItem(ItemMenu * returnFocus);
@@ -210,13 +210,13 @@ class ItemMenu
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.
 
-        void MenuInsert(menu_list_cursor_t pos, ItemMenu * item)
-        {
-            if ( m_MenuList != NULL )
-            {
-                m_MenuList->InsertAfter(pos, item, true);
-            }
-        }
+//        void MenuInsert(menu_list_cursor_t pos, ItemMenu * item)
+//        {
+//            if ( m_MenuList != NULL )
+//            {
+//                m_MenuList->InsertAfter(pos, item, true);
+//            }
+//        }
 
         void InitStatus();
 

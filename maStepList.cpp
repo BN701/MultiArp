@@ -200,11 +200,12 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         {
             Cluster & c = m_Clusters.at(m_PosEdit);
             c.SetItemID(m_PosEdit + 1);
-            c.SetFocus();
-            c.SetReturnFocus(this);
+//            c.SetFocus();
             c.SetDisplayIndent(m_MenuListIndent + 2);
             c.SetVisible(m_Visible);
-            MenuInsert(m_MenuPos, & c);
+            m_MenuList->InsertAfter(m_MenuPos, & c, true);  // This selects it, too.
+            c.SetReturnFocus(this);                         // Override return focus.
+//            MenuInsert(m_MenuPos, & c);
         }
         break;
 
@@ -249,50 +250,23 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_ctrl_left:
-        if ( !m_Clusters.empty() )
-        {
-            m_Clusters.insert(m_Clusters.begin() + m_PosEdit, m_Clusters.at(m_PosEdit));
-        }
+        CopyLeft();
         break;
 
     case BaseUI::key_ctrl_right:
-        if ( !m_Clusters.empty() )
-        {
-            m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, m_Clusters.at(m_PosEdit));
-            m_PosEdit += 1;
-        }
+        CopyRight();
         break;
 
     case BaseUI::key_shift_left:
-        if ( m_Clusters.empty() )
-        {
-            m_Clusters.emplace_back();
-            m_PosEdit = 0;
-        }
-        else
-            m_Clusters.insert(m_Clusters.begin() + m_PosEdit, *(new Cluster()));
+        InsertLeft();
         break;
 
     case BaseUI::key_shift_right:
-        if ( m_Clusters.empty() )
-        {
-            m_Clusters.emplace_back();
-            m_PosEdit = 0;
-        }
-        else
-        {
-            m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, *(new Cluster()));
-            m_PosEdit += 1;
-        }
+        InsertRight();
         break;
 
     case BaseUI::key_shift_delete:
-        if ( !m_Clusters.empty() )
-        {
-            m_Clusters.erase(m_Clusters.begin() + m_PosEdit);
-            if ( m_PosEdit == m_Clusters.size() )
-                m_PosEdit -= 1;
-        }
+        DeleteStep();
         break;
 
     default:
@@ -306,4 +280,55 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
+void StepList::InsertLeft()
+{
+    if ( m_Clusters.empty() )
+    {
+        m_Clusters.emplace_back();
+        m_PosEdit = 0;
+    }
+    else
+        m_Clusters.insert(m_Clusters.begin() + m_PosEdit, *(new Cluster()));
+}
+
+void StepList::InsertRight()
+{
+    if ( m_Clusters.empty() )
+    {
+        m_Clusters.emplace_back();
+        m_PosEdit = 0;
+    }
+    else
+    {
+        m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, *(new Cluster()));
+        m_PosEdit += 1;
+    }
+}
+
+void StepList::CopyLeft()
+{
+    if ( !m_Clusters.empty() )
+    {
+        m_Clusters.insert(m_Clusters.begin() + m_PosEdit, m_Clusters.at(m_PosEdit));
+    }
+}
+
+void StepList::CopyRight()
+{
+    if ( !m_Clusters.empty() )
+    {
+        m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, m_Clusters.at(m_PosEdit));
+        m_PosEdit += 1;
+    }
+}
+
+void StepList::DeleteStep()
+{
+    if ( !m_Clusters.empty() )
+    {
+        m_Clusters.erase(m_Clusters.begin() + m_PosEdit);
+        if ( m_PosEdit == m_Clusters.size() )
+            m_PosEdit -= 1;
+    }
+}
 

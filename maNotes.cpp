@@ -376,9 +376,9 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         if ( m_MenuList != NULL )
         {
             m_MenuList->m_Container->SetRedraw();
-            m_MenuList->Remove(m_MenuPos);
+            m_MenuList->Remove(m_MenuPos, false);
         }
-        ReturnFocus();
+//        ReturnFocus();
         break;
 
     case BaseUI::key_left:
@@ -608,12 +608,13 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         if ( !m_Notes.empty() )
         {
             Note & n = m_Notes.at(m_PosEdit);
-            n.SetItemID(m_PosEdit + 1);
-            n.SetFocus();
-            n.SetReturnFocus(this);
             n.SetDisplayIndent(m_MenuListIndent + 2);
+            n.SetItemID(m_PosEdit + 1);
             n.SetVisible(m_Visible);
-            MenuInsert(m_MenuPos, &n);
+            m_MenuList->InsertAfter(m_MenuPos, & n, true);  // This selects it, too.
+            n.SetReturnFocus(this);                         // Override return focus.
+//            n.SetFocus();
+//            MenuInsert(m_MenuPos, &n);
         }
         break;
 
@@ -622,9 +623,9 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         if ( m_MenuList != NULL )
         {
             m_MenuList->m_Container->SetRedraw();
-            m_MenuList->Remove(m_MenuPos);
+            m_MenuList->Remove(m_MenuPos, false);
         }
-        ReturnFocus();
+//        ReturnFocus();
         break;
 
     case BaseUI::key_left:
@@ -666,50 +667,23 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
 //        return true;
 
     case BaseUI::key_ctrl_left:
-        if ( !m_Notes.empty() )
-        {
-            m_Notes.insert(m_Notes.begin() + m_PosEdit, m_Notes.at(m_PosEdit));
-        }
+        CopyLeft();
         break;
 
     case BaseUI::key_ctrl_right:
-        if ( !m_Notes.empty() )
-        {
-            m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, m_Notes.at(m_PosEdit));
-            m_PosEdit += 1;
-        }
+        CopyRight();
         break;
 
     case BaseUI::key_shift_left:
-        if ( m_Notes.empty() )
-        {
-            m_Notes.emplace_back();
-            m_PosEdit = 0;
-        }
-        else
-            m_Notes.insert(m_Notes.begin() + m_PosEdit, *(new Note()));
+        InsertLeft();
         break;
 
     case BaseUI::key_shift_delete:
-        if ( !m_Notes.empty() )
-        {
-            m_Notes.erase(m_Notes.begin() + m_PosEdit);
-            if ( m_PosEdit == m_Notes.size() )
-                m_PosEdit -= 1;
-        }
+        DeleteNote();
         break;
 
     case BaseUI::key_shift_right:
-        if ( m_Notes.empty() )
-        {
-            m_Notes.emplace_back();
-            m_PosEdit = 0;
-        }
-        else
-        {
-            m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, *(new Note()));
-            m_PosEdit += 1;
-        }
+        InsertRight();
         break;
 
     default:
@@ -721,5 +695,57 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
     SetRedraw();
 
     return true;
+}
+
+void Cluster::InsertLeft()
+{
+    if ( m_Notes.empty() )
+    {
+        m_Notes.emplace_back();
+        m_PosEdit = 0;
+    }
+    else
+        m_Notes.insert(m_Notes.begin() + m_PosEdit, *(new Note()));
+}
+
+void Cluster::InsertRight()
+{
+    if ( m_Notes.empty() )
+    {
+        m_Notes.emplace_back();
+        m_PosEdit = 0;
+    }
+    else
+    {
+        m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, *(new Note()));
+        m_PosEdit += 1;
+    }
+}
+
+void Cluster::CopyLeft()
+{
+    if ( !m_Notes.empty() )
+    {
+        m_Notes.insert(m_Notes.begin() + m_PosEdit, m_Notes.at(m_PosEdit));
+    }
+}
+
+void Cluster::CopyRight()
+{
+    if ( !m_Notes.empty() )
+    {
+        m_Notes.insert(m_Notes.begin() + m_PosEdit + 1, m_Notes.at(m_PosEdit));
+        m_PosEdit += 1;
+    }
+}
+
+void Cluster::DeleteNote()
+{
+    if ( !m_Notes.empty() )
+    {
+        m_Notes.erase(m_Notes.begin() + m_PosEdit);
+        if ( m_PosEdit == m_Notes.size() )
+            m_PosEdit -= 1;
+    }
 }
 

@@ -121,7 +121,8 @@ struct Cluster : public ItemMenu
     Cluster():
         m_StepLength(1)
     {
-        m_DisplayObjectType = BaseUI::dot_step_list;
+        m_DisplayObjectType = BaseUI::dot_cluster;
+        m_PopUpMenuID = C_MENU_ID_CLUSTER;
         m_Help = "S-Left/Right: insert note, C-Left/Right: copy note, S-Del: delete";
     }
 
@@ -142,6 +143,12 @@ struct Cluster : public ItemMenu
         m_Notes.push_back(note);
         return m_Notes.back();
     }
+
+    void InsertLeft();
+    void InsertRight();
+    void CopyLeft();
+    void CopyRight();
+    void DeleteNote();
 
     void Clear() { m_Notes.clear(); }
     bool Empty() { return m_Notes.empty(); }

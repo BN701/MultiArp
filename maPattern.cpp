@@ -276,7 +276,7 @@ string Pattern::StepListManager(command_t command)
             StepList *pStepList = pGroup->NewStepList();
             pStepList->SetVisible(m_Visible);
             menu_list_cursor_t pos = m_MenuList.FindFirstNonMatching(BaseUI::dot_step_list);
-            m_MenuList.Insert(pos, pStepList);
+            m_MenuList.Insert(pos, pStepList);  // We could automatically select, but don't at the moment.
             break;
         }
 //        case C_LIST_EDIT:
@@ -290,6 +290,71 @@ string Pattern::StepListManager(command_t command)
 //
 //            break;
 //        }
+        case C_STEP_INSERT_LEFT:
+        case C_STEP_INSERT_RIGHT:
+        case C_STEP_COPY_LEFT:
+        case C_STEP_COPY_RIGHT:
+        case C_STEP_DELETE:
+        {
+            StepList * pStepList = dynamic_cast<StepList*>(m_MenuList.CurrentItem());
+            if ( pStepList == NULL )
+                return "Pattern Step List Manager: Not a step list.";
+            switch (command)
+            {
+                case C_STEP_INSERT_LEFT:
+                    pStepList->InsertLeft();
+                    break;
+                case C_STEP_INSERT_RIGHT:
+                    pStepList->InsertRight();
+                    break;
+                case C_STEP_COPY_LEFT:
+                    pStepList->CopyLeft();
+                    break;
+                case C_STEP_COPY_RIGHT:
+                    pStepList->CopyRight();
+                    break;
+                case C_STEP_DELETE:
+                    pStepList->DeleteStep();
+                    break;
+                default:
+                    break;
+            }
+            pStepList->SetRedraw();
+            break;
+        }
+        case C_CLUSTER_INSERT_LEFT:
+        case C_CLUSTER_INSERT_RIGHT:
+        case C_CLUSTER_COPY_LEFT:
+        case C_CLUSTER_COPY_RIGHT:
+        case C_CLUSTER_DELETE:
+        {
+            Cluster * pCluster = dynamic_cast<Cluster*>(m_MenuList.CurrentItem());
+            if ( pCluster == NULL )
+                return "Pattern Step List Manager: Not a step list step (Cluster).";
+            switch ( command )
+            {
+                case C_CLUSTER_INSERT_LEFT:
+                    pCluster->InsertLeft();
+                    break;
+                case C_CLUSTER_INSERT_RIGHT:
+                    pCluster->InsertRight();
+                    break;
+                case C_CLUSTER_COPY_LEFT:
+                    pCluster->CopyLeft();
+                    break;
+                case C_CLUSTER_COPY_RIGHT:
+                    pCluster->CopyRight();
+                    break;
+                case C_CLUSTER_DELETE:
+                    pCluster->DeleteNote();
+                    break;
+                default:
+                    break;
+            }
+            pCluster->SetRedraw();
+            break;
+        }
+
         default:
             return "Pattern Step List Manager: Doesn't handle this command.";
     }
@@ -968,7 +1033,7 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
 
     ItemMenu * m = m_ListGroups.back();
     m->SetVisible(m_Visible);
-    m_MenuList.Add(m /*, true*/);   // Insert /*& select*/
+    m_MenuList.Add(m /*, true*/);   // Add /*& select*/
 }
 
 void Pattern::ReplaceList(StepList & noteList)

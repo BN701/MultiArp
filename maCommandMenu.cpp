@@ -64,15 +64,18 @@ map<int, const char *> CommandMenu::m_MenuTitles =
     {C_MENU_ID_NONE, ""},
     {C_MENU_ID_TOP, "Menu"},
     {C_MENU_ID_PATTERN, "Pattern"},
-    {C_MENU_ID_SET, "Seq+Loop"},
-    {C_MENU_ID_SET_FULL, "Seq+Loop"},
+    {C_MENU_ID_SET, "Layer"},
+    {C_MENU_ID_SET_FULL, "Layer"},
     {C_MENU_ID_SETTINGS, "Settings"},
-    {C_MENU_ID_SEQUENCE, "Sequencer"},
-    {C_MENU_ID_LOOP, "Looper"},
+    {C_MENU_ID_SEQUENCE, "Sequence"},
+    {C_MENU_ID_LOOP, "Loop"},
     {C_MENU_ID_MIDI_MODE, "Capture"},
     {C_MENU_ID_TRIGS, "Trigs"},
     {C_MENU_ID_STEPLIST, "List"},
-    {C_MENU_ID_STEPLIST_LAYER, "More"},
+    {C_MENU_ID_STEPLIST_INSERT, "Insert"},
+    {C_MENU_ID_STEPLIST_COPY, "Copy"},
+    {C_MENU_ID_STEPLIST_MORE, "More"},
+    {C_MENU_ID_CLUSTER, "Step Detail"},
     {C_MENU_ID_RTLIST, "Looper"}
 };
 
@@ -80,12 +83,12 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
     // Pattern Store
     {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
-    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Sequencer/Looper", ""}},
+    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Layer", ""}},
     {C_MENU_ID_TOP, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
     // Pattern Store -> Set
-    {C_MENU_ID_SET, {false, C_NEW_STEP_GROUP, "New Sequencer", ""}},
-    {C_MENU_ID_SET, {false, C_NEW_RT_GROUP, "New Looper", ""}},
+    {C_MENU_ID_SET, {false, C_NEW_STEP_GROUP, "New Sequence Layer", ""}},
+    {C_MENU_ID_SET, {false, C_NEW_RT_GROUP, "New Loop Layer", ""}},
 
     // Pattern Store -> Settings
     {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
@@ -102,25 +105,39 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 
     // Sequencer
     {C_MENU_ID_SEQUENCE, {false, C_LIST_NEW, "New List", ""}},
-    {C_MENU_ID_SEQUENCE, {true, C_MENU_ID_SET_FULL, "Seq/Looper", ""}},
+    {C_MENU_ID_SEQUENCE, {true, C_MENU_ID_SET_FULL, "Layer", ""}},
     {C_MENU_ID_SEQUENCE, {true, C_NONE, "Trigs", ""}},
 
     // Sequencer -> More
-    {C_MENU_ID_SET_FULL, {false, C_NEW_STEP_GROUP, "New Sequencer", ""}},
-    {C_MENU_ID_SET_FULL, {false, C_NEW_RT_GROUP, "New Looper", ""}},
-    {C_MENU_ID_SET_FULL, {false, C_COPY_GROUP, "Copy", ""}},
-    {C_MENU_ID_SET_FULL, {false, C_DELETE_GROUP, "Delete", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_NEW_STEP_GROUP, "New Sequence Layer", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_NEW_RT_GROUP, "New Loop Layer", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_COPY_GROUP, "Copy Layer", ""}},
+    {C_MENU_ID_SET_FULL, {false, C_DELETE_GROUP, "Delete Layer", ""}},
 
     // List
-    {C_MENU_ID_STEPLIST, {false, C_NONE, "New Step", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_NONE, "Copy Step", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_NONE, "Delete Step", ""}},
-    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_LAYER, "More ...", ""}},
+    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_INSERT, "Insert Step", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_STEP_COPY_RIGHT, "Copy Step", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_STEP_DELETE, "Delete Step", ""}},
+    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_MORE, "More ...", ""}},
+
+    // List -> Insert
+    {C_MENU_ID_STEPLIST_INSERT, {false, C_STEP_INSERT_LEFT, "Left of cursor", ""}},
+    {C_MENU_ID_STEPLIST_INSERT, {false, C_STEP_INSERT_RIGHT, "Right of cursor", ""}},
+
+    // List -> Copy (Not used)
+    {C_MENU_ID_STEPLIST_COPY, {false, C_STEP_COPY_LEFT, "Left of cursor", ""}},
+    {C_MENU_ID_STEPLIST_COPY, {false, C_STEP_COPY_RIGHT, "Right of cursor", ""}},
 
     // List -> More
-    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_NEW, "New List", ""}},
-    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_COPY, "Copy List", ""}},
-    {C_MENU_ID_STEPLIST_LAYER, {false, C_LIST_DELETE, "Delete List", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_NEW, "New List", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_COPY, "Copy List", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_DELETE, "Delete List", ""}},
+
+    // Step Detail (Cluster)
+    {C_MENU_ID_CLUSTER, {false, C_CLUSTER_INSERT_LEFT, "Insert Left", ""}},
+    {C_MENU_ID_CLUSTER, {false, C_CLUSTER_INSERT_RIGHT, "Insert Right", ""}},
+    {C_MENU_ID_CLUSTER, {false, C_CLUSTER_COPY_RIGHT, "Copy", ""}},
+    {C_MENU_ID_CLUSTER, {false, C_CLUSTER_DELETE, "Delete", ""}},
 
     // Not used (yet)
     {C_MENU_ID_LOOP, {false, C_NONE, "New List", ""}},

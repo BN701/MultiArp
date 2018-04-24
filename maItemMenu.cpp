@@ -65,7 +65,7 @@ menu_list_cursor_t MenuList::InsertAfter(menu_list_cursor_t pos, ItemMenu * item
     return newItemPos;
 }
 
-menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos)
+menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setReturnFocus)
 {
     int row = (*pos)->MenuListRow();
     (*pos)->ClearMenuList();
@@ -75,11 +75,11 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos)
         (*it)->SetMenuListRow(row++);
     result--;
     if ( reselect )
-        Select(result);
+        Select(result, setReturnFocus);
     return result;
 }
 
-menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos)
+menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos, bool setReturnFocus)
 {
     if ( m_Cursor != m_Items.end() )
         (*m_Cursor)->SetRedraw();
@@ -89,7 +89,9 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos)
     m_SelectionChanged = true;
 
     (*m_Cursor)->SetFocus();
-    (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
+
+    if ( setReturnFocus )
+        (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
 }
 
 bool MenuList::UpCursorPos()

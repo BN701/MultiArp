@@ -99,6 +99,12 @@ struct StepList : public ItemMenu
 
     Cluster * Step();
 
+    void InsertLeft();
+    void InsertRight();
+    void CopyLeft();
+    void CopyRight();
+    void DeleteStep();
+
     void ResetPosition()
     {
         m_Pos = 0;

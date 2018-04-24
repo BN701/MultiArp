@@ -157,6 +157,19 @@ enum command_t
     C_LIST_DELETE,
     C_LIST_IMPORT,      // Import from midi file.
 
+    C_STEP_INSERT_LEFT,
+    C_STEP_INSERT_RIGHT,
+    C_STEP_COPY_LEFT,
+    C_STEP_COPY_RIGHT,
+    C_STEP_DELETE,
+
+    C_CLUSTER_INSERT_LEFT,
+    C_CLUSTER_INSERT_RIGHT,
+    C_CLUSTER_COPY_LEFT,
+    C_CLUSTER_COPY_RIGHT,
+    C_CLUSTER_DELETE,
+
+
     C_LIST_RT,          // Real time list commands.
     C_LIST_RT_DELETE,
     C_LIST_RT_RATE,     // Set playback multipliers for real time lists

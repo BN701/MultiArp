@@ -158,7 +158,7 @@ StepList * StepListGroup::NewStepList()
 
 void StepListGroup::AddToMenuList(MenuList & m)
 {
-    m.Add(this /*, true*/);   // Insert (& select?)
+    m.Add(this /*, true*/);   // Add (& select?)
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         m.Add(&*it);
 }
@@ -183,7 +183,7 @@ RTListGroup::RTListGroup(ListGroup * g):
 
 void RTListGroup::AddToMenuList(MenuList & m)
 {
-    m.Add(this /*, true*/);   // Insert (& select?)
+    m.Add(this /*, true*/);   // Add (& select?)
     for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
         m.Add(&*it);
 }

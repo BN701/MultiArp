@@ -1048,6 +1048,17 @@ bool do_command(string commandString, int directCommand)
             break;
 
         case C_LIST_NEW:
+        case C_STEP_INSERT_LEFT:
+        case C_STEP_INSERT_RIGHT:
+        case C_STEP_COPY_LEFT:
+        case C_STEP_COPY_RIGHT:
+        case C_STEP_DELETE:
+        case C_CLUSTER_INSERT_LEFT:
+        case C_CLUSTER_INSERT_RIGHT:
+        case C_CLUSTER_COPY_LEFT:
+        case C_CLUSTER_COPY_RIGHT:
+        case C_CLUSTER_DELETE:
+
 //        case C_LIST_EDIT:
             set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command).c_str());
 //            update_big_panel();

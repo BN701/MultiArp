@@ -61,8 +61,8 @@ class MenuList
         menu_list_cursor_t ReverseFind(int type);
 
         MenuList(ItemMenu * container, bool * vis):
-            m_Container(container),
-            m_Visible(vis)
+            m_Visible(vis),
+            m_Container(container)
         {}
 
         bool DownCursorPos();

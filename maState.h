@@ -74,6 +74,9 @@ class State
         int PatternReset() { return m_PatternReset; }
         void SetPatternReset(int val) { m_PatternReset = val; }
 
+        void SetSequencerQueueID( int val ) { m_QueueID = val; }
+        int SequencerQueueID() { return m_QueueID; }
+
     protected:
 
     private:
@@ -81,18 +84,20 @@ class State
         double m_CurrentStepValue;
         double m_LastUsedStepValue;
         double m_Quantum;
-        bool m_RunState = false;
-        bool m_RecState = false;
         double m_Beat;
         double m_Phase;
-        int m_PatternReset;
 
         bool m_NewRunStatePending;
         bool m_NewRunState;
         bool m_NewQuantumPending;
         int m_NewQuantum;
 
+        bool m_RunState = false;
+        bool m_RecState = false;
+        int m_PatternReset;
         int m_DeferStop;
+
+        int m_QueueID = 0;  // Somewhere to store this for everything else.
 
 #if defined(MA_BLUE)
     public:

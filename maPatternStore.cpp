@@ -951,7 +951,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
 //    if ( m_Patterns.at(m_PosEdit).AddStepListFromString(index, commandString.substr(pos)) )
 //        return "List updated.";
 //    else
-//        return "Nothing changed.";
+        return "Nothing changed.";
 }
 
 

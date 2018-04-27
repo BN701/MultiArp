@@ -51,7 +51,7 @@ public:
     }
 
     bool ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len);
-    bool ScheduleNextCallBack(int queueId);
+    bool ScheduleNextCallBack(int queueId, int raw0 = -1, int raw1 = -1, int raw2 = -1);
 
     snd_seq_t * Handle()
     {

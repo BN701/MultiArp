@@ -103,7 +103,7 @@ bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char 
 }
 
 
-bool AlsaSequencer::ScheduleNextCallBack(int queueId)
+bool AlsaSequencer::ScheduleNextCallBack(int queueId, int raw0, int raw1, int raw2)
 {
     snd_seq_event_t ev;
 
@@ -112,9 +112,9 @@ bool AlsaSequencer::ScheduleNextCallBack(int queueId)
 
     snd_seq_ev_clear(&ev);
     ev.type = SND_SEQ_EVENT_ECHO;
-    ev.data.raw32.d[0] = 1;
-    ev.data.raw32.d[1] = 34;
-    ev.data.raw32.d[2] = 4321;
+    ev.data.raw32.d[0] = raw0;
+    ev.data.raw32.d[1] = raw1;
+    ev.data.raw32.d[2] = raw2;
     snd_seq_ev_schedule_real(&ev, queueId,  0, &m_NextScheduleTime);
     snd_seq_ev_set_dest(&ev, snd_seq_client_id(m_SeqHandle), m_PortInId);
     snd_seq_event_output_direct(m_SeqHandle, &ev);

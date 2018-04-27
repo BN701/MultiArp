@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, sigterm_exit);
 #endif
 
-   g_PatternStore.SetFocus();
+    g_PatternStore.SetFocus();
 
 #if defined(MA_BLUE)
 
@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
 
 
     int queueIndex = g_Sequencer.CreateQueue();
-    int queueId = g_Sequencer.Queue(queueIndex).GetQueueId();
+    g_State.SetSequencerQueueID(g_Sequencer.Queue(queueIndex).GetQueueId());
 
     update_pattern_status_panel();
 
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
 
     // Queue first events
 
-    queue_next_step(queueId);
+    queue_next_step(g_State.SequencerQueueID(), NULL);
 
     // Polling loop
 
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
             for ( int i = 2; i < npfd + 2; i++ )
             {
                 if ( pfd[i].revents > 0 )
-                    read_midi_ALSA(queueId);
+                    read_midi_ALSA(g_State.SequencerQueueID());
             }
 
             update_item_menus();

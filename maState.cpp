@@ -25,13 +25,13 @@ extern State g_State;  // Global State instance.
 State::State():
     m_CurrentStepValue(16.0),
     m_Quantum(16.0),
-    m_RunState(false),
     m_Beat(-4/m_CurrentStepValue),
     m_Phase(0),
     m_NewRunStatePending(false),
     m_NewRunState(false),
     m_NewQuantumPending(false),
     m_NewQuantum(0),
+    m_RunState(false),
     m_DeferStop(0)
 {
     //ctor

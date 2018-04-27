@@ -20,7 +20,7 @@
 #ifndef STEP_H
 #define STEP_H
 
-void queue_next_step(int queueId);
+void queue_next_step(int queueId, snd_seq_event_t *ev);
 void handle_midi_event(snd_seq_event_t *ev, int queueId = -1);
 
 #if !defined(MA_BLUE)

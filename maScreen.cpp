@@ -268,7 +268,7 @@ void update_big_panel_v1()
     try
     {
 #endif
-        bool showTrigProgress = false;
+//        bool showTrigProgress = false;
         static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
         string text;
         switch ( g_TextUI.BigPanelPage() )
@@ -280,13 +280,13 @@ void update_big_panel_v1()
 //#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
             highlights.clear();
 //#endif
-            showTrigProgress = true;
+//            showTrigProgress = true;
             break;
         case BaseUI::two:
             g_TextUI.ClearArea(BaseUI::big_panel);
             text = g_PatternStore.CurrentPlayPattern().Display(1, highlights, 25, 79);
             g_TextUI.Text(BaseUI::big_panel, 0, 0, text.c_str(), & highlights);
-            showTrigProgress = true;
+//            showTrigProgress = true;
 //#if defined(MA_BLUE) // || defined(MA_BLUE_PC)
             highlights.clear();
 //#endif
@@ -434,7 +434,7 @@ void update_item_menus()
         // that to position the whole string within the available width. Any
         // highlights set after the first may end up off screen.
 
-        if ( status.size() < width )
+        if ( status.size() < static_cast<uint32_t>(width) )
             adjustOffset = 0;
 
         vector<screen_pos_t> & highlights = menuItem->ItemHighlights();

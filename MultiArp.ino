@@ -157,7 +157,7 @@ void setup()
 
     g_TextUI.ResetScreen();
     set_top_line();
-    queue_next_step(0);
+    queue_next_step(0, NULL);
 
 }
 
@@ -277,7 +277,7 @@ void loop()
     if ( callStep )
     {
 //        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-        queue_next_step(0);
+        queue_next_step(0, NULL);
     }
 
     if ( sendNow )

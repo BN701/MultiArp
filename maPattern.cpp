@@ -58,11 +58,11 @@ Pattern::~Pattern()
 Pattern::Pattern(const Pattern & p):
     ItemMenu(p),
     m_Pos(p.m_Pos),
+    m_Label(p.m_Label),
     m_StepValue(p.m_StepValue),
     m_Gate(p.m_Gate),
     m_GateHold(p.m_GateHold),
     m_Velocity(p.m_Velocity),
-    m_Label(p.m_Label),
     m_MenuList(this, &m_Visible)    // Initialized, not copied
 {
 
@@ -409,7 +409,7 @@ unordered_map<pat_element_names_t, const char *> pat_element_names = {
 
 void Pattern::SetStatus()
 {
-    int pos = 0;
+//    int pos = 0;
     char buff[50];
 
     m_FieldPositions.clear();
@@ -1016,7 +1016,7 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
 //        rtList->BeginEcho(inc, target, interval);
 }
 
-void Pattern::NewListGroup(ListGroup::list_group_type type)
+void Pattern::NewListGroup(ListGroup::list_group_type type, int queueID)
 {
 //    m_StepListSet.emplace_back();
 //    m_PosEdit = m_StepListSet.size() - 1;
@@ -1031,9 +1031,11 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
             break;
     }
 
-    ItemMenu * m = m_ListGroups.back();
-    m->SetVisible(m_Visible);
-    m_MenuList.Add(m /*, true*/);   // Add /*& select*/
+    ListGroup * lg = m_ListGroups.back();
+    lg->SetVisible(m_Visible);
+    m_MenuList.Add(lg /*, true*/);   // Add /*& select*/
+
+    lg->Step(queueID);
 }
 
 void Pattern::ReplaceList(StepList & noteList)

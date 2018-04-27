@@ -1026,10 +1026,10 @@ bool do_command(string commandString, int directCommand)
             switch ( command )
             {
                 case C_NEW_STEP_GROUP:
-                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_step);
+                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_step, g_State.SequencerQueueID());
                     break;
                 case C_NEW_RT_GROUP:
-                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime);
+                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime, g_State.SequencerQueueID());
                     break;
                 default:
                     break;

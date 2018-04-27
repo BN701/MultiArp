@@ -92,6 +92,8 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos, bool setReturnFocus)
 
     if ( setReturnFocus )
         (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
+
+    return m_Cursor;
 }
 
 bool MenuList::UpCursorPos()

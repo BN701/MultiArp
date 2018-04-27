@@ -37,23 +37,51 @@ class ListGroup : public ItemMenu
             lgtype_realtime
         };
 
-        ListGroup(list_group_type type):
-            m_Type(type)
-        {}
+        ListGroup(list_group_type type);
+        ListGroup(ListGroup & lg);
+        ~ListGroup();
 
         list_group_type Type() { return m_Type; }
         void ResetPosition();
         void SetStatus();
         bool HandleKey(BaseUI::key_command_t k);
 
+        static bool Step(int ListGroupID, int queueId);
+
+        virtual void Step(int queueId);
+
         virtual void AddToMenuList(MenuList & m) = 0;
 
 //        void NewListGroup();
 
     protected:
+        enum listgroup_params_menu_focus_t
+        {
+            lgp_midi_channel,
+            lgp_step_value,
+            lgp_quantum,
+            num_listgroup_params_menu_focus_modes
+        };
+
+        listgroup_params_menu_focus_t m_ListGroupMenuFocus = lgp_midi_channel;
+
+        static int m_ListGroupCounter;
+        static std::map<int, ListGroup*> m_ListGroupsLookup;
+        int m_ListGroupID = m_ListGroupCounter++;
+
+
         list_group_type m_Type;
         uint8_t m_MidiChannel = 0;
-        double m_Step = 4;
+//        double m_Step = 4;
+
+        char m_Progress[20];
+        double m_CurrentStepValue = 4;
+        double m_LastUsedStepValue = 4;
+        double m_Quantum = 4;
+        double m_Beat = 0;
+        double m_Phase = 0;
+
+
 };
 
 class StepListGroup : public ListGroup
@@ -68,6 +96,8 @@ class StepListGroup : public ListGroup
 //        StepListPtr NewStepList();
         StepList * NewStepList();
 
+        virtual void Step(int queueId);
+
         virtual void AddToMenuList(MenuList & m);
 
 };
@@ -80,6 +110,7 @@ class RTListGroup : public ListGroup
         RTListGroup();
         RTListGroup(ListGroup * g);
 
+        virtual void Step(int queueId);
         virtual void AddToMenuList(MenuList & m);
 
 };

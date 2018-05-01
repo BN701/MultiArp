@@ -75,7 +75,13 @@ enum command_menu_id_t
 
 struct CommandMenuItem
 {
-//    command_menu_id_t m_Parent;
+    CommandMenuItem(bool subMenu, int command, const char * label, const char * params):
+        m_SubMenu(subMenu),
+        m_Command(command),
+        m_Label(label),
+        m_ParameterString(params)
+    {}
+
     bool m_SubMenu;
     int m_Command;
     const char * m_Label;
@@ -85,14 +91,15 @@ struct CommandMenuItem
 struct CommandMenuChoice
 {
     int m_ID = -1;
-    int m_Pos = -1;
+    int m_Pos = -1; // Not used now that we cache all menu choices. Keep the struct, though, in case we
+                    // need to put other things on the menu stack.
 };
 
 class CommandMenu
 {
     public:
         bool Active() { return m_Active; }
-        void Open(int menu = C_MENU_ID_TOP, int choice = -1);
+        void Open(int menu = C_MENU_ID_TOP);
         void Show();
         void Choose(int i);
         bool HandleKey(BaseUI::key_command_t key);
@@ -101,6 +108,7 @@ class CommandMenu
     private:
         static std::map<int, const char *> m_MenuTitles;
         static std::multimap<int, CommandMenuItem> m_MenuItems;
+        static std::map<int, int> m_LastChoices;
 
         bool m_Active = false;
         int m_MenuPos = 0;

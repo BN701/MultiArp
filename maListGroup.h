@@ -121,6 +121,9 @@ class StepListGroup : public ListGroup
         StepListGroup(ListGroup * g);
 
         StepList * NewStepList();
+        void MoveListUp(StepList * pItem, MenuList & menu);
+        void MoveListDown(StepList * pItem, MenuList & menu);
+        void CopyList(StepList * pItem, MenuList & menu);
         void DeleteList(StepList * pItem, MenuList & menu);
 
         virtual void Step(int queueId);
@@ -132,6 +135,9 @@ class StepListGroup : public ListGroup
                         double globalBeat );
 
         virtual void AddToMenuList(MenuList & m);
+
+    private:
+        void MoveList(StepList * pItem, MenuList & menu, bool up);
 
 
 };

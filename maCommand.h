@@ -155,6 +155,8 @@ enum command_t
     C_LIST_COPY,
     C_LIST_EDIT,
     C_LIST_DELETE,
+    C_LIST_MOVE_UP,
+    C_LIST_MOVE_DOWN,
     C_LIST_IMPORT,      // Import from midi file.
 
     C_STEP_INSERT_LEFT,

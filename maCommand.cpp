@@ -1050,6 +1050,8 @@ bool do_command(string commandString, int directCommand)
         case C_LIST_NEW:
         case C_LIST_COPY:
         case C_LIST_DELETE:
+        case C_LIST_MOVE_UP:
+        case C_LIST_MOVE_DOWN:
         case C_STEP_INSERT_LEFT:
         case C_STEP_INSERT_RIGHT:
         case C_STEP_COPY_LEFT:

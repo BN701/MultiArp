@@ -59,6 +59,8 @@ extern ListBuilder g_ListBuilder;
 
 CommandMenu g_CommandMenu;
 
+std::map<int, int> CommandMenu::m_LastChoices;
+
 map<int, const char *> CommandMenu::m_MenuTitles =
 {
     {C_MENU_ID_NONE, ""},
@@ -71,10 +73,10 @@ map<int, const char *> CommandMenu::m_MenuTitles =
     {C_MENU_ID_LOOP, "Loop"},
     {C_MENU_ID_MIDI_MODE, "Capture"},
     {C_MENU_ID_TRIGS, "Trigs"},
-    {C_MENU_ID_STEPLIST, "List"},
+    {C_MENU_ID_STEPLIST, "Step"},
     {C_MENU_ID_STEPLIST_INSERT, "Insert"},
     {C_MENU_ID_STEPLIST_COPY, "Copy"},
-    {C_MENU_ID_STEPLIST_MORE, "More"},
+    {C_MENU_ID_STEPLIST_MORE, "List"},
     {C_MENU_ID_CLUSTER, "Step Detail"},
     {C_MENU_ID_RTLIST, "Looper"}
 };
@@ -114,24 +116,26 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_SET_FULL, {false, C_COPY_GROUP, "Copy Layer", ""}},
     {C_MENU_ID_SET_FULL, {false, C_DELETE_GROUP, "Delete Layer", ""}},
 
-    // List
+    // Step
     {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_INSERT, "Insert Step", ""}},
     {C_MENU_ID_STEPLIST, {false, C_STEP_COPY_RIGHT, "Copy Step", ""}},
     {C_MENU_ID_STEPLIST, {false, C_STEP_DELETE, "Delete Step", ""}},
     {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_MORE, "More ...", ""}},
 
-    // List -> Insert
+    // Step -> Insert
     {C_MENU_ID_STEPLIST_INSERT, {false, C_STEP_INSERT_LEFT, "Left of cursor", ""}},
     {C_MENU_ID_STEPLIST_INSERT, {false, C_STEP_INSERT_RIGHT, "Right of cursor", ""}},
 
-    // List -> Copy (Not used)
+    // Step -> Copy (Not used)
     {C_MENU_ID_STEPLIST_COPY, {false, C_STEP_COPY_LEFT, "Left of cursor", ""}},
     {C_MENU_ID_STEPLIST_COPY, {false, C_STEP_COPY_RIGHT, "Right of cursor", ""}},
 
     // List -> More
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_NEW, "New List", ""}},
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_COPY, "Copy List", ""}},
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_DELETE, "Delete List", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_NEW, "New", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_COPY, "Copy", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_DELETE, "Delete", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_MOVE_UP, "Move Up", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_MOVE_DOWN, "Move Down", ""}},
 
     // Step Detail (Cluster)
     {C_MENU_ID_CLUSTER, {false, C_CLUSTER_INSERT_LEFT, "Insert Left", ""}},
@@ -155,24 +159,31 @@ int CommandMenu::InitMenuPos(int menu)
             break;
 
         default:
-            m_MenuPos = 0;
+        {
+            auto it = m_LastChoices.find(menu);
+            if ( it != m_LastChoices.end() )
+                m_MenuPos = it->second;
+            else
+                m_MenuPos = 0;
             break;
+        }
     }
 
     return m_MenuPos;
 }
 
-void CommandMenu::Open(int menu, int choice)
+void CommandMenu::Open(int menu)
 {
     m_Active = true;
     m_MenuString = "";
     m_CurrentMenu = m_MenuItems.equal_range(menu);
     m_FieldPositions.clear();
 
-    if ( choice == -1 )
-        InitMenuPos(menu);
-    else
-        m_MenuPos = choice;
+//    if ( choice == -1 )
+//        InitMenuPos(menu);
+//    else
+//        m_MenuPos = choice;
+    InitMenuPos(menu);
 
     m_CurrentMenuID = menu;
 
@@ -229,11 +240,12 @@ void CommandMenu::Choose(int choice)
     if ( it != m_CurrentMenu.second )
     {
         CommandMenuItem & item = it->second;
+        m_LastChoices[m_CurrentMenuID] = choice;
         if ( item.m_SubMenu )
         {
             m_MenuStack.emplace_back();
             m_MenuStack.back().m_ID = m_CurrentMenuID;
-            m_MenuStack.back().m_Pos = choice;
+            m_MenuStack.back().m_Pos = choice;  // Not used now that we cache all menu choices.
             Open(item.m_Command);
         }
         else
@@ -270,7 +282,7 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
             {
                 CommandMenuChoice m = m_MenuStack.back();
                 m_MenuStack.pop_back();
-                Open(m.m_ID, m.m_Pos);
+                Open(m.m_ID);
             }
             else
 //                Open();

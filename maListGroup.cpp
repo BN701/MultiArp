@@ -357,14 +357,54 @@ StepListGroup::StepListGroup(ListGroup * g):
     m_StepListSet = dynamic_cast<StepListGroup*>(g)->m_StepListSet;
 }
 
-//StepListPtr StepListGroup::NewStepList()
 StepList * StepListGroup::NewStepList()
 {
-//    static int itemID = 100;
     m_StepListSet.emplace_back();
     m_StepListSet.back().SetItemID(m_StepListSet.size() - 1);
-//    m_StepListSet.back().SetItemID(++itemID);
     return & m_StepListSet.back();
+}
+
+void StepListGroup::CopyList(StepList * pItem, MenuList & menu)
+{
+    if ( pItem != NULL )
+    {
+        // Get list position and then delete the list.
+
+        int pos = pItem->ItemID();
+
+        // Remove references to this item and those beyond it.
+        // (Inserting an item in a vector shuffles everything up
+        // so pointers, etc. to those items become invalid.)
+
+        menu_list_cursor_t menuInsertPos;
+        for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
+        {
+            menuInsertPos = menu.Remove(it->MenuPos(), false);
+            m_RedrawList.remove(&*it);
+        }
+
+        // Insert a copy.
+
+        m_StepListSet.insert(m_StepListSet.begin() + pos, *pItem);
+
+        // Renumber any lists starting at the copied item and put them back in
+        // the menu list.
+
+        int itemId = pos;
+        for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
+        {
+            it->SetItemID(itemId++);
+            menuInsertPos = menu.InsertAfter(menuInsertPos, &*it);
+        }
+
+        menu.Select(m_StepListSet[pos].MenuPos());
+
+        // Renumber lists in the deferred update queue.
+
+        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
+            if ( it->list_id > pos )
+                it->list_id++;
+    }
 }
 
 void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
@@ -408,6 +448,62 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
                 m_DeferredUpdates.erase(it);
             else if ( it->list_id > pos )
                 it->list_id--;
+    }
+}
+
+void StepListGroup::MoveListUp(StepList * pItem, MenuList & menu)
+{
+    MoveList(pItem, menu, true);
+}
+
+void StepListGroup::MoveListDown(StepList * pItem, MenuList & menu)
+{
+    MoveList(pItem, menu, false);
+}
+
+void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
+{
+    if ( pItem != NULL )
+    {
+        // Get list position and then delete the list.
+
+        int pos = pItem->ItemID();
+
+        if ( up )
+        {
+            if ( pos == 0 )
+                return;
+        }
+        else
+        {
+            if ( pos == m_StepListSet.size() - 1 )
+                return;
+            pos++;
+        }
+
+        // Swap two items. The process is the same regardless
+        // of which one was selected.
+
+        m_RedrawList.remove(&m_StepListSet[pos]);
+        m_RedrawList.remove(&m_StepListSet[pos - 1]);
+
+        auto putBack = menu.Remove(m_StepListSet[pos - 1].MenuPos(), false);
+        menu.Remove(m_StepListSet[pos].MenuPos(), false);
+
+        StepList temp = m_StepListSet[pos];
+        m_StepListSet[pos] = m_StepListSet[pos - 1];
+        m_StepListSet[pos].SetItemID(pos);
+
+        m_StepListSet[pos - 1] = temp;
+        m_StepListSet[pos - 1].SetItemID(pos - 1);
+
+        putBack = menu.InsertAfter(putBack, &m_StepListSet[pos - 1]);
+        menu.InsertAfter(putBack, &m_StepListSet[pos]);
+
+        if ( up )
+            menu.Select(m_StepListSet[pos - 1].MenuPos());
+        else
+            menu.Select(m_StepListSet[pos].MenuPos());
     }
 }
 

@@ -280,12 +280,9 @@ string Pattern::StepListManager(command_t command)
             break;
         }
 
+        case C_LIST_MOVE_UP:
+        case C_LIST_MOVE_DOWN:
         case C_LIST_COPY:
-        {
-
-            break;
-        }
-
         case C_LIST_DELETE:
         {
             // Make sure we have a step list pointer.
@@ -306,10 +303,24 @@ string Pattern::StepListManager(command_t command)
             if ( pGroup == NULL )
                 return "Pattern Step List Manager: Can't find containing step list group.";
 
-            m_MenuList.Select(pGroup->MenuPos());
-            pGroup->DeleteList(pStepList, m_MenuList);
-//            SetRedraw();
-            break;
+            switch ( command )
+            {
+                case C_LIST_MOVE_UP:
+                    pGroup->MoveListUp(pStepList, m_MenuList);
+                    break;
+                case C_LIST_MOVE_DOWN:
+                    pGroup->MoveListDown(pStepList, m_MenuList);
+                    break;
+                case C_LIST_COPY:
+                    pGroup->CopyList(pStepList, m_MenuList);
+                    break;
+                case C_LIST_DELETE:
+                    m_MenuList.Select(pGroup->MenuPos());
+                    pGroup->DeleteList(pStepList, m_MenuList);
+                    break;
+                default:
+                    break;
+            }
         }
 
 //        case C_LIST_EDIT:

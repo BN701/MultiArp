@@ -61,7 +61,7 @@ extern State g_State;
 
 //extern Display g_Display;
 
-int gDeferStop = 0;
+int g_DeferStop = 0;
 
 void do_UI_updates()
 {
@@ -112,7 +112,7 @@ void do_phase0_updates()
    {
        if ( g_State.RunState() )
            g_PatternStore.ResetAllPatterns();
-       gDeferStop = g_State.DeferStop();
+       g_DeferStop = g_State.DeferStop();
    }
 
    if ( g_State.PatternReset() != RESET_NONE )
@@ -229,7 +229,7 @@ void queue_next_step(int queueId, snd_seq_event_t *ev)
     TrigRepeater repeater;
     TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
 
-    if ( g_State.RunState() || gDeferStop-- > 0 )
+    if ( g_State.RunState() || g_DeferStop-- > 0 )
     {
         g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
         if ( g_ListBuilder.RealTimeRecord() )
@@ -394,7 +394,7 @@ void queue_next_step(int queueId)
    TrigRepeater repeater;
    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
 
-   if ( g_State.RunState() || gDeferStop-- > 0 )
+   if ( g_State.RunState() || g_DeferStop-- > 0 )
    {
         g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
         if ( g_ListBuilder.RealTimeRecord() )

@@ -117,7 +117,7 @@ void Pattern::Clear()
     }
     ResetPosition();
     m_TranslateTable.Reset();
-    m_TrigList.Clear();
+//    m_TrigList.Clear();
     m_StepValue = 4.0;
     m_Gate = 0.5;
     m_GateHold = false;
@@ -136,18 +136,18 @@ void Pattern::SetRedraw()
     {
         if ( m_MenuList.m_Items.empty() )
         {
-            m_RedrawList.push_back(this);
+            ItemMenu::SetRedraw();
             return;
         }
         for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
-            m_RedrawList.push_back(*it);
+            (*it)->SetRedraw();
     }
 }
 
 void Pattern::ResetPosition()
 {
     m_Pos = 0;
-    m_TrigList.ResetPosition();
+//    m_TrigList.ResetPosition();
 
     for ( auto group = m_ListGroups.begin(); group != m_ListGroups.end(); group++ )
         (*group)->ResetPosition();
@@ -279,6 +279,39 @@ string Pattern::StepListManager(command_t command)
             m_MenuList.Insert(pos, pStepList);  // We could automatically select, but don't at the moment.
             break;
         }
+
+        case C_LIST_COPY:
+        {
+
+            break;
+        }
+
+        case C_LIST_DELETE:
+        {
+            // Make sure we have a step list pointer.
+
+            StepList * pStepList = dynamic_cast<StepList*>(m_MenuList.CurrentItem());
+
+            if ( pStepList == NULL )
+                return "Pattern Step List Manager: Not a step list.";
+
+            // Get the current group.
+
+            StepListGroup * pGroup = NULL;
+
+            menu_list_cursor_t pos = m_MenuList.ReverseFind(BaseUI::dot_step_list_group);
+            if ( pos != m_MenuList.m_Items.end() )
+                pGroup = dynamic_cast<StepListGroup*>(*pos);
+
+            if ( pGroup == NULL )
+                return "Pattern Step List Manager: Can't find containing step list group.";
+
+            m_MenuList.Select(pGroup->MenuPos());
+            pGroup->DeleteList(pStepList, m_MenuList);
+//            SetRedraw();
+            break;
+        }
+
 //        case C_LIST_EDIT:
 //        {
 //            StepList * pStepList = dynamic_cast<StepList*>(*m_PosCursor);
@@ -378,10 +411,10 @@ bool Pattern::AllListsComplete()
     return bResult;
 }
 
-string Pattern::TrigsToStringForDisplay()
-{
-    return m_TrigList.ToStringForDisplay();
-}
+//string Pattern::TrigsToStringForDisplay()
+//{
+//    return m_TrigList.ToStringForDisplay();
+//}
 
 enum pat_element_names_t
 {
@@ -539,8 +572,8 @@ string Pattern::ToString(const char * prefix)
     result += m_FeelMap.ToString(prefix);
     result += "\n";
 
-    result += m_TrigList.ToString(prefix);
-    result += "\n";
+//    result += m_TrigList.ToString(prefix);
+//    result += "\n";
 
 // TODO:LG
 //    int index = 1;
@@ -673,12 +706,12 @@ bool Pattern::FromString(string s, int & updates)
             updates += 1;
             return true;
         }
-        else if ( s.find(" Trigs ") == 7 )
-        {
-            m_TrigList.FromString(s.substr(14));
-            updates += 1;
-            return true;
-        }
+//        else if ( s.find(" Trigs ") == 7 )
+//        {
+//            m_TrigList.FromString(s.substr(14));
+//            updates += 1;
+//            return true;
+//        }
         else if ( s.find(" Scale ") == 7 )
         {
             m_TranslateTable.FromString(s);
@@ -1016,7 +1049,7 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
 //        rtList->BeginEcho(inc, target, interval);
 }
 
-void Pattern::NewListGroup(ListGroup::list_group_type type, int queueID)
+void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
 {
 //    m_StepListSet.emplace_back();
 //    m_PosEdit = m_StepListSet.size() - 1;
@@ -1024,10 +1057,10 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueID)
     switch (type)
     {
         case ListGroup::lgtype_step:
-            m_ListGroups.push_back(new StepListGroup());
+            m_ListGroups.push_back(new StepListGroup(*this));
             break;
         case ListGroup::lgtype_realtime:
-            m_ListGroups.push_back(new RTListGroup());
+            m_ListGroups.push_back(new RTListGroup(*this));
             break;
     }
 
@@ -1035,7 +1068,7 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueID)
     lg->SetVisible(m_Visible);
     m_MenuList.Add(lg /*, true*/);   // Add /*& select*/
 
-    lg->Step(queueID);
+    lg->Step(queueId);
 }
 
 void Pattern::ReplaceList(StepList & noteList)
@@ -1196,15 +1229,15 @@ string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int
 
     // Trigs
 
-    result = "\n    ";
-    if ( ! m_TrigList.Empty() )
-    {
-        result += m_TrigList.ToStringForDisplay2(offset, length, width);
-        highlights.push_back(PosInfo2(row, offset + 4, length));
-        result += '\n';
-    }
-    else
-        result += "Triggers: Auto\n";
+//    result = "\n    ";
+//    if ( ! m_TrigList.Empty() )
+//    {
+//        result += m_TrigList.ToStringForDisplay2(offset, length, width);
+//        highlights.push_back(PosInfo2(row, offset + 4, length));
+//        result += '\n';
+//    }
+//    else
+//        result += "Triggers: Auto\n";
 
     result += '\n';
     row += 2;

@@ -25,6 +25,7 @@
 #include <map>
 
 #include "maItemMenu.h"
+#include "maNotes.h"
 
 struct RealTimeListParams : public ItemMenu
 {

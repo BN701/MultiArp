@@ -1048,6 +1048,8 @@ bool do_command(string commandString, int directCommand)
             break;
 
         case C_LIST_NEW:
+        case C_LIST_COPY:
+        case C_LIST_DELETE:
         case C_STEP_INSERT_LEFT:
         case C_STEP_INSERT_RIGHT:
         case C_STEP_COPY_LEFT:
@@ -1058,10 +1060,7 @@ bool do_command(string commandString, int directCommand)
         case C_CLUSTER_COPY_LEFT:
         case C_CLUSTER_COPY_RIGHT:
         case C_CLUSTER_DELETE:
-
-//        case C_LIST_EDIT:
             set_status(STAT_POS_2, "%.60s", g_PatternStore.CurrentEditPattern().StepListManager(command).c_str());
-//            update_big_panel();
             break;
 
 #ifndef MA_BLUE
@@ -1152,24 +1151,24 @@ bool do_command(string commandString, int directCommand)
             break;
 
        case C_TRIGS:
-           if ( firstParameter > 0 )
-           {
-//                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
-               g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(tokens.begin() + firstParameter, tokens.end());
-           }
-           g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
-           g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
-           show_status_after_navigation();
+//           if ( firstParameter > 0 )
+//           {
+////                g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(commandString);
+//               g_PatternStore.CurrentEditPattern().PatternTrigList().FromSimpleString(tokens.begin() + firstParameter, tokens.end());
+//           }
+//           g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
+//           g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
+//           show_status_after_navigation();
            break;
 
        case C_TRIGS_ARPEGGIO:
-           if ( firstParameter > 0 )
-           {
-               g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(tokens.begin() + firstParameter, tokens.end());
-           }
-           g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
-           g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
-           show_status_after_navigation();
+//           if ( firstParameter > 0 )
+//           {
+//               g_PatternStore.CurrentEditPattern().PatternTrigList().AddArpeggio(tokens.begin() + firstParameter, tokens.end());
+//           }
+//           g_PatternStore.CurrentEditPattern().PatternTrigList().SetStatus();
+//           g_PatternStore.CurrentEditPattern().PatternTrigList().SetFocus();
+//           show_status_after_navigation();
            break;
 
 #if 0

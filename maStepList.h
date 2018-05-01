@@ -29,21 +29,18 @@
 
 struct StepList : public ItemMenu
 {
-    std::vector<Cluster>::size_type m_Pos;                  // Points to the next position to be retrieved.
-    std::vector<Cluster>::size_type m_LastRequestedPos;     // Last position for which note info was requested.
     std::vector<Cluster> m_Clusters;
+    std::vector<Cluster>::size_type m_Pos = 0;                  // Points to the next position to be retrieved.
+//    std::vector<Cluster>::size_type m_NowPlayingPos = 0;        // Updated by parent group when events are played.
+    bool m_Complete = false;
 
 //    std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
 
     // std::string m_Label;
     static StepList EmptyList;
 
-    bool m_Complete;
 
-    StepList():
-        m_Pos(0),
-        m_LastRequestedPos(0),
-        m_Complete(false)
+    StepList()
     {
         m_DisplayObjectType = BaseUI::dot_step_list;
         m_PopUpMenuID = C_MENU_ID_STEPLIST;
@@ -97,6 +94,15 @@ struct StepList : public ItemMenu
         return m_Complete;
     }
 
+    void SetNowPlayingPos( std::vector<Cluster>::size_type val )
+    {
+        if ( m_NowPlayingPos != val )
+        {
+            m_NowPlayingPos = val;
+            SetRedraw();
+        }
+    }
+
     Cluster * Step();
 
     void InsertLeft();
@@ -112,16 +118,19 @@ struct StepList : public ItemMenu
     }
 
     std::string ToString(bool fullFormat = true);
-    std::string ToStringForDisplay(int & offset, int & length);
-    std::string ToStringForDisplay2(int & offset, int & length, unsigned width = 80);
+//    std::string ToStringForDisplay(int & offset, int & length);
+//    std::string ToStringForDisplay2(int & offset, int & length, unsigned width = 80);
     bool StepListFromString(std::string s);
 
-//    bool PlayPositionInfo(int & offset,  int & length);
-
     virtual void SetStatus();
+
     protected:
         virtual bool HandleKey(BaseUI::key_command_t k);
         std::vector<Cluster>::size_type m_PosEdit = 0;
+
+    private:
+        std::vector<Cluster>::size_type m_NowPlayingPos = -1;        // Updated by parent group when events are played.
+
 
 };
 

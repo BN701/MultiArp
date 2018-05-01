@@ -74,7 +74,7 @@ void AlsaSequencer::SetScheduleTime(uint64_t t)
     m_NextScheduleTime.tv_nsec = (t % 1000000) * 1000;
 }
 
-bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len)
+bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len, uint8_t midiChannel)
 {
     snd_seq_event_t ev;
 
@@ -82,7 +82,11 @@ bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char 
     snd_seq_ev_clear(&ev);
 
     // Macro: fills in event record with note data, ch, key, vel, dur. Also sets event type to Note
-    snd_seq_ev_set_note(&ev, m_MidiChannel, note, vel, len);
+
+    if ( midiChannel < 16 )
+        snd_seq_ev_set_note(&ev, midiChannel, note, vel, len);
+    else
+        snd_seq_ev_set_note(&ev, m_MidiChannel, note, vel, len);
 
     // Macro: schedules the event in MIDI tick mode
     // snd_seq_ev_schedule_tick(&ev, queue_id,  0, tick);

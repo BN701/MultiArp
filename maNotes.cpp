@@ -525,51 +525,6 @@ bool Cluster::ClusterFromString(string s)
     return ! m_Notes.empty();
 }
 
-Cluster * StepList::Step()
-{
-    if ( m_Clusters.empty() )
-        return NULL;
-
-    m_LastRequestedPos = m_Pos;
-    Cluster *pCluster = & m_Clusters[m_Pos++];
-
-    // Look ahead for rests.
-
-    if ( !pCluster->IsRest() )
-    {
-        vector<int>::size_type p = m_Pos;
-        pCluster->m_StepLength = 0;
-
-        do
-        {
-            if ( p == m_Clusters.size() )
-                p = 0;
-
-            if ( m_Clusters[p++].IsRest() )
-                pCluster->m_StepLength += 1;
-            else
-                break;
-
-        } while ( true );
-    }
-    else
-        pCluster = NULL;
-
-    // Set completion flag.
-
-    if ( m_Pos >= m_Clusters.size() )
-    {
-        m_Complete = true;
-        m_Pos = 0;
-    }
-    else
-    {
-        m_Complete = false;
-    }
-
-    return pCluster;
-}
-
 void Cluster::SetStatus()
 {
     int pos = 0;

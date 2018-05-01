@@ -23,10 +23,15 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <queue>
 
 #include "maItemMenu.h"
+//#include "maPattern.h"
 #include "maRealTimeList.h"
 #include "maStepList.h"
+#include "maTrigList.h"
+
+class Pattern;
 
 class ListGroup : public ItemMenu
 {
@@ -37,7 +42,7 @@ class ListGroup : public ItemMenu
             lgtype_realtime
         };
 
-        ListGroup(list_group_type type);
+        ListGroup(Pattern & p, list_group_type type);
         ListGroup(ListGroup & lg);
         ~ListGroup();
 
@@ -55,6 +60,9 @@ class ListGroup : public ItemMenu
 //        void NewListGroup();
 
     protected:
+
+        Pattern & m_Parent;
+
         enum listgroup_params_menu_focus_t
         {
             lgp_midi_channel,
@@ -69,6 +77,8 @@ class ListGroup : public ItemMenu
         static std::map<int, ListGroup*> m_ListGroupsLookup;
         int m_ListGroupID = m_ListGroupCounter++;
 
+        std::queue<ItemMenu*> m_DeferredRedrawList;
+
 
         list_group_type m_Type;
         uint8_t m_MidiChannel = 0;
@@ -81,24 +91,48 @@ class ListGroup : public ItemMenu
         double m_Beat = 0;
         double m_Phase = 0;
 
+        // Step() working data used by derived functions.
+        uint64_t m_QueueTimeUsec;
+        double m_NextBeatSwung;
+        double m_Tempo;
 
+
+};
+
+typedef std::vector<StepList>::size_type size_steplist;
+
+struct update_pair
+{
+    size_steplist list_id;
+    std::vector<Cluster>::size_type list_pos;
 };
 
 class StepListGroup : public ListGroup
 {
     public:
-//        std::vector<StepListPtr> m_StepListSet;
-        std::vector<StepList> m_StepListSet;
+        TrigList m_TrigList;
 
-        StepListGroup();
+        std::vector<StepList> m_StepListSet;
+        size_steplist m_Pos = 0;
+
+        std::vector<update_pair> m_DeferredUpdates;
+
+        StepListGroup(Pattern & p);
         StepListGroup(ListGroup * g);
 
-//        StepListPtr NewStepList();
         StepList * NewStepList();
+        void DeleteList(StepList * pItem, MenuList & menu);
 
         virtual void Step(int queueId);
+        void StepTheLists( Cluster & cluster,
+                        TrigRepeater & repeater,
+                        double & stepValueMultiplier,
+                        double phase,
+                        double stepValue,
+                        double globalBeat );
 
         virtual void AddToMenuList(MenuList & m);
+
 
 };
 
@@ -107,7 +141,7 @@ class RTListGroup : public ListGroup
     public:
         std::vector<RealTimeList> m_RealTimeSet;
 
-        RTListGroup();
+        RTListGroup(Pattern & p);
         RTListGroup(ListGroup * g);
 
         virtual void Step(int queueId);

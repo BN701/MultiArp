@@ -177,11 +177,18 @@ class ItemMenu
         virtual void SetRedraw()
         {
             if ( m_Visible )
+            {
+                // There's no 'find' function, so may as well attempt
+                // a 'remove' just to make sure we don't waste time
+                // with duplicates.
+                m_RedrawList.remove(this);
                 m_RedrawList.push_back(this);
+            }
         }
 
         void SetVisible(bool val) { m_Visible = val; }
         void SetMenuPos(menu_list_cursor_t pos) { m_MenuPos = pos; }
+        menu_list_cursor_t MenuPos() { return m_MenuPos; }
 //        std::string m_TestString = "Set from ItemMenu class definition.";
 
     protected:

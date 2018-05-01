@@ -75,7 +75,10 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setReturnFocus)
         (*it)->SetMenuListRow(row++);
     result--;
     if ( reselect )
+    {
+        m_Cursor = m_Items.end();
         Select(result, setReturnFocus);
+    }
     return result;
 }
 

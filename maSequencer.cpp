@@ -97,14 +97,17 @@ bool Sequencer::ScheduleEvent(snd_seq_event_t & ev)
     return true;
 }
 
-bool Sequencer::ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t len)
+bool Sequencer::ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t len, uint8_t midiChannel)
 {
     snd_seq_event_t ev = {0};
 
     /// Schedule note-on.
 
     ev.type = SND_SEQ_EVENT_NOTEON;
-    ev.data.note.channel = m_MidiChannel;
+    if ( midiChannel < 16 )
+        ev.data.note.channel = midiChannel;
+    else
+        ev.data.note.channel = m_MidiChannel;
     ev.data.note.note = note;
     ev.data.note.velocity = vel;
 

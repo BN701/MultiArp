@@ -17,10 +17,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "maNotes.h"
+//#include "maNotes.h"
 #include "maListGroup.h"
-#include "maRealTimeList.h"
-#include "maStepList.h"
+#include "maPattern.h"
+//#include "maRealTimeList.h"
+//#include "maStepList.h"
+#include "maState.h"
+#include "maTranslateTable.h"
 
 #include <algorithm>
 #include <cmath>
@@ -55,6 +58,8 @@ extern AlsaSequencer g_Sequencer;
 
 #endif // MA_BLUE
 
+extern State g_State;
+
 //
 //  ListGroup
 //
@@ -63,13 +68,15 @@ extern AlsaSequencer g_Sequencer;
 int ListGroup::m_ListGroupCounter = 0;
 map<int, ListGroup*> ListGroup::m_ListGroupsLookup;
 
-ListGroup::ListGroup(list_group_type type):
+ListGroup::ListGroup(Pattern & p, list_group_type type):
+    m_Parent(p),
     m_Type(type)
 {
     m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
 
 ListGroup::ListGroup(ListGroup & lg):
+    m_Parent(lg.m_Parent),
     m_Type(lg.m_Type),
     m_MidiChannel(lg.m_MidiChannel),
     m_CurrentStepValue(lg.m_CurrentStepValue),
@@ -265,7 +272,7 @@ void ListGroup::Step(int queueId)
     double nextBeatStrict = m_Beat;    // This is absolute beat value since the clock started,
 
 //->    double nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
-        double nextBeatSwung = nextBeatStrict;
+    m_NextBeatSwung = nextBeatStrict;
 
 #ifdef MA_BLUE
    // MA_BLUE Todo: Convert beat (phase) to schedule time
@@ -275,7 +282,7 @@ void ListGroup::Step(int queueId)
 
 #else
     ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-    chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeatSwung, m_Quantum);
+    chrono::microseconds t_next_usec = timeline.timeAtBeat(m_NextBeatSwung, m_Quantum);
 
     m_Phase = timeline.phaseAtTime(t_next_usec, m_Quantum);
 #endif
@@ -290,34 +297,38 @@ void ListGroup::Step(int queueId)
 
     // Set next schedule time on the queue
 
-    uint64_t queue_time_usec = 0;
+//    uint64_t queue_time_usec = 0;
 
 #ifdef MA_BLUE
-//    queue_time_usec = llround(nextBeat * 60000000/120);
-    queue_time_usec = g_State.TimeLineMicros();
+//    m_QueueTimeUsec = llround(nextBeat * 60000000/120);
+    m_QueueTimeUsec = g_State.TimeLineMicros();
+    m_Tempo = g_State.Tempo();
 #else
     if ( g_LinkStartTime.count() < 0 )
     {
        g_LinkStartTime = t_next_usec;
-       queue_time_usec = 0;
+       m_QueueTimeUsec = 0;
     }
     else
     {
-       queue_time_usec = (t_next_usec.count() - g_LinkStartTime.count());
+       m_QueueTimeUsec = (t_next_usec.count() - g_LinkStartTime.count());
     }
+
+    m_Tempo = timeline.tempo();
 #endif
 
-    if ( queue_time_usec < 0 )
+
+    if ( m_QueueTimeUsec < 0 )
     {
        // Sometimes at start up link appears to go backwards, especially if
        // there's another instance of the app running. For now, just keep
        // reschedule and hope things settle down. This is probably our count
        // in, though I haven't thought it through properly.
     //        raise(SIGINT);
-       queue_time_usec = 0;
+       m_QueueTimeUsec = 0;
     }
 
-    g_Sequencer.SetScheduleTime(queue_time_usec);
+    g_Sequencer.SetScheduleTime(m_QueueTimeUsec);
 
     // Schedule an event to be fired back to our own app which prompts another
     // arpeggio to be placed in the queue.
@@ -326,7 +337,6 @@ void ListGroup::Step(int queueId)
     //       been any noticable effects of doing it before?
 
     g_Sequencer.ScheduleNextCallBack(queueId, m_ListGroupID);
-
 }
 
 //
@@ -334,8 +344,8 @@ void ListGroup::Step(int queueId)
 //
 ////////////////////////////////////////////////////////////////////
 
-StepListGroup::StepListGroup():
-    ListGroup(lgtype_step)
+StepListGroup::StepListGroup(Pattern & p):
+    ListGroup(p, lgtype_step)
 {
     m_DisplayObjectType = BaseUI::dot_step_list_group;
     m_PopUpMenuID = C_MENU_ID_SEQUENCE;
@@ -350,9 +360,55 @@ StepListGroup::StepListGroup(ListGroup * g):
 //StepListPtr StepListGroup::NewStepList()
 StepList * StepListGroup::NewStepList()
 {
+//    static int itemID = 100;
     m_StepListSet.emplace_back();
-//    m_StepListSet.emplace_back(new StepList());
+    m_StepListSet.back().SetItemID(m_StepListSet.size() - 1);
+//    m_StepListSet.back().SetItemID(++itemID);
     return & m_StepListSet.back();
+}
+
+void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
+{
+    if ( pItem != NULL )
+    {
+        // Get list position and then delete the list.
+
+        int pos = pItem->ItemID();
+
+        // Remove references to this item and those beyond it.
+        // (Erasing an item in a vector shuffles everything down
+        // so pointers, etc. to those items become invalid.)
+
+        for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
+        {
+            menu.Remove(it->MenuPos(), false);
+            m_RedrawList.remove(&*it);
+        }
+
+        // Erase the list.
+
+        m_StepListSet.erase(m_StepListSet.begin() + pos);
+
+        // Renumber any lists beyond deleted item and put them back in
+        // the menu list.
+
+        auto menuPos = m_MenuPos;
+        for ( int i = 0; i < pos; i++ )
+            menuPos++;
+        for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
+        {
+            it->SetItemID(it->ItemID() - 1);
+            menuPos = menu.InsertAfter(menuPos, &*it);
+        }
+
+        // Renumber lists in the deferred update queue (and remove the deleted list, if present).
+
+        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
+            if ( it->list_id == pos )
+                m_DeferredUpdates.erase(it);
+            else if ( it->list_id > pos )
+                it->list_id--;
+    }
 }
 
 void StepListGroup::AddToMenuList(MenuList & m)
@@ -362,29 +418,125 @@ void StepListGroup::AddToMenuList(MenuList & m)
         m.Add(&*it);
 }
 
+void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
+    double & stepValueMultiplier, double phase, double stepValue, double globalBeat)
+{
+    if ( ! m_StepListSet.empty() )
+    {
+        unsigned loopCheck = 0;
+
+        for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+            it->SetNowPlayingPos(-1);
+
+        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
+        {
+            update_pair & u = m_DeferredUpdates.front();
+            if ( u.list_id < m_StepListSet.size() )
+            {
+                StepList & l = m_StepListSet[u.list_id];
+                l.SetNowPlayingPos(u.list_pos);
+            }
+        }
+
+        m_DeferredUpdates.clear();
+
+        if ( m_TrigList.Empty() )
+        {
+            if ( m_Pos >= m_StepListSet.size() )
+                m_Pos = 0;
+
+            StepList & l = m_StepListSet[m_Pos];
+
+            update_pair u;
+            u.list_id = m_Pos;
+            u.list_pos = l.m_Pos;
+            m_DeferredUpdates.push_back(u);
+
+            m_Pos++;
+
+            Cluster * result = l.Step();
+
+            if ( result != NULL )
+            {
+                cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+                cluster += *result;
+            }
+
+        }
+//        else while ( loopCheck < m_TrigList.Size() ) // Loop only if skipping entries.
+//        {
+//            TrigListItem * trigItem = m_TrigList.Step();
+//
+//            if ( trigItem->Skip() )
+//            {
+//                loopCheck += 1;
+//                continue;
+//            }
+//
+//            if ( trigItem->Mute() )
+//                break;
+//
+//            stepValueMultiplier = trigItem->Multiplier();
+//
+//            repeater = trigItem->Repeater();
+//
+//            for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
+//            {
+//                // Just ignore list number if list doesn't exist.
+//
+//                if ( static_cast<unsigned>(*it) < m_StepListSet.size() )
+//                {
+//                    m_LastRequestedPos = *it;
+//
+//                    Cluster * result = m_StepListSet.at(*it).Step();
+//
+//                    if ( result != NULL )
+//                    {
+//                        cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+//                        cluster += *result;
+//                    }
+//                }
+//            }
+//
+//            break;
+//        }
+
+//        if ( m_StepListSet.size() == 1 && ! m_DeferredRedrawList.empty() )
+//        {
+//            m_DeferredRedrawList.front()->SetRedraw();
+//            m_DeferredRedrawList.pop();
+//        }
+    }
+
+    // All notes collected so far are from step lists, so they won't have any
+    // phase start times set. Fix that now ...
+
+    cluster.SetPhaseAllNotes(phase);
+
+}
+
 void StepListGroup::Step(int queueId)
 {
+//    uint64_t queueTimeUsec = 0;
+//    double nextBeatSwung;
+
     ListGroup::Step(queueId);
 
     Cluster nextCluster;
     TrigRepeater repeater;
-    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
+    TranslateTable & translator = m_Parent.m_TranslateTable;
+    double stepValueMultiplier; // Todo: work out how to use this from here (it's filled in
+                                // from the TrigList via StepTheLists() ...
 
-    if ( g_State.RunState() || gDeferStop-- > 0 )
+    if ( g_State.RunState() /*|| g_DeferStop-- > 0*/ )
     {
-        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
-        if ( g_ListBuilder.RealTimeRecord() )
-            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
+        StepTheLists(nextCluster, repeater, stepValueMultiplier, m_Phase, m_CurrentStepValue, m_NextBeatSwung);
+//        if ( g_ListBuilder.RealTimeRecord() )
+//            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     }
 
     if ( nextCluster.Empty() )
        return;
-
-#ifdef MA_BLUE
-    double tempo = g_State.Tempo();
-#else
-    double tempo = timeline.tempo();
-#endif
 
     /*
          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
@@ -396,10 +548,10 @@ void StepListGroup::Step(int queueId)
          Step length in mSec = 1000*240/TV
     */
 
-    double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
-    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
+    double stepLengthMilliSecs = 240000.0/(m_Tempo * m_CurrentStepValue);
+    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + m_Parent.m_Gate));
 
-    repeater.Init(tempo, stepLengthMilliSecs);
+    repeater.Init(m_Tempo, stepLengthMilliSecs);
 
     for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
     {
@@ -415,21 +567,21 @@ void StepListGroup::Step(int queueId)
        // too far ahead, obviously, but there's no mechanism
        // yet for dealing with that situation if it happens.)
 
-       double phaseAdjust = note->Phase() - g_State.Phase();
-       int64_t timeAdjust = llround(60000000.0 * phaseAdjust/tempo);
+       double phaseAdjust = note->Phase() - m_Phase;
+       int64_t timeAdjust = llround(60000000.0 * phaseAdjust/m_Tempo);
 
-       int64_t queue_time_adjusted = queue_time_usec + timeAdjust;
+       int64_t queue_time_adjusted = m_QueueTimeUsec + timeAdjust;
 
        if ( note->m_NoteVelocity > 0 )
            noteVelocity = note->m_NoteVelocity;
        else
-           noteVelocity = g_PatternStore.NoteVelocity();
+           noteVelocity = m_Parent.m_Velocity;
 
        double noteLength = note->Length();
        if ( lround(noteLength * 100) > 0 )
        {
            // Note length here is in beats. Convert to milliseconds.
-           duration = lround(60000.0 * noteLength / tempo);
+           duration = lround(60000.0 * noteLength / m_Tempo);
        }
 
        int64_t queue_time_delta = 0;
@@ -440,7 +592,7 @@ void StepListGroup::Step(int queueId)
        {
            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-           g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
+           g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration, m_MidiChannel);
        }
        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
@@ -452,8 +604,8 @@ void StepListGroup::Step(int queueId)
 //
 ////////////////////////////////////////////////////////////////////
 
-RTListGroup::RTListGroup():
-    ListGroup(lgtype_realtime)
+RTListGroup::RTListGroup(Pattern & p):
+    ListGroup(p, lgtype_realtime)
 {
     m_DisplayObjectType = BaseUI::dot_rt_list_group;
     m_PopUpMenuID = C_MENU_ID_LOOP;

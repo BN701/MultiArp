@@ -25,10 +25,11 @@
 #include <string>
 #include <vector>
 
-#include "maItemMenu.h"
+#include "maCommand.h"
 #include "maFeelMap.h"
-#include "maNotes.h"
+#include "maItemMenu.h"
 #include "maListGroup.h"
+#include "maNotes.h"
 #include "maRealTimeList.h"
 #include "maStepList.h"
 #include "maTranslateTable.h"
@@ -42,10 +43,10 @@ struct Pattern : public ItemMenu
 
     // Variables
 
-    std::vector<StepList>::size_type m_Pos = -1; // Was zero
+    std::vector<StepList>::size_type m_Pos = 0;
 //    std::vector<StepList>::size_type m_PosEdit;
-    std::vector<RealTimeList>::size_type m_PosRealTimeEdit = -1; // Was zero
-    std::vector<StepList>::size_type m_LastRequestedPos = -1; // Was zero
+    std::vector<RealTimeList>::size_type m_PosRealTimeEdit = 0;
+    std::vector<StepList>::size_type m_LastRequestedPos = 0;
 
     std::string m_Label = "Empty Pattern";
 
@@ -80,7 +81,7 @@ struct Pattern : public ItemMenu
 
     FeelMap m_FeelMap;
     TranslateTable m_TranslateTable;
-    TrigList m_TrigList;
+//    TrigList m_TrigList;
 
     // Functions
 
@@ -107,7 +108,7 @@ struct Pattern : public ItemMenu
 //    ListGroup & ListGroupForEdit() { return *m_ListGroups.at(m_PosEdit); }
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
-    TrigList & PatternTrigList() { return m_TrigList; }
+//    TrigList & PatternTrigList() { return m_TrigList; }
 
     void SetStatus();
 
@@ -147,7 +148,7 @@ struct Pattern : public ItemMenu
 //    int StepListCount() { return m_StepListSet.size(); }
     int ListGroupCount() { return m_ListGroups.size(); }
 //    int RealTimeListCount() { return m_RealTimeSet.size(); }
-    int TrigListCount() { return m_TrigList.Size(); }
+//    int TrigListCount() { return m_TrigList.Size(); }
     void ResetPosition();
 
     void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue, double globalBeat);
@@ -157,10 +158,10 @@ struct Pattern : public ItemMenu
         return m_Label.empty();
     }
 
-    size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
+//    size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
     std::string Label() { return m_Label; }
     std::string Label(size_t width);
-    std::string TrigsToStringForDisplay();
+//    std::string TrigsToStringForDisplay();
     std::string ToString(const char * prefix);
     std::string Display(int mode, std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
 

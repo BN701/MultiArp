@@ -56,83 +56,83 @@ string StepList::ToString(bool fullFormat)
     return result;
 }
 
-string StepList::ToStringForDisplay(int & offset, int & length)
-{
-    string result;
-
-    char buff[50];
-
-    offset = 0;
-    length = 0;
-
-    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
-    {
-        if ( i > 0 )
-            result += ' ';
-        if ( i == m_LastRequestedPos )
-        {
-#if defined(MA_BLUE)
-            const char * format = "%3u| ";
-#else
-            const char * format = "%3lu| ";
-#endif
-            snprintf(buff, 50, format, m_LastRequestedPos + 1);
-            result += buff;
-        }
-        if ( i == 0 )
-            offset = result.size();
-
-        result += m_Clusters.at(i).ToString(false);
-
-        if ( i == 0 )
-            length = result.size() - offset;
-    }
-
-    return result;
-}
-
-string StepList::ToStringForDisplay2(int & offset, int & length, unsigned width)
-{
-    string result;
-
-    offset = 0;
-    length = 0;
-
-    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
-    {
-        if ( i > 0 )
-            result += ' ';
-        if ( i == m_LastRequestedPos )
-        {
-            offset = result.size();
-        }
-        result += m_Clusters.at(i).ToString(false);
-        if ( i == m_LastRequestedPos )
-        {
-            length = result.size() - offset;
-        }
-    }
-
-    // Scroll left if highlight is beyond width.
-
-    while ( static_cast<unsigned>(offset + length) > width )
-    {
-        int scroll = 3 * width / 4;
-        result.erase(0, scroll + 3);
-        result.insert(0, "...");
-        offset -= scroll;
-    }
-
-    // Truncate if line itself goes beyond width.
-
-    if ( result.size() > width )
-    {
-        result = result.substr(0, width - 4);
-        result += "... ";
-    }
-
-    return result;
-}
+//string StepList::ToStringForDisplay(int & offset, int & length)
+//{
+//    string result;
+//
+//    char buff[50];
+//
+//    offset = 0;
+//    length = 0;
+//
+//    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
+//    {
+//        if ( i > 0 )
+//            result += ' ';
+//        if ( i == m_NowPlayingPos )
+//        {
+//#if defined(MA_BLUE)
+//            const char * format = "%3u| ";
+//#else
+//            const char * format = "%3lu| ";
+//#endif
+//            snprintf(buff, 50, format, m_NowPlayingPos + 1);
+//            result += buff;
+//        }
+//        if ( i == 0 )
+//            offset = result.size();
+//
+//        result += m_Clusters.at(i).ToString(false);
+//
+//        if ( i == 0 )
+//            length = result.size() - offset;
+//    }
+//
+//    return result;
+//}
+//
+//string StepList::ToStringForDisplay2(int & offset, int & length, unsigned width)
+//{
+//    string result;
+//
+//    offset = 0;
+//    length = 0;
+//
+//    for ( unsigned i = 0; i < m_Clusters.size(); i++ )
+//    {
+//        if ( i > 0 )
+//            result += ' ';
+//        if ( i == m_NowPlayingPos )
+//        {
+//            offset = result.size();
+//        }
+//        result += m_Clusters.at(i).ToString(false);
+//        if ( i == m_NowPlayingPos )
+//        {
+//            length = result.size() - offset;
+//        }
+//    }
+//
+//    // Scroll left if highlight is beyond width.
+//
+//    while ( static_cast<unsigned>(offset + length) > width )
+//    {
+//        int scroll = 3 * width / 4;
+//        result.erase(0, scroll + 3);
+//        result.insert(0, "...");
+//        offset -= scroll;
+//    }
+//
+//    // Truncate if line itself goes beyond width.
+//
+//    if ( result.size() > width )
+//    {
+//        result = result.substr(0, width - 4);
+//        result += "... ";
+//    }
+//
+//    return result;
+//}
 
 bool StepList::StepListFromString(string s)
 {
@@ -165,19 +165,28 @@ void StepList::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
+#if 0
+    if ( m_GotFocus )
+        snprintf(buff, 200, "[List %lu] ", m_NowPlayingPos + 1);
+    else
+        snprintf(buff, 200, " List %lu  ", m_NowPlayingPos + 1);
+#else
     if ( m_GotFocus )
         snprintf(buff, 200, "[List %i] ", m_ItemID);
     else
         snprintf(buff, 200, " List %i  ", m_ItemID);
-
+#endif
     InitStatus();
     m_Status += buff;
-
 
     for ( unsigned i = 0; i < m_Clusters.size(); i++ )
     {
         if ( i > 0 )
-            m_Status += ", ";
+            m_Status += ",";
+        if ( i == m_NowPlayingPos )
+            m_Status += '>';
+        else
+            m_Status += ' ';
         pos = m_Status.size();
         Cluster & c = m_Clusters.at(i);
         if ( !c.Empty() )
@@ -187,7 +196,7 @@ void StepList::SetStatus()
         m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
     }
 
-    if ( !m_FieldPositions.empty() )
+    if ( m_GotFocus && !m_FieldPositions.empty() )
         m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
@@ -330,5 +339,51 @@ void StepList::DeleteStep()
         if ( m_PosEdit == m_Clusters.size() )
             m_PosEdit -= 1;
     }
+}
+
+Cluster * StepList::Step()
+{
+    if ( m_Clusters.empty() )
+        return NULL;
+
+//    m_LastRequestedPos = m_Pos;
+    Cluster *pCluster = & m_Clusters[m_Pos++];
+
+    // Look ahead for rests.
+
+    if ( !pCluster->IsRest() )
+    {
+        vector<int>::size_type p = m_Pos;
+        pCluster->m_StepLength = 0;
+
+        do
+        {
+            if ( p == m_Clusters.size() )
+                p = 0;
+
+            if ( m_Clusters[p++].IsRest() )
+                pCluster->m_StepLength += 1;
+            else
+                break;
+
+        } while ( true );
+    }
+    else
+        pCluster = NULL;
+
+    // Set completion flag.
+
+    if ( m_Pos >= m_Clusters.size() )
+    {
+        m_Complete = true;
+        m_Pos = 0;
+    }
+    else
+    {
+        m_Complete = false;
+    }
+
+//    SetRedraw();
+    return pCluster;
 }
 

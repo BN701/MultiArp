@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
 #endif
 
     g_PatternStore.SetFocus();
+    ItemMenu::SetDefaultFocus();
 
 #if defined(MA_BLUE)
 

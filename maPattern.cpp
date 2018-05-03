@@ -76,10 +76,10 @@ Pattern::Pattern(const Pattern & p):
         switch( (*it)->Type() )
         {
             case ListGroup::lgtype_step:
-                lgNew = new StepListGroup(*it);
+                lgNew = new StepListGroup(dynamic_cast<StepListGroup*>(*it));
                 break;
             case ListGroup::lgtype_realtime:
-                lgNew = new RTListGroup(*it);
+                lgNew = new RTListGroup(dynamic_cast<RTListGroup*>(*it));
                 break;
         }
         if ( lgNew != NULL )
@@ -1076,10 +1076,66 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
     }
 
     ListGroup * lg = m_ListGroups.back();
+    lg->SetReturnFocus(m_ReturnFocus);
+    lg->SetItemID(m_ListGroups.size() - 1);
     lg->SetVisible(m_Visible);
     m_MenuList.Add(lg /*, true*/);   // Add /*& select*/
 
     lg->Step(queueId);
+}
+
+void Pattern::CopyCurrentListGroup()
+{
+    ListGroup * pNewGroup = NULL;
+    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
+    if ( pGroup == NULL )
+        return;
+
+    int pos = pGroup->ItemID() + 1;
+
+    pGroup->ReturnFocus();  // Move focus elsewhere while we make copies.
+
+    pGroup->RemoveListsFromMenu();
+    auto menuInsertPos = m_MenuList.Remove(pGroup->MenuPos());
+
+    switch ( pGroup->Type() )
+    {
+        case ListGroup::lgtype_step:
+            pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new StepListGroup(dynamic_cast<StepListGroup*>(pGroup)));
+            break;
+        case ListGroup::lgtype_realtime:
+            pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new RTListGroup(dynamic_cast<RTListGroup*>(pGroup)));
+            break;
+    }
+    pGroup->SetFocus();
+
+    for ( auto it = m_ListGroups.begin() + pos; it != m_ListGroups.end(); it++ )
+        (*it)->SetItemID((*it)->ItemID() + 1);
+
+    m_MenuList.Insert(menuInsertPos, pGroup);
+    pGroup->InsertListsIntoMenu(menuInsertPos);
+    m_MenuList.Insert(menuInsertPos, pNewGroup);
+    pNewGroup->InsertListsIntoMenu(menuInsertPos);
+
+    m_MenuList.Select(pNewGroup->MenuPos());
+
+    SetRedraw();
+}
+
+void Pattern::DeleteCurrentListGroup()
+{
+    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
+    if ( pGroup == NULL )
+        return;
+
+    int pos = pGroup->ItemID();
+    m_ListGroups.erase(m_ListGroups.begin() + pos);
+
+    for ( auto it = m_ListGroups.begin() + pos; it != m_ListGroups.end(); it++ )
+        (*it)->SetItemID((*it)->ItemID() - 1);
+
+    delete pGroup;
+    SetRedraw();
 }
 
 void Pattern::ReplaceList(StepList & noteList)

@@ -273,16 +273,19 @@ command_t command_from_string(string commandName)
 #else
     try
     {
-       transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
-       command = g_CommandList.at(commandName);
+        transform(commandName.begin(), commandName.end(), commandName.begin(), ::tolower);
+        if ( g_CommandList.count(commandName) > 0 )
+            command = g_CommandList.at(commandName);
+        else
+            command = C_NONE;
     }
     catch ( out_of_range const & e )
     {
-       command = C_NONE;
+        command = C_NONE;
     }
     catch( ... )
     {
-       command = C_NONE;
+        command = C_NONE;
     }
 #endif
 
@@ -1018,6 +1021,8 @@ bool do_command(string commandString, int directCommand)
 
         case C_NEW_STEP_GROUP:
         case C_NEW_RT_GROUP:
+        case C_COPY_GROUP:
+        case C_DELETE_GROUP:
             if ( g_PatternStore.Empty() )
             {
                 set_status(STAT_POS_2, "You need to create an empty pattern first.");
@@ -1030,6 +1035,12 @@ bool do_command(string commandString, int directCommand)
                     break;
                 case C_NEW_RT_GROUP:
                     g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime, g_State.SequencerQueueID());
+                    break;
+                case C_COPY_GROUP:
+                    g_PatternStore.CurrentEditPattern().CopyCurrentListGroup();
+                    break;
+                case C_DELETE_GROUP:
+                    g_PatternStore.CurrentEditPattern().DeleteCurrentListGroup();
                     break;
                 default:
                     break;
@@ -1205,10 +1216,14 @@ bool do_command(string commandString, int directCommand)
                 break;
             }
 #else
-            iTemp = stoi(tokens[0]);
+//            iTemp = stoi(tokens[0]);
+            iTemp = strtol(tokens[0].c_str(), NULL, 0);
 #endif
-            // Function returns a format string. Too obfuscated?
-            set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp - 1).c_str(), iTemp);
+            if ( iTemp > 0 )
+                // Function returns a format string. Too obfuscated?
+                set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp - 1).c_str(), iTemp);
+            else
+                set_status(STAT_POS_2, "Phrase not recognised.");
             break;
         default :
             break;

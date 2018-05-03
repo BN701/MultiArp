@@ -56,6 +56,8 @@ class ListGroup : public ItemMenu
         virtual void Step(int queueId);
 
         virtual void AddToMenuList(MenuList & m) = 0;
+        virtual void InsertListsIntoMenu(menu_list_cursor_t before) = 0;
+        virtual void RemoveListsFromMenu() = 0;
 
 //        void NewListGroup();
 
@@ -84,12 +86,18 @@ class ListGroup : public ItemMenu
         uint8_t m_MidiChannel = 0;
 //        double m_Step = 4;
 
-        char m_Progress[20];
+        char m_Progress[20] = "";
         double m_CurrentStepValue = 4;
         double m_LastUsedStepValue = 4;
         double m_Quantum = 4;
         double m_Beat = 0;
         double m_Phase = 0;
+
+        double m_StepEdit = 4;
+        double m_StepPending = 4;
+
+        double m_QuantumEdit = 4;
+        double m_QuantumPending = 4;
 
         // Step() working data used by derived functions.
         uint64_t m_QueueTimeUsec;
@@ -118,7 +126,7 @@ class StepListGroup : public ListGroup
         std::vector<update_pair> m_DeferredUpdates;
 
         StepListGroup(Pattern & p);
-        StepListGroup(ListGroup * g);
+        StepListGroup(StepListGroup * g);
 
         StepList * NewStepList();
         void MoveListUp(StepList * pItem, MenuList & menu);
@@ -135,10 +143,11 @@ class StepListGroup : public ListGroup
                         double globalBeat );
 
         virtual void AddToMenuList(MenuList & m);
+        virtual void InsertListsIntoMenu(menu_list_cursor_t before);
+        virtual void RemoveListsFromMenu();
 
     private:
         void MoveList(StepList * pItem, MenuList & menu, bool up);
-
 
 };
 
@@ -148,10 +157,12 @@ class RTListGroup : public ListGroup
         std::vector<RealTimeList> m_RealTimeSet;
 
         RTListGroup(Pattern & p);
-        RTListGroup(ListGroup * g);
+        RTListGroup(RTListGroup * g);
 
         virtual void Step(int queueId);
         virtual void AddToMenuList(MenuList & m);
+        virtual void InsertListsIntoMenu(menu_list_cursor_t before);
+        virtual void RemoveListsFromMenu();
 
 };
 

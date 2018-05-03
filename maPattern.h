@@ -180,6 +180,9 @@ struct Pattern : public ItemMenu
 
     void ReplaceList(StepList & noteList);
     void NewListGroup(ListGroup::list_group_type type, int queueID);
+    void CopyCurrentListGroup();
+    void DeleteCurrentListGroup();
+
     void DeleteCurrentList();
     void DeleteCurrentRealTimeList();
 

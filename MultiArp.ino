@@ -143,6 +143,7 @@ void setup()
     digitalWrite(LED_BUILTIN, LOW);
 
     g_PatternStore.SetFocus();
+    ItemMenu::SetDefaultFocus();
 
     Serial.begin(115200);
     delay(1000); // Do this else the following print() is missed.

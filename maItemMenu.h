@@ -49,8 +49,8 @@ class MenuList
         menu_list_cursor_t Add(ItemMenu * item, bool select = false);    // Wraps push_back().
         menu_list_cursor_t Insert(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
         menu_list_cursor_t InsertAfter(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
-        menu_list_cursor_t Remove(menu_list_cursor_t pos, bool setReturnFocus);
-        menu_list_cursor_t Select(menu_list_cursor_t pos, bool setReturnFocus = true);
+        menu_list_cursor_t Remove(menu_list_cursor_t pos/*, bool setReturnFocus*/);
+        menu_list_cursor_t Select(menu_list_cursor_t pos/*, bool setReturnFocus = true*/);
 
 //        void OpenCurrentItem();
 //        void OpenCurrentItem(ItemMenu * returnFocus);
@@ -100,6 +100,9 @@ class ItemMenu
                 m_ReturnFocus->SetFocus();
                 m_ReturnFocus = NULL;
             }
+            else if ( m_DefaultFocus != NULL )
+                m_DefaultFocus->SetFocus();
+
         }
 
         // These two should be overriden, but don't make them pure as we
@@ -122,6 +125,8 @@ class ItemMenu
         }
 
         bool HasFocus() { return m_GotFocus; }
+
+        static void SetDefaultFocus() { m_DefaultFocus = m_Focus; }
 
         std::string & StatusString() { return m_Status; }
 
@@ -193,6 +198,7 @@ class ItemMenu
 
     protected:
         static ItemMenu * m_Focus;
+        static ItemMenu * m_DefaultFocus;   // Use this for return focus if nothing else has been set.
         static std::list<ItemMenu*> m_RedrawList;
 
         bool m_GotFocus = false;

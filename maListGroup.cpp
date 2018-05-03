@@ -24,6 +24,7 @@
 //#include "maStepList.h"
 #include "maState.h"
 #include "maTranslateTable.h"
+#include "maUtility.h"
 
 #include <algorithm>
 #include <cmath>
@@ -76,6 +77,7 @@ ListGroup::ListGroup(Pattern & p, list_group_type type):
 }
 
 ListGroup::ListGroup(ListGroup & lg):
+    ItemMenu(lg),
     m_Parent(lg.m_Parent),
     m_Type(lg.m_Type),
     m_MidiChannel(lg.m_MidiChannel),
@@ -108,9 +110,9 @@ void ListGroup::SetStatus()
     m_Highlights.clear();
 
     if ( m_GotFocus )
-        snprintf(buff, 50, "[%s] -", g_LGTypeNames[m_Type]);
+        snprintf(buff, 50, "[%s %i] -", g_LGTypeNames[m_Type], m_ItemID);
     else
-        snprintf(buff, 50, " %s  -", g_LGTypeNames[m_Type]);
+        snprintf(buff, 50, " %s %i  -", g_LGTypeNames[m_Type], m_ItemID);
 
     InitStatus();
     m_Status += buff;
@@ -123,16 +125,34 @@ void ListGroup::SetStatus()
 
     m_Status += " Step:";
     pos = m_Status.size();
-    snprintf(buff, 50, "%05.2f", m_CurrentStepValue);
+    snprintf(buff, 50, "%05.2f", m_StepEdit);
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
 
-    m_Status += " (Q:";
+    if ( !equals(m_CurrentStepValue, m_StepEdit) )
+    {
+        if ( !equals(m_CurrentStepValue, m_StepPending) )
+            snprintf(buff, 50, ">%05.2f>%05.2f", m_StepPending, m_CurrentStepValue);
+        else
+            snprintf(buff, 50, ">%05.2f", m_CurrentStepValue);
+        m_Status += buff;
+    }
+
+
+    m_Status += " Q:";
     pos = m_Status.size();
-    snprintf(buff, 50, "%05.2f", m_Quantum);
+    snprintf(buff, 50, "%05.2f", m_QuantumEdit);
     m_Status += buff;
-    m_Status += ")";
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    if ( !equals(m_Quantum, m_QuantumEdit) )
+    {
+        if ( !equals(m_Quantum, m_QuantumPending) )
+            snprintf(buff, 50, ">%05.2f>%05.2f", m_QuantumPending, m_Quantum);
+        else
+            snprintf(buff, 50, ">%05.2f", m_Quantum);
+        m_Status += buff;
+    }
 
     m_Status += m_Progress;
 
@@ -148,11 +168,36 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     switch ( k )
     {
     case BaseUI::key_return:
+        switch ( m_ListGroupMenuFocus )
+        {
+        case lgp_midi_channel:
+            break;
+        case lgp_step_value:
+//            m_CurrentStepValue += inc;
+            m_StepPending = m_StepEdit;
+            break;
+        case lgp_quantum:
+            m_QuantumPending = m_QuantumEdit;
+            break;
+        default:
+            break;
+        }
         break;
 
     case BaseUI::key_backspace:
     case BaseUI::key_escape:
-        ReturnFocus();
+        if ( ! equals(m_CurrentStepValue, m_StepEdit) )
+        {
+            m_StepEdit = m_CurrentStepValue;
+            m_StepPending = m_CurrentStepValue;
+        }
+        else if ( ! equals(m_Quantum, m_QuantumEdit) )
+        {
+            m_QuantumEdit = m_Quantum;
+            m_QuantumPending = m_Quantum;
+        }
+        else
+            ReturnFocus();
         return true;
 
     case BaseUI::key_ctrl_up:
@@ -187,10 +232,11 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
                 m_MidiChannel += 1;
             break;
         case lgp_step_value:
-            m_CurrentStepValue += inc;
+//            m_CurrentStepValue += inc;
+            m_StepEdit += inc;
             break;
         case lgp_quantum:
-            m_Quantum += inc;
+            m_QuantumEdit += inc;
             break;
         default:
             break;
@@ -207,12 +253,14 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
                 m_MidiChannel -= 1;
             break;
         case lgp_step_value:
-            if ( m_CurrentStepValue - inc > 0 )
-                m_CurrentStepValue -= inc;
+//            if ( m_CurrentStepValue - inc > 0 )
+//                m_CurrentStepValue -= inc;
+            if ( m_StepEdit - inc > 0 )
+                m_StepEdit -= inc;
             break;
         case lgp_quantum:
-            if ( m_Quantum - inc > 0 )
-                m_Quantum -= inc;
+            if ( m_QuantumEdit - inc > 1 )
+                m_QuantumEdit -= inc;
             break;
         default:
             break;
@@ -249,7 +297,7 @@ void ListGroup::Step(int queueId)
     // this has all completed.)
 
 #if 1
-    snprintf(m_Progress, 20, " %5.2f", m_Phase + 1);
+    snprintf(m_Progress, 20, " - %5.2f", m_Phase + 1);
 #else
     snprintf(m_Progress, 20, " %5.2f - %.2f", m_Phase + 1, m_Beat);
 #endif
@@ -287,6 +335,11 @@ void ListGroup::Step(int queueId)
     m_Phase = timeline.phaseAtTime(t_next_usec, m_Quantum);
 #endif
 
+    if ( equals(m_Phase, 0) )
+    {
+        m_CurrentStepValue = m_StepPending;
+        m_Quantum = m_QuantumPending;
+    }
 
 //    if ( g_State.PhaseIsZero() )
 //    {
@@ -351,7 +404,7 @@ StepListGroup::StepListGroup(Pattern & p):
     m_PopUpMenuID = C_MENU_ID_SEQUENCE;
 }
 
-StepListGroup::StepListGroup(ListGroup * g):
+StepListGroup::StepListGroup(StepListGroup * g):
     ListGroup(*g)
 {
     m_StepListSet = dynamic_cast<StepListGroup*>(g)->m_StepListSet;
@@ -368,7 +421,7 @@ void StepListGroup::CopyList(StepList * pItem, MenuList & menu)
 {
     if ( pItem != NULL )
     {
-        // Get list position and then delete the list.
+        // Get list position.
 
         int pos = pItem->ItemID();
 
@@ -379,7 +432,7 @@ void StepListGroup::CopyList(StepList * pItem, MenuList & menu)
         menu_list_cursor_t menuInsertPos;
         for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
         {
-            menuInsertPos = menu.Remove(it->MenuPos(), false);
+            menuInsertPos = menu.Remove(it->MenuPos()/*, false*/);
             m_RedrawList.remove(&*it);
         }
 
@@ -394,7 +447,7 @@ void StepListGroup::CopyList(StepList * pItem, MenuList & menu)
         for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
         {
             it->SetItemID(itemId++);
-            menuInsertPos = menu.InsertAfter(menuInsertPos, &*it);
+            menu.Insert(menuInsertPos, &*it);
         }
 
         menu.Select(m_StepListSet[pos].MenuPos());
@@ -421,7 +474,7 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
 
         for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )
         {
-            menu.Remove(it->MenuPos(), false);
+            menu.Remove(it->MenuPos()/*, false*/);
             m_RedrawList.remove(&*it);
         }
 
@@ -487,8 +540,8 @@ void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
         m_RedrawList.remove(&m_StepListSet[pos]);
         m_RedrawList.remove(&m_StepListSet[pos - 1]);
 
-        auto putBack = menu.Remove(m_StepListSet[pos - 1].MenuPos(), false);
-        menu.Remove(m_StepListSet[pos].MenuPos(), false);
+        auto menuInsertPos = menu.Remove(m_StepListSet[pos - 1].MenuPos()/*, false*/);
+        menu.Remove(m_StepListSet[pos].MenuPos()/*, false*/);
 
         StepList temp = m_StepListSet[pos];
         m_StepListSet[pos] = m_StepListSet[pos - 1];
@@ -497,8 +550,8 @@ void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
         m_StepListSet[pos - 1] = temp;
         m_StepListSet[pos - 1].SetItemID(pos - 1);
 
-        putBack = menu.InsertAfter(putBack, &m_StepListSet[pos - 1]);
-        menu.InsertAfter(putBack, &m_StepListSet[pos]);
+        menu.Insert(menuInsertPos, &m_StepListSet[pos - 1]);
+        menu.Insert(menuInsertPos, &m_StepListSet[pos]);
 
         if ( up )
             menu.Select(m_StepListSet[pos - 1].MenuPos());
@@ -512,6 +565,24 @@ void StepListGroup::AddToMenuList(MenuList & m)
     m.Add(this /*, true*/);   // Add (& select?)
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         m.Add(&*it);
+}
+
+void StepListGroup::InsertListsIntoMenu(menu_list_cursor_t before)
+{
+    if ( m_MenuList == NULL )
+        return;
+
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        m_MenuList->Insert(before, &*it);
+}
+
+void StepListGroup::RemoveListsFromMenu()
+{
+    if ( m_MenuList == NULL )
+        return;
+
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        m_MenuList->Remove(it->MenuPos());
 }
 
 void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
@@ -707,7 +778,7 @@ RTListGroup::RTListGroup(Pattern & p):
     m_PopUpMenuID = C_MENU_ID_LOOP;
 }
 
-RTListGroup::RTListGroup(ListGroup * g):
+RTListGroup::RTListGroup(RTListGroup * g):
     ListGroup(*g)
 {
 
@@ -718,6 +789,16 @@ void RTListGroup::AddToMenuList(MenuList & m)
     m.Add(this /*, true*/);   // Add (& select?)
     for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
         m.Add(&*it);
+}
+
+void RTListGroup::InsertListsIntoMenu(menu_list_cursor_t before)
+{
+
+}
+
+void RTListGroup::RemoveListsFromMenu()
+{
+
 }
 
 

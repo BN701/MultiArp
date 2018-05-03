@@ -21,6 +21,7 @@
 #include "maItemMenu.h"
 
 ItemMenu * ItemMenu::m_Focus = NULL;
+ItemMenu * ItemMenu::m_DefaultFocus = NULL;
 std::list<ItemMenu*> ItemMenu::m_RedrawList;
 
 //bool ItemMenu::m_RedrawMenuList = false;
@@ -65,24 +66,43 @@ menu_list_cursor_t MenuList::InsertAfter(menu_list_cursor_t pos, ItemMenu * item
     return newItemPos;
 }
 
-menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setReturnFocus)
+menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocus*/)
 {
     int row = (*pos)->MenuListRow();
     (*pos)->ClearMenuList();
+
+    // If we're taking out the current selection,
+    // we have to select something else.
+
     bool reselect = m_Cursor == pos;
     menu_list_cursor_t result = m_Items.erase(pos);
+
+    // If we've removed the last item, nothing more to do.
+
+    if ( m_Items.empty() )
+    {
+        m_Cursor = result;
+        return result;
+    }
+
+    // Renumber items further along the list.
+
     for ( auto it = result; it != m_Items.end(); it++ )
         (*it)->SetMenuListRow(row++);
-    result--;
+
+//    if ( result != m_Items.begin() )
+//        result--;
+
     if ( reselect )
     {
         m_Cursor = m_Items.end();
-        Select(result, setReturnFocus);
+        Select(result/*, setReturnFocus*/);
     }
+
     return result;
 }
 
-menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos, bool setReturnFocus)
+menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos/*, bool setReturnFocus*/)
 {
     if ( m_Cursor != m_Items.end() )
         (*m_Cursor)->SetRedraw();
@@ -93,8 +113,8 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos, bool setReturnFocus)
 
     (*m_Cursor)->SetFocus();
 
-    if ( setReturnFocus )
-        (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
+//    if ( setReturnFocus )
+//        (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
 
     return m_Cursor;
 }
@@ -202,6 +222,11 @@ ItemMenu::ItemMenu(const ItemMenu & m):
 {
 //    m_TestString = "Set from ItemMenu copy constructor body.";
 
+    // Doing these is fine if we're being copied as part
+    // of a reallocation, as the original will be destroyed.
+
+    // If making a real copy, remove focus and remove from menu beforehand.
+
     if ( m_GotFocus )
     {
         SetFocus();
@@ -217,10 +242,18 @@ ItemMenu::~ItemMenu()
 {
     //dtor
 
+    // Calling ReturnFocus() from here is *not* the preferred way of
+    // closing things down. Objects persist regardless of whether their
+    // menus are visible or have input focus. It's probably still a
+    // useful thing to do, however.
+
     if ( m_Focus == this )
     {
         ReturnFocus();
     }
+
+    if ( m_MenuList != NULL && *m_MenuPos == this)
+        m_MenuList->Remove(m_MenuPos/*, false*/);
 
     m_RedrawList.remove(this);
 }

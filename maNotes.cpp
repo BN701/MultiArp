@@ -376,7 +376,8 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         if ( m_MenuList != NULL )
         {
             m_MenuList->m_Container->SetRedraw();
-            m_MenuList->Remove(m_MenuPos, false);
+            m_MenuList->DownCursorPos();
+            m_MenuList->Remove(m_MenuPos);
         }
 //        ReturnFocus();
         break;
@@ -578,7 +579,8 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         if ( m_MenuList != NULL )
         {
             m_MenuList->m_Container->SetRedraw();
-            m_MenuList->Remove(m_MenuPos, false);
+            m_MenuList->DownCursorPos();
+            m_MenuList->Remove(m_MenuPos);
         }
 //        ReturnFocus();
         break;

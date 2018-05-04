@@ -409,11 +409,18 @@ void update_item_menus()
     if ( ItemMenu::RedrawList().empty() )
         return;
 
-    // One loop for each UI interested in this.
+    // Todo: Perhaps one loop for each UI interested in updates, though the loop
+    // eats the list as it progresses. Maybe each UI processes an item within the loop.
 
-    for ( auto it = ItemMenu::RedrawList().begin(); it != ItemMenu::RedrawList().end(); it++ )
+    while ( ! ItemMenu::RedrawList().empty() )
     {
-        ItemMenu * menuItem = *it;
+        // Make this a "while not empty" loop because GetDisplayInfo()
+        // may trigger scrolling, in which case the dirty list will grow
+        // and an iterator loop doesn't see the new entries.
+
+        ItemMenu * menuItem = ItemMenu::RedrawList().front();
+        ItemMenu::RedrawList().pop_front();
+
         menuItem->SetStatus();
         Rectangle clearArea = {0, 0, 0, 0};   // Fill this in if an area of screen needs to be cleared first.
         int row, col, width;
@@ -462,9 +469,6 @@ void update_item_menus()
             g_TextUI.HighlightLastWrite(h->offset - adjustOffset, h->length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
     }
 
-    // Then clear the 'dirty' list.
-
-    ItemMenu::ClearRedrawList();
 }
 
 void update_big_panel()

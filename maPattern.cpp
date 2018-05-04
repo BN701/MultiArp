@@ -1075,16 +1075,16 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
             break;
     }
 
-    ListGroup * lg = m_ListGroups.back();
-    lg->SetReturnFocus(m_ReturnFocus);
-    lg->SetItemID(m_ListGroups.size() - 1);
-    lg->SetVisible(m_Visible);
-    m_MenuList.Add(lg /*, true*/);   // Add /*& select*/
+    ListGroup * pNewGroup = m_ListGroups.back();
+    pNewGroup->SetReturnFocus(m_ReturnFocus);
+    pNewGroup->SetItemID(m_ListGroups.size() - 1);
+    pNewGroup->SetVisible(m_Visible);
+    m_MenuList.Add(pNewGroup);
 
-    lg->Step(queueId);
+    pNewGroup->Step(queueId);
 }
 
-void Pattern::CopyCurrentListGroup()
+void Pattern::CopyCurrentListGroup(int queueId)
 {
     ListGroup * pNewGroup = NULL;
     ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
@@ -1118,6 +1118,8 @@ void Pattern::CopyCurrentListGroup()
     pNewGroup->InsertListsIntoMenu(menuInsertPos);
 
     m_MenuList.Select(pNewGroup->MenuPos());
+
+    pNewGroup->Step(queueId);
 
     SetRedraw();
 }

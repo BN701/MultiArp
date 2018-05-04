@@ -1037,7 +1037,7 @@ bool do_command(string commandString, int directCommand)
                     g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime, g_State.SequencerQueueID());
                     break;
                 case C_COPY_GROUP:
-                    g_PatternStore.CurrentEditPattern().CopyCurrentListGroup();
+                    g_PatternStore.CurrentEditPattern().CopyCurrentListGroup(g_State.SequencerQueueID());
                     break;
                 case C_DELETE_GROUP:
                     g_PatternStore.CurrentEditPattern().DeleteCurrentListGroup();

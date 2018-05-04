@@ -84,6 +84,7 @@ ListGroup::ListGroup(ListGroup & lg):
     m_CurrentStepValue(lg.m_CurrentStepValue),
     m_Quantum(lg.m_Quantum)
 {
+    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
 
 ListGroup::~ListGroup()
@@ -110,9 +111,9 @@ void ListGroup::SetStatus()
     m_Highlights.clear();
 
     if ( m_GotFocus )
-        snprintf(buff, 50, "[%s %i] -", g_LGTypeNames[m_Type], m_ItemID);
+        snprintf(buff, 50, "[%s %i] -", g_LGTypeNames[m_Type], m_ListGroupID);
     else
-        snprintf(buff, 50, " %s %i  -", g_LGTypeNames[m_Type], m_ItemID);
+        snprintf(buff, 50, " %s %i  -", g_LGTypeNames[m_Type], m_ListGroupID);
 
     InitStatus();
     m_Status += buff;

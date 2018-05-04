@@ -77,9 +77,10 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocu
     bool reselect = m_Cursor == pos;
     menu_list_cursor_t result = m_Items.erase(pos);
 
-    // If we've removed the last item, nothing more to do.
+    // If we've removed the last item in the list, nothing more to do?
 
-    if ( m_Items.empty() )
+//    if ( m_Items.empty() )
+    if ( result == m_Items.end() )
     {
         m_Cursor = result;
         return result;
@@ -95,7 +96,8 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocu
 
     if ( reselect )
     {
-        m_Cursor = m_Items.end();
+        m_Cursor = m_Items.end();   // Prevent Select() from doing anything to the item we've
+                                    // just removed.
         Select(result/*, setReturnFocus*/);
     }
 

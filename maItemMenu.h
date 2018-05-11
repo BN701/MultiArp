@@ -56,7 +56,7 @@ class MenuList
 //        void OpenCurrentItem(ItemMenu * returnFocus);
         bool GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo);
 
-        ItemMenu * CurrentItem() { return *m_Cursor; }
+        ItemMenu * CurrentItem();
         menu_list_cursor_t FindFirstNonMatching(int type);
         menu_list_cursor_t ReverseFind(int type);
 

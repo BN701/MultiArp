@@ -71,10 +71,17 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocu
     int row = (*pos)->MenuListRow();
     (*pos)->ClearMenuList();
 
-    // If we're taking out the current selection,
-    // we have to select something else.
+//    // If we're taking out the current selection,
+//    // we have to select something else.
 
-    bool reselect = m_Cursor == pos;
+//    bool reselect = m_Cursor == pos;
+
+    // Prevent removal of current selection. This saves agonising
+    // over what to reselect and shifts that responsibility upstream :)
+
+    if ( m_Cursor == pos )
+        throw "MenuList::Remove(), should't try to remove current selection.";
+
     menu_list_cursor_t result = m_Items.erase(pos);
 
     // If we've removed the last item in the list, nothing more to do?
@@ -82,7 +89,7 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocu
 //    if ( m_Items.empty() )
     if ( result == m_Items.end() )
     {
-        m_Cursor = result;
+//        m_Cursor = result;
         return result;
     }
 
@@ -94,13 +101,13 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocu
 //    if ( result != m_Items.begin() )
 //        result--;
 
-    if ( reselect )
-    {
-        m_Cursor = m_Items.end();   // Prevent Select() from doing anything to the item we've
-                                    // just removed.
-        Select(result/*, setReturnFocus*/);
-    }
-
+//    if ( reselect )
+//    {
+//        m_Cursor = m_Items.end();   // Prevent Select() from doing anything to the item we've
+//                                    // just removed.
+//        Select(result/*, setReturnFocus*/);
+//    }
+//
     return result;
 }
 
@@ -108,6 +115,8 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos/*, bool setReturnFocu
 {
     if ( m_Cursor != m_Items.end() )
         (*m_Cursor)->SetRedraw();
+
+    menu_list_cursor_t previous = m_Cursor;
     m_Cursor = pos;
 
     (*m_Cursor)->SetRedraw();
@@ -118,7 +127,7 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos/*, bool setReturnFocu
 //    if ( setReturnFocus )
 //        (*m_Cursor)->SetReturnFocus(m_Container->m_ReturnFocus);
 
-    return m_Cursor;
+    return previous;
 }
 
 bool MenuList::UpCursorPos()
@@ -169,6 +178,14 @@ menu_list_cursor_t MenuList::ReverseFind(int type)
         }
     }
     return result;
+}
+
+ItemMenu * MenuList::CurrentItem()
+{
+    if ( m_Cursor == m_Items.end() )
+        return NULL;
+    else
+        return *m_Cursor;
 }
 
 //void MenuList::OpenCurrentItem()
@@ -357,7 +374,7 @@ bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & widt
 
         // Make sure selected item is within scrolling window.
 
-        if ( m_MenuList->m_SelectionChanged )
+        if ( m_MenuList->m_SelectionChanged && m_MenuList->m_Cursor != m_MenuList->m_Items.end() )
         {
             int rowSelection = (*m_MenuList->m_Cursor)->m_MenuListRow;
 

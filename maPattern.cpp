@@ -315,7 +315,7 @@ string Pattern::StepListManager(command_t command)
                     pGroup->CopyList(pStepList, m_MenuList);
                     break;
                 case C_LIST_DELETE:
-                    m_MenuList.Select(pGroup->MenuPos());
+//                    m_MenuList.Select(pGroup->MenuPos());
                     pGroup->DeleteList(pStepList, m_MenuList);
                     break;
                 default:

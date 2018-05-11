@@ -465,6 +465,10 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
 {
     if ( pItem != NULL )
     {
+        // Move cursor out of the way.
+
+        menu.Select(m_MenuPos);
+
         // Get list position and then delete the list.
 
         int pos = pItem->ItemID();
@@ -494,6 +498,14 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
             it->SetItemID(it->ItemID() - 1);
             menuPos = menu.InsertAfter(menuPos, &*it);
         }
+
+        // Reselect: Cursor stays at same position, or moves up if end of list.
+
+        if ( pos < m_StepListSet.size() )
+            menu.Select((m_StepListSet.begin() + pos)->MenuPos());
+        else if ( ! m_StepListSet.empty() )
+            menu.Select(m_StepListSet.back().MenuPos());
+
 
         // Renumber lists in the deferred update queue (and remove the deleted list, if present).
 
@@ -610,19 +622,29 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
 
         if ( m_TrigList.Empty() )
         {
-            if ( m_Pos >= m_StepListSet.size() )
-                m_Pos = 0;
+            StepList * l = NULL;
 
-            StepList & l = m_StepListSet[m_Pos];
+            while ( loopCheck < m_StepListSet.size() )
+            {
+                if ( m_Pos >= m_StepListSet.size() )
+                    m_Pos = 0;
+
+                l = & m_StepListSet[m_Pos];
+
+                m_Pos++;
+
+                if ( ! l->Empty() )
+                    break;
+
+                loopCheck++;
+            }
 
             update_pair u;
             u.list_id = m_Pos;
-            u.list_pos = l.m_Pos;
+            u.list_pos = l->m_Pos;
             m_DeferredUpdates.push_back(u);
 
-            m_Pos++;
-
-            Cluster * result = l.Step();
+            Cluster * result = l->Step();
 
             if ( result != NULL )
             {

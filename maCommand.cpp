@@ -511,7 +511,7 @@ bool do_command(string commandString, int directCommand)
             break;
 
 
-        case C_CUE  :
+        case C_CUE :
             if ( tokens.size() < 2 )
             {
                 set_status(STAT_POS_2, "Hint: play nn, where 'nn' is pattern number.");
@@ -537,13 +537,22 @@ bool do_command(string commandString, int directCommand)
             g_PatternStore.SetNewPatternPending(iTemp);
             break;
 
+        case C_CUE_CURRENT :
+            if ( ! g_PatternStore.Empty() )
+            {
+                set_status(STAT_POS_2, "Cueing pattern: %s", g_PatternStore.CurrentEditPattern().ShortLabel());
+                g_PatternStore.SetNewPatternPending(g_PatternStore.CurrentPosEdit());
+                g_PatternStore.SetRedraw();
+            }
+            break;
+
         case C_EDIT :
             if ( tokens.size() < 2 )
             {
                 // No value specified, just open the menu.
                 g_PatternStore.SetFocus();
                 g_PatternStore.SetStatus();
-                show_status_after_navigation();
+//                show_status_after_navigation();
             }
             else
             {
@@ -565,7 +574,7 @@ bool do_command(string commandString, int directCommand)
                 }
                 set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
                 g_PatternStore.SetEditPos(iTemp);
-                update_pattern_status_panel();
+//                update_pattern_status_panel();
             }
             break;
 
@@ -577,7 +586,7 @@ bool do_command(string commandString, int directCommand)
        case C_EDIT_CURSOR_LOCK:
            g_PatternStore.SetEditFocusFollowsPlay(true);
            set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
-           update_pattern_status_panel();
+//           update_pattern_status_panel();
            break;
        case C_EDIT_CURSOR_UNLOCK:
            g_PatternStore.SetEditFocusFollowsPlay(false);
@@ -592,9 +601,9 @@ bool do_command(string commandString, int directCommand)
             // g_PatternStore.AddEmptyPattern(tokens.begin() + firstParameter, tokens.end());
             // g_PatternStore.SetStepValCurrentEditPattern(g_State.StepValue());
             set_status(STAT_POS_2, "Empty pattern added at position %i.", g_PatternStore.m_Patterns.size());
-            update_pattern_status_panel();
-            show_status_after_navigation();
-            update_big_panel();
+//            update_pattern_status_panel();
+//            show_status_after_navigation();
+//            update_big_panel();
             break;
 
        case C_COPY :
@@ -605,7 +614,7 @@ bool do_command(string commandString, int directCommand)
            }
            g_PatternStore.CopyCurrentPattern();
            set_status(STAT_POS_2, "Current pattern copied at position %i.", g_PatternStore.m_Patterns.size());
-           update_pattern_status_panel();
+//           update_pattern_status_panel();
            break;
 
        case C_DELETE :
@@ -624,13 +633,13 @@ bool do_command(string commandString, int directCommand)
                g_PatternStore.DeleteCurrentPattern();
                set_status(STAT_POS_2, "Current pattern deleted. (\'Undo\' puts it at the end of the list.)");
            }
-           update_pattern_status_panel();
+//           update_pattern_status_panel();
            break;
 
        case C_UNDO :
            g_PatternStore.PopDeletedPattern();
            set_status(STAT_POS_2, "Pattern restored at position %i.", g_PatternStore.m_Patterns.size());
-           update_pattern_status_panel();
+//           update_pattern_status_panel();
            break;
 
        case C_CLEAR :
@@ -764,39 +773,39 @@ bool do_command(string commandString, int directCommand)
 
         case C_FEEL:
             g_PatternStore.FeelMapForEdit().SetStatus();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_FEEL_HELP:
             set_status(STAT_POS_2, "feel new[list]|on|off|add|remove|respace|bypass");
             break;
         case C_FEEL_ON:
             g_PatternStore.FeelMapForEdit().SetActive(true);
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_FEEL_OFF:
             g_PatternStore.FeelMapForEdit().SetActive(false);
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_FEEL_NEW:
             g_PatternStore.FeelMapForEdit().New(tokens);
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_FEEL_ADD:
             g_PatternStore.FeelMapForEdit().Add();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_FEEL_REMOVE:
             g_PatternStore.FeelMapForEdit().Remove();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_FEEL_RESPACE:
             g_PatternStore.FeelMapForEdit().Respace();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
 
         case C_SCALE:
             g_PatternStore.TranslateTableForEdit().SetStatus();    // This automatically sets focus.
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_SCALE_FROM_LIST:
 //            g_PatternStore.TranslateTableForEdit().SetScale(g_PatternStore.CurrentEditStepList());
@@ -923,7 +932,7 @@ bool do_command(string commandString, int directCommand)
                g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
            g_PatternStore.PatternChainForEdit().SetStatus();
            g_PatternStore.PatternChainForEdit().SetFocus();
-           show_status_after_navigation();
+//           show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_OFF:
            g_PatternStore.SetPatternChainMode(PatternChain::off);
@@ -936,16 +945,16 @@ bool do_command(string commandString, int directCommand)
             break;
         case C_PATTERN_CHAIN_CLEAR:
            g_PatternStore.PatternChainForEdit().Clear();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_NEW:
            g_PatternStore.PatternChainForEdit().New();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_DELETE:
            g_PatternStore.PatternChainForEdit().Delete();
            g_PatternStore.PatternChainForEdit().SetStatus();
-            show_status_after_navigation();
+//            show_status_after_navigation();
             break;
         case C_PATTERN_CHAIN_JUMP:
             break;
@@ -1045,7 +1054,7 @@ bool do_command(string commandString, int directCommand)
                 default:
                     break;
             }
-            update_big_panel();
+//            update_big_panel();
             break;
 
         case C_LIST:
@@ -1055,7 +1064,7 @@ bool do_command(string commandString, int directCommand)
                 break;
             }
             set_status(STAT_POS_2, "%.60s", g_PatternStore.ListManager(commandString, tokens).c_str());
-            update_big_panel();
+//            update_big_panel();
             break;
 
         case C_LIST_NEW:
@@ -1085,7 +1094,7 @@ bool do_command(string commandString, int directCommand)
             }
             g_PatternStore.UpdatePatternFromMidiFile(commandString);
             set_status(STAT_POS_2, "File imported to Real Time list.");
-            update_big_panel();
+//            update_big_panel();
             break;
 #endif
 
@@ -1248,7 +1257,7 @@ bool do_command(string commandString, int directCommand)
     // is nearly impossible, so might as well just do it every
     // time.
 
-    update_pattern_list_panels(true);
+//    update_pattern_list_panels(true);
     commandString = "";
     return bResult;
 }
@@ -1497,9 +1506,9 @@ bool handle_key_input(BaseUI::key_command_t key)
             set_status(STAT_POS_2, "%s", errorMessage.c_str());
         }
 #endif
-        update_pattern_status_panel();
-        update_pattern_list_panels();
-        update_big_panel();
+//        update_pattern_status_panel();
+//        update_pattern_list_panels();
+//        update_big_panel();
         keyUsed = true;
         break;
 #endif
@@ -1532,7 +1541,7 @@ bool handle_key_input(BaseUI::key_command_t key)
             else
                 g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
             g_ListBuilder.Clear();
-            update_big_panel();
+//            update_big_panel();
             set_status(STAT_POS_2, "");
             keyUsed = true;
         }
@@ -1648,7 +1657,7 @@ bool handle_key_input(BaseUI::key_command_t key)
 
     if ( ! keyUsed && ItemMenu::RouteKey(key) )
     {
-        show_status_after_navigation();
+//        show_status_after_navigation();
 //        update_pattern_list_panels();
 //        update_big_panel();
         return true;

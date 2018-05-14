@@ -66,7 +66,7 @@ menu_list_cursor_t MenuList::InsertAfter(menu_list_cursor_t pos, ItemMenu * item
     return newItemPos;
 }
 
-menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocus*/)
+menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setCursorToEnd)
 {
     int row = (*pos)->MenuListRow();
     (*pos)->ClearMenuList();
@@ -80,7 +80,10 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos/*, bool setReturnFocu
     // over what to reselect and shifts that responsibility upstream :)
 
     if ( m_Cursor == pos )
-        throw "MenuList::Remove(), should't try to remove current selection.";
+        if ( setCursorToEnd )
+            m_Cursor = m_Items.end();
+        else
+            throw "MenuList::Remove(), should't try to remove current selection.";
 
     menu_list_cursor_t result = m_Items.erase(pos);
 
@@ -237,7 +240,7 @@ ItemMenu::ItemMenu(const ItemMenu & m):
     m_Help(m.m_Help),
     m_ItemID(m.m_ItemID),
     m_MenuList(m.m_MenuList),
-    m_MenuPos(m.m_MenuPos)
+    m_PosInMenuList(m.m_PosInMenuList)
 {
 //    m_TestString = "Set from ItemMenu copy constructor body.";
 
@@ -253,7 +256,7 @@ ItemMenu::ItemMenu(const ItemMenu & m):
 
     if ( m_MenuList != NULL )
     {
-        *m_MenuPos = this;
+        *m_PosInMenuList = this;
     }
 }
 
@@ -271,8 +274,8 @@ ItemMenu::~ItemMenu()
         ReturnFocus();
     }
 
-    if ( m_MenuList != NULL && *m_MenuPos == this)
-        m_MenuList->Remove(m_MenuPos/*, false*/);
+    if ( m_MenuList != NULL && *m_PosInMenuList == this)
+        m_MenuList->Remove(m_PosInMenuList, true); // Allow removal even if selected.
 
     m_RedrawList.remove(this);
 }
@@ -310,7 +313,7 @@ void ItemMenu::InitStatus()
 
     if ( m_MenuList != NULL )
     {
-        if ( /* m_MenuList->m_Container->m_GotFocus && */ m_MenuList->m_Cursor == m_MenuPos )
+        if ( /* m_MenuList->m_Container->m_GotFocus && */ m_MenuList->m_Cursor == m_PosInMenuList )
             m_Status = " -> ";
         m_Status.resize(m_MenuListIndent + 4, ' ');
     }

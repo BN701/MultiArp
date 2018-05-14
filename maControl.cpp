@@ -140,7 +140,7 @@ void control(control_message_t message, int value)
                 else
                     g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
                 g_ListBuilder.Clear();
-                update_big_panel();
+//                update_big_panel();
                 set_status(STAT_POS_2, "");
             }
             break;
@@ -169,8 +169,8 @@ void control(control_message_t message, int value)
                 }
 
                 ItemMenu::RouteKey(key);
-                show_status_after_navigation();
-                update_pattern_list_panels();
+//                show_status_after_navigation();
+//                update_pattern_list_panels();
             }
             break;
 

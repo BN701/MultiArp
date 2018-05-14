@@ -20,7 +20,7 @@
 #include <cmath>
 #include <cstring>
 #include <numeric>
-#include <unordered_map>
+//#include <unordered_map>
 
 #ifdef MA_BLUE
 #include <cerrno>
@@ -36,13 +36,15 @@
 
 using namespace std;
 
+unordered_set<std::string> Pattern::m_ShortLabels;
+
 Pattern::Pattern():
     m_MenuList(this, &m_Visible)
 {
 //    m_TestString = "Set from Pattern Constructor.";
 
     m_PopUpMenuID = C_MENU_ID_PATTERN;
-//        m_MenuList.Add(this);
+    m_MenuList.Add(this);
 //        m_MenuList.Select(m_MenuPos);
     m_MenuListIndent = 0;
     m_DisplayObjectType = BaseUI::dot_pattern;
@@ -53,12 +55,18 @@ Pattern::~Pattern()
 {
     for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
         delete *it;
+
+//    m_MenuList.m_Items.clear();
+    ItemMenu::m_MenuList = NULL;    // Prevent ItemMenu destructor from attempting
+                                    // to remove ourselves from the menu list that
+                                    // will already have been cleared.
 }
 
 Pattern::Pattern(const Pattern & p):
     ItemMenu(p),
     m_Pos(p.m_Pos),
     m_Label(p.m_Label),
+    m_ShortLabel(p.m_ShortLabel),
     m_StepValue(p.m_StepValue),
     m_Gate(p.m_Gate),
     m_GateHold(p.m_GateHold),
@@ -67,6 +75,7 @@ Pattern::Pattern(const Pattern & p):
 {
 
     m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
+    m_MenuList.Add(this);
 
     // This is a copy constructor, so we have to copy each List Group
 
@@ -90,7 +99,7 @@ Pattern::Pattern(const Pattern & p):
         }
     }
 
-    // Copy the menu list cursor, too.
+    // Copy the menu list cursor position, too.
 
     if ( !m_MenuList.m_Items.empty() )
     {
@@ -130,17 +139,60 @@ void Pattern::SetLabel(const char * label)
     SetRedraw();
 }
 
+void Pattern::SetShortLabel(const char * label)
+{
+    if ( label != NULL )
+        m_ShortLabel = label;
+    else if ( m_ShortLabel.empty() )
+    {
+        static int n = 1;
+        char buff[10];
+        snprintf(buff, 10, "P%02i", n++);
+        m_ShortLabel = buff;
+    }
+    else
+    {
+        // Add (and increment) an alphabetic suffix.
+        char c = m_ShortLabel.back();
+        if ( isdigit(c) )
+            c = 'a';
+        else
+            m_ShortLabel.pop_back();
+        while ( true )
+        {
+            if ( c < 'z' )
+            {
+                m_ShortLabel += ++c;
+                auto result = m_ShortLabels.insert(m_ShortLabel);
+                if ( result.second )
+                    break;
+                else
+                    m_ShortLabel.pop_back();
+            }
+            else
+            {
+                // Give up and generate a fresh short label.
+                m_ShortLabel.clear();
+                SetShortLabel();
+                break;
+            }
+        }
+    }
+}
+
 void Pattern::SetRedraw()
 {
     if ( m_Visible )
     {
-        if ( m_MenuList.m_Items.empty() )
-        {
-            ItemMenu::SetRedraw();
-            return;
-        }
+//        if ( m_MenuList.m_Items.empty() )
+//        {
+//            ItemMenu::SetRedraw();
+//            return;
+//        }
+        ItemMenu::SetRedraw();
         for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
-            (*it)->SetRedraw();
+            if ( *it != this )
+                (*it)->SetRedraw();
     }
 }
 
@@ -492,7 +544,7 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_backspace:
-//        ReturnFocus();
+        ReturnFocus();
         break;
 
     case BaseUI::key_left:
@@ -500,6 +552,14 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
 
     case BaseUI::key_right:
         break;
+
+    case BaseUI::key_ctrl_up:
+        m_MenuList.DownCursorPos();
+        return true;
+
+    case BaseUI::key_ctrl_down:
+        m_MenuList.UpCursorPos();
+        return true;
 
 //    case BaseUI::key_up:
 //        DownCursorPos();
@@ -510,7 +570,7 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
 //        break;
 
 //    case BaseUI::key_up:
-    case BaseUI::key_ctrl_up:
+//    case BaseUI::key_ctrl_up:
 //        DownCursorPos();
 //        m_MenuList.OpenCurrentItem();
 
@@ -521,7 +581,7 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
         break;
 
 //    case BaseUI::key_down:
-    case BaseUI::key_ctrl_down:
+//    case BaseUI::key_ctrl_down:
 //        UpCursorPos();
 //        m_MenuList.OpenCurrentItem();
 

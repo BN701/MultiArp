@@ -49,7 +49,7 @@ class MenuList
         menu_list_cursor_t Add(ItemMenu * item, bool select = false);    // Wraps push_back().
         menu_list_cursor_t Insert(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
         menu_list_cursor_t InsertAfter(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
-        menu_list_cursor_t Remove(menu_list_cursor_t pos/*, bool setReturnFocus*/);
+        menu_list_cursor_t Remove(menu_list_cursor_t pos, bool setCursorToEnd = false);
         menu_list_cursor_t Select(menu_list_cursor_t pos/*, bool setReturnFocus = true*/);
 
 //        void OpenCurrentItem();
@@ -169,7 +169,7 @@ class ItemMenu
         void SetMenuList(MenuList * list, menu_list_cursor_t pos)
         {
             m_MenuList = list;
-            m_MenuPos = pos;
+            m_PosInMenuList = pos;
         }
 
         void ClearMenuList() { m_MenuList = NULL; }
@@ -183,17 +183,17 @@ class ItemMenu
         {
             if ( m_Visible )
             {
-                // There's no 'find' function, so may as well attempt
-                // a 'remove' just to make sure we don't waste time
-                // with duplicates.
+                // There's no 'find' function to check that we're not
+                // adding a duplicate, so may as well attempt a 'remove'
+                // to make sure.
                 m_RedrawList.remove(this);
                 m_RedrawList.push_back(this);
             }
         }
 
         void SetVisible(bool val) { m_Visible = val; }
-        void SetMenuPos(menu_list_cursor_t pos) { m_MenuPos = pos; }
-        menu_list_cursor_t MenuPos() { return m_MenuPos; }
+        void SetMenuPos(menu_list_cursor_t pos) { m_PosInMenuList = pos; }
+        menu_list_cursor_t MenuPos() { return m_PosInMenuList; }
 //        std::string m_TestString = "Set from ItemMenu class definition.";
 
     protected:
@@ -218,7 +218,7 @@ class ItemMenu
         int m_ItemID = -1;
 
         MenuList * m_MenuList = NULL;
-        menu_list_cursor_t m_MenuPos;
+        menu_list_cursor_t m_PosInMenuList;
 
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.

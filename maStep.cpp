@@ -70,7 +70,7 @@ void do_UI_updates()
    if ( g_PatternStore.PatternChanged(true) )
    {
        set_top_line();
-       update_pattern_list_panels();
+//       update_pattern_list_panels();
        set_status(STAT_POS_2, "Pattern changed ...");
    }
 
@@ -78,7 +78,7 @@ void do_UI_updates()
 
     if ( g_State.PhaseIsZero() )
     {
-        update_pattern_status_panel();
+//        update_pattern_status_panel();
     }
 
     // Every step ...
@@ -503,7 +503,7 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
                g_ListBuilder.Clear();
                set_status(STAT_POS_2, "");
-               update_big_panel();
+//               update_big_panel();
             }
             else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/
             {

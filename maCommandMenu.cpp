@@ -84,21 +84,20 @@ map<int, const char *> CommandMenu::m_MenuTitles =
 multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
     // Pattern Store
-    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
-    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Layer", ""}},
+//    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
+//    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Layer", ""}},
+    {C_MENU_ID_TOP, {false, C_NEW_PATTERN, "New", ""}},
+    {C_MENU_ID_TOP, {false, C_CUE_CURRENT, "Cue", ""}},
+    {C_MENU_ID_TOP, {false, C_COPY, "Copy", ""}},
+    {C_MENU_ID_TOP, {false, C_DELETE, "Delete", ""}},
     {C_MENU_ID_TOP, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
-
-    // Pattern Store -> Set
-    {C_MENU_ID_SET, {false, C_NEW_STEP_GROUP, "New Sequence Layer", ""}},
-    {C_MENU_ID_SET, {false, C_NEW_RT_GROUP, "New Loop Layer", ""}},
 
     // Pattern Store -> Settings
     {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
 
     // Pattern Store -> Pattern
-    {C_MENU_ID_PATTERN, {false, C_NEW_PATTERN, "New", ""}},
-    {C_MENU_ID_PATTERN, {false, C_COPY, "Copy", ""}},
-    {C_MENU_ID_PATTERN, {false, C_DELETE, "Delete", ""}},
+    {C_MENU_ID_PATTERN, {false, C_NEW_STEP_GROUP, "New Sequence Layer", ""}},
+    {C_MENU_ID_PATTERN, {false, C_NEW_RT_GROUP, "New Loop Layer", ""}},
 
     // Pattern Store -> Settings -> Capture
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
@@ -155,21 +154,21 @@ int CommandMenu::InitMenuPos(int menu)
     switch (menu)
     {
         case C_MENU_ID_MIDI_MODE:
-            m_MenuPos = g_ListBuilder.MidiInputMode();
+            m_MenuChoice = g_ListBuilder.MidiInputMode();
             break;
 
         default:
         {
             auto it = m_LastChoices.find(menu);
             if ( it != m_LastChoices.end() )
-                m_MenuPos = it->second;
+                m_MenuChoice = it->second;
             else
-                m_MenuPos = 0;
+                m_MenuChoice = 0;
             break;
         }
     }
 
-    return m_MenuPos;
+    return m_MenuChoice;
 }
 
 void CommandMenu::Open(int menu)
@@ -182,7 +181,7 @@ void CommandMenu::Open(int menu)
 //    if ( choice == -1 )
 //        InitMenuPos(menu);
 //    else
-//        m_MenuPos = choice;
+//        m_MenuChoice = choice;
     InitMenuPos(menu);
 
     m_CurrentMenuID = menu;
@@ -219,7 +218,7 @@ void CommandMenu::Open(int menu)
 void CommandMenu::Show()
 {
     set_status(COMMAND_HOME, m_MenuString.c_str());
-    g_TextUI.HighlightLastWrite(m_FieldPositions[m_MenuPos].offset, m_FieldPositions[m_MenuPos].length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+    g_TextUI.HighlightLastWrite(m_FieldPositions[m_MenuChoice].offset, m_FieldPositions[m_MenuChoice].length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
 }
 
 void CommandMenu::ClearAll()
@@ -271,7 +270,7 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
             break;
 
         case BaseUI::key_return:
-            Choose(m_MenuPos);
+            Choose(m_MenuChoice);
             break;
 
         case BaseUI::key_backspace:
@@ -294,17 +293,17 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
             break;
 
         case BaseUI::key_left:
-            if ( m_MenuPos  > 0 )
+            if ( m_MenuChoice  > 0 )
             {
-                m_MenuPos -= 1;
+                m_MenuChoice -= 1;
                 Show();
             }
             break;
 
         case BaseUI::key_right:
-            if ( m_MenuPos < m_Choices - 1 )
+            if ( m_MenuChoice < m_Choices - 1 )
             {
-                m_MenuPos += 1;
+                m_MenuChoice += 1;
                 Show();
             }
             break;

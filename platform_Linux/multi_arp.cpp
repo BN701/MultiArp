@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
     int queueIndex = g_Sequencer.CreateQueue();
     g_State.SetSequencerQueueID(g_Sequencer.Queue(queueIndex).GetQueueId());
 
-    update_pattern_status_panel();
+//    update_pattern_status_panel();
 
     // Start the queue.
 

@@ -49,6 +49,42 @@ using namespace std;
 //RealTimeList RealTimeList::EmptyList;
 //Pattern Pattern::EmptyPattern;
 
+#if 1
+void PatternStore::SetStatus()
+{
+    int pos = 0;
+    char buff[200];
+
+    m_FieldPositions.clear();
+    m_Highlights.clear();
+
+    InitStatus();
+    if ( m_GotFocus )
+        m_Status += "[Patterns] ";
+    else
+        m_Status += " Patterns  ";
+
+    for ( unsigned i = 0; i < m_Patterns.size(); i++ )
+    {
+        if ( i > 0 )
+            m_Status += ",";
+        if ( m_NewPatternPending && i == m_NewPattern )
+            m_Status += '+';
+        else if ( i == m_PosPlay )
+            m_Status += '>';
+        else
+            m_Status += ' ';
+
+        pos = m_Status.size();
+        m_Status += m_Patterns[i].ShortLabel();
+        m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+    }
+
+    if ( m_GotFocus && !m_FieldPositions.empty() )
+        m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
+}
+
+#else
 void PatternStore::SetStatus()
 {
     size_t pos = 0;
@@ -115,6 +151,7 @@ void PatternStore::SetStatus()
 //    m_Highlights.push_back(m_FieldPositions.at(m_PatternStoreFocus));
     m_Highlights.push_back(m_FieldPositions.at(0));
 }
+#endif
 
 //bool PatternStore::HandleKey(BaseUI::key_command_t k)
 //{
@@ -247,22 +284,22 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
-
-
     case BaseUI::key_left:
+        DownEditPos();
         break;
 
     case BaseUI::key_right:
+        UpEditPos();
         break;
 
     case BaseUI::key_up:
-        UpEditPos();
+//        UpEditPos();
 //        DownListPos();
 //        SetRedrawMenuList();
         break;
 
     case BaseUI::key_down:
-        DownEditPos();
+//        DownEditPos();
 //        UpListPos();
 //        SetRedrawMenuList();
         break;
@@ -324,6 +361,7 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
     Pattern & p = m_Patterns.back();
 
     p.SetVisible(true);
+    p.SetShortLabel();
     p.SetLabel(label.c_str());
     p.SetReturnFocus(this);
 
@@ -335,6 +373,21 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
     return m_PosEdit = m_Patterns.size() - 1;
 
 }
+
+int PatternStore::CopyCurrentPattern()
+{
+    m_Patterns.push_back(m_Patterns.at(m_PosEdit));
+    SetRedraw();
+    m_Patterns.back().ResetPosition();
+    m_Patterns.back().SetShortLabel();
+    m_Patterns.back().SetLabel((m_Patterns.back().Label() + ", copy").c_str());
+
+    if ( m_EditPosFollowsPlay )
+        return m_Patterns.size() - 1;
+    else
+        return m_PosEdit = m_Patterns.size() - 1;
+}
+
 
 // TODO:LG
 //StepList & PatternStore::CurrentEditStepList()

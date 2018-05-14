@@ -105,6 +105,7 @@ enum command_t
 //    C_MIDI_OFF,
 
     C_CUE,              // Set the next pattern to play
+    C_CUE_CURRENT,      // Set the current edit pattern to play next
     C_EDIT,             // Set focus for copy/paste
     C_EDIT_ITEM,
     C_EDIT_CURSOR_LOCK,

@@ -111,7 +111,7 @@ class CommandMenu
         static std::map<int, int> m_LastChoices;
 
         bool m_Active = false;
-        int m_MenuPos = 0;
+        int m_MenuChoice = 0;
         int m_Choices = 0;
         int m_CurrentMenuID = 0;
 

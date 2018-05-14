@@ -212,9 +212,9 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
 //            c.SetFocus();
             c.SetDisplayIndent(m_MenuListIndent + 2);
             c.SetVisible(m_Visible);
-            m_MenuList->InsertAfter(m_MenuPos, & c, true);  // This selects it, too.
+            m_MenuList->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
             c.SetReturnFocus(this);                         // Override return focus.
-//            MenuInsert(m_MenuPos, & c);
+//            MenuInsert(m_PosInMenuList, & c);
         }
         break;
 

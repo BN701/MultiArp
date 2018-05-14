@@ -150,107 +150,107 @@ void update_progress_bar()
 // Called from queue_next_step() when phase zero to catch pattern chain updates.
 // Called from update_pattern_list_panels() to catch any pattern store changes.
 
-void update_pattern_status_panel()
-{
-    set_status_w(STAT_POS_PATTERN_EDIT, g_PatternStore.PatternStatusEdit().c_str());
+//void update_pattern_status_panel()
+//{
+//    set_status_w(STAT_POS_PATTERN_EDIT, g_PatternStore.PatternStatusEdit().c_str());
+//
+//    if ( g_PatternStore.PatternChainMode() == PatternChain::off ||
+//         g_PatternStore.Empty() ||
+//         g_PatternStore.PatternChainEmpty() )
+//    {
+//        set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatusPlay().c_str());
+//        return;
+//    }
+//
+//    // We're displaying a Pattern Chain and we have to pick a row to display.
+//
+//    static int firstRow = 0;
+//    const int rows = 1;
+//
+//    int selection = g_PatternStore.CurrentPosPatternChain();
+//
+//    while ( selection >= 4 * (firstRow + rows) )
+//        firstRow += 1;
+//
+//    while ( selection < 4 * firstRow )
+//        firstRow -= 1;
+//
+//    int rowSelect = selection/4 - firstRow;
+//
+//    g_TextUI.Text(BaseUI::small_panel, 1, 0, g_PatternStore.PatternChainToStringForDisplay(firstRow, rows).c_str());
+//    g_TextUI.Highlight(BaseUI::small_panel, 1 + rowSelect, 5 + 12 * (selection % 4), 12, CP_PATTERN_CHAIN_HIGHLIGHT);
+//}
 
-    if ( g_PatternStore.PatternChainMode() == PatternChain::off ||
-         g_PatternStore.Empty() ||
-         g_PatternStore.PatternChainEmpty() )
-    {
-        set_status_w(STAT_POS_PATTERN, g_PatternStore.PatternStatusPlay().c_str());
-        return;
-    }
-
-    // We're displaying a Pattern Chain and we have to pick a row to display.
-
-    static int firstRow = 0;
-    const int rows = 1;
-
-    int selection = g_PatternStore.CurrentPosPatternChain();
-
-    while ( selection >= 4 * (firstRow + rows) )
-        firstRow += 1;
-
-    while ( selection < 4 * firstRow )
-        firstRow -= 1;
-
-    int rowSelect = selection/4 - firstRow;
-
-    g_TextUI.Text(BaseUI::small_panel, 1, 0, g_PatternStore.PatternChainToStringForDisplay(firstRow, rows).c_str());
-    g_TextUI.Highlight(BaseUI::small_panel, 1 + rowSelect, 5 + 12 * (selection % 4), 12, CP_PATTERN_CHAIN_HIGHLIGHT);
-}
-
-void update_pattern_list_panels(bool refreshList)
-{
-    update_pattern_status_panel();
-
-    switch ( g_TextUI.BigPanelPage() )
-    {
-    case AnsiUI::one:
-    case AnsiUI::two:
-        break;
-    default:
-        return;
-    }
-
-    if ( g_PatternStore.Empty() )
-    {
-        g_TextUI.ClearArea(BaseUI::pattern_list_panel);
-        g_TextUI.ClearArea(BaseUI::pattern_list_summary_panel);
-        return;
-    }
-
-    // Selection List
-
-    static int listStart = 0;
-    const int rows = 4;
-
-    int selection = g_PatternStore.CurrentPosEdit();
-
-    while ( selection >= listStart + rows )
-        listStart += 1;
-
-    while ( selection < listStart )
-        listStart -= 1;
-
-    g_TextUI.ClearArea(BaseUI::pattern_list_panel);
-
-    g_TextUI.SetTextRowHighlight(selection - listStart);
-    g_TextUI.Text(BaseUI::pattern_list_panel, 0, 0, g_PatternStore.PatternSelectionList(listStart, rows).c_str());
-    g_TextUI.Highlight(BaseUI::pattern_list_panel, selection - listStart, 0, 20, CP_SUMMARY_PANEL_BKGND);
-
-    // Summary Panel
-
-    g_TextUI.ClearArea(BaseUI::pattern_list_summary_panel);
-
-    char text[100];
-    Pattern & p = g_PatternStore.CurrentEditPattern();
-
-// TODO:LG
-//    snprintf(text, 100, "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
-    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 0, 1, text);
-
-    snprintf(text, 100, "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
-        p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
-    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 1, 1, text);
-
-    TranslateTable & table = p.PatternTranslateTable();
-
-    snprintf(text, 100, "Chromatic %i, Tonal %i (%s), %s-%s",
-            table.Transpose(),
-            table.DegreeShift(),
-            table.ShiftName(),
-            table.RootName().c_str(),
-            table.ScaleName());
-    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 2, 1, text);
-
-    snprintf(text, 100, "Premap %s, Accidentals %s",
-            table.PremapModeName(),
-            table.AccidentalsModeName());
-    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 3, 1, text);
-
-}
+//void update_pattern_list_panels(bool refreshList)
+//{
+//    update_pattern_status_panel();
+//
+//    switch ( g_TextUI.BigPanelPage() )
+//    {
+//    case AnsiUI::one:
+//    case AnsiUI::two:
+//        break;
+//    default:
+//        return;
+//    }
+//
+//    if ( g_PatternStore.Empty() )
+//    {
+//        g_TextUI.ClearArea(BaseUI::pattern_list_panel);
+//        g_TextUI.ClearArea(BaseUI::pattern_list_summary_panel);
+//        return;
+//    }
+//
+//    // Selection List
+//
+//    static int listStart = 0;
+//    const int rows = 4;
+//
+//    int selection = g_PatternStore.CurrentPosEdit();
+//
+//    while ( selection >= listStart + rows )
+//        listStart += 1;
+//
+//    while ( selection < listStart )
+//        listStart -= 1;
+//
+//    g_TextUI.ClearArea(BaseUI::pattern_list_panel);
+//
+//    g_TextUI.SetTextRowHighlight(selection - listStart);
+//    g_TextUI.Text(BaseUI::pattern_list_panel, 0, 0, g_PatternStore.PatternSelectionList(listStart, rows).c_str());
+//    g_TextUI.Highlight(BaseUI::pattern_list_panel, selection - listStart, 0, 20, CP_SUMMARY_PANEL_BKGND);
+//
+//    // Summary Panel
+//
+//    g_TextUI.ClearArea(BaseUI::pattern_list_summary_panel);
+//
+//    char text[100];
+//    Pattern & p = g_PatternStore.CurrentEditPattern();
+//
+//// TODO:LG
+////    snprintf(text, 100, "List(s) %i, Real Time %i, Trigs %i", p.StepListCount(), p.RealTimeListCount(), p.TrigListCount());
+//    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 0, 1, text);
+//
+//    snprintf(text, 100, "Step value %.2f, Vel %i, Gate %.0f%% (Hold %s)", p.StepValue(),
+//        p.Velocity(), p.Gate() * 100, p.GateHold() ? "on" : "off");
+//    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 1, 1, text);
+//
+//    TranslateTable & table = p.PatternTranslateTable();
+//
+//    snprintf(text, 100, "Chromatic %i, Tonal %i (%s), %s-%s",
+//            table.Transpose(),
+//            table.DegreeShift(),
+//            table.ShiftName(),
+//            table.RootName().c_str(),
+//            table.ScaleName());
+//    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 2, 1, text);
+//
+//    snprintf(text, 100, "Premap %s, Accidentals %s",
+//            table.PremapModeName(),
+//            table.AccidentalsModeName());
+//    g_TextUI.Text(BaseUI::pattern_list_summary_panel, 3, 1, text);
+//
+//}
 
 void layout_pattern_extra_panel(vector<InOutPair> & pairs)
 {
@@ -347,62 +347,62 @@ void show_status()
     set_status(STAT_POS_2, g_PatternStore.PatternOverview().c_str());
 }
 
-void show_status_after_navigation()
-{
-    return;
-
-    const int width = 72;
-
-//    if ( ItemMenu::RedrawMenuList() )
-//        update_big_panel();
-
-    static int adjustOffset = 0;
-    string status = ItemMenu::Status();
-
-    // Although I started off with a mechanism which allows for multiple
-    // highlights, so far I've only ever set one at a time. Now that I
-    // need to handle long strings and need to make sure the highlight
-    // is visible I'm relying on there only being one highlight and using
-    // that to position the whole string within the available width. Any
-    // highlights set after the first may end up off screen.
-
-    if ( status.size() < width )
-        adjustOffset = 0;
-
-    vector<screen_pos_t> & highlights = ItemMenu::GetHighlights();
-
-    if ( !highlights.empty() )
-    {
-        screen_pos_t cursor = highlights.front();
-
-        if ( ItemMenu::FirstField() )
-        {
-            // Make sure whole string scrolls into view on the left.
-            cursor.length += cursor.offset;
-            cursor.offset = 0;
-        }
-
-        if ( cursor.offset < adjustOffset )
-            adjustOffset = cursor.offset;
-        else if ( cursor.offset + cursor.length - adjustOffset >= width )
-            adjustOffset = cursor.offset + cursor.length - width;
-    }
-
-    g_TextUI.SendSaveCursor();
-
-    int row, col;
-    if ( ItemMenu::DisplayPos(row, col) )
-        set_status(row, col, status.substr(adjustOffset, width).c_str());
-    else
-        set_status(STAT_POS_MENU, status.substr(adjustOffset, width).c_str());
-
-    for ( size_t i = 0; i < highlights.size(); i++ )
-//        g_TextUI.Highlight(BaseUI::whole_screen, STAT_POS_MENU + highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
-        g_TextUI.HighlightLastWrite(highlights.at(i).offset - adjustOffset + 2, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
-
-    g_TextUI.SendRestoreCursor();
-
-}
+//void show_status_after_navigation()
+//{
+//    return;
+//
+//    const int width = 72;
+//
+////    if ( ItemMenu::RedrawMenuList() )
+////        update_big_panel();
+//
+//    static int adjustOffset = 0;
+//    string status = ItemMenu::Status();
+//
+//    // Although I started off with a mechanism which allows for multiple
+//    // highlights, so far I've only ever set one at a time. Now that I
+//    // need to handle long strings and need to make sure the highlight
+//    // is visible I'm relying on there only being one highlight and using
+//    // that to position the whole string within the available width. Any
+//    // highlights set after the first may end up off screen.
+//
+//    if ( status.size() < width )
+//        adjustOffset = 0;
+//
+//    vector<screen_pos_t> & highlights = ItemMenu::GetHighlights();
+//
+//    if ( !highlights.empty() )
+//    {
+//        screen_pos_t cursor = highlights.front();
+//
+//        if ( ItemMenu::FirstField() )
+//        {
+//            // Make sure whole string scrolls into view on the left.
+//            cursor.length += cursor.offset;
+//            cursor.offset = 0;
+//        }
+//
+//        if ( cursor.offset < adjustOffset )
+//            adjustOffset = cursor.offset;
+//        else if ( cursor.offset + cursor.length - adjustOffset >= width )
+//            adjustOffset = cursor.offset + cursor.length - width;
+//    }
+//
+//    g_TextUI.SendSaveCursor();
+//
+//    int row, col;
+//    if ( ItemMenu::DisplayPos(row, col) )
+//        set_status(row, col, status.substr(adjustOffset, width).c_str());
+//    else
+//        set_status(STAT_POS_MENU, status.substr(adjustOffset, width).c_str());
+//
+//    for ( size_t i = 0; i < highlights.size(); i++ )
+////        g_TextUI.Highlight(BaseUI::whole_screen, STAT_POS_MENU + highlights.at(i).offset - adjustOffset, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+//        g_TextUI.HighlightLastWrite(highlights.at(i).offset - adjustOffset + 2, highlights.at(i).length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+//
+//    g_TextUI.SendRestoreCursor();
+//
+//}
 
 void update_item_menus()
 {

@@ -467,7 +467,7 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
     {
         // Move cursor out of the way.
 
-        menu.Select(m_MenuPos);
+        menu.Select(m_PosInMenuList);
 
         // Get list position and then delete the list.
 
@@ -490,7 +490,7 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
         // Renumber any lists beyond deleted item and put them back in
         // the menu list.
 
-        auto menuPos = m_MenuPos;
+        auto menuPos = m_PosInMenuList;
         for ( int i = 0; i < pos; i++ )
             menuPos++;
         for ( auto it = m_StepListSet.begin() + pos; it != m_StepListSet.end(); it++ )

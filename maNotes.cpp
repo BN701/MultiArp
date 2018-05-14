@@ -377,7 +377,7 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         {
             m_MenuList->m_Container->SetRedraw();
             m_MenuList->DownCursorPos();
-            m_MenuList->Remove(m_MenuPos);
+            m_MenuList->Remove(m_PosInMenuList);
         }
 //        ReturnFocus();
         break;
@@ -567,10 +567,10 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             n.SetDisplayIndent(m_MenuListIndent + 2);
             n.SetItemID(m_PosEdit + 1);
             n.SetVisible(m_Visible);
-            m_MenuList->InsertAfter(m_MenuPos, & n, true);  // This selects it, too.
+            m_MenuList->InsertAfter(m_PosInMenuList, & n, true);  // This selects it, too.
             n.SetReturnFocus(this);                         // Override return focus.
 //            n.SetFocus();
-//            MenuInsert(m_MenuPos, &n);
+//            MenuInsert(m_PosInMenuList, &n);
         }
         break;
 
@@ -580,7 +580,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         {
             m_MenuList->m_Container->SetRedraw();
             m_MenuList->DownCursorPos();
-            m_MenuList->Remove(m_MenuPos);
+            m_MenuList->Remove(m_PosInMenuList);
         }
 //        ReturnFocus();
         break;

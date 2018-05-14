@@ -102,6 +102,7 @@ struct PatternStore : public ItemMenu
     {
         m_NewPattern = val;
         m_NewPatternPending = true;
+        SetRedraw();
     }
 
     bool NewPatternPending()
@@ -110,6 +111,7 @@ struct PatternStore : public ItemMenu
         {
             SetPlayPos(m_NewPattern);
             m_NewPatternPending = false;
+            SetRedraw();
             return true;
         }
         else
@@ -211,17 +213,19 @@ struct PatternStore : public ItemMenu
 //
 //    }
 
-    int CopyCurrentPattern()
-    {
-        m_Patterns.push_back(m_Patterns.at(m_PosEdit));
-        m_Patterns.back().ResetPosition();
-        m_Patterns.back().SetLabel((m_Patterns.back().Label() + ", copy").c_str());
-
-        if ( m_EditPosFollowsPlay )
-            return m_Patterns.size() - 1;
-        else
-            return m_PosEdit = m_Patterns.size() - 1;
-    }
+    int CopyCurrentPattern();
+//    {
+//        m_Patterns.push_back(m_Patterns.at(m_PosEdit));
+//        SetRedraw();
+//        m_Patterns.back().ResetPosition();
+//        m_Patterns.back().SetShortLabel();
+//        m_Patterns.back().SetLabel((m_Patterns.back().Label() + ", copy").c_str());
+//
+//        if ( m_EditPosFollowsPlay )
+//            return m_Patterns.size() - 1;
+//        else
+//            return m_PosEdit = m_Patterns.size() - 1;
+//    }
 
     void ClearCurrentPattern()
     {

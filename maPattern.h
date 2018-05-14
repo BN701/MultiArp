@@ -23,6 +23,7 @@
 #include <list>
 #include <map>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "maCommand.h"
@@ -40,6 +41,7 @@ struct Pattern : public ItemMenu
     // Statics
 
     static Pattern EmptyPattern;
+    static std::unordered_set<std::string> m_ShortLabels;
 
     // Variables
 
@@ -49,6 +51,7 @@ struct Pattern : public ItemMenu
     std::vector<StepList>::size_type m_LastRequestedPos = 0;
 
     std::string m_Label = "Empty Pattern";
+    std::string m_ShortLabel;
 
     double m_StepValue = 16;
     double m_Gate = 0.5;
@@ -115,6 +118,7 @@ struct Pattern : public ItemMenu
     void Clear();
 
     void SetLabel(const char * label);
+    void SetShortLabel(const char * label = NULL);
 
     virtual void SetRedraw();
 
@@ -161,6 +165,7 @@ struct Pattern : public ItemMenu
 //    size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
     std::string Label() { return m_Label; }
     std::string Label(size_t width);
+    const char * ShortLabel() { return m_ShortLabel.c_str(); }
 //    std::string TrigsToStringForDisplay();
     std::string ToString(const char * prefix);
     std::string Display(int mode, std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);

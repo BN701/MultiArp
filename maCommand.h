@@ -116,6 +116,9 @@ enum command_t
     C_NEW_RT_GROUP,
     C_COPY_GROUP,
     C_DELETE_GROUP,
+    C_GROUP_RUN,
+    C_GROUP_STOP,
+    C_GROUP_RS_TOGGLE,
     C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
     C_DELETE,           // Delete pattern and reduce size of pattern list.
     C_CLEAR,            // Clear pattern but leave empty entry in pattern list.
@@ -131,6 +134,8 @@ enum command_t
     C_PATTERN_CHAIN_DELETE,
     C_PATTERN_CHAIN_JUMP,
     C_PATTERN_CHAIN_HELP,
+    C_PATTERN_RUN_ALL,  // Run all List Groups
+    C_PATTERN_STOP_ALL, // Stop all List Groups
 
     C_STORE,
     C_STORE_STEP,

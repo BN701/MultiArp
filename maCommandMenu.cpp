@@ -64,8 +64,8 @@ std::map<int, int> CommandMenu::m_LastChoices;
 map<int, const char *> CommandMenu::m_MenuTitles =
 {
     {C_MENU_ID_NONE, ""},
-    {C_MENU_ID_TOP, "Menu"},
-    {C_MENU_ID_PATTERN, "Pattern"},
+    {C_MENU_ID_TOP, "Pattern"},
+    {C_MENU_ID_PATTERN, "Current Pattern"},
     {C_MENU_ID_SET, "Layer"},
     {C_MENU_ID_SET_FULL, "Layer"},
     {C_MENU_ID_SETTINGS, "Settings"},
@@ -96,6 +96,8 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
 
     // Pattern Store -> Pattern
+    {C_MENU_ID_PATTERN, {false, C_PATTERN_RUN_ALL, "Run", ""}},
+    {C_MENU_ID_PATTERN, {false, C_PATTERN_STOP_ALL, "Stop", ""}},
     {C_MENU_ID_PATTERN, {false, C_NEW_STEP_GROUP, "New Sequence Layer", ""}},
     {C_MENU_ID_PATTERN, {false, C_NEW_RT_GROUP, "New Loop Layer", ""}},
 

@@ -83,6 +83,7 @@ ListGroup::ListGroup(ListGroup & lg):
     m_MidiChannel(lg.m_MidiChannel),
     m_CurrentStepValue(lg.m_CurrentStepValue),
     m_Quantum(lg.m_Quantum)
+//    m_QueueID(lg.m_QueueID)
 {
     m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
@@ -111,14 +112,21 @@ void ListGroup::SetStatus()
     m_Highlights.clear();
 
     if ( m_GotFocus )
-        snprintf(buff, 50, "[%s %i] -", g_LGTypeNames[m_Type], m_ListGroupID);
+        snprintf(buff, 50, "[%s %i] - ", g_LGTypeNames[m_Type], m_ListGroupID);
     else
-        snprintf(buff, 50, " %s %i  -", g_LGTypeNames[m_Type], m_ListGroupID);
+        snprintf(buff, 50, " %s %i  - ", g_LGTypeNames[m_Type], m_ListGroupID);
 
     InitStatus();
     m_Status += buff;
 
-    m_Status += " Midi: ";
+    pos = m_Status.size();
+    if ( m_Running )
+        m_Status += "Running";
+    else
+        m_Status += "Stopped";
+    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+
+    m_Status += " - Midi: ";
     pos = m_Status.size();
     snprintf(buff, 50, "%02i", m_MidiChannel + 1);
     m_Status += buff;
@@ -228,6 +236,12 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_up:
         switch ( m_ListGroupMenuFocus )
         {
+        case lgp_run_stop:
+            if ( m_Running )
+                Stop();
+            else
+                Run(g_State.SequencerQueueID());
+            break;
         case lgp_midi_channel:
             if ( m_MidiChannel + 1 < 16 )
                 m_MidiChannel += 1;
@@ -249,6 +263,12 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_down:
         switch ( m_ListGroupMenuFocus )
         {
+        case lgp_run_stop:
+            if ( m_Running )
+                Stop();
+            else
+                Run(g_State.SequencerQueueID());
+            break;
         case lgp_midi_channel:
             if ( m_MidiChannel - 1 >= 0 )
                 m_MidiChannel -= 1;
@@ -276,6 +296,27 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
+void ListGroup::Run(int queueId)
+{
+#if defined(MA_BLUE)
+   // MA_BLUE Todo: Do something here to work out a sensible start beat.
+#else
+    chrono::microseconds t_now = g_Link.clock().micros();
+    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+    double beat = timeline.beatAtTime(t_now, m_Quantum);
+    double phase = timeline.phaseAtTime(t_now, m_Quantum);
+    m_Beat = beat - phase + m_Quantum - 1;
+#endif
+
+    m_Running = true;
+    Step(queueId);
+}
+
+void ListGroup::Stop()
+{
+    m_Running = false;
+}
+
 // Static callback routing lookup.
 
 bool ListGroup::Step(int listGroupID, int queueId)
@@ -287,8 +328,13 @@ bool ListGroup::Step(int listGroupID, int queueId)
     return true;
 }
 
-void ListGroup::Step(int queueId)
+// Instance callback, called from static callback.
+
+bool ListGroup::Step(int queueId)
 {
+    if ( !m_Running )
+        return false; // Break the cycle.
+
     // In the main loop, this is where we update progress indicators.
     // With the ItemMenu deferred drawing mechanism this item
     // is placed on the redraw queue but nothing is actually displayed until
@@ -306,7 +352,7 @@ void ListGroup::Step(int queueId)
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
-//->    g_State.Step(g_PatternStore.StepValueMultiplier());
+//    g_State.Step(g_PatternStore.StepValueMultiplier());
 //    m_LastUsedStepValue = m_CurrentStepValue;
     double stepValueMultiplier = 1.0;
     double beatInc = 4.0 * stepValueMultiplier / m_CurrentStepValue;
@@ -317,13 +363,12 @@ void ListGroup::Step(int queueId)
 
     // Get time of next step from Link.
 
-
     double nextBeatStrict = m_Beat;    // This is absolute beat value since the clock started,
 
 //->    double nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
     m_NextBeatSwung = nextBeatStrict;
 
-#ifdef MA_BLUE
+#if defined(MA_BLUE)
    // MA_BLUE Todo: Convert beat (phase) to schedule time
 //   chrono::microseconds t_next_usec(llround(nextBeat * 60000000/120));
 
@@ -705,12 +750,13 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
 
 }
 
-void StepListGroup::Step(int queueId)
+bool StepListGroup::Step(int queueId)
 {
 //    uint64_t queueTimeUsec = 0;
 //    double nextBeatSwung;
 
-    ListGroup::Step(queueId);
+    if ( !ListGroup::Step(queueId) )
+        return false;
 
     Cluster nextCluster;
     TrigRepeater repeater;
@@ -726,7 +772,7 @@ void StepListGroup::Step(int queueId)
     }
 
     if ( nextCluster.Empty() )
-       return;
+       return true;
 
     /*
          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
@@ -787,6 +833,15 @@ void StepListGroup::Step(int queueId)
        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
 
+    return true;
+}
+
+void StepListGroup::Run(int queueId)
+{
+    m_Pos = 0;
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        it->ResetPosition();
+    ListGroup::Run(queueId);
 }
 
 //
@@ -825,9 +880,10 @@ void RTListGroup::RemoveListsFromMenu()
 }
 
 
-void RTListGroup::Step(int queueId)
+bool RTListGroup::Step(int queueId)
 {
-    ListGroup::Step(queueId);
+    if ( !ListGroup::Step(queueId) )
+        return false;
 }
 
 

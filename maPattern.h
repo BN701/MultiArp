@@ -186,6 +186,10 @@ struct Pattern : public ItemMenu
     void ReplaceList(StepList & noteList);
     void NewListGroup(ListGroup::list_group_type type, int queueID);
     void CopyCurrentListGroup(int queueId);
+    void RunCurrentListGroup(int queueId);
+    void StopCurrentListGroup();
+    void RunAllListGroups(int queueId);
+    void StopAllListGroups();
     void DeleteCurrentListGroup();
 
     void DeleteCurrentList();

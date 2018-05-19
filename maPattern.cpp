@@ -1141,7 +1141,8 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
     pNewGroup->SetVisible(m_Visible);
     m_MenuList.Add(pNewGroup);
 
-    pNewGroup->Step(queueId);
+//    pNewGroup->SetQueueID(queueId);
+//    pNewGroup->Step(queueId);
 }
 
 void Pattern::CopyCurrentListGroup(int queueId)
@@ -1179,7 +1180,7 @@ void Pattern::CopyCurrentListGroup(int queueId)
 
     m_MenuList.Select(pNewGroup->MenuPos());
 
-    pNewGroup->Step(queueId);
+//    pNewGroup->Step(queueId);
 
     SetRedraw();
 }
@@ -1197,6 +1198,40 @@ void Pattern::DeleteCurrentListGroup()
         (*it)->SetItemID((*it)->ItemID() - 1);
 
     delete pGroup;
+    SetRedraw();
+}
+
+void Pattern::RunCurrentListGroup(int queueId)
+{
+    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
+    if ( pGroup == NULL )
+        return;
+
+    pGroup->Run(queueId);
+    pGroup->SetRedraw();
+}
+
+void Pattern::RunAllListGroups(int queueId)
+{
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        (*it)->Run(queueId);
+    SetRedraw();
+}
+
+void Pattern::StopCurrentListGroup()
+{
+    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
+    if ( pGroup == NULL )
+        return;
+
+    pGroup->Stop();
+    pGroup->SetRedraw();
+}
+
+void Pattern::StopAllListGroups()
+{
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        (*it)->Stop();
     SetRedraw();
 }
 

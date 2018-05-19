@@ -1286,3 +1286,47 @@ string PatternStore::SetNewPatternOrJump( int val )
 #endif
     }
 }
+
+void PatternStore::SetPlayPos( std::vector<int>::size_type p )
+{
+    if ( p >= 0 && p < m_Patterns.size() )
+    {
+        m_Patterns[m_PosPlay].StopAllListGroups();
+        m_PosPlay = p;
+        m_Patterns[m_PosPlay].RunAllListGroups();
+        if ( m_EditPosFollowsPlay /*&& m_PatternChainMode == PC_MODE_NONE*/ )
+            m_PosEdit = m_PosPlay;
+        m_PatternChanged = true; // Cleared again at the start of Step() ..
+    }
+
+    if ( m_ResetOnPatternChange )
+        m_Patterns.at(m_PosPlay).ResetPosition();
+
+}
+
+void PatternStore::SetEditPos( std::vector<int>::size_type p )
+{
+    if ( p >= 0 && p < m_Patterns.size() )
+    {
+        m_Patterns[m_PosEdit].SetVisible(false);
+        m_PosEdit = p;
+        m_EditPosFollowsPlay = false;
+        SetRedraw();
+        m_Patterns[m_PosEdit].SetVisible(true);
+        m_Patterns[m_PosEdit].SetRedraw();
+    }
+}
+
+bool PatternStore::NewPatternPending()
+{
+    if ( m_NewPatternPending )
+    {
+        SetPlayPos(m_NewPattern);
+        m_NewPatternPending = false;
+        SetRedraw();
+        return true;
+    }
+    else
+        return false;
+}
+

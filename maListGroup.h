@@ -53,11 +53,16 @@ class ListGroup : public ItemMenu
 
         static bool Step(int ListGroupID, int queueId);
 
-        virtual void Step(int queueId);
+//        void SetQueueID(int queueID) { m_QueueID = queueID; }
+        virtual bool Step(int queueId);
 
         virtual void AddToMenuList(MenuList & m) = 0;
         virtual void InsertListsIntoMenu(menu_list_cursor_t before) = 0;
         virtual void RemoveListsFromMenu() = 0;
+
+        virtual void Run(int queueId);
+
+        void Stop();
 
 //        void NewListGroup();
 
@@ -67,13 +72,14 @@ class ListGroup : public ItemMenu
 
         enum listgroup_params_menu_focus_t
         {
+            lgp_run_stop,
             lgp_midi_channel,
             lgp_step_value,
             lgp_quantum,
             num_listgroup_params_menu_focus_modes
         };
 
-        listgroup_params_menu_focus_t m_ListGroupMenuFocus = lgp_midi_channel;
+        listgroup_params_menu_focus_t m_ListGroupMenuFocus = lgp_run_stop;
 
         static int m_ListGroupCounter;
         static std::map<int, ListGroup*> m_ListGroupsLookup;
@@ -104,6 +110,8 @@ class ListGroup : public ItemMenu
         double m_NextBeatSwung;
         double m_Tempo;
 
+        bool m_Running = false;
+//        int m_QueueID = -1;
 
 };
 
@@ -134,13 +142,14 @@ class StepListGroup : public ListGroup
         void CopyList(StepList * pItem, MenuList & menu);
         void DeleteList(StepList * pItem, MenuList & menu);
 
-        virtual void Step(int queueId);
         void StepTheLists( Cluster & cluster,
                         TrigRepeater & repeater,
                         double & stepValueMultiplier,
                         double phase,
                         double stepValue,
                         double globalBeat );
+        virtual bool Step(int queueId);
+        virtual void Run(int queueId);
 
         virtual void AddToMenuList(MenuList & m);
         virtual void InsertListsIntoMenu(menu_list_cursor_t before);
@@ -159,7 +168,7 @@ class RTListGroup : public ListGroup
         RTListGroup(Pattern & p);
         RTListGroup(RTListGroup * g);
 
-        virtual void Step(int queueId);
+        virtual bool Step(int queueId);
         virtual void AddToMenuList(MenuList & m);
         virtual void InsertListsIntoMenu(menu_list_cursor_t before);
         virtual void RemoveListsFromMenu();

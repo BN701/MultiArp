@@ -105,18 +105,7 @@ struct PatternStore : public ItemMenu
         SetRedraw();
     }
 
-    bool NewPatternPending()
-    {
-        if ( m_NewPatternPending )
-        {
-            SetPlayPos(m_NewPattern);
-            m_NewPatternPending = false;
-            SetRedraw();
-            return true;
-        }
-        else
-            return false;
-    }
+    bool NewPatternPending();
 
     void SetEditFocusFollowsPlay(bool bVal)
     {
@@ -304,34 +293,9 @@ struct PatternStore : public ItemMenu
         return result;
     }
 
-    void SetPlayPos( std::vector<int>::size_type p )
-    {
-        if ( p >= 0 && p < m_Patterns.size() )
-        {
-            m_PosPlay = p;
-            if ( m_EditPosFollowsPlay /*&& m_PatternChainMode == PC_MODE_NONE*/ )
-                m_PosEdit = m_PosPlay;
-            m_PatternChanged = true; // Cleared again at the start of Step() ..
-        }
+    void SetPlayPos( std::vector<int>::size_type p );
 
-        if ( m_ResetOnPatternChange )
-            m_Patterns.at(m_PosPlay).ResetPosition();
-
-    }
-
-    void SetEditPos( std::vector<int>::size_type p )
-    {
-        if ( p >= 0 && p < m_Patterns.size() )
-        {
-            m_Patterns[m_PosEdit].SetVisible(false);
-            m_PosEdit = p;
-            m_EditPosFollowsPlay = false;
-            SetRedraw();
-            m_Patterns[m_PosEdit].SetVisible(true);
-            m_Patterns[m_PosEdit].SetRedraw();
-        }
-    }
-
+    void SetEditPos( std::vector<int>::size_type p );
     void UpEditPos() { SetEditPos(m_PosEdit + 1); }
     void DownEditPos() { SetEditPos(m_PosEdit - 1); }
 

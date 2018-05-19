@@ -81,21 +81,21 @@ class State
 
     private:
 
-        double m_CurrentStepValue;
+        double m_CurrentStepValue = 16;
         double m_LastUsedStepValue;
-        double m_Quantum;
-        double m_Beat;
-        double m_Phase;
+        double m_Quantum = 4;
+        double m_Beat = -4/m_CurrentStepValue;
+        double m_Phase = 0;
 
-        bool m_NewRunStatePending;
-        bool m_NewRunState;
-        bool m_NewQuantumPending;
-        int m_NewQuantum;
+        bool m_NewRunStatePending = false;
+        bool m_NewRunState = false;
+        bool m_NewQuantumPending = false;
+        int m_NewQuantum = 0;
 
         bool m_RunState = false;
         bool m_RecState = false;
         int m_PatternReset;
-        int m_DeferStop;
+        int m_DeferStop = 0;
 
         int m_QueueID = 0;  // Somewhere to store this for everything else.
 

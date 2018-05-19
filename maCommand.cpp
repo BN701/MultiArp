@@ -1057,6 +1057,21 @@ bool do_command(string commandString, int directCommand)
 //            update_big_panel();
             break;
 
+        case C_GROUP_RUN:
+            g_PatternStore.CurrentEditPattern().RunCurrentListGroup(g_State.SequencerQueueID());
+            break;
+        case C_GROUP_STOP:
+            g_PatternStore.CurrentEditPattern().StopCurrentListGroup();
+            break;
+        case C_PATTERN_RUN_ALL:
+            g_PatternStore.CurrentEditPattern().RunAllListGroups(g_State.SequencerQueueID());
+            break;
+        case C_PATTERN_STOP_ALL:
+            g_PatternStore.CurrentEditPattern().StopAllListGroups();
+            break;
+        case C_GROUP_RS_TOGGLE:
+            break;
+
         case C_LIST:
             if ( tokens.size() < 2 )
             {

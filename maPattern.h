@@ -184,11 +184,11 @@ struct Pattern : public ItemMenu
     void SetFieldsFromString(std::string s);
 
     void ReplaceList(StepList & noteList);
-    void NewListGroup(ListGroup::list_group_type type, int queueID);
-    void CopyCurrentListGroup(int queueId);
-    void RunCurrentListGroup(int queueId);
+    void NewListGroup(ListGroup::list_group_type type);
+    void CopyCurrentListGroup();
+    void RunCurrentListGroup();
     void StopCurrentListGroup();
-    void RunAllListGroups(int queueId);
+    void RunAllListGroups();
     void StopAllListGroups();
     void DeleteCurrentListGroup();
 

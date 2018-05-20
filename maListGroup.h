@@ -42,7 +42,7 @@ class ListGroup : public ItemMenu
             lgtype_realtime
         };
 
-        ListGroup(Pattern & p, list_group_type type);
+        ListGroup(Pattern * p, list_group_type type);
         ListGroup(ListGroup & lg);
         ~ListGroup();
 
@@ -50,17 +50,17 @@ class ListGroup : public ItemMenu
         void ResetPosition();
         void SetStatus();
         bool HandleKey(BaseUI::key_command_t k);
+        void SetParent(Pattern * p) { m_Parent = p; }
 
-        static bool Step(int ListGroupID, int queueId);
+        static bool Step(int ListGroupID);
 
-//        void SetQueueID(int queueID) { m_QueueID = queueID; }
-        virtual bool Step(int queueId);
+        virtual bool Step();
 
         virtual void AddToMenuList(MenuList & m) = 0;
         virtual void InsertListsIntoMenu(menu_list_cursor_t before) = 0;
         virtual void RemoveListsFromMenu() = 0;
 
-        virtual void Run(int queueId);
+        virtual void Run();
 
         void Stop();
 
@@ -68,7 +68,7 @@ class ListGroup : public ItemMenu
 
     protected:
 
-        Pattern & m_Parent;
+        Pattern * m_Parent = NULL;
 
         enum listgroup_params_menu_focus_t
         {
@@ -111,7 +111,6 @@ class ListGroup : public ItemMenu
         double m_Tempo;
 
         bool m_Running = false;
-//        int m_QueueID = -1;
 
 };
 
@@ -133,7 +132,7 @@ class StepListGroup : public ListGroup
 
         std::vector<update_pair> m_DeferredUpdates;
 
-        StepListGroup(Pattern & p);
+        StepListGroup(Pattern * p);
         StepListGroup(StepListGroup * g);
 
         StepList * NewStepList();
@@ -148,8 +147,8 @@ class StepListGroup : public ListGroup
                         double phase,
                         double stepValue,
                         double globalBeat );
-        virtual bool Step(int queueId);
-        virtual void Run(int queueId);
+        virtual bool Step();
+        virtual void Run();
 
         virtual void AddToMenuList(MenuList & m);
         virtual void InsertListsIntoMenu(menu_list_cursor_t before);
@@ -165,10 +164,10 @@ class RTListGroup : public ListGroup
     public:
         std::vector<RealTimeList> m_RealTimeSet;
 
-        RTListGroup(Pattern & p);
+        RTListGroup(Pattern * p);
         RTListGroup(RTListGroup * g);
 
-        virtual bool Step(int queueId);
+        virtual bool Step();
         virtual void AddToMenuList(MenuList & m);
         virtual void InsertListsIntoMenu(menu_list_cursor_t before);
         virtual void RemoveListsFromMenu();

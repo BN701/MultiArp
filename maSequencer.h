@@ -49,8 +49,8 @@ class Sequencer
         }
 
 
-        bool ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t len, uint8_t midiChannel = 255);
-        bool ScheduleNextCallBack(int queueId);
+        bool ScheduleNote(uint8_t note, uint8_t vel, uint16_t len, uint8_t midiChannel = 255);
+        bool ScheduleNextCallBack();
 
         snd_seq_event_t * GetEvent(uint64_t);
         void PopEvent();

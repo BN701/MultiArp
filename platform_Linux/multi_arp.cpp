@@ -267,14 +267,15 @@ int main(int argc, char *argv[])
 
     g_Link.enable(true); // Start peer-to-peer interactions.
 
+    // The next bit is a little convoluted. The sequencer class
+    // has the potential to work with multiple queues, but I haven't
+    // investigated the benefits of this and have been getting by
+    // perfectly well so far with just the one. So create that here,
+    // store its ID in the sequencer class and any subsequent scheduling
+    // calls will just use the queue.
 
     int queueIndex = g_Sequencer.CreateQueue();
-    g_State.SetSequencerQueueID(g_Sequencer.Queue(queueIndex).GetQueueId());
-
-//    update_pattern_status_panel();
-
-    // Start the queue.
-
+    g_Sequencer.SetQueueId(queueIndex);
     g_Sequencer.Queue(queueIndex).Start();
 
     set_top_line();
@@ -300,7 +301,7 @@ int main(int argc, char *argv[])
 
     // Queue first events
 
-    queue_next_step(g_State.SequencerQueueID(), NULL);
+    queue_next_step(NULL);
 
     // Polling loop
 
@@ -333,7 +334,7 @@ int main(int argc, char *argv[])
             for ( int i = 2; i < npfd + 2; i++ )
             {
                 if ( pfd[i].revents > 0 )
-                    read_midi_ALSA(g_State.SequencerQueueID());
+                    read_midi_ALSA();
             }
 
             update_item_menus();

@@ -136,7 +136,7 @@ void do_phase0_updates()
 
 #if 1
 
-void queue_next_step(int queueId, snd_seq_event_t *ev)
+void queue_next_step(snd_seq_event_t *ev)
 {
     // We're called when ALSA has played the events we scheduled last time we were here,
     // so updating position info at this point should reflect what we are hearing.
@@ -148,7 +148,7 @@ void queue_next_step(int queueId, snd_seq_event_t *ev)
     if ( ev != NULL && ev->type == SND_SEQ_EVENT_ECHO )
     {
         int listGroupID = ev->data.raw32.d[0];
-        if ( ListGroup::Step(listGroupID, queueId) )
+        if ( ListGroup::Step(listGroupID) )
             return;
     }
 
@@ -221,7 +221,7 @@ void queue_next_step(int queueId, snd_seq_event_t *ev)
     // TODO: We used to do this after scheduling all midi events. Have there
     //       been any noticable effects of doing it before?
 
-    g_Sequencer.ScheduleNextCallBack(queueId);
+    g_Sequencer.ScheduleNextCallBack();
 
     // Step the Pattern Store
 
@@ -299,7 +299,7 @@ void queue_next_step(int queueId, snd_seq_event_t *ev)
        {
            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-           g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
+           g_Sequencer.ScheduleNote(note, noteVelocity, duration);
        }
        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
@@ -310,7 +310,7 @@ void queue_next_step(int queueId, snd_seq_event_t *ev)
 
 // Original, global version.
 
-void queue_next_step(int queueId)
+void queue_next_step()
 {
    // We're called when ALSA has played the events we scheduled last time we were here,
    // so updating position info at this point should reflect what we are hearing.
@@ -386,7 +386,7 @@ void queue_next_step(int queueId)
    // TODO: We used to do this after scheduling all midi events. Have there
    //       been any noticable effects of doing it before?
 
-   g_Sequencer.ScheduleNextCallBack(queueId);
+   g_Sequencer.ScheduleNextCallBack();
 
    // Step the Pattern Store
 
@@ -464,7 +464,7 @@ void queue_next_step(int queueId)
        {
            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-           g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration);
+           g_Sequencer.ScheduleNote(note, noteVelocity, duration);
        }
        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
    }
@@ -473,7 +473,7 @@ void queue_next_step(int queueId)
 
 #endif
 
-void handle_midi_event(snd_seq_event_t *ev, int queueId)
+void handle_midi_event(snd_seq_event_t *ev)
 {
     static int otherEvents = 0; // Just for interest.
 
@@ -483,7 +483,7 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
             // This is our 'tick', so schedule everything
             // that should happen next, including the
             // next tick.
-            queue_next_step(queueId, ev);
+            queue_next_step(ev);
             break;
 
         case SND_SEQ_EVENT_NOTEON:
@@ -522,7 +522,7 @@ void handle_midi_event(snd_seq_event_t *ev, int queueId)
 }
 
 #if !defined(MA_BLUE)
-void read_midi_ALSA(int queueId)
+void read_midi_ALSA()
 {
 //    static int otherEvents = 0; // Just for interest.
 
@@ -534,7 +534,7 @@ void read_midi_ALSA(int queueId)
         {
             // I'm not sure why ev might be NULL, but we've had at least one instance
             // since beginning work on callback routing to multiple list groups.
-            handle_midi_event(ev, queueId);
+            handle_midi_event(ev);
             snd_seq_free_event(ev);
         }
     }

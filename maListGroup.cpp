@@ -69,11 +69,12 @@ extern State g_State;
 int ListGroup::m_ListGroupCounter = 0;
 map<int, ListGroup*> ListGroup::m_ListGroupsLookup;
 
-ListGroup::ListGroup(Pattern & p, list_group_type type):
+ListGroup::ListGroup(Pattern * p, list_group_type type):
     m_Parent(p),
     m_Type(type)
 {
-    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
+    m_ListGroupsLookup[m_ListGroupID] = this;
+//    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
 
 ListGroup::ListGroup(ListGroup & lg):
@@ -82,10 +83,26 @@ ListGroup::ListGroup(ListGroup & lg):
     m_Type(lg.m_Type),
     m_MidiChannel(lg.m_MidiChannel),
     m_CurrentStepValue(lg.m_CurrentStepValue),
-    m_Quantum(lg.m_Quantum)
-//    m_QueueID(lg.m_QueueID)
+    m_Quantum(lg.m_Quantum),
+    m_Running(lg.m_Running)
 {
-    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
+    // If parent is being reallocated, old parent pointer is invalid!
+
+    // Todo: I don't think we can find out the new parent from here ...
+    // Do we have to find an alternative to parent pointers?
+
+    // We won't know if this copy is part of a vector reallocation or a genuine copy.
+    // We have to assume the former and swap IDs around so lookups will seemlessly
+    // go to the new copy of the existing list before the old one is deleted.
+    // If a genuine copy is taking place, we must be aware that the original
+    // item must be used as new.
+
+    int temp = m_ListGroupID;
+    m_ListGroupID = lg.m_ListGroupID;
+    lg.m_ListGroupID = temp;
+    m_ListGroupsLookup[m_ListGroupID] = this;
+    m_ListGroupsLookup[lg.m_ListGroupID] = &lg;
+//    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
 
 ListGroup::~ListGroup()
@@ -240,7 +257,7 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
             if ( m_Running )
                 Stop();
             else
-                Run(g_State.SequencerQueueID());
+                Run();
             break;
         case lgp_midi_channel:
             if ( m_MidiChannel + 1 < 16 )
@@ -267,7 +284,7 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
             if ( m_Running )
                 Stop();
             else
-                Run(g_State.SequencerQueueID());
+                Run();
             break;
         case lgp_midi_channel:
             if ( m_MidiChannel - 1 >= 0 )
@@ -296,7 +313,7 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
-void ListGroup::Run(int queueId)
+void ListGroup::Run()
 {
 #if defined(MA_BLUE)
    // MA_BLUE Todo: Do something here to work out a sensible start beat.
@@ -309,7 +326,7 @@ void ListGroup::Run(int queueId)
 #endif
 
     m_Running = true;
-    Step(queueId);
+    Step();
 }
 
 void ListGroup::Stop()
@@ -319,18 +336,19 @@ void ListGroup::Stop()
 
 // Static callback routing lookup.
 
-bool ListGroup::Step(int listGroupID, int queueId)
+bool ListGroup::Step(int listGroupID)
 {
     auto pos = m_ListGroupsLookup.find(listGroupID);
     if ( pos == m_ListGroupsLookup.end() )
         return false;
-    pos->second->Step(queueId);
+    pos->second->Step();
+//    m_ListGroupsLookup[listGroupID]->Step();
     return true;
 }
 
 // Instance callback, called from static callback.
 
-bool ListGroup::Step(int queueId)
+bool ListGroup::Step()
 {
     if ( !m_Running )
         return false; // Break the cycle.
@@ -435,7 +453,7 @@ bool ListGroup::Step(int queueId)
     // TODO: We used to do this after scheduling all midi events. Have there
     //       been any noticable effects of doing it before?
 
-    g_Sequencer.ScheduleNextCallBack(queueId, m_ListGroupID);
+    g_Sequencer.ScheduleNextCallBack(m_ListGroupID);
 }
 
 //
@@ -443,7 +461,7 @@ bool ListGroup::Step(int queueId)
 //
 ////////////////////////////////////////////////////////////////////
 
-StepListGroup::StepListGroup(Pattern & p):
+StepListGroup::StepListGroup(Pattern * p):
     ListGroup(p, lgtype_step)
 {
     m_DisplayObjectType = BaseUI::dot_step_list_group;
@@ -453,7 +471,8 @@ StepListGroup::StepListGroup(Pattern & p):
 StepListGroup::StepListGroup(StepListGroup * g):
     ListGroup(*g)
 {
-    m_StepListSet = dynamic_cast<StepListGroup*>(g)->m_StepListSet;
+//    m_StepListSet = dynamic_cast<StepListGroup*>(g)->m_StepListSet;
+    m_StepListSet = g->m_StepListSet;
 }
 
 StepList * StepListGroup::NewStepList()
@@ -750,17 +769,17 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
 
 }
 
-bool StepListGroup::Step(int queueId)
+bool StepListGroup::Step()
 {
 //    uint64_t queueTimeUsec = 0;
 //    double nextBeatSwung;
 
-    if ( !ListGroup::Step(queueId) )
+    if ( !ListGroup::Step() )
         return false;
 
     Cluster nextCluster;
     TrigRepeater repeater;
-    TranslateTable & translator = m_Parent.m_TranslateTable;
+    TranslateTable & translator = m_Parent->m_TranslateTable;
     double stepValueMultiplier; // Todo: work out how to use this from here (it's filled in
                                 // from the TrigList via StepTheLists() ...
 
@@ -785,7 +804,7 @@ bool StepListGroup::Step(int queueId)
     */
 
     double stepLengthMilliSecs = 240000.0/(m_Tempo * m_CurrentStepValue);
-    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + m_Parent.m_Gate));
+    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + m_Parent->m_Gate));
 
     repeater.Init(m_Tempo, stepLengthMilliSecs);
 
@@ -811,7 +830,7 @@ bool StepListGroup::Step(int queueId)
        if ( note->m_NoteVelocity > 0 )
            noteVelocity = note->m_NoteVelocity;
        else
-           noteVelocity = m_Parent.m_Velocity;
+           noteVelocity = m_Parent->m_Velocity;
 
        double noteLength = note->Length();
        if ( lround(noteLength * 100) > 0 )
@@ -828,7 +847,7 @@ bool StepListGroup::Step(int queueId)
        {
            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-           g_Sequencer.ScheduleNote(queueId, note, noteVelocity, duration, m_MidiChannel);
+           g_Sequencer.ScheduleNote(note, noteVelocity, duration, m_MidiChannel);
        }
        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
@@ -836,12 +855,12 @@ bool StepListGroup::Step(int queueId)
     return true;
 }
 
-void StepListGroup::Run(int queueId)
+void StepListGroup::Run()
 {
     m_Pos = 0;
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         it->ResetPosition();
-    ListGroup::Run(queueId);
+    ListGroup::Run();
 }
 
 //
@@ -849,7 +868,7 @@ void StepListGroup::Run(int queueId)
 //
 ////////////////////////////////////////////////////////////////////
 
-RTListGroup::RTListGroup(Pattern & p):
+RTListGroup::RTListGroup(Pattern * p):
     ListGroup(p, lgtype_realtime)
 {
     m_DisplayObjectType = BaseUI::dot_rt_list_group;
@@ -880,9 +899,9 @@ void RTListGroup::RemoveListsFromMenu()
 }
 
 
-bool RTListGroup::Step(int queueId)
+bool RTListGroup::Step()
 {
-    if ( !ListGroup::Step(queueId) )
+    if ( !ListGroup::Step() )
         return false;
 }
 

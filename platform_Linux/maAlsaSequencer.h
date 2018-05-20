@@ -50,8 +50,8 @@ public:
         return m_NextScheduleTime.tv_nsec;
     }
 
-    bool ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len, uint8_t midiChannel = 255);
-    bool ScheduleNextCallBack(int queueId, int raw0 = -1, int raw1 = -1, int raw2 = -1);
+    bool ScheduleNote(unsigned char note, unsigned char vel, unsigned int len, uint8_t midiChannel = 255);
+    bool ScheduleNextCallBack(int raw0 = -1, int raw1 = -1, int raw2 = -1);
 
     snd_seq_t * Handle()
     {
@@ -73,6 +73,11 @@ public:
     AlsaSequencerQueue & Queue(int queueIndex)
     {
         return m_QueueList.at(queueIndex);
+    }
+
+    void SetQueueId(int queueIndex)
+    {
+        m_QueueId = m_QueueList.at(queueIndex).GetQueueId();
     }
 
     int GetFileDescriptorCount()
@@ -110,6 +115,8 @@ protected:
     snd_seq_real_time_t m_NextScheduleTime;
 
     unsigned char m_MidiChannel;
+
+    int m_QueueId = -1;
     int m_PortInId;
     int m_PortOutId;
 

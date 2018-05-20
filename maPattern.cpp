@@ -94,6 +94,7 @@ Pattern::Pattern(const Pattern & p):
         if ( lgNew != NULL )
         {
             m_ListGroups.push_back(lgNew);
+            lgNew->SetParent(this);
             lgNew->SetVisible(m_Visible);
             lgNew->AddToMenuList(m_MenuList);
         }
@@ -1120,7 +1121,7 @@ void Pattern::StartRealTimeEcho(vector<string>::iterator token, vector<string>::
 //        rtList->BeginEcho(inc, target, interval);
 }
 
-void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
+void Pattern::NewListGroup(ListGroup::list_group_type type)
 {
 //    m_StepListSet.emplace_back();
 //    m_PosEdit = m_StepListSet.size() - 1;
@@ -1128,10 +1129,10 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
     switch (type)
     {
         case ListGroup::lgtype_step:
-            m_ListGroups.push_back(new StepListGroup(*this));
+            m_ListGroups.push_back(new StepListGroup(this));
             break;
         case ListGroup::lgtype_realtime:
-            m_ListGroups.push_back(new RTListGroup(*this));
+            m_ListGroups.push_back(new RTListGroup(this));
             break;
     }
 
@@ -1141,11 +1142,9 @@ void Pattern::NewListGroup(ListGroup::list_group_type type, int queueId)
     pNewGroup->SetVisible(m_Visible);
     m_MenuList.Add(pNewGroup);
 
-//    pNewGroup->SetQueueID(queueId);
-//    pNewGroup->Step(queueId);
 }
 
-void Pattern::CopyCurrentListGroup(int queueId)
+void Pattern::CopyCurrentListGroup()
 {
     ListGroup * pNewGroup = NULL;
     ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
@@ -1180,8 +1179,6 @@ void Pattern::CopyCurrentListGroup(int queueId)
 
     m_MenuList.Select(pNewGroup->MenuPos());
 
-//    pNewGroup->Step(queueId);
-
     SetRedraw();
 }
 
@@ -1201,20 +1198,20 @@ void Pattern::DeleteCurrentListGroup()
     SetRedraw();
 }
 
-void Pattern::RunCurrentListGroup(int queueId)
+void Pattern::RunCurrentListGroup()
 {
     ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
     if ( pGroup == NULL )
         return;
 
-    pGroup->Run(queueId);
+    pGroup->Run();
     pGroup->SetRedraw();
 }
 
-void Pattern::RunAllListGroups(int queueId)
+void Pattern::RunAllListGroups()
 {
     for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
-        (*it)->Run(queueId);
+        (*it)->Run();
     SetRedraw();
 }
 

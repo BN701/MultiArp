@@ -97,7 +97,7 @@ bool Sequencer::ScheduleEvent(snd_seq_event_t & ev)
     return true;
 }
 
-bool Sequencer::ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t len, uint8_t midiChannel)
+bool Sequencer::ScheduleNote(uint8_t note, uint8_t vel, uint16_t len, uint8_t midiChannel)
 {
     snd_seq_event_t ev = {0};
 
@@ -130,7 +130,7 @@ bool Sequencer::ScheduleNote(int queueId, uint8_t note, uint8_t vel, uint16_t le
     return ScheduleEvent(ev);
 }
 
-bool Sequencer::ScheduleNextCallBack(int queueId)
+bool Sequencer::ScheduleNextCallBack()
 {
     snd_seq_event_t ev = {0};
     ev.type = SND_SEQ_EVENT_ECHO;

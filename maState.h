@@ -74,9 +74,6 @@ class State
         int PatternReset() { return m_PatternReset; }
         void SetPatternReset(int val) { m_PatternReset = val; }
 
-        void SetSequencerQueueID( int val ) { m_QueueID = val; }
-        int SequencerQueueID() { return m_QueueID; }
-
     protected:
 
     private:
@@ -96,8 +93,6 @@ class State
         bool m_RecState = false;
         int m_PatternReset;
         int m_DeferStop = 0;
-
-        int m_QueueID = 0;  // Somewhere to store this for everything else.
 
 #if defined(MA_BLUE)
     public:

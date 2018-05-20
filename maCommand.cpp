@@ -1040,13 +1040,13 @@ bool do_command(string commandString, int directCommand)
             switch ( command )
             {
                 case C_NEW_STEP_GROUP:
-                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_step, g_State.SequencerQueueID());
+                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_step);
                     break;
                 case C_NEW_RT_GROUP:
-                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime, g_State.SequencerQueueID());
+                    g_PatternStore.CurrentEditPattern().NewListGroup(ListGroup::lgtype_realtime);
                     break;
                 case C_COPY_GROUP:
-                    g_PatternStore.CurrentEditPattern().CopyCurrentListGroup(g_State.SequencerQueueID());
+                    g_PatternStore.CurrentEditPattern().CopyCurrentListGroup();
                     break;
                 case C_DELETE_GROUP:
                     g_PatternStore.CurrentEditPattern().DeleteCurrentListGroup();
@@ -1058,13 +1058,13 @@ bool do_command(string commandString, int directCommand)
             break;
 
         case C_GROUP_RUN:
-            g_PatternStore.CurrentEditPattern().RunCurrentListGroup(g_State.SequencerQueueID());
+            g_PatternStore.CurrentEditPattern().RunCurrentListGroup();
             break;
         case C_GROUP_STOP:
             g_PatternStore.CurrentEditPattern().StopCurrentListGroup();
             break;
         case C_PATTERN_RUN_ALL:
-            g_PatternStore.CurrentEditPattern().RunAllListGroups(g_State.SequencerQueueID());
+            g_PatternStore.CurrentEditPattern().RunAllListGroups();
             break;
         case C_PATTERN_STOP_ALL:
             g_PatternStore.CurrentEditPattern().StopAllListGroups();

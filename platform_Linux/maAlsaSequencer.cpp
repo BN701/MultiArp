@@ -74,7 +74,7 @@ void AlsaSequencer::SetScheduleTime(uint64_t t)
     m_NextScheduleTime.tv_nsec = (t % 1000000) * 1000;
 }
 
-bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char vel, unsigned int len, uint8_t midiChannel)
+bool AlsaSequencer::ScheduleNote(unsigned char note, unsigned char vel, unsigned int len, uint8_t midiChannel)
 {
     snd_seq_event_t ev;
 
@@ -90,7 +90,7 @@ bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char 
 
     // Macro: schedules the event in MIDI tick mode
     // snd_seq_ev_schedule_tick(&ev, queue_id,  0, tick);
-    snd_seq_ev_schedule_real(&ev, queueId,  0, &m_NextScheduleTime);
+    snd_seq_ev_schedule_real(&ev, m_QueueId,  0, &m_NextScheduleTime);
 
     // Macro: sets the source port id number on the event record
     snd_seq_ev_set_source(&ev, m_PortOutId);
@@ -107,7 +107,7 @@ bool AlsaSequencer::ScheduleNote(int queueId, unsigned char note, unsigned char 
 }
 
 
-bool AlsaSequencer::ScheduleNextCallBack(int queueId, int raw0, int raw1, int raw2)
+bool AlsaSequencer::ScheduleNextCallBack(int raw0, int raw1, int raw2)
 {
     snd_seq_event_t ev;
 
@@ -119,7 +119,7 @@ bool AlsaSequencer::ScheduleNextCallBack(int queueId, int raw0, int raw1, int ra
     ev.data.raw32.d[0] = raw0;
     ev.data.raw32.d[1] = raw1;
     ev.data.raw32.d[2] = raw2;
-    snd_seq_ev_schedule_real(&ev, queueId,  0, &m_NextScheduleTime);
+    snd_seq_ev_schedule_real(&ev, m_QueueId,  0, &m_NextScheduleTime);
     snd_seq_ev_set_dest(&ev, snd_seq_client_id(m_SeqHandle), m_PortInId);
     snd_seq_event_output_direct(m_SeqHandle, &ev);
 

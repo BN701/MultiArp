@@ -47,13 +47,15 @@ using namespace std;
 //
 //StepList StepList::EmptyList;
 //RealTimeList RealTimeList::EmptyList;
-//Pattern Pattern::EmptyPattern;
+
+PatternStore g_PatternStore;
+Pattern Pattern::EmptyPattern;
 
 #if 1
 void PatternStore::SetStatus()
 {
     int pos = 0;
-    char buff[200];
+//    char buff[200];
 
     m_FieldPositions.clear();
     m_Highlights.clear();
@@ -360,7 +362,6 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 
     Pattern & p = m_Patterns.back();
 
-    p.SetVisible(true);
     p.SetShortLabel();
     p.SetLabel(label.c_str());
     p.SetReturnFocus(this);
@@ -370,7 +371,10 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 //    else
 //        return m_PosEdit = m_Patterns.size() - 1;
 
-    return m_PosEdit = m_Patterns.size() - 1;
+    unsigned pos = m_Patterns.size() - 1;
+    SetEditPos(pos);
+
+    return pos;
 
 }
 
@@ -1293,7 +1297,7 @@ void PatternStore::SetPlayPos( std::vector<int>::size_type p )
     {
         m_Patterns[m_PosPlay].StopAllListGroups();
         m_PosPlay = p;
-        m_Patterns[m_PosPlay].RunAllListGroups();
+        m_Patterns[m_PosPlay].RunAllListGroups(g_State.Beat());
         if ( m_EditPosFollowsPlay /*&& m_PatternChainMode == PC_MODE_NONE*/ )
             m_PosEdit = m_PosPlay;
         m_PatternChanged = true; // Cleared again at the start of Step() ..

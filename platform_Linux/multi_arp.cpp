@@ -52,8 +52,6 @@
 #include <thread>
 
 #include "maSequencer.h"
-Sequencer g_Sequencer;
-ListBuilder g_ListBuilder;
 
 #if defined(MA_BLUE_PC)
 // Direct midi IO with ALSA ...
@@ -74,11 +72,8 @@ ListBuilder g_ListBuilder;
 
 // Global Link instance.
 
-ableton::Link g_Link(120.);
+ableton::Link g_Link(120.0);
 std::chrono::microseconds g_LinkStartTime(-1);
-
-AlsaSequencer g_Sequencer;
-ListBuilder g_ListBuilder(&g_Link);
 
 #endif
 
@@ -86,14 +81,12 @@ using namespace std;
 
 // Global instances.
 
-PatternStore g_PatternStore;
-
 AnsiUI g_TextUI;
 #ifndef MA_BLUE
 CairoUI g_CairoUI(false);
 #endif
 
-State g_State;
+//State g_State;
 //PatternStore g_PatternStore;
 
 // Static instances of empty items
@@ -108,7 +101,6 @@ State g_State;
 
 StepList StepList::EmptyList;
 RealTimeList RealTimeList::EmptyList;
-Pattern Pattern::EmptyPattern;
 
 void sigterm_exit(int sig)
 {

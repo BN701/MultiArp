@@ -32,6 +32,7 @@
 
 #include "maListBuilder.h"  // Listbuilder is used for midi file import.
 #include "maPattern.h"
+#include "maState.h"
 #include "maUtility.h"
 
 using namespace std;
@@ -185,16 +186,18 @@ void Pattern::SetRedraw()
 {
     if ( m_Visible )
     {
-//        if ( m_MenuList.m_Items.empty() )
-//        {
-//            ItemMenu::SetRedraw();
-//            return;
-//        }
         ItemMenu::SetRedraw();
         for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
             if ( *it != this )
                 (*it)->SetRedraw();
     }
+}
+
+void Pattern::SetVisible(bool val)
+{
+    m_Visible = val;
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        (*it)->SetVisible(val);
 }
 
 void Pattern::ResetPosition()
@@ -1204,14 +1207,14 @@ void Pattern::RunCurrentListGroup()
     if ( pGroup == NULL )
         return;
 
-    pGroup->Run();
+    pGroup->Run(g_State.Beat());
     pGroup->SetRedraw();
 }
 
-void Pattern::RunAllListGroups()
+void Pattern::RunAllListGroups(double startBeat)
 {
     for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
-        (*it)->Run();
+        (*it)->Run(startBeat);
     SetRedraw();
 }
 
@@ -1379,7 +1382,7 @@ string & Centre(string & line, unsigned centre, unsigned width, int & offset)
 
 string Pattern::Display(int mode, vector<PosInfo2> & highlights, int centre, int width, int displayRows)
 {
-    int offset, length;
+//    int offset, length;
     int row = 1;
 
     string result;

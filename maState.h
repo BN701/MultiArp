@@ -68,6 +68,7 @@ class State
         void SetBeat(double val) { m_Beat = val; }
 
         bool PhaseIsZero();
+        bool LastStep();
         double Phase() { return m_Phase; }
         void SetPhase(double val) { m_Phase = val; }
 
@@ -110,5 +111,7 @@ class State
 #endif
 
 };
+
+extern State g_State;
 
 #endif // STATE_H

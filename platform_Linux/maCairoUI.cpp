@@ -1064,7 +1064,7 @@ dot_position_table_t g_CairoUI_DOT_Positions =
 
 bool CairoUI::GetDisplayInfo(int dot, MenuListDisplayInfo * & displayInfo)
 {
-
+    return false;
 }
 
 

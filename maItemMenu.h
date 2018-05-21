@@ -191,7 +191,7 @@ class ItemMenu
             }
         }
 
-        void SetVisible(bool val) { m_Visible = val; }
+        virtual void SetVisible(bool val) { m_Visible = val; }
         void SetMenuPos(menu_list_cursor_t pos) { m_PosInMenuList = pos; }
         menu_list_cursor_t MenuPos() { return m_PosInMenuList; }
 //        std::string m_TestString = "Set from ItemMenu class definition.";

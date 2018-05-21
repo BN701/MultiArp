@@ -103,4 +103,6 @@ class ListBuilder
     private:
 };
 
+extern ListBuilder g_ListBuilder;
+
 #endif // LISTBUILDER_H

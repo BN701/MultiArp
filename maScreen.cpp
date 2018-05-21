@@ -24,13 +24,11 @@
 #ifdef MA_BLUE
 #include <cstdio>
 #include "maSequencer.h"
-extern Sequencer g_Sequencer;
 #else
 
 #include "platform_Linux/maAlsaSequencer.h"
 #include "platform_Linux/maAlsaSequencerQueue.h"
 // Global ALSA Sequencer instance.
-extern AlsaSequencer g_Sequencer;
 
 #define LINK_PLATFORM_LINUX
 #include <ableton/Link.hpp>
@@ -48,11 +46,6 @@ extern ableton::Link g_Link;
 #include "maUtility.h"
 
 using namespace std;
-
-
-extern ListBuilder g_ListBuilder;
-extern PatternStore g_PatternStore;
-extern State g_State;
 
 extern AnsiUI g_TextUI;
 #ifndef MA_BLUE

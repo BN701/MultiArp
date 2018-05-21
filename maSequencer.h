@@ -128,4 +128,6 @@ class Sequencer
 //        bool m_InsertLast = true;
 };
 
+extern Sequencer g_Sequencer;
+
 #endif // MASEQUENCER_H

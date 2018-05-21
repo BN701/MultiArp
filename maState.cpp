@@ -20,7 +20,7 @@
 #include <cmath>
 #include "maState.h"
 
-extern State g_State;  // Global State instance.
+State g_State;  // Global State instance.
 
 State::State()
 {
@@ -90,6 +90,11 @@ bool State::NewQuantumPending()
 bool State::PhaseIsZero()
 {
     return lround(1000.0 * m_Phase) == 0;
+}
+
+bool State::LastStep()
+{
+    return lround(1000.0 * (m_Phase + 4/m_CurrentStepValue - m_Quantum)) == 0;
 }
 
 #if defined(MA_BLUE)

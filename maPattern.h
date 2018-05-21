@@ -121,6 +121,7 @@ struct Pattern : public ItemMenu
     void SetShortLabel(const char * label = NULL);
 
     virtual void SetRedraw();
+    virtual void SetVisible(bool val);
 
 //    void SetCursorPos( int p )
 //    {
@@ -188,7 +189,7 @@ struct Pattern : public ItemMenu
     void CopyCurrentListGroup();
     void RunCurrentListGroup();
     void StopCurrentListGroup();
-    void RunAllListGroups();
+    void RunAllListGroups(double startBeat);
     void StopAllListGroups();
     void DeleteCurrentListGroup();
 

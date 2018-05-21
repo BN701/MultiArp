@@ -23,6 +23,10 @@
 #include <cstdio>
 #include <cstring>
 
+//#if defined(MA_BLUE)
+Sequencer g_Sequencer;
+//#endif
+
 Sequencer::Sequencer()
 {
     //ctor

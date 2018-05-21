@@ -42,7 +42,6 @@ using namespace std;
 
 #include <math.h>
 #include "maSequencer.h"
-extern Sequencer g_Sequencer;
 
 #else
 
@@ -55,11 +54,10 @@ extern ableton::Link g_Link;
 extern chrono::microseconds g_LinkStartTime;
 
 #include "platform_Linux/maAlsaSequencer.h"
-extern AlsaSequencer g_Sequencer;
 
 #endif // MA_BLUE
 
-extern State g_State;
+//extern State g_State;
 
 //
 //  ListGroup
@@ -257,7 +255,7 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
             if ( m_Running )
                 Stop();
             else
-                Run();
+                Run(g_State.Beat());
             break;
         case lgp_midi_channel:
             if ( m_MidiChannel + 1 < 16 )
@@ -284,7 +282,7 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
             if ( m_Running )
                 Stop();
             else
-                Run();
+                Run(g_State.Beat());
             break;
         case lgp_midi_channel:
             if ( m_MidiChannel - 1 >= 0 )
@@ -313,18 +311,21 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
-void ListGroup::Run()
+void ListGroup::Run(double startBeat)
 {
 #if defined(MA_BLUE)
    // MA_BLUE Todo: Do something here to work out a sensible start beat.
 #else
+#if 0
     chrono::microseconds t_now = g_Link.clock().micros();
     ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
     double beat = timeline.beatAtTime(t_now, m_Quantum);
     double phase = timeline.phaseAtTime(t_now, m_Quantum);
     m_Beat = beat - phase + m_Quantum - 1;
 #endif
-
+#endif
+//    m_Beat = startBeat - 4.0/m_CurrentStepValue;
+    m_Beat = startBeat;
     m_Running = true;
     Step();
 }
@@ -454,6 +455,8 @@ bool ListGroup::Step()
     //       been any noticable effects of doing it before?
 
     g_Sequencer.ScheduleNextCallBack(m_ListGroupID);
+
+    return true;
 }
 
 //
@@ -855,12 +858,12 @@ bool StepListGroup::Step()
     return true;
 }
 
-void StepListGroup::Run()
+void StepListGroup::Run(double startBeat)
 {
     m_Pos = 0;
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         it->ResetPosition();
-    ListGroup::Run();
+    ListGroup::Run(startBeat);
 }
 
 //
@@ -903,6 +906,7 @@ bool RTListGroup::Step()
 {
     if ( !ListGroup::Step() )
         return false;
+    return true;
 }
 
 

@@ -123,4 +123,6 @@ protected:
 private:
 };
 
+extern AlsaSequencer g_Sequencer;
+
 #endif // ALSASEQUENCER_H

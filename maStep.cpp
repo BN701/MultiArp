@@ -26,7 +26,6 @@ using namespace std;
 
 #include <math.h>
 #include "maSequencer.h"
-extern Sequencer g_Sequencer;
 
 #else
 
@@ -39,7 +38,6 @@ extern ableton::Link g_Link;
 extern chrono::microseconds g_LinkStartTime;
 
 #include "platform_Linux/maAlsaSequencer.h"
-extern AlsaSequencer g_Sequencer;
 
 #endif // MA_BLUE
 
@@ -54,12 +52,6 @@ extern AlsaSequencer g_Sequencer;
 
 
 // Global instances.
-
-extern ListBuilder g_ListBuilder;
-extern PatternStore g_PatternStore;
-extern State g_State;
-
-//extern Display g_Display;
 
 int g_DeferStop = 0;
 
@@ -103,10 +95,10 @@ void do_phase0_updates()
        set_status(STAT_POS_2, "Transpose set.");
    }
 
-   if ( g_PatternStore.NewPatternPending() )
-   {
-       set_status(STAT_POS_2, "Pattern changed.");
-   }
+//   if ( g_PatternStore.NewPatternPending() )
+//   {
+//       set_status(STAT_POS_2, "Pattern changed.");
+//   }
 
    if ( g_State.NewRunStatePending() )
    {
@@ -138,11 +130,6 @@ void do_phase0_updates()
 
 void queue_next_step(snd_seq_event_t *ev)
 {
-    // We're called when ALSA has played the events we scheduled last time we were here,
-    // so updating position info at this point should reflect what we are hearing.
-
-    do_UI_updates();
-
     // Pop something in here to catch events destined for pattern layers.
 
     if ( ev != NULL && ev->type == SND_SEQ_EVENT_ECHO )
@@ -151,6 +138,13 @@ void queue_next_step(snd_seq_event_t *ev)
         if ( ListGroup::Step(listGroupID) )
             return;
     }
+
+    // Now process global step events ...
+
+    // We're called when ALSA has played the events we scheduled last time we were here,
+    // so updating position info at this point should reflect what we are hearing.
+
+    do_UI_updates();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
@@ -176,6 +170,10 @@ void queue_next_step(snd_seq_event_t *ev)
     g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
 #endif
 
+    if ( g_State.LastStep() && g_PatternStore.NewPatternPending() )
+    {
+       set_status(STAT_POS_2, "Pattern changed.");
+    }
 
     if ( g_State.PhaseIsZero() )
     {

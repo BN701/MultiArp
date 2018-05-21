@@ -377,4 +377,6 @@ struct PatternStore : public ItemMenu
 
 };
 
+extern PatternStore g_PatternStore;
+
 #endif // PATTERN_STORE_H_INCLUDED

@@ -28,10 +28,6 @@
 #include "maScreen.h"
 #include "maState.h"
 
-extern ListBuilder g_ListBuilder;
-extern PatternStore g_PatternStore;
-extern State g_State;
-
 using namespace std;
 
 enum control_message_t

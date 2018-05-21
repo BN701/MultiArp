@@ -60,7 +60,7 @@ class ListGroup : public ItemMenu
         virtual void InsertListsIntoMenu(menu_list_cursor_t before) = 0;
         virtual void RemoveListsFromMenu() = 0;
 
-        virtual void Run();
+        virtual void Run(double startBeat);
 
         void Stop();
 
@@ -148,7 +148,7 @@ class StepListGroup : public ListGroup
                         double stepValue,
                         double globalBeat );
         virtual bool Step();
-        virtual void Run();
+        virtual void Run(double startBeat);
 
         virtual void AddToMenuList(MenuList & m);
         virtual void InsertListsIntoMenu(menu_list_cursor_t before);

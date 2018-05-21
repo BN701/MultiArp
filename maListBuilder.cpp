@@ -26,7 +26,7 @@
 #include <cstdio>
 
 #include "maState.h"
-extern State g_State;
+//extern State g_State;
 
 #else
 #include <alsa/asoundlib.h>
@@ -44,6 +44,9 @@ using namespace std;
 #if LOG_ON
 ofstream fLog;
 #endif
+
+extern ableton::Link g_Link;
+ListBuilder g_ListBuilder(&g_Link);
 
 ListBuilder::ListBuilder()
 {

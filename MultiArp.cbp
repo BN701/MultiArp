@@ -125,7 +125,10 @@
 		<Unit filename="maRealTimeList.h" />
 		<Unit filename="maScreen.cpp" />
 		<Unit filename="maScreen.h" />
-		<Unit filename="maSequencer.cpp" />
+		<Unit filename="maSequencer.cpp">
+			<Option target="Debug (Blue)" />
+			<Option target="Release (Blue)" />
+		</Unit>
 		<Unit filename="maSequencer.h" />
 		<Unit filename="maState.cpp" />
 		<Unit filename="maState.h" />

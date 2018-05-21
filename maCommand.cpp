@@ -30,11 +30,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include "maSequencer.h"
-extern Sequencer g_Sequencer;
 #else
 #include "platform_Linux/maAlsaSequencer.h"
 #include "platform_Linux/maAlsaSequencerQueue.h"
-extern AlsaSequencer g_Sequencer;
 #endif // MA_BLUE
 
 //#include "maItemMenu.h"
@@ -53,11 +51,6 @@ using namespace std;
 #endif
 
 extern AnsiUI g_TextUI;
-extern CommandMenu g_CommandMenu;
-extern ListBuilder g_ListBuilder;
-extern PatternStore g_PatternStore;
-extern State g_State;
-
 
 unordered_map<string, command_t> g_CommandList =
 {
@@ -1064,7 +1057,7 @@ bool do_command(string commandString, int directCommand)
             g_PatternStore.CurrentEditPattern().StopCurrentListGroup();
             break;
         case C_PATTERN_RUN_ALL:
-            g_PatternStore.CurrentEditPattern().RunAllListGroups();
+            g_PatternStore.CurrentEditPattern().RunAllListGroups(g_State.Beat());
             break;
         case C_PATTERN_STOP_ALL:
             g_PatternStore.CurrentEditPattern().StopAllListGroups();

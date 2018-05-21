@@ -94,22 +94,12 @@ void DogHandler()
     dogCount ++;
 }
 
-
-
-
-Sequencer g_Sequencer;
-ListBuilder g_ListBuilder;
-
 AnsiUI g_TextUI;
-State g_State;
-
 
 StepList StepList::EmptyList;
 RealTimeList RealTimeList::EmptyList;
 
 
-PatternStore g_PatternStore;
-Pattern Pattern::EmptyPattern;
 
 // Maintain a 64 bit time counter
 // as the built in micros() function

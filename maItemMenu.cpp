@@ -80,10 +80,12 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setCursorToEnd)
     // over what to reselect and shifts that responsibility upstream :)
 
     if ( m_Cursor == pos )
+    {
         if ( setCursorToEnd )
             m_Cursor = m_Items.end();
         else
             throw "MenuList::Remove(), should't try to remove current selection.";
+    }
 
     menu_list_cursor_t result = m_Items.erase(pos);
 

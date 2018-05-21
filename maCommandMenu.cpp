@@ -30,11 +30,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include "maSequencer.h"
-extern Sequencer g_Sequencer;
 #else
 #include "platform_Linux/maAlsaSequencer.h"
 #include "platform_Linux/maAlsaSequencerQueue.h"
-extern AlsaSequencer g_Sequencer;
 #endif // MA_BLUE
 
 //#include "maItemMenu.h"
@@ -52,10 +50,7 @@ using namespace std;
 #ifndef MA_BLUE
 #endif
 
-extern State g_State;
-extern PatternStore g_PatternStore;
 extern AnsiUI g_TextUI;
-extern ListBuilder g_ListBuilder;
 
 CommandMenu g_CommandMenu;
 

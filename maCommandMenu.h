@@ -124,5 +124,6 @@ class CommandMenu
         int InitMenuPos(int menu);
 };
 
+extern CommandMenu g_CommandMenu;
 
 #endif // MACOMMANDMENU_H_INCLUDED

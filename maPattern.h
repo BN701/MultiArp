@@ -191,6 +191,7 @@ struct Pattern : public ItemMenu
     void StopCurrentListGroup();
     void RunAllListGroups(double startBeat);
     void StopAllListGroups();
+    void StopAllListGroups(double lastBeat);
     void DeleteCurrentListGroup();
 
     void DeleteCurrentList();

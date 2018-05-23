@@ -1447,6 +1447,25 @@ void load_from_string(string s, int & created, int & updated )
 
 //bool handle_key_input(ItemMenu::key_type_t curKey, xcb_keysym_t sym)
 
+map<int, int> g_KeyCommandMap =
+{
+    {BaseUI::key_return, BaseUI::key_cmd_enter},
+    {BaseUI::key_backspace, BaseUI::key_cmd_back},
+    {BaseUI::key_ctrl_up, BaseUI::key_cmd_up},
+    {BaseUI::key_ctrl_down, BaseUI::key_cmd_down},
+    {BaseUI::key_left, BaseUI::key_cmd_left},
+    {BaseUI::key_right, BaseUI::key_cmd_right},
+    {BaseUI::key_up, BaseUI::key_cmd_up},
+    {BaseUI::key_down, BaseUI::key_cmd_down},
+    {BaseUI::key_shift_left, BaseUI::key_cmd_insert_left},
+    {BaseUI::key_shift_right, BaseUI::key_cmd_insert_right},
+    {BaseUI::key_ctrl_left, BaseUI::key_cmd_copy_left},
+    {BaseUI::key_ctrl_right, BaseUI::key_cmd_copy_right},
+    {BaseUI::key_shift_up, BaseUI::key_cmd_inc},
+    {BaseUI::key_shift_down, BaseUI::key_cmd_dec},
+    {BaseUI::key_alt_shift_up, BaseUI::key_cmd_inc_2},
+    {BaseUI::key_alt_shift_down, BaseUI::key_cmd_dec_2}
+};
 
 bool handle_key_input(BaseUI::key_command_t key)
 {
@@ -1514,26 +1533,9 @@ bool handle_key_input(BaseUI::key_command_t key)
             set_status(STAT_POS_2, "%s", errorMessage.c_str());
         }
 #endif
-//        update_pattern_status_panel();
-//        update_pattern_list_panels();
-//        update_big_panel();
         keyUsed = true;
         break;
 #endif
-
-//    case static_cast<BaseUI::key_command_t>('/'):
-//        if ( commandString.empty() )
-//        {
-//            do_command("", C_MENU);
-////            g_CommandMenu.Open();
-//        }
-//        else
-//        {
-//            commandString += '/';
-//            place_cursor(COMMAND_HOME + commandString.size());
-//            set_status(COMMAND_HOME, commandString.c_str());
-//        }
-//        break;
 
     case BaseUI::key_return: // Enter
         if ( !commandString.empty() )
@@ -1549,19 +1551,16 @@ bool handle_key_input(BaseUI::key_command_t key)
             else
                 g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
             g_ListBuilder.Clear();
-//            update_big_panel();
             set_status(STAT_POS_2, "");
             keyUsed = true;
         }
-//        else if ( ItemMenu::RouteKey(key) )
-//        {
-//            show_status_after_navigation();
-//        }
         if ( keyUsed )
         {
             place_cursor(COMMAND_HOME);
             set_status(COMMAND_HOME, "");
         }
+//        else
+//            key = BaseUI::key_cmd_enter;
         break;
 
     case BaseUI::key_backspace: // XK_BackSpace:
@@ -1572,16 +1571,16 @@ bool handle_key_input(BaseUI::key_command_t key)
         }
         else if ( g_ListBuilder.HandleKeybInput(key) )
         {
-           show_listbuilder_status();
+            show_listbuilder_status();
             keyUsed = true;
         }
-//        else if ( ItemMenu::RouteKey(key) )
-//            show_status_after_navigation();
         if ( keyUsed )
         {
             place_cursor(COMMAND_HOME + commandString.size());
             set_status(COMMAND_HOME, commandString.c_str());
         }
+//        else
+//            key = BaseUI::key_cmd_back;
         break;
 
     case BaseUI::key_space: // XK_space: // Space bar.
@@ -1663,16 +1662,72 @@ bool handle_key_input(BaseUI::key_command_t key)
         break;
     }
 
-    if ( ! keyUsed && ItemMenu::RouteKey(key) )
-    {
-//        show_status_after_navigation();
-//        update_pattern_list_panels();
-//        update_big_panel();
+    if ( keyUsed )
+        return result;
+
+    // Remap key strokes into generic ItemMenu commands.
+
+    auto pos = g_KeyCommandMap.find(key);
+    if ( pos != g_KeyCommandMap.end() )
+        key = static_cast<BaseUI::key_command_t>(pos->second);
+
+//    if ( key > BaseUI::key_menu_control )
+//    {
+//        // This should be a map. (It probably is elsewhere, ironically mapping
+//        // things onto key strokes.)
+//        switch (key)
+//        {
+//            case BaseUI::key_ctrl_up:
+//                key = BaseUI::key_cmd_up;
+//                break;
+//            case BaseUI::key_ctrl_down:
+//                key = BaseUI::key_cmd_down;
+//                break;
+//            case BaseUI::key_left:
+//                key = BaseUI::key_cmd_left;
+//                break;
+//            case BaseUI::key_right:
+//                key = BaseUI::key_cmd_right;
+//                break;
+//            case BaseUI::key_up:
+//                key = BaseUI::key_cmd_up;
+//                break;
+//            case BaseUI::key_down:
+//                key = BaseUI::key_cmd_down;
+//                break;
+//            case BaseUI::key_shift_left:
+//                key = BaseUI::key_cmd_insert_left;
+//                break;
+//            case BaseUI::key_shift_right:
+//                key = BaseUI::key_cmd_insert_right;
+//                break;
+//            case BaseUI::key_ctrl_left:
+//                key = BaseUI::key_cmd_copy_left;
+//                break;
+//            case BaseUI::key_ctrl_right:
+//                key = BaseUI::key_cmd_copy_right;
+//                break;
+//            case BaseUI::key_shift_up:
+//                key = BaseUI::key_cmd_inc;
+//                break;
+//            case BaseUI::key_shift_down:
+//                key = BaseUI::key_cmd_dec;
+//                break;
+//            case BaseUI::key_alt_shift_up:
+//                key = BaseUI::key_cmd_inc_2;
+//                break;
+//            case BaseUI::key_alt_shift_down:
+//                key = BaseUI::key_cmd_dec_2;
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+
+    if ( ItemMenu::RouteKey(key) )
         return true;
-    }
-
-
-    return result;
+    else
+        return result;
 }
 
 

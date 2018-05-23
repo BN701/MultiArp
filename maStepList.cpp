@@ -204,7 +204,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case BaseUI::key_return:
+    case BaseUI::key_cmd_enter:
         if ( ! m_Clusters.empty() )
         {
             Cluster & c = m_Clusters.at(m_PosEdit);
@@ -218,63 +218,57 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
-    case BaseUI::key_backspace:
-    case BaseUI::key_escape:
+    case BaseUI::key_cmd_back:
         ReturnFocus();
         break;
 
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
 
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         if ( m_PosEdit < m_Clusters.size() - 1 )
             m_PosEdit += 1;
         break;
 
-    case BaseUI::key_ctrl_up:
+    case BaseUI::key_cmd_up:
         if ( m_MenuList != NULL )
             m_MenuList->DownCursorPos();
         return true;
 
-    case BaseUI::key_ctrl_down:
+    case BaseUI::key_cmd_down:
         if ( m_MenuList != NULL )
             m_MenuList->UpCursorPos();
-//        if ( m_ReturnFocus != NULL )
-//        {
-//            m_ReturnFocus->HandleKey(k);
-////            m_ReturnFocus->HandleKey(BaseUI::key_return);
-//        }
         return true;
 
-    case BaseUI::key_up:
-    case BaseUI::key_down:
-    case BaseUI::key_shift_up:
-    case BaseUI::key_shift_down:
+    case BaseUI::key_cmd_inc:
+    case BaseUI::key_cmd_dec:
+    case BaseUI::key_cmd_inc_2:
+    case BaseUI::key_cmd_dec_2:
         if ( !m_Clusters.empty() )
         {
             m_Clusters.at(m_PosEdit).HandleKey(k);
         }
         break;
 
-    case BaseUI::key_ctrl_left:
+    case BaseUI::key_cmd_copy_left:
         CopyLeft();
         break;
 
-    case BaseUI::key_ctrl_right:
+    case BaseUI::key_cmd_copy_right:
         CopyRight();
         break;
 
-    case BaseUI::key_shift_left:
+    case BaseUI::key_cmd_insert_left:
         InsertLeft();
         break;
 
-    case BaseUI::key_shift_right:
+    case BaseUI::key_cmd_insert_right:
         InsertRight();
         break;
 
-    case BaseUI::key_shift_delete:
+    case BaseUI::key_cmd_delete:
         DeleteStep();
         break;
 

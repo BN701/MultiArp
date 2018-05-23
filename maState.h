@@ -65,10 +65,11 @@ class State
         int DeferStop() { return m_DeferStop; }
 
         double Beat() { return m_Beat; }
+        double NextPhaseZero() { return m_Beat - m_Phase + m_Quantum; }
         void SetBeat(double val) { m_Beat = val; }
 
         bool PhaseIsZero();
-        bool LastStep();
+//        bool LastStep();
         double Phase() { return m_Phase; }
         void SetPhase(double val) { m_Phase = val; }
 

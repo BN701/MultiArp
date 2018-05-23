@@ -140,6 +140,22 @@ class BaseUI
             key_ctrl_page_down,
             key_alt_page_up,
             key_alt_page_down,
+            key_cmd_base,
+            key_cmd_enter,
+            key_cmd_back,
+            key_cmd_up,
+            key_cmd_down,
+            key_cmd_left,
+            key_cmd_right,
+            key_cmd_insert_left,
+            key_cmd_insert_right,
+            key_cmd_copy_left,
+            key_cmd_copy_right,
+            key_cmd_delete,
+            key_cmd_inc,
+            key_cmd_inc_2,
+            key_cmd_dec,
+            key_cmd_dec_2
         };
 
         enum display_object_type_t  // Hopefully just use these for sanity checks.

@@ -95,10 +95,10 @@ void do_phase0_updates()
        set_status(STAT_POS_2, "Transpose set.");
    }
 
-//   if ( g_PatternStore.NewPatternPending() )
-//   {
-//       set_status(STAT_POS_2, "Pattern changed.");
-//   }
+   if ( g_PatternStore.NewPatternPending() )
+   {
+       set_status(STAT_POS_2, "Pattern changed.");
+   }
 
    if ( g_State.NewRunStatePending() )
    {
@@ -170,11 +170,12 @@ void queue_next_step(snd_seq_event_t *ev)
     g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));
 #endif
 
-    if ( g_State.LastStep() && g_PatternStore.NewPatternPending() )
-    {
-       set_status(STAT_POS_2, "Pattern changed.");
-    }
-
+//    if ( g_State.LastStep() && g_PatternStore.NewPatternPending(false) )
+//    {
+//        g_PatternStore.CurrentPlayPattern().StopAllListGroups();
+//        set_status(STAT_POS_2, "Stopping current pattern.");
+//    }
+//
     if ( g_State.PhaseIsZero() )
     {
        do_phase0_updates();

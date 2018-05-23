@@ -63,6 +63,7 @@ class ListGroup : public ItemMenu
         virtual void Run(double startBeat);
 
         void Stop();
+        void Stop(double lastBeat);
 
 //        void NewListGroup();
 
@@ -75,7 +76,7 @@ class ListGroup : public ItemMenu
             lgp_run_stop,
             lgp_midi_channel,
             lgp_step_value,
-            lgp_quantum,
+//            lgp_quantum,
             num_listgroup_params_menu_focus_modes
         };
 
@@ -95,15 +96,15 @@ class ListGroup : public ItemMenu
         char m_Progress[20] = "";
         double m_CurrentStepValue = 4;
         double m_LastUsedStepValue = 4;
-        double m_Quantum = 4;
+//        double m_Quantum = 4;
         double m_Beat = 0;
         double m_Phase = 0;
 
         double m_StepEdit = 4;
         double m_StepPending = 4;
 
-        double m_QuantumEdit = 4;
-        double m_QuantumPending = 4;
+//        double m_QuantumEdit = 4;
+//        double m_QuantumPending = 4;
 
         // Step() working data used by derived functions.
         uint64_t m_QueueTimeUsec;
@@ -111,6 +112,8 @@ class ListGroup : public ItemMenu
         double m_Tempo;
 
         bool m_Running = false;
+        bool m_Stopping = false;
+        double m_LastBeat = 0;
 
 };
 

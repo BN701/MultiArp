@@ -543,25 +543,25 @@ bool Pattern::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case BaseUI::key_return:
+    case BaseUI::key_cmd_enter:
 //        m_MenuList.OpenCurrentItem(this);
         break;
 
-    case BaseUI::key_backspace:
+    case BaseUI::key_cmd_back:
         ReturnFocus();
         break;
 
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         break;
 
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         break;
 
-    case BaseUI::key_ctrl_up:
+    case BaseUI::key_cmd_up:
         m_MenuList.DownCursorPos();
         return true;
 
-    case BaseUI::key_ctrl_down:
+    case BaseUI::key_cmd_down:
         m_MenuList.UpCursorPos();
         return true;
 
@@ -1232,6 +1232,15 @@ void Pattern::StopAllListGroups()
 {
     for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
         (*it)->Stop();
+
+    SetRedraw();
+}
+
+void Pattern::StopAllListGroups(double lastBeat)
+{
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        (*it)->Stop(lastBeat);
+
     SetRedraw();
 }
 

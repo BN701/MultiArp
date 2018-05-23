@@ -81,7 +81,6 @@ struct PatternStore : public ItemMenu
         m_NewPattern(-1),
         m_PatternChanged(false),
         m_UsePatternPlayData(false)
-//        m_PatternStoreFocus(psf_pattern)
     {
         m_DisplayObjectType = BaseUI::dot_pattern_store;
         m_Visible = true;
@@ -98,14 +97,8 @@ struct PatternStore : public ItemMenu
     int PatternCount() { return m_Patterns.size(); }
 
     std::string SetNewPatternOrJump( int val );
-    void SetNewPatternPending( int val )
-    {
-        m_NewPattern = val;
-        m_NewPatternPending = true;
-        SetRedraw();
-    }
-
-    bool NewPatternPending();
+    void SetNewPatternPending( int val );
+    bool NewPatternPending(bool clearAndReset = true);
 
     void SetEditFocusFollowsPlay(bool bVal)
     {
@@ -164,7 +157,6 @@ struct PatternStore : public ItemMenu
     void UpdatePatternChainFromSimpleString(std::string s); // Old style, from chain command, no support for jumps.
     void UpdatePatternChainFromString(std::string s);
 
-//    StepList & CurrentEditStepList();
     StepList & CurrentEditStepList();
     RealTimeList & CurrentEditRealTimeList();
     Pattern & CurrentPlayPattern();
@@ -178,44 +170,7 @@ struct PatternStore : public ItemMenu
     double LastRealTimeBeat();
 
     int AddEmptyPattern(std::vector<std::string> & tokens, int firstToken);
-//    int AddEmptyPattern(std::vector<std::string>::iterator token, std::vector<std::string>::iterator stop)
-//    {
-//        m_Patterns.push_back(m_DefaultPattern);
-//        m_Patterns.back().NewList();
-//
-//        std::string label;
-//        if ( token != stop )
-//            while ( true )
-//            {
-//                label += *token;
-//                if ( ++token == stop )
-//                    break;
-//                label += ' ';
-//            }
-//
-//        m_Patterns.back().SetLabel(label.c_str());
-//
-//        if ( m_EditPosFollowsPlay )
-//            return m_Patterns.size() - 1;
-//        else
-//            return m_PosEdit = m_Patterns.size() - 1;
-//
-//    }
-
     int CopyCurrentPattern();
-//    {
-//        m_Patterns.push_back(m_Patterns.at(m_PosEdit));
-//        SetRedraw();
-//        m_Patterns.back().ResetPosition();
-//        m_Patterns.back().SetShortLabel();
-//        m_Patterns.back().SetLabel((m_Patterns.back().Label() + ", copy").c_str());
-//
-//        if ( m_EditPosFollowsPlay )
-//            return m_Patterns.size() - 1;
-//        else
-//            return m_PosEdit = m_Patterns.size() - 1;
-//    }
-
     void ClearCurrentPattern()
     {
         m_Deleted.push_back(m_Patterns.at(m_PosEdit));
@@ -294,7 +249,6 @@ struct PatternStore : public ItemMenu
     }
 
     void SetPlayPos( std::vector<int>::size_type p );
-
     void SetEditPos( std::vector<int>::size_type p );
     void UpEditPos() { SetEditPos(m_PosEdit + 1); }
     void DownEditPos() { SetEditPos(m_PosEdit - 1); }
@@ -356,24 +310,12 @@ struct PatternStore : public ItemMenu
     virtual void SetFocus()
     {
         ItemMenu::SetFocus();
-        // SetStatus();
     }
 
     void OpenCurrentItemMenu();
 
-
     protected:
-//        enum pattern_store_menu_focus_t
-//        {
-//            psf_pattern,
-//            psf_list,
-//            psf_rt_list,
-//            psf_trig_list,
-//            num_psf_menu_focus_modes
-//        };
-
         virtual bool HandleKey(BaseUI::key_command_t k);
-//        pattern_store_menu_focus_t m_PatternStoreFocus;
 
 };
 

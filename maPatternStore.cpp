@@ -270,7 +270,7 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case BaseUI::key_return:
+    case BaseUI::key_cmd_enter:
         if ( !m_Patterns.empty() )
         {
             MenuList & m = m_Patterns.at(m_PosEdit).m_MenuList;
@@ -286,11 +286,11 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         DownEditPos();
         break;
 
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         UpEditPos();
         break;
 
@@ -1258,6 +1258,22 @@ string PatternStore::ShowPatternPlayData()
     return result;
 }
 
+void PatternStore::SetNewPatternPending( int val )
+{
+    m_NewPattern = val;
+    m_NewPatternPending = true;
+
+    // Calculate end beat for current pattern and
+    // tell it to when to stop.
+
+    // g_State.NextPhaseZero() is beat - phase + quantum.
+
+    m_Patterns[m_PosPlay].StopAllListGroups(g_State.NextPhaseZero());
+
+    SetRedraw();
+}
+
+
 string PatternStore::SetNewPatternOrJump( int val )
 {
     if ( m_PatternChain.Mode() == PatternChain::off )
@@ -1295,7 +1311,7 @@ void PatternStore::SetPlayPos( std::vector<int>::size_type p )
 {
     if ( p >= 0 && p < m_Patterns.size() )
     {
-        m_Patterns[m_PosPlay].StopAllListGroups();
+//        m_Patterns[m_PosPlay].StopAllListGroups();
         m_PosPlay = p;
         m_Patterns[m_PosPlay].RunAllListGroups(g_State.Beat());
         if ( m_EditPosFollowsPlay /*&& m_PatternChainMode == PC_MODE_NONE*/ )
@@ -1321,8 +1337,11 @@ void PatternStore::SetEditPos( std::vector<int>::size_type p )
     }
 }
 
-bool PatternStore::NewPatternPending()
+bool PatternStore::NewPatternPending(bool clearAndReset)
 {
+    if ( !clearAndReset )
+        return m_NewPatternPending;
+
     if ( m_NewPatternPending )
     {
         SetPlayPos(m_NewPattern);

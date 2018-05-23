@@ -81,13 +81,15 @@ ListGroup::ListGroup(ListGroup & lg):
     m_Type(lg.m_Type),
     m_MidiChannel(lg.m_MidiChannel),
     m_CurrentStepValue(lg.m_CurrentStepValue),
-    m_Quantum(lg.m_Quantum),
+//    m_Quantum(lg.m_Quantum),
     m_Running(lg.m_Running)
 {
     // If parent is being reallocated, old parent pointer is invalid!
 
     // Todo: I don't think we can find out the new parent from here ...
-    // Do we have to find an alternative to parent pointers?
+    // Do we have to find an alternative to parent pointers? I don't like
+    // relying on the parent copy constructor to update the parent pointer
+    // (though that's exactly what we're doing here).
 
     // We won't know if this copy is part of a vector reallocation or a genuine copy.
     // We have to assume the former and swap IDs around so lookups will seemlessly
@@ -100,7 +102,6 @@ ListGroup::ListGroup(ListGroup & lg):
     lg.m_ListGroupID = temp;
     m_ListGroupsLookup[m_ListGroupID] = this;
     m_ListGroupsLookup[lg.m_ListGroupID] = &lg;
-//    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
 
 ListGroup::~ListGroup()
@@ -163,20 +164,20 @@ void ListGroup::SetStatus()
     }
 
 
-    m_Status += " Q:";
-    pos = m_Status.size();
-    snprintf(buff, 50, "%05.2f", m_QuantumEdit);
-    m_Status += buff;
-    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
-
-    if ( !equals(m_Quantum, m_QuantumEdit) )
-    {
-        if ( !equals(m_Quantum, m_QuantumPending) )
-            snprintf(buff, 50, ">%05.2f>%05.2f", m_QuantumPending, m_Quantum);
-        else
-            snprintf(buff, 50, ">%05.2f", m_Quantum);
-        m_Status += buff;
-    }
+//    m_Status += " Q:";
+//    pos = m_Status.size();
+//    snprintf(buff, 50, "%05.2f", m_QuantumEdit);
+//    m_Status += buff;
+//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
+//
+//    if ( !equals(m_Quantum, m_QuantumEdit) )
+//    {
+//        if ( !equals(m_Quantum, m_QuantumPending) )
+//            snprintf(buff, 50, ">%05.2f>%05.2f", m_QuantumPending, m_Quantum);
+//        else
+//            snprintf(buff, 50, ">%05.2f", m_Quantum);
+//        m_Status += buff;
+//    }
 
     m_Status += m_Progress;
 
@@ -191,7 +192,7 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
 
     switch ( k )
     {
-    case BaseUI::key_return:
+    case BaseUI::key_cmd_enter:
         switch ( m_ListGroupMenuFocus )
         {
         case lgp_midi_channel:
@@ -199,56 +200,58 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
         case lgp_step_value:
 //            m_CurrentStepValue += inc;
             m_StepPending = m_StepEdit;
+            if ( !m_Running )
+                m_CurrentStepValue = m_StepEdit;
             break;
-        case lgp_quantum:
-            m_QuantumPending = m_QuantumEdit;
-            break;
+//        case lgp_quantum:
+//            m_QuantumPending = m_QuantumEdit;
+//            break;
         default:
             break;
         }
         break;
 
-    case BaseUI::key_backspace:
-    case BaseUI::key_escape:
+    case BaseUI::key_cmd_back:
         if ( ! equals(m_CurrentStepValue, m_StepEdit) )
         {
             m_StepEdit = m_CurrentStepValue;
             m_StepPending = m_CurrentStepValue;
+            SetRedraw();
         }
-        else if ( ! equals(m_Quantum, m_QuantumEdit) )
-        {
-            m_QuantumEdit = m_Quantum;
-            m_QuantumPending = m_Quantum;
-        }
+//        else if ( ! equals(m_Quantum, m_QuantumEdit) )
+//        {
+//            m_QuantumEdit = m_Quantum;
+//            m_QuantumPending = m_Quantum;
+//        }
         else
             ReturnFocus();
         return true;
 
-    case BaseUI::key_ctrl_up:
+    case BaseUI::key_cmd_up:
         if ( m_MenuList != NULL )
             m_MenuList->DownCursorPos();
         return true;
 
-    case BaseUI::key_ctrl_down:
+    case BaseUI::key_cmd_down:
         if ( m_MenuList != NULL )
             m_MenuList->UpCursorPos();
         return true;
 
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         temp = static_cast<int>(m_ListGroupMenuFocus) - 1;
         if ( temp >= 0 && temp < num_listgroup_params_menu_focus_modes )
             m_ListGroupMenuFocus = static_cast<listgroup_params_menu_focus_t>(temp);
         break;
 
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         temp = static_cast<int>(m_ListGroupMenuFocus) + 1;
         if ( temp >= 0 && temp < num_listgroup_params_menu_focus_modes )
             m_ListGroupMenuFocus = static_cast<listgroup_params_menu_focus_t>(temp);
         break;
 
-    case BaseUI::key_shift_up:
+    case BaseUI::key_cmd_inc:
         inc = 1;
-    case BaseUI::key_up:
+    case BaseUI::key_cmd_inc_2:
         switch ( m_ListGroupMenuFocus )
         {
         case lgp_run_stop:
@@ -265,17 +268,17 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
 //            m_CurrentStepValue += inc;
             m_StepEdit += inc;
             break;
-        case lgp_quantum:
-            m_QuantumEdit += inc;
-            break;
+//        case lgp_quantum:
+//            m_QuantumEdit += inc;
+//            break;
         default:
             break;
         }
         break;
 
-    case BaseUI::key_shift_down:
+    case BaseUI::key_cmd_dec:
         inc = 1;
-    case BaseUI::key_down:
+    case BaseUI::key_cmd_dec_2:
         switch ( m_ListGroupMenuFocus )
         {
         case lgp_run_stop:
@@ -294,10 +297,10 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
             if ( m_StepEdit - inc > 0 )
                 m_StepEdit -= inc;
             break;
-        case lgp_quantum:
-            if ( m_QuantumEdit - inc > 1 )
-                m_QuantumEdit -= inc;
-            break;
+//        case lgp_quantum:
+//            if ( m_QuantumEdit - inc > 1 )
+//                m_QuantumEdit -= inc;
+//            break;
         default:
             break;
         }
@@ -324,8 +327,8 @@ void ListGroup::Run(double startBeat)
     m_Beat = beat - phase + m_Quantum - 1;
 #endif
 #endif
-//    m_Beat = startBeat - 4.0/m_CurrentStepValue;
-    m_Beat = startBeat;
+//    m_Beat = startBeat;
+    m_Beat = startBeat - 4.0/m_CurrentStepValue;
     m_Running = true;
     Step();
 }
@@ -333,6 +336,12 @@ void ListGroup::Run(double startBeat)
 void ListGroup::Stop()
 {
     m_Running = false;
+}
+
+void ListGroup::Stop(double lastBeat)
+{
+    m_Stopping = true;
+    m_LastBeat = lastBeat - 0.01;
 }
 
 // Static callback routing lookup.
@@ -376,6 +385,14 @@ bool ListGroup::Step()
     double stepValueMultiplier = 1.0;
     double beatInc = 4.0 * stepValueMultiplier / m_CurrentStepValue;
     m_Beat += beatInc;
+
+    if ( m_Stopping && m_Beat > m_LastBeat )
+    {
+        m_Stopping = false;
+        m_Running = false;
+        return false;
+    }
+
 #if defined(MA_BLUE)
     m_TimeLineMicros += beatInc * 60000000 / m_Tempo;
 #endif
@@ -395,15 +412,15 @@ bool ListGroup::Step()
 
 #else
     ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-    chrono::microseconds t_next_usec = timeline.timeAtBeat(m_NextBeatSwung, m_Quantum);
+    chrono::microseconds t_next_usec = timeline.timeAtBeat(m_NextBeatSwung, g_State.Quantum());
 
-    m_Phase = timeline.phaseAtTime(t_next_usec, m_Quantum);
+    m_Phase = timeline.phaseAtTime(t_next_usec, g_State.Quantum());
 #endif
 
     if ( equals(m_Phase, 0) )
     {
         m_CurrentStepValue = m_StepPending;
-        m_Quantum = m_QuantumPending;
+//        m_Quantum = m_QuantumPending;
     }
 
 //    if ( g_State.PhaseIsZero() )

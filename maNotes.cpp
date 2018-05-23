@@ -371,31 +371,29 @@ bool Note::HandleKey(BaseUI::key_command_t k)
     switch ( k )
     {
 //    case BaseUI::key_return:
-    case BaseUI::key_backspace:
-    case BaseUI::key_escape:
+    case BaseUI::key_cmd_back:
         if ( m_MenuList != NULL )
         {
             m_MenuList->m_Container->SetRedraw();
             m_MenuList->DownCursorPos();
             m_MenuList->Remove(m_PosInMenuList);
         }
-//        ReturnFocus();
         break;
 
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         if ( m_NoteEditFocus > 0 )
             m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus - 1);
         break;
 
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         if ( m_NoteEditFocus < num_nef_types - 1 )
             m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus + 1);
         break;
 
-    case BaseUI::key_shift_up:
+    case BaseUI::key_cmd_inc_2:
         inc = 0.01;
         note_inc = 12;
-    case BaseUI::key_up:
+    case BaseUI::key_cmd_inc:
         switch ( m_NoteEditFocus )
         {
         case nef_note_number:
@@ -414,10 +412,10 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
-    case BaseUI::key_shift_down:
+    case BaseUI::key_cmd_dec_2:
         inc = 0.01;
         note_inc = 12;
-    case BaseUI::key_down:
+    case BaseUI::key_cmd_dec:
         switch ( m_NoteEditFocus )
         {
         case nef_note_number:
@@ -560,7 +558,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case BaseUI::key_return:
+    case BaseUI::key_cmd_enter:
         if ( !m_Notes.empty() )
         {
             Note & n = m_Notes.at(m_PosEdit);
@@ -574,31 +572,29 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
-    case BaseUI::key_backspace:
-    case BaseUI::key_escape:
+    case BaseUI::key_cmd_back:
         if ( m_MenuList != NULL )
         {
             m_MenuList->m_Container->SetRedraw();
             m_MenuList->DownCursorPos();
             m_MenuList->Remove(m_PosInMenuList);
         }
-//        ReturnFocus();
         break;
 
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
 
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         if ( m_PosEdit < m_Notes.size() - 1 )
             m_PosEdit += 1;
         break;
 
-    case BaseUI::key_up:
-    case BaseUI::key_down:
-    case BaseUI::key_shift_up:
-    case BaseUI::key_shift_down:
+    case BaseUI::key_cmd_inc:
+    case BaseUI::key_cmd_inc_2:
+    case BaseUI::key_cmd_dec:
+    case BaseUI::key_cmd_dec_2:
         if ( m_Notes.empty() )
         {
             m_Notes.emplace_back();
@@ -607,39 +603,23 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         m_Notes.at(m_PosEdit).HandleKey(k);
         break;
 
-//    case BaseUI::key_up:
-//        if ( m_ReturnFocus != NULL )
-//        {
-//            m_ReturnFocus->HandleKey(BaseUI::key_right);
-//            m_ReturnFocus->HandleKey(BaseUI::key_return);
-//        }
-//        return true;
-//
-//    case BaseUI::key_down:
-//        if ( m_ReturnFocus != NULL )
-//        {
-//            m_ReturnFocus->HandleKey(BaseUI::key_left);
-//            m_ReturnFocus->HandleKey(BaseUI::key_return);
-//        }
-//        return true;
-
-    case BaseUI::key_ctrl_left:
+    case BaseUI::key_cmd_copy_left:
         CopyLeft();
         break;
 
-    case BaseUI::key_ctrl_right:
+    case BaseUI::key_cmd_copy_right:
         CopyRight();
         break;
 
-    case BaseUI::key_shift_left:
+    case BaseUI::key_cmd_insert_left:
         InsertLeft();
         break;
 
-    case BaseUI::key_shift_delete:
+    case BaseUI::key_cmd_delete:
         DeleteNote();
         break;
 
-    case BaseUI::key_shift_right:
+    case BaseUI::key_cmd_insert_right:
         InsertRight();
         break;
 

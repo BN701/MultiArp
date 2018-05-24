@@ -332,7 +332,7 @@ string Pattern::StepListManager(command_t command)
             StepList *pStepList = pGroup->NewStepList();
             pStepList->SetVisible(m_Visible);
             menu_list_cursor_t pos = m_MenuList.FindFirstNonMatching(BaseUI::dot_step_list);
-            m_MenuList.Insert(pos, pStepList);  // We could automatically select, but don't at the moment.
+            m_MenuList.Insert(pos, pStepList, true);  // Automatically select.
             break;
         }
 
@@ -379,17 +379,6 @@ string Pattern::StepListManager(command_t command)
             }
         }
 
-//        case C_LIST_EDIT:
-//        {
-//            StepList * pStepList = dynamic_cast<StepList*>(*m_PosCursor);
-//            if ( pStepList == NULL )
-//                return "Pattern Step List Manager: Not a step list.";
-//            (*m_PosCursor)->SetFocus();
-//            (*m_PosCursor)->SetDisplayPos(21, 4);
-//            (*m_PosCursor)->SetReturnFocus(this);
-//
-//            break;
-//        }
         case C_STEP_INSERT_LEFT:
         case C_STEP_INSERT_RIGHT:
         case C_STEP_COPY_LEFT:
@@ -1143,7 +1132,7 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
     pNewGroup->SetReturnFocus(m_ReturnFocus);
     pNewGroup->SetItemID(m_ListGroups.size() - 1);
     pNewGroup->SetVisible(m_Visible);
-    m_MenuList.Add(pNewGroup);
+    m_MenuList.Add(pNewGroup, true);    // Autoselect new item.
 
 }
 
@@ -1156,7 +1145,9 @@ void Pattern::CopyCurrentListGroup()
 
     int pos = pGroup->ItemID() + 1;
 
-    pGroup->ReturnFocus();  // Move focus elsewhere while we make copies.
+    // Move focus elsewhere while we make copies.
+//    pGroup->ReturnFocus();
+    auto reselect = m_MenuList.ClearCursor();
 
     pGroup->RemoveListsFromMenu();
     auto menuInsertPos = m_MenuList.Remove(pGroup->MenuPos());
@@ -1170,7 +1161,8 @@ void Pattern::CopyCurrentListGroup()
             pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new RTListGroup(dynamic_cast<RTListGroup*>(pGroup)));
             break;
     }
-    pGroup->SetFocus();
+//    pGroup->SetFocus();
+    m_MenuList.Select(reselect);
 
     for ( auto it = m_ListGroups.begin() + pos; it != m_ListGroups.end(); it++ )
         (*it)->SetItemID((*it)->ItemID() + 1);
@@ -1198,6 +1190,7 @@ void Pattern::DeleteCurrentListGroup()
         (*it)->SetItemID((*it)->ItemID() - 1);
 
     delete pGroup;
+    m_MenuList.Select(m_PosInMenuList);
     SetRedraw();
 }
 

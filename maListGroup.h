@@ -131,7 +131,7 @@ class StepListGroup : public ListGroup
         TrigList m_TrigList;
 
         std::vector<StepList> m_StepListSet;
-        size_steplist m_Pos = 0;
+        size_steplist m_PosSLG = 0;
 
         std::vector<update_pair> m_DeferredUpdates;
 
@@ -156,6 +156,7 @@ class StepListGroup : public ListGroup
         virtual void AddToMenuList(MenuList & m);
         virtual void InsertListsIntoMenu(menu_list_cursor_t before);
         virtual void RemoveListsFromMenu();
+        virtual void SetVisible(bool val);
 
     private:
         void MoveList(StepList * pItem, MenuList & menu, bool up);

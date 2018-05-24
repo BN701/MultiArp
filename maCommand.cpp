@@ -1459,8 +1459,10 @@ map<int, int> g_KeyCommandMap =
     {BaseUI::key_down, BaseUI::key_cmd_down},
     {BaseUI::key_shift_left, BaseUI::key_cmd_insert_left},
     {BaseUI::key_shift_right, BaseUI::key_cmd_insert_right},
+    {BaseUI::key_shift_delete, BaseUI::key_cmd_delete},
     {BaseUI::key_ctrl_left, BaseUI::key_cmd_copy_left},
     {BaseUI::key_ctrl_right, BaseUI::key_cmd_copy_right},
+    {BaseUI::key_ctrl_delete, BaseUI::key_cmd_undo},
     {BaseUI::key_shift_up, BaseUI::key_cmd_inc},
     {BaseUI::key_shift_down, BaseUI::key_cmd_dec},
     {BaseUI::key_alt_shift_up, BaseUI::key_cmd_inc_2},
@@ -1671,63 +1673,12 @@ bool handle_key_input(BaseUI::key_command_t key)
     if ( pos != g_KeyCommandMap.end() )
         key = static_cast<BaseUI::key_command_t>(pos->second);
 
-//    if ( key > BaseUI::key_menu_control )
-//    {
-//        // This should be a map. (It probably is elsewhere, ironically mapping
-//        // things onto key strokes.)
-//        switch (key)
-//        {
-//            case BaseUI::key_ctrl_up:
-//                key = BaseUI::key_cmd_up;
-//                break;
-//            case BaseUI::key_ctrl_down:
-//                key = BaseUI::key_cmd_down;
-//                break;
-//            case BaseUI::key_left:
-//                key = BaseUI::key_cmd_left;
-//                break;
-//            case BaseUI::key_right:
-//                key = BaseUI::key_cmd_right;
-//                break;
-//            case BaseUI::key_up:
-//                key = BaseUI::key_cmd_up;
-//                break;
-//            case BaseUI::key_down:
-//                key = BaseUI::key_cmd_down;
-//                break;
-//            case BaseUI::key_shift_left:
-//                key = BaseUI::key_cmd_insert_left;
-//                break;
-//            case BaseUI::key_shift_right:
-//                key = BaseUI::key_cmd_insert_right;
-//                break;
-//            case BaseUI::key_ctrl_left:
-//                key = BaseUI::key_cmd_copy_left;
-//                break;
-//            case BaseUI::key_ctrl_right:
-//                key = BaseUI::key_cmd_copy_right;
-//                break;
-//            case BaseUI::key_shift_up:
-//                key = BaseUI::key_cmd_inc;
-//                break;
-//            case BaseUI::key_shift_down:
-//                key = BaseUI::key_cmd_dec;
-//                break;
-//            case BaseUI::key_alt_shift_up:
-//                key = BaseUI::key_cmd_inc_2;
-//                break;
-//            case BaseUI::key_alt_shift_down:
-//                key = BaseUI::key_cmd_dec_2;
-//                break;
-//            default:
-//                break;
-//        }
-//    }
+    // Send key strokes off to active ItemMenu.
 
     if ( ItemMenu::RouteKey(key) )
         return true;
     else
-        return result;
+        return result;  // If result is set to false by do_command(), the program quits.
 }
 
 

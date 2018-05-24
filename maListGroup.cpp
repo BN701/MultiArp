@@ -81,7 +81,13 @@ ListGroup::ListGroup(ListGroup & lg):
     m_Type(lg.m_Type),
     m_MidiChannel(lg.m_MidiChannel),
     m_CurrentStepValue(lg.m_CurrentStepValue),
-//    m_Quantum(lg.m_Quantum),
+    m_LastUsedStepValue(lg.m_LastUsedStepValue),
+    m_ListGroupMenuFocus(lg.m_ListGroupMenuFocus),
+    m_Beat(lg.m_Beat),
+    m_Phase(lg.m_Phase),
+    m_StepEdit(lg.m_StepEdit),
+    m_StepPending(lg.m_StepPending),
+    m_Tempo(lg.m_Tempo),
     m_Running(lg.m_Running)
 {
     // If parent is being reallocated, old parent pointer is invalid!
@@ -195,17 +201,17 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_cmd_enter:
         switch ( m_ListGroupMenuFocus )
         {
-        case lgp_midi_channel:
+        case lgp_run_stop:
+            if ( m_Running )
+                Stop();
+            else
+                Run(g_State.NextPhaseZero());
             break;
         case lgp_step_value:
-//            m_CurrentStepValue += inc;
             m_StepPending = m_StepEdit;
             if ( !m_Running )
                 m_CurrentStepValue = m_StepEdit;
             break;
-//        case lgp_quantum:
-//            m_QuantumPending = m_QuantumEdit;
-//            break;
         default:
             break;
         }
@@ -254,12 +260,6 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_cmd_inc_2:
         switch ( m_ListGroupMenuFocus )
         {
-        case lgp_run_stop:
-            if ( m_Running )
-                Stop();
-            else
-                Run(g_State.Beat());
-            break;
         case lgp_midi_channel:
             if ( m_MidiChannel + 1 < 16 )
                 m_MidiChannel += 1;
@@ -281,12 +281,6 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_cmd_dec_2:
         switch ( m_ListGroupMenuFocus )
         {
-        case lgp_run_stop:
-            if ( m_Running )
-                Stop();
-            else
-                Run(g_State.Beat());
-            break;
         case lgp_midi_channel:
             if ( m_MidiChannel - 1 >= 0 )
                 m_MidiChannel -= 1;
@@ -361,7 +355,7 @@ bool ListGroup::Step(int listGroupID)
 bool ListGroup::Step()
 {
     if ( !m_Running )
-        return false; // Break the cycle.
+        return false; // Break the cycle, enforced.
 
     // In the main loop, this is where we update progress indicators.
     // With the ItemMenu deferred drawing mechanism this item
@@ -390,7 +384,7 @@ bool ListGroup::Step()
     {
         m_Stopping = false;
         m_Running = false;
-        return false;
+        return false;   // Break the cycle, 'unenforced'.
     }
 
 #if defined(MA_BLUE)
@@ -506,6 +500,8 @@ void StepListGroup::CopyList(StepList * pItem, MenuList & menu)
 {
     if ( pItem != NULL )
     {
+        menu.ClearCursor();
+
         // Get list position.
 
         int pos = pItem->ItemID();
@@ -615,9 +611,11 @@ void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
 {
     if ( pItem != NULL )
     {
-        // Get list position and then delete the list.
+        // Get list position.
 
         int pos = pItem->ItemID();
+
+        // Up means closer to zero.
 
         if ( up )
         {
@@ -628,17 +626,23 @@ void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
         {
             if ( pos == m_StepListSet.size() - 1 )
                 return;
+            // Moving an item downwards is the same as moving the one below it upwards.
             pos++;
         }
 
-        // Swap two items. The process is the same regardless
-        // of which one was selected.
+        // Remove from the redraw list. We'll put them back later.
 
         m_RedrawList.remove(&m_StepListSet[pos]);
         m_RedrawList.remove(&m_StepListSet[pos - 1]);
 
-        auto menuInsertPos = menu.Remove(m_StepListSet[pos - 1].MenuPos()/*, false*/);
-        menu.Remove(m_StepListSet[pos].MenuPos()/*, false*/);
+        // Remove from the menu list.
+
+        menu.ClearCursor();
+        menu.Remove(m_StepListSet[pos].MenuPos());
+        auto menuInsertPos = menu.Remove(m_StepListSet[pos-1].MenuPos());
+
+        // Swap two items. The process is the same regardless
+        // of which one was selected.
 
         StepList temp = m_StepListSet[pos];
         m_StepListSet[pos] = m_StepListSet[pos - 1];
@@ -710,12 +714,12 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
 
             while ( loopCheck < m_StepListSet.size() )
             {
-                if ( m_Pos >= m_StepListSet.size() )
-                    m_Pos = 0;
+                if ( m_PosSLG >= m_StepListSet.size() )
+                    m_PosSLG = 0;
 
-                l = & m_StepListSet[m_Pos];
+                l = & m_StepListSet[m_PosSLG];
 
-                m_Pos++;
+                m_PosSLG++; // Increment here so we can use zero as a reset value (rather than the list size).
 
                 if ( ! l->Empty() )
                     break;
@@ -724,8 +728,8 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
             }
 
             update_pair u;
-            u.list_id = m_Pos;
-            u.list_pos = l->m_Pos;
+            u.list_id = m_PosSLG - 1;
+            u.list_pos = l->m_PosSL;
             m_DeferredUpdates.push_back(u);
 
             Cluster * result = l->Step();
@@ -877,10 +881,17 @@ bool StepListGroup::Step()
 
 void StepListGroup::Run(double startBeat)
 {
-    m_Pos = 0;
+    m_PosSLG = 0;
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         it->ResetPosition();
     ListGroup::Run(startBeat);
+}
+
+void StepListGroup::SetVisible(bool val)
+{
+    m_Visible = val;
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        it->SetVisible(val);
 }
 
 //

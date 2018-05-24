@@ -380,6 +380,18 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
+#if 0
+    case BaseUI::key_cmd_up:
+        if ( m_MenuList != NULL )
+            m_MenuList->DownCursorPos();
+        return true;
+
+    case BaseUI::key_cmd_down:
+        if ( m_MenuList != NULL )
+            m_MenuList->UpCursorPos();
+        return true;
+#endif
+
     case BaseUI::key_cmd_left:
         if ( m_NoteEditFocus > 0 )
             m_NoteEditFocus = static_cast<note_edit_menu_focus_t>(m_NoteEditFocus - 1);
@@ -580,6 +592,18 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             m_MenuList->Remove(m_PosInMenuList);
         }
         break;
+
+#if 0
+    case BaseUI::key_cmd_up:
+        if ( m_MenuList != NULL )
+            m_MenuList->DownCursorPos();
+        return true;
+
+    case BaseUI::key_cmd_down:
+        if ( m_MenuList != NULL )
+            m_MenuList->UpCursorPos();
+        return true;
+#endif
 
     case BaseUI::key_cmd_left:
         if ( m_PosEdit > 0 )

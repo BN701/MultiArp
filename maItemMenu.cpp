@@ -135,6 +135,18 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos/*, bool setReturnFocu
     return previous;
 }
 
+menu_list_cursor_t MenuList::Select(ItemMenu * item)
+{
+    return Select(item->m_PosInMenuList);
+}
+
+ItemMenu* MenuList::ClearCursor()
+{
+    auto result = m_Cursor;
+    m_Cursor = m_Items.end();
+    return *result;
+}
+
 bool MenuList::UpCursorPos()
 {
     menu_list_cursor_t pos = m_Cursor;

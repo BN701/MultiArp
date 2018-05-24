@@ -341,13 +341,13 @@ Cluster * StepList::Step()
         return NULL;
 
 //    m_LastRequestedPos = m_Pos;
-    Cluster *pCluster = & m_Clusters[m_Pos++];
+    Cluster *pCluster = & m_Clusters[m_PosSL++];
 
     // Look ahead for rests.
 
     if ( !pCluster->IsRest() )
     {
-        vector<int>::size_type p = m_Pos;
+        vector<int>::size_type p = m_PosSL;
         pCluster->m_StepLength = 0;
 
         do
@@ -367,10 +367,10 @@ Cluster * StepList::Step()
 
     // Set completion flag.
 
-    if ( m_Pos >= m_Clusters.size() )
+    if ( m_PosSL >= m_Clusters.size() )
     {
         m_Complete = true;
-        m_Pos = 0;
+        m_PosSL = 0;
     }
     else
     {

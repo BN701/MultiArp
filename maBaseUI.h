@@ -152,6 +152,7 @@ class BaseUI
             key_cmd_copy_left,
             key_cmd_copy_right,
             key_cmd_delete,
+            key_cmd_undo,
             key_cmd_inc,
             key_cmd_inc_2,
             key_cmd_dec,

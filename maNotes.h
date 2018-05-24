@@ -61,8 +61,8 @@ struct Note : public ItemMenu
     int m_NoteNumber;        // -1 indicates 'empty' or 'rest'.
     int m_NoteVelocity;      // -1 indicates not set (so use value from elsewhere)
 
-    double m_Phase;
     double m_Length;         // Length in beats (or fraction of a beat).
+    double m_Phase;
 
     // Self-modifying list things.
 
@@ -73,11 +73,11 @@ struct Note : public ItemMenu
 
     bool IncrementAndCheckTarget();
 
-    Note(int n = -1, int v = -1):
+    Note(int n = -1, int v = -1, double length = 0, double phase = 0 ):
         m_NoteNumber(n),
         m_NoteVelocity(v),
-        m_Phase(0),
-        m_Length(0)
+        m_Length(length),
+        m_Phase(phase)
     {
         m_DisplayObjectType = BaseUI::dot_note;
     }
@@ -128,7 +128,10 @@ struct Cluster : public ItemMenu
 
     Cluster & operator+=(const Cluster & rhs)
     {
-        m_Notes.insert(m_Notes.end(), rhs.m_Notes.begin(), rhs.m_Notes.end());
+        // Copy note data, not the whole object with its menu data.
+        // m_Notes.insert(m_Notes.end(), rhs.m_Notes.begin(), rhs.m_Notes.end());
+        for ( auto it = rhs.m_Notes.begin(); it != rhs.m_Notes.end(); it++ )
+            m_Notes.emplace_back(it->m_NoteNumber, it->m_NoteVelocity, it->m_Length, it->m_Phase);
         return *this; // return the result by reference
     }
 

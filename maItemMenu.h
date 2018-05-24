@@ -51,6 +51,8 @@ class MenuList
         menu_list_cursor_t InsertAfter(menu_list_cursor_t pos, ItemMenu * item, bool select = false);
         menu_list_cursor_t Remove(menu_list_cursor_t pos, bool setCursorToEnd = false);
         menu_list_cursor_t Select(menu_list_cursor_t pos/*, bool setReturnFocus = true*/);
+        menu_list_cursor_t Select(ItemMenu * item);
+        ItemMenu* ClearCursor();
 
 //        void OpenCurrentItem();
 //        void OpenCurrentItem(ItemMenu * returnFocus);

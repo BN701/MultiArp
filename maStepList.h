@@ -30,7 +30,7 @@
 struct StepList : public ItemMenu
 {
     std::vector<Cluster> m_Clusters;
-    std::vector<Cluster>::size_type m_Pos = 0;                  // Points to the next position to be retrieved.
+    std::vector<Cluster>::size_type m_PosSL = 0;                  // Points to the next position to be retrieved.
 //    std::vector<Cluster>::size_type m_NowPlayingPos = 0;        // Updated by parent group when events are played.
     bool m_Complete = false;
 
@@ -113,7 +113,7 @@ struct StepList : public ItemMenu
 
     void ResetPosition()
     {
-        m_Pos = 0;
+        m_PosSL = 0;
         m_Complete = false;
     }
 

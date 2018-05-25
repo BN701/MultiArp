@@ -452,7 +452,6 @@ bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & widt
         }
     }
 
-
     col += displayInfo->m_iX;
     row += displayInfo->m_iY;
     width = displayInfo->m_iWidth;

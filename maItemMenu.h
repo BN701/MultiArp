@@ -112,6 +112,7 @@ class ItemMenu
         // to the active menu instance.
 
         virtual void SetStatus() {};
+        void ClearStatus() { m_Status.clear(); }
         virtual bool HandleKey(BaseUI::key_command_t k) { return false; };
 
         virtual void SetFocus()
@@ -156,6 +157,7 @@ class ItemMenu
         }
 
         bool CheckType(int type) { return m_DisplayObjectType == type; }
+        void SetType(BaseUI::display_object_type_t type) { m_DisplayObjectType = type; }
         BaseUI::display_object_type_t Type() { return m_DisplayObjectType; }
 
         void SetDisplayIndent(int val) { m_MenuListIndent = val; }

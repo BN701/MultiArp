@@ -50,6 +50,7 @@ using namespace std;
 
 PatternStore g_PatternStore;
 Pattern Pattern::EmptyPattern;
+//ItemMenu PatternStore::m_MenuListWindow;
 
 #if 1
 void PatternStore::SetStatus()
@@ -390,6 +391,45 @@ int PatternStore::CopyCurrentPattern()
         return m_Patterns.size() - 1;
     else
         return m_PosEdit = m_Patterns.size() - 1;
+}
+
+void PatternStore::DeleteCurrentPattern()
+{
+    if ( m_Patterns.empty() )
+        return;
+
+    SetRedraw();
+
+    m_Deleted.push_back(m_Patterns.at(m_PosEdit));
+    m_Patterns.erase(m_Patterns.begin() + m_PosEdit);
+
+    if ( m_Patterns.empty() )
+    {
+        m_MenuListWindow.SetRedraw();
+        m_PosEdit = 0;
+        m_PosPlay = 0;
+        return;
+    }
+
+    // If the play pointer is above the pattern that was deleted,
+    // move it down to keep it with the pattern it points at.
+    //
+    // Or, if the play pointer was pointing at the last pattern in
+    // the list and that was deleted, it needs to point to the item
+    // that's now at the end of the list.
+    //
+    // (If it was pointing at the pattern that was deleted, it now
+    // points to the one that took its place.)
+
+    if ( m_PosPlay > m_PosEdit || m_PosPlay == m_Patterns.size() )
+        m_PosPlay -= 1;
+
+    // The edit pointer stays in place and now points to next in
+    // list (unless it was already at the end of the list).
+
+    if ( m_PosEdit == m_Patterns.size() )
+        m_PosEdit -= 1;
+
 }
 
 
@@ -1268,7 +1308,9 @@ void PatternStore::SetNewPatternPending( int val )
 
     // g_State.NextPhaseZero() is beat - phase + quantum.
 
-    m_Patterns[m_PosPlay].StopAllListGroups(g_State.NextPhaseZero());
+    double lastBeat = g_State.NextPhaseZero();
+    for ( auto it = m_Patterns.begin(); it != m_Patterns.end(); it++ )
+        it->StopAllListGroups(lastBeat);
 
     SetRedraw();
 }

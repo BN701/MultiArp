@@ -1057,7 +1057,7 @@ bool do_command(string commandString, int directCommand)
             g_PatternStore.CurrentEditPattern().StopCurrentListGroup();
             break;
         case C_PATTERN_RUN_ALL:
-            g_PatternStore.CurrentEditPattern().RunAllListGroups(g_State.Beat());
+            g_PatternStore.CurrentEditPattern().RunAllListGroups(g_State.NextPhaseZero());
             break;
         case C_PATTERN_STOP_ALL:
             g_PatternStore.CurrentEditPattern().StopAllListGroups();

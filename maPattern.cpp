@@ -74,7 +74,7 @@ Pattern::Pattern(const Pattern & p):
     m_Velocity(p.m_Velocity),
     m_MenuList(this, &m_Visible)    // Initialized, not copied
 {
-
+    m_Visible = false;
     m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
     m_MenuList.Add(this);
 

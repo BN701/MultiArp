@@ -66,6 +66,7 @@ class State
 
         double Beat() { return m_Beat; }
         double NextPhaseZero() { return m_Beat - m_Phase + m_Quantum; }
+        double CurrentPhaseZero() { return m_Beat - m_Phase; }
         void SetBeat(double val) { m_Beat = val; }
 
         bool PhaseIsZero();

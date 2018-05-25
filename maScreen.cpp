@@ -462,6 +462,7 @@ void update_item_menus()
             g_TextUI.HighlightLastWrite(h->offset - adjustOffset, h->length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
     }
 
+    ItemMenu::RedrawList().clear();
 }
 
 void update_big_panel()

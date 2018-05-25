@@ -324,6 +324,7 @@ void ListGroup::Run(double startBeat)
 //    m_Beat = startBeat;
     m_Beat = startBeat - 4.0/m_CurrentStepValue;
     m_Running = true;
+    m_Stopping = false;
     Step();
 }
 

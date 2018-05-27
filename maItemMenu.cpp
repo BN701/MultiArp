@@ -82,7 +82,10 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setCursorToEnd)
     if ( m_Cursor == pos )
     {
         if ( setCursorToEnd )
+        {
             m_Cursor = m_Items.end();
+            m_LastCursorPos = -1;
+        }
         else
             throw "MenuList::Remove(), should't try to remove current selection.";
     }
@@ -123,6 +126,7 @@ menu_list_cursor_t MenuList::Select(menu_list_cursor_t pos/*, bool setReturnFocu
 
     menu_list_cursor_t previous = m_Cursor;
     m_Cursor = pos;
+    m_LastCursorPos = distance(m_Items.begin(), m_Cursor);
 
     (*m_Cursor)->SetRedraw();
     m_SelectionChanged = true;
@@ -144,6 +148,7 @@ ItemMenu* MenuList::ClearCursor()
 {
     auto result = m_Cursor;
     m_Cursor = m_Items.end();
+    m_LastCursorPos = -1;
     return *result;
 }
 
@@ -253,7 +258,7 @@ ItemMenu::ItemMenu(const ItemMenu & m):
     m_Status(m.m_Status),
     m_Help(m.m_Help),
     m_ItemID(m.m_ItemID),
-    m_MenuList(m.m_MenuList),
+    m_MenuListPtr(m.m_MenuListPtr),
     m_PosInMenuList(m.m_PosInMenuList)
 {
 //    m_TestString = "Set from ItemMenu copy constructor body.";
@@ -268,7 +273,7 @@ ItemMenu::ItemMenu(const ItemMenu & m):
         SetFocus();
     }
 
-    if ( m_MenuList != NULL )
+    if ( m_MenuListPtr != NULL )
     {
         *m_PosInMenuList = this;
     }
@@ -288,8 +293,8 @@ ItemMenu::~ItemMenu()
         ReturnFocus();
     }
 
-    if ( m_MenuList != NULL && *m_PosInMenuList == this)
-        m_MenuList->Remove(m_PosInMenuList, true); // Allow removal even if selected.
+    if ( m_MenuListPtr != NULL && *m_PosInMenuList == this)
+        m_MenuListPtr->Remove(m_PosInMenuList, true); // Allow removal even if selected.
 
     m_RedrawList.remove(this);
 }
@@ -325,9 +330,9 @@ void ItemMenu::InitStatus()
 {
     m_Status.clear();
 
-    if ( m_MenuList != NULL )
+    if ( m_MenuListPtr != NULL )
     {
-        if ( /* m_MenuList->m_Container->m_GotFocus && */ m_MenuList->m_Cursor == m_PosInMenuList )
+        if ( /* m_MenuList->m_Container->m_GotFocus && */ m_MenuListPtr->m_Cursor == m_PosInMenuList )
             m_Status = " -> ";
         m_Status.resize(m_MenuListIndent + 4, ' ');
     }
@@ -384,30 +389,30 @@ bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & widt
     col = 0;
     width = 80; // Just a sensible looking default width.
 
-    if ( m_MenuList != NULL )
+    if ( m_MenuListPtr != NULL )
     {
-        if ( !m_MenuList->GetDisplayInfo(display, displayInfo) )
+        if ( !m_MenuListPtr->GetDisplayInfo(display, displayInfo) )
             return false;
 
         // Make sure selected item is within scrolling window.
 
-        if ( m_MenuList->m_SelectionChanged && m_MenuList->m_Cursor != m_MenuList->m_Items.end() )
+        if ( m_MenuListPtr->m_SelectionChanged && m_MenuListPtr->m_Cursor != m_MenuListPtr->m_Items.end() )
         {
-            int rowSelection = (*m_MenuList->m_Cursor)->m_MenuListRow;
+            int rowSelection = (*m_MenuListPtr->m_Cursor)->m_MenuListRow;
 
             if ( rowSelection < displayInfo->m_ScrollStart )
             {
                 displayInfo->m_ScrollStart = rowSelection;
-                m_MenuList->m_Container->SetRedraw();
+                m_MenuListPtr->m_Container->SetRedraw();
             }
 
             if ( rowSelection >= displayInfo->m_ScrollStart + displayInfo->m_ScrollHeight )
             {
                 displayInfo->m_ScrollStart = rowSelection - displayInfo->m_ScrollHeight + 1;
-                m_MenuList->m_Container->SetRedraw();
+                m_MenuListPtr->m_Container->SetRedraw();
             }
 
-            m_MenuList->m_SelectionChanged = false;
+            m_MenuListPtr->m_SelectionChanged = false;
         }
 
         // Check the current item.
@@ -422,7 +427,7 @@ bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & widt
 
         // Check if we need to clear space at the bottom of the display area.
 
-        int listSize = m_MenuList->m_Items.size();
+        int listSize = m_MenuListPtr->m_Items.size();
 
         if ( listSize < displayInfo->m_PreviousListSize )
         {

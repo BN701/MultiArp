@@ -212,7 +212,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
 //            c.SetFocus();
             c.SetDisplayIndent(m_MenuListIndent + 2);
             c.SetVisible(m_Visible);
-            m_MenuList->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
+            m_MenuListPtr->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
             c.SetReturnFocus(this);                         // Override return focus.
 //            MenuInsert(m_PosInMenuList, & c);
         }
@@ -233,13 +233,13 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_cmd_up:
-        if ( m_MenuList != NULL )
-            m_MenuList->DownCursorPos();
+        if ( m_MenuListPtr != NULL )
+            m_MenuListPtr->DownCursorPos();
         return true;
 
     case BaseUI::key_cmd_down:
-        if ( m_MenuList != NULL )
-            m_MenuList->UpCursorPos();
+        if ( m_MenuListPtr != NULL )
+            m_MenuListPtr->UpCursorPos();
         return true;
 
     case BaseUI::key_cmd_inc:

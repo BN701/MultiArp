@@ -182,68 +182,8 @@ struct PatternStore : public ItemMenu
     }
 
     void DeleteCurrentPattern();
-//    {
-//        if ( m_Patterns.empty() )
-//            return;
-//
-//        m_Deleted.push_back(m_Patterns.at(m_PosEdit));
-//        m_Patterns.erase(m_Patterns.begin() + m_PosEdit);
-//
-//        if ( m_Patterns.empty() )
-//        {
-//            m_PosEdit = 0;
-//            m_PosPlay = 0;
-//            return;
-//        }
-//
-//        // If the play pointer is above the pattern that was deleted,
-//        // move it down to keep it with the pattern it points at.
-//        //
-//        // Or, if the play pointer was pointing at the last pattern in
-//        // the list and that was deleted, it needs to point to the item
-//        // that's now at the end of the list.
-//        //
-//        // (If it was pointing at the pattern that was deleted, it now
-//        // points to the one that took its place.)
-//
-//        if ( m_PosPlay > m_PosEdit || m_PosPlay == m_Patterns.size() )
-//            m_PosPlay -= 1;
-//
-//        // The edit pointer stays in place and now points to next in
-//        // list (unless it was already at the end of the list).
-//
-//        if ( m_PosEdit == m_Patterns.size() )
-//            m_PosEdit -= 1;
-//
-//        SetRedraw();
-//    }
-
-    void DeleteAllPatterns()
-    {
-        while ( !m_Patterns.empty() )
-        {
-            m_Deleted.push_back(m_Patterns.back());
-            m_Patterns.erase(m_Patterns.end());
-        }
-
-        m_PosEdit = 0;
-        m_PosPlay = 0;
-    }
-
-    void PopDeletedPattern()
-    {
-        if ( m_Deleted.empty() )
-#ifdef MA_BLUE
-            return;
-#else
-            throw std::string("There are no deleted patterns to restore.");
-#endif
-        m_Patterns.push_back(m_Deleted.back());
-        m_Deleted.pop_back();
-
-        if ( !m_EditPosFollowsPlay )
-            m_PosEdit = m_Patterns.size() - 1;
-    }
+    void DeleteAllPatterns();
+    void PopDeletedPattern();
 
     bool PatternChanged(bool resetValue = false)
     {

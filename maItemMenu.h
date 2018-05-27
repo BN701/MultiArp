@@ -67,12 +67,17 @@ class MenuList
             m_Container(container)
         {}
 
+        ~MenuList()
+        {}
+
         bool DownCursorPos();
         bool UpCursorPos();
 
         bool m_SelectionChanged = false;
         bool * m_Visible = NULL;
         ItemMenu * m_Container = NULL;
+
+        int m_LastCursorPos = -1;
 
 };
 
@@ -172,11 +177,11 @@ class ItemMenu
 
         void SetMenuList(MenuList * list, menu_list_cursor_t pos)
         {
-            m_MenuList = list;
+            m_MenuListPtr = list;
             m_PosInMenuList = pos;
         }
 
-        void ClearMenuList() { m_MenuList = NULL; }
+        void ClearMenuList() { m_MenuListPtr = NULL; }
 
         bool GetDisplayInfo(BaseUI & display, int & row, int & col, int & width, Rectangle & clearArea);
 
@@ -221,7 +226,7 @@ class ItemMenu
 
         int m_ItemID = -1;
 
-        MenuList * m_MenuList = NULL;
+        MenuList * m_MenuListPtr = NULL;
         menu_list_cursor_t m_PosInMenuList;
 
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.

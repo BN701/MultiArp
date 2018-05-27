@@ -372,18 +372,18 @@ bool Note::HandleKey(BaseUI::key_command_t k)
     {
 //    case BaseUI::key_return:
     case BaseUI::key_cmd_back:
-        if ( m_MenuList != NULL )
+        if ( m_MenuListPtr != NULL )
         {
-            m_MenuList->m_Container->SetRedraw();
-            m_MenuList->DownCursorPos();
-            m_MenuList->Remove(m_PosInMenuList);
+            m_MenuListPtr->m_Container->SetRedraw();
+            m_MenuListPtr->DownCursorPos();
+            m_MenuListPtr->Remove(m_PosInMenuList);
         }
         break;
 
 #if 0
     case BaseUI::key_cmd_up:
-        if ( m_MenuList != NULL )
-            m_MenuList->DownCursorPos();
+        if ( m_MenuListPtr != NULL )
+            m_MenuListPtr->DownCursorPos();
         return true;
 
     case BaseUI::key_cmd_down:
@@ -577,7 +577,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             n.SetDisplayIndent(m_MenuListIndent + 2);
             n.SetItemID(m_PosEdit + 1);
             n.SetVisible(m_Visible);
-            m_MenuList->InsertAfter(m_PosInMenuList, & n, true);  // This selects it, too.
+            m_MenuListPtr->InsertAfter(m_PosInMenuList, & n, true);  // This selects it, too.
             n.SetReturnFocus(this);                         // Override return focus.
 //            n.SetFocus();
 //            MenuInsert(m_PosInMenuList, &n);
@@ -585,11 +585,11 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_cmd_back:
-        if ( m_MenuList != NULL )
+        if ( m_MenuListPtr != NULL )
         {
-            m_MenuList->m_Container->SetRedraw();
-            m_MenuList->DownCursorPos();
-            m_MenuList->Remove(m_PosInMenuList);
+            m_MenuListPtr->m_Container->SetRedraw();
+            m_MenuListPtr->DownCursorPos();
+            m_MenuListPtr->Remove(m_PosInMenuList);
         }
         break;
 

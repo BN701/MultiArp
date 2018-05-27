@@ -41,6 +41,7 @@ struct Pattern : public ItemMenu
     // Statics
 
     static Pattern EmptyPattern;
+    static int m_PatternCount;
     static std::unordered_set<std::string> m_ShortLabels;
 
     // Variables
@@ -92,6 +93,8 @@ struct Pattern : public ItemMenu
     Pattern(const Pattern & p);
     ~Pattern();
 
+    void ResetMenuList();
+
     menu_list_cursor_t CursorPos() { return m_MenuList.m_Cursor; }
     double LastRealTimeBeat() { return m_LastRealTimeBeat; }
 
@@ -106,8 +109,6 @@ struct Pattern : public ItemMenu
     bool GateHold() { return m_GateHold; }
     unsigned char Velocity() { return m_Velocity; }
 
-//    StepList & StepListForEdit() { return m_StepListSet.at(m_PosEdit); }
-//    RealTimeList & RTListForEdit() { return m_RealTimeSet.at(m_PosRealTimeEdit); }
 //    ListGroup & ListGroupForEdit() { return *m_ListGroups.at(m_PosEdit); }
     TranslateTable & PatternTranslateTable() { return m_TranslateTable; }
     FeelMap & PatternFeelMap() { return m_FeelMap; }
@@ -120,16 +121,15 @@ struct Pattern : public ItemMenu
     void SetLabel(const char * label);
     void SetShortLabel(const char * label = NULL);
 
+    int SetPatternID()
+    {
+        m_PatternID = ++m_PatternCount;
+        return m_PatternID;
+    }
+    int PatternID() { return m_PatternID; }
+
     virtual void SetRedraw();
     virtual void SetVisible(bool val);
-
-//    void SetCursorPos( int p )
-//    {
-////        if ( p >= 0 && p < m_StepListSet.size() )
-////            m_PosEdit = p;
-//        if ( p >= 0 && p < m_MenuList.size() )
-//            m_PosCursor = p;
-//    }
 
     command_menu_id_t PopUpMenuID()
     {
@@ -142,12 +142,6 @@ struct Pattern : public ItemMenu
     }
 
     std::string StepListManager(command_t command);
-
-//    void SetRealTimeEditPos( std::vector<int>::size_type p )
-//    {
-//        if ( p >= 0 && p < m_RealTimeSet.size() )
-//            m_PosRealTimeEdit = p;
-//    }
 
     void SetStepValue( double val ) { m_StepValue = val; }
 //    int StepListCount() { return m_StepListSet.size(); }
@@ -200,25 +194,18 @@ struct Pattern : public ItemMenu
     bool AllListsComplete();
 
     protected:
+        int m_PatternID = -1;
         virtual bool HandleKey(BaseUI::key_command_t k);
 
-//    void UpCursorPos() { SetCursorPos( m_PosCursor + 1); }
         void UpCursorPos()
         {
             m_MenuList.UpCursorPos();
-//        if ( m_PosCursor != --m_MenuList.end())
-//            m_PosCursor++;
         }
 
         void DownCursorPos()
         {
             m_MenuList.DownCursorPos();
-//        if ( m_PosCursor != m_MenuList.begin() )
-//            m_PosCursor--;
         }
-
-//    void UpRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit + 1); }
-//    void DownRTEditPos() { SetRealTimeEditPos( m_PosRealTimeEdit - 1); }
 
 };
 

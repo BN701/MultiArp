@@ -52,11 +52,9 @@ PatternStore g_PatternStore;
 Pattern Pattern::EmptyPattern;
 //ItemMenu PatternStore::m_MenuListWindow;
 
-#if 1
 void PatternStore::SetStatus()
 {
     int pos = 0;
-//    char buff[200];
 
     m_FieldPositions.clear();
     m_Highlights.clear();
@@ -87,185 +85,6 @@ void PatternStore::SetStatus()
         m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
-#else
-void PatternStore::SetStatus()
-{
-    size_t pos = 0;
-    m_Highlights.clear();
-    m_FieldPositions.clear();
-
-    InitStatus();
-    if ( m_Patterns.empty() )
-    {
-        m_Status = "Hit the menu key and create a pattern ...";
-        return;
-    }
-
-    char buff[100];
-#if defined(MA_BLUE)
-    const char * format = "%u/%u";
-#else
-    const char * format = "%lu/%lu";
-#endif
-    if ( m_GotFocus )
-        m_Status += "[Pattern] ";
-    else
-        m_Status += " Pattern  ";
-    pos = m_Status.size();
-    snprintf(buff, 100, format, m_PosEdit + 1, m_Patterns.size());
-    m_Status += buff;
-    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-
-//    m_Status += ", Step List ";
-//    pos = m_Status.size();
-//    if ( !m_Patterns.at(m_PosEdit).m_ListGroups.empty() )
-//    {
-//        snprintf(buff, 100, format,
-//            m_Patterns.at(m_PosEdit).m_PosEdit + 1,
-//            m_Patterns.at(m_PosEdit).m_ListGroups.size());
-//        m_Status += buff;
-//    }
-//    else
-//    {
-//        m_Status += "-/-";
-//    }
-//    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-//
-//    m_Status += ", Real Time List ";
-//    pos = m_Status.size();
-//    if ( !m_Patterns.at(m_PosEdit).m_RealTimeSet.empty() )
-//    {
-//        snprintf(buff, 100, format,
-//            m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1,
-//            m_Patterns.at(m_PosEdit).m_RealTimeSet.size());
-//        m_Status += buff;
-//    }
-//    else
-//    {
-//        m_Status += "-/-";
-//    }
-//    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-
-//    m_Status += ", ";
-//    pos = m_Status.size();
-//    m_Status += "Trig List";
-//    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
-
-//    m_Highlights.push_back(m_FieldPositions.at(m_PatternStoreFocus));
-    m_Highlights.push_back(m_FieldPositions.at(0));
-}
-#endif
-
-//bool PatternStore::HandleKey(BaseUI::key_command_t k)
-//{
-//    int temp;
-//
-//    switch ( k )
-//    {
-//    case BaseUI::key_return:
-//        switch ( m_PatternStoreFocus )
-//        {
-//        case psf_pattern:
-//            // TODO: Set current pattern (not Pattern Chain mode).
-//            break;
-//
-//        case psf_list:
-////            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).StepListCount() > 0 )
-//            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).ListGroupCount() > 0 )
-//            {
-//// TODO:LG
-////                StepList & s = m_Patterns.at(m_PosEdit).ListGroupForEdit();
-////                s.SetItemID(m_Patterns.at(m_PosEdit).m_PosEdit + 1);
-////                s.SetFocus();
-////                s.SetStatus();
-////                s.SetReturnFocus(this);
-//            }
-//            break;
-//
-////        case psf_rt_list:
-////            if ( !m_Patterns.empty() && m_Patterns.at(m_PosEdit).RealTimeListCount() > 0 )
-////            {
-////                RealTimeList & r = m_Patterns.at(m_PosEdit).RTListForEdit();
-////                r.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
-////                r.SetFocus();
-////                r.SetStatus();
-////                r.SetReturnFocus(this);
-////            }
-////            break;
-//
-//        case psf_trig_list:
-//            if ( !m_Patterns.empty() )
-//            {
-//                TrigList & t = m_Patterns.at(m_PosEdit).PatternTrigList();
-//                t.SetItemID(m_Patterns.at(m_PosEdit).m_PosRealTimeEdit + 1);
-//                t.SetFocus();
-//                t.SetStatus();
-//                t.SetReturnFocus(this);
-//            }
-//            break;
-//
-//        default:
-//            break;
-//        }
-//        break;
-//
-//    case BaseUI::key_left:
-//        temp = static_cast<int>(m_PatternStoreFocus) - 1;
-//        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
-//            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
-//        break;
-//
-//    case BaseUI::key_right:
-//        temp = static_cast<int>(m_PatternStoreFocus) + 1;
-//        if ( temp >= 0 && temp < num_psf_menu_focus_modes )
-//            m_PatternStoreFocus = static_cast<pattern_store_menu_focus_t>(temp);
-//        break;
-//
-//    case BaseUI::key_up:
-//        switch ( m_PatternStoreFocus )
-//        {
-//        case psf_pattern:
-//            DownEditPos();
-//            break;
-//        case psf_list:
-//            DownListPos();
-//            break;
-//        case psf_rt_list:
-//// TODO:LG
-////            DownRTListPos();
-//            break;
-//        default:
-//            break;
-//        }
-//        break;
-//
-//    case BaseUI::key_down:
-//        switch ( m_PatternStoreFocus )
-//        {
-//        case psf_pattern:
-//            UpEditPos();
-//            break;
-//        case psf_list:
-//            UpListPos();
-//            break;
-//        case psf_rt_list:
-//// TODO:LG
-////            UpRTListPos();
-//            break;
-//        default:
-//            break;
-//        }
-//        break;
-//
-//    default:
-//        return false;
-//    }
-//
-//    SetStatus();
-//
-//    return true;
-//}
-//
 
 bool PatternStore::HandleKey(BaseUI::key_command_t k)
 {
@@ -337,7 +156,9 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 //
 //    m_Patterns.back().SetLabel(label.c_str());
 
+    Pattern & p = m_Patterns.back();
     string label;
+
     if ( ! tokens.empty() && firstToken >= 0 )
     {
         auto token = tokens.begin() + firstToken;
@@ -353,15 +174,13 @@ int PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
     {
         // Automatic label name.
 
-        int n = m_Patterns.size();
+        int n = p.SetPatternID();
         while ( n > 0 )
         {
             label.insert(0, numbers[n % 10]);
             n /= 10;
         }
     }
-
-    Pattern & p = m_Patterns.back();
 
     p.SetShortLabel();
     p.SetLabel(label.c_str());
@@ -393,43 +212,100 @@ int PatternStore::CopyCurrentPattern()
         return m_PosEdit = m_Patterns.size() - 1;
 }
 
+#define DEBUG_PATTERN_LIST
+
 void PatternStore::DeleteCurrentPattern()
 {
     if ( m_Patterns.empty() )
         return;
 
-    SetRedraw();
+#ifdef DEBUG_PATTERN_LIST
+    string patternAddresses;
+    int i = 0;
+    for ( auto p = m_Patterns.begin(); p != m_Patterns.end(); p++, i++ )
+    {
+        char buff[20];
+        snprintf(buff, 20, "%02i:%p,", i, &(*p));
+        patternAddresses += buff;
+    }
+#endif
 
     m_Deleted.push_back(m_Patterns.at(m_PosEdit));
     m_Patterns.erase(m_Patterns.begin() + m_PosEdit);
 
+#ifdef DEBUG_PATTERN_LIST
+    patternAddresses += '-';
+    i = 0;
+    for ( auto p = m_Patterns.begin(); p != m_Patterns.end(); p++, i++ )
+    {
+        char buff[20];
+        snprintf(buff, 20, "%02i:%p,", i, &(*p));
+        patternAddresses += buff;
+    }
+#endif
+
     if ( m_Patterns.empty() )
     {
         m_MenuListWindow.SetRedraw();
+        SetRedraw();
         m_PosEdit = 0;
         m_PosPlay = 0;
-        return;
+    }
+    else
+    {
+        // If the play pointer is above the pattern that was deleted,
+        // move it down to keep it with the pattern it points at.
+        //
+        // Or, if the play pointer was pointing at the last pattern in
+        // the list and that was deleted, it needs to point to the item
+        // that's now at the end of the list.
+        //
+        // (If it was pointing at the pattern that was deleted, it now
+        // points to the one that took its place.)
+
+        if ( m_PosPlay > m_PosEdit || m_PosPlay == m_Patterns.size() )
+            m_PosPlay -= 1;
+
+        // The edit pointer stays in place and now points to next in
+        // list (unless it was already at the end of the list).
+
+        if ( m_PosEdit == m_Patterns.size() )
+            m_PosEdit -= 1;
+
+        for ( auto p = m_PosEdit; p < m_Patterns.size(); p++ )
+            m_Patterns[p].ResetMenuList();
+
+        SetEditPos(m_PosEdit);
+    }
+}
+
+void PatternStore::DeleteAllPatterns()
+{
+    while ( !m_Patterns.empty() )
+    {
+        m_Deleted.push_back(m_Patterns.back());
+        m_Patterns.erase(m_Patterns.end());
     }
 
-    // If the play pointer is above the pattern that was deleted,
-    // move it down to keep it with the pattern it points at.
-    //
-    // Or, if the play pointer was pointing at the last pattern in
-    // the list and that was deleted, it needs to point to the item
-    // that's now at the end of the list.
-    //
-    // (If it was pointing at the pattern that was deleted, it now
-    // points to the one that took its place.)
+    m_PosEdit = 0;
+    m_PosPlay = 0;
+}
 
-    if ( m_PosPlay > m_PosEdit || m_PosPlay == m_Patterns.size() )
-        m_PosPlay -= 1;
+void PatternStore::PopDeletedPattern()
+{
+    if ( m_Deleted.empty() )
+#ifdef MA_BLUE
+        return;
+#else
+        throw std::string("There are no deleted patterns to restore.");
+#endif
+    m_Patterns.push_back(m_Deleted.back());
+    m_Deleted.pop_back();
 
-    // The edit pointer stays in place and now points to next in
-    // list (unless it was already at the end of the list).
+    SetEditPos(m_Patterns.size() - 1);
 
-    if ( m_PosEdit == m_Patterns.size() )
-        m_PosEdit -= 1;
-
+    if ( !m_EditPosFollowsPlay )
+        m_PosEdit = m_Patterns.size() - 1;
 }
 
 

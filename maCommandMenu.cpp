@@ -85,6 +85,7 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_TOP, {false, C_CUE_CURRENT, "Cue", ""}},
     {C_MENU_ID_TOP, {false, C_COPY, "Copy", ""}},
     {C_MENU_ID_TOP, {false, C_DELETE, "Delete", ""}},
+    {C_MENU_ID_TOP, {false, C_UNDO_PATTERN_DELETE, "Undo", ""}},
     {C_MENU_ID_TOP, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
     // Pattern Store -> Settings

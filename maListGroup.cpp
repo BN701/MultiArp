@@ -234,13 +234,13 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
         return true;
 
     case BaseUI::key_cmd_up:
-        if ( m_MenuList != NULL )
-            m_MenuList->DownCursorPos();
+        if ( m_MenuListPtr != NULL )
+            m_MenuListPtr->DownCursorPos();
         return true;
 
     case BaseUI::key_cmd_down:
-        if ( m_MenuList != NULL )
-            m_MenuList->UpCursorPos();
+        if ( m_MenuListPtr != NULL )
+            m_MenuListPtr->UpCursorPos();
         return true;
 
     case BaseUI::key_cmd_left:
@@ -546,7 +546,8 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
 {
     if ( pItem != NULL )
     {
-        // Move cursor out of the way.
+        // Move cursor out of the way by selecting the owning
+        // list group, i.e. 'us'.
 
         menu.Select(m_PosInMenuList);
 
@@ -671,20 +672,20 @@ void StepListGroup::AddToMenuList(MenuList & m)
 
 void StepListGroup::InsertListsIntoMenu(menu_list_cursor_t before)
 {
-    if ( m_MenuList == NULL )
+    if ( m_MenuListPtr == NULL )
         return;
 
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
-        m_MenuList->Insert(before, &*it);
+        m_MenuListPtr->Insert(before, &*it);
 }
 
 void StepListGroup::RemoveListsFromMenu()
 {
-    if ( m_MenuList == NULL )
+    if ( m_MenuListPtr == NULL )
         return;
 
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
-        m_MenuList->Remove(it->MenuPos());
+        m_MenuListPtr->Remove(it->MenuPos());
 }
 
 void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,

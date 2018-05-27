@@ -122,7 +122,7 @@ enum command_t
     C_COPY,             // Copy current pattern into a new entry at the end of the pattern list.
     C_DELETE,           // Delete pattern and reduce size of pattern list.
     C_CLEAR,            // Clear pattern but leave empty entry in pattern list.
-    C_UNDO,             // Restore deleted or cleared pattern to end of the pattern list.
+    C_UNDO_PATTERN_DELETE,
     C_STATUS,           // Display current stats.
 
     C_PATTERN_CHAIN,    // Set pattern chain mode.

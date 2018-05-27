@@ -217,7 +217,7 @@ unordered_map<string, command_t> g_CommandList =
 
     {"status", C_STATUS},
     {"stat", C_STATUS},
-    {"undo", C_UNDO},
+    {"undo", C_UNDO_PATTERN_DELETE},
 
     {"store", C_STORE},
     {"store step", C_STORE_STEP},
@@ -350,7 +350,7 @@ void do_help(string topicName)
             set_status(STAT_POS_2, "Clear pattern but leave empty entry in pattern list.");
             break;
 
-        case C_UNDO :
+        case C_UNDO_PATTERN_DELETE :
             set_status(STAT_POS_2, "Restore deleted or cleared pattern to end of the pattern list.");
             break;
 
@@ -629,7 +629,7 @@ bool do_command(string commandString, int directCommand)
 //           update_pattern_status_panel();
            break;
 
-       case C_UNDO :
+       case C_UNDO_PATTERN_DELETE :
            g_PatternStore.PopDeletedPattern();
            set_status(STAT_POS_2, "Pattern restored at position %i.", g_PatternStore.m_Patterns.size());
 //           update_pattern_status_panel();

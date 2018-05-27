@@ -37,6 +37,7 @@
 
 using namespace std;
 
+int Pattern::m_PatternCount = 0;
 unordered_set<std::string> Pattern::m_ShortLabels;
 
 Pattern::Pattern():
@@ -58,7 +59,7 @@ Pattern::~Pattern()
         delete *it;
 
 //    m_MenuList.m_Items.clear();
-    ItemMenu::m_MenuList = NULL;    // Prevent ItemMenu destructor from attempting
+    ItemMenu::m_MenuListPtr = NULL;    // Prevent ItemMenu destructor from attempting
                                     // to remove ourselves from the menu list that
                                     // will already have been cleared.
 }
@@ -76,8 +77,9 @@ Pattern::Pattern(const Pattern & p):
 {
     m_Visible = false;
     m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
-    m_MenuList.Add(this);
 
+//    m_MenuList.Add(this);
+//
     // This is a copy constructor, so we have to copy each List Group
 
     for ( auto it = p.m_ListGroups.begin(); it != p.m_ListGroups.end(); it++ )
@@ -97,24 +99,49 @@ Pattern::Pattern(const Pattern & p):
             m_ListGroups.push_back(lgNew);
             lgNew->SetParent(this);
             lgNew->SetVisible(m_Visible);
-            lgNew->AddToMenuList(m_MenuList);
+//            lgNew->AddToMenuList(m_MenuList);
         }
     }
+//
+//    // Copy the menu list cursor position, too.
+//
+//    if ( !m_MenuList.m_Items.empty() )
+//    {
+//        m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
+//        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Items.end(); it++)
+//        {
+//            if ( it == p.m_MenuList.m_Cursor )
+//                break;
+//            m_MenuList.m_Cursor++;
+//        }
+//    }
+    ResetMenuList();
+}
+
+void Pattern::ResetMenuList()
+{
+//    ItemMenu::m_MenuListPtr = & m_MenuList;
+//    *(m_MenuList.m_Items.begin()) = this;
+//    m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
+
+    m_MenuList.m_Items.clear();
+
+    m_MenuList.Add(this);
+
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        (*it)->AddToMenuList(m_MenuList);
 
     // Copy the menu list cursor position, too.
 
-    if ( !m_MenuList.m_Items.empty() )
+    if ( m_MenuList.m_LastCursorPos >= 0 )
     {
         m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
-        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Items.end(); it++)
-        {
-            if ( it == p.m_MenuList.m_Cursor )
-                break;
+        for ( int pos = 0; pos < m_MenuList.m_LastCursorPos;  pos++)
             m_MenuList.m_Cursor++;
-        }
     }
+    else
+        m_MenuList.m_Cursor = m_MenuList.m_Items.end();
 }
-
 
 void Pattern::Clear()
 {
@@ -147,9 +174,8 @@ void Pattern::SetShortLabel(const char * label)
         m_ShortLabel = label;
     else if ( m_ShortLabel.empty() )
     {
-        static int n = 1;
         char buff[10];
-        snprintf(buff, 10, "P%02i", n++);
+        snprintf(buff, 10, "P%02i", m_PatternID);
         m_ShortLabel = buff;
     }
     else
@@ -188,8 +214,11 @@ void Pattern::SetRedraw()
     {
         ItemMenu::SetRedraw();
         for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
-            if ( *it != this )
+            if ( *it != this )  // Avoid recursive call back to Pattern::SetRedraw()!
+            {
+                Pattern & debugPattern = *dynamic_cast<Pattern*>(*it);
                 (*it)->SetRedraw();
+            }
     }
 }
 

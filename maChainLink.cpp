@@ -237,7 +237,7 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         {
         case 0:     // Pattern
             m_Pattern += 1;
-            m_FollowUp = update_pattern_browser;
+//            m_FollowUp = update_pattern_browser;
             break;
         case 1:     // Repeats
             m_Repeats += 1;
@@ -257,7 +257,7 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
             if ( m_Pattern > 0 )
             {
                 m_Pattern -= 1;
-                m_FollowUp = update_pattern_browser;
+//                m_FollowUp = update_pattern_browser;
             }
             break;
         case 1:     // Repeats

@@ -47,7 +47,6 @@ Pattern::Pattern():
 
     m_PopUpMenuID = C_MENU_ID_PATTERN;
     m_MenuList.Add(this);
-//        m_MenuList.Select(m_MenuPos);
     m_MenuListIndent = 0;
     m_DisplayObjectType = BaseUI::dot_pattern;
     m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_menu_list;
@@ -78,10 +77,33 @@ Pattern::Pattern(const Pattern & p):
     m_Visible = false;
     m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
 
-//    m_MenuList.Add(this);
-//
+    m_MenuList.Add(this);
+
     // This is a copy constructor, so we have to copy each List Group
 
+    CopyContent(p);
+
+}
+
+Pattern & Pattern::operator = (const Pattern & p)
+{
+    ItemMenu::operator = (p);
+
+    m_Pos = p.m_Pos;
+    m_Label = p.m_Label;
+    m_ShortLabel = p.m_ShortLabel;
+    m_StepValue = p.m_StepValue;
+    m_Gate = p.m_Gate;
+    m_GateHold = p.m_GateHold;
+    m_Velocity = p.m_Velocity;
+
+    CopyContent(p);
+
+    return *this;
+}
+
+void Pattern::CopyContent(const Pattern & p)
+{
     for ( auto it = p.m_ListGroups.begin(); it != p.m_ListGroups.end(); it++ )
     {
         ListGroup * lgNew = NULL;
@@ -99,49 +121,49 @@ Pattern::Pattern(const Pattern & p):
             m_ListGroups.push_back(lgNew);
             lgNew->SetParent(this);
             lgNew->SetVisible(m_Visible);
-//            lgNew->AddToMenuList(m_MenuList);
+            lgNew->AddToMenuList(m_MenuList);
         }
     }
-//
-//    // Copy the menu list cursor position, too.
-//
-//    if ( !m_MenuList.m_Items.empty() )
-//    {
-//        m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
-//        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Items.end(); it++)
-//        {
-//            if ( it == p.m_MenuList.m_Cursor )
-//                break;
-//            m_MenuList.m_Cursor++;
-//        }
-//    }
-    ResetMenuList();
-}
-
-void Pattern::ResetMenuList()
-{
-//    ItemMenu::m_MenuListPtr = & m_MenuList;
-//    *(m_MenuList.m_Items.begin()) = this;
-//    m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
-
-    m_MenuList.m_Items.clear();
-
-    m_MenuList.Add(this);
-
-    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
-        (*it)->AddToMenuList(m_MenuList);
 
     // Copy the menu list cursor position, too.
 
-    if ( m_MenuList.m_LastCursorPos >= 0 )
+    if ( !m_MenuList.m_Items.empty() )
     {
         m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
-        for ( int pos = 0; pos < m_MenuList.m_LastCursorPos;  pos++)
+        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Items.end(); it++)
+        {
+            if ( it == p.m_MenuList.m_Cursor )
+                break;
             m_MenuList.m_Cursor++;
+        }
     }
-    else
-        m_MenuList.m_Cursor = m_MenuList.m_Items.end();
 }
+
+
+//void Pattern::ResetMenuList()
+//{
+////    ItemMenu::m_MenuListPtr = & m_MenuList;
+////    *(m_MenuList.m_Items.begin()) = this;
+////    m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
+//
+//    m_MenuList.m_Items.clear();
+//
+//    m_MenuList.Add(this);
+//
+//    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+//        (*it)->AddToMenuList(m_MenuList);
+//
+//    // Copy the menu list cursor position, too.
+//
+//    if ( m_MenuList.m_LastCursorPos >= 0 )
+//    {
+//        m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
+//        for ( int pos = 0; pos < m_MenuList.m_LastCursorPos;  pos++)
+//            m_MenuList.m_Cursor++;
+//    }
+//    else
+//        m_MenuList.m_Cursor = m_MenuList.m_Items.end();
+//}
 
 void Pattern::Clear()
 {
@@ -208,7 +230,7 @@ void Pattern::SetShortLabel(const char * label)
     }
 }
 
-void Pattern::SetRedraw()
+void Pattern::SetRedraw() noexcept
 {
     if ( m_Visible )
     {
@@ -216,7 +238,7 @@ void Pattern::SetRedraw()
         for ( auto it = m_MenuList.m_Items.begin(); it != m_MenuList.m_Items.end(); it++ )
             if ( *it != this )  // Avoid recursive call back to Pattern::SetRedraw()!
             {
-                Pattern & debugPattern = *dynamic_cast<Pattern*>(*it);
+//                Pattern & debugPattern = *dynamic_cast<Pattern*>(*it);
                 (*it)->SetRedraw();
             }
     }

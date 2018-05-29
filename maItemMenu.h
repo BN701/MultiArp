@@ -87,14 +87,16 @@ class ItemMenu
     public:
         ItemMenu();
         ItemMenu(const ItemMenu & val);
+        ItemMenu & operator=(const ItemMenu &); // Needed because we have a move constructor.
+        ItemMenu(ItemMenu && val) noexcept;
         virtual ~ItemMenu();
 
-        enum follow_up_action_t
-        {
-            none,
-            update_pattern_browser,
-            num_follow_up_actions
-        };
+//        enum follow_up_action_t
+//        {
+//            none,
+//            update_pattern_browser,
+//            num_follow_up_actions
+//        };
 
         int ItemID() { return m_ItemID; }
         void SetItemID( int val ) { m_ItemID = val; }
@@ -120,7 +122,7 @@ class ItemMenu
         void ClearStatus() { m_Status.clear(); }
         virtual bool HandleKey(BaseUI::key_command_t k) { return false; };
 
-        virtual void SetFocus()
+        virtual void SetFocus() noexcept
         {
             if ( m_Focus != NULL )
             {
@@ -149,12 +151,12 @@ class ItemMenu
 
         std::vector<screen_pos_t> & ItemHighlights() { return m_Highlights; }
 
-        follow_up_action_t FollowUp()
-        {
-            follow_up_action_t t = m_FollowUp;
-            m_FollowUp = none;
-            return t;
-        }
+//        follow_up_action_t FollowUp()
+//        {
+//            follow_up_action_t t = m_FollowUp;
+//            m_FollowUp = none;
+//            return t;
+//        }
 
         command_menu_id_t PopUpMenuID()
         {
@@ -188,7 +190,7 @@ class ItemMenu
         static void ClearRedrawList() { m_RedrawList.clear(); }
         static std::list<ItemMenu *> & RedrawList() { return m_RedrawList; }
 
-        virtual void SetRedraw()
+        virtual void SetRedraw() noexcept
         {
             if ( m_Visible )
             {
@@ -216,7 +218,7 @@ class ItemMenu
         int m_MenuListIndent = 0;
         command_menu_id_t m_PopUpMenuID = C_MENU_ID_NONE;
         bool m_FirstField = true;
-        follow_up_action_t m_FollowUp = none;
+//        follow_up_action_t m_FollowUp = none;
         ItemMenu * m_ReturnFocus = NULL;
 
         BaseUI::display_object_type_t m_DisplayObjectType = BaseUI::dot_base;
@@ -227,7 +229,7 @@ class ItemMenu
         int m_ItemID = -1;
 
         MenuList * m_MenuListPtr = NULL;
-        menu_list_cursor_t m_PosInMenuList;
+        menu_list_cursor_t m_PosInMenuList; // This is an iterator to a list, so I think I read it's safe to store.
 
         std::vector<screen_pos_t> m_FieldPositions; // Offset/length.
         std::vector<screen_pos_t> m_Highlights; // Offset/length.

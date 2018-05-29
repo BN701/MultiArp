@@ -200,11 +200,6 @@ class TranslateTable : public ItemMenu
         std::string ShowNoteMap();
 
         virtual void SetStatus();
-        virtual void SetFocus()
-        {
-            ItemMenu::SetFocus();
-            // SetStatus();
-        }
 
         TranslateDiags & Diags() { return m_Diags; }
 

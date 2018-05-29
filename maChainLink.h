@@ -47,11 +47,6 @@ class ChainLink : public ItemMenu
 
         void SetParent( PatternChain * val ) { m_Parent = val; }
         virtual void SetStatus();
-        virtual void SetFocus()
-        {
-            ItemMenu::SetFocus();
-            // SetStatus();
-        }
 
     protected:
 //        virtual bool HandleKey(key_type_t k);

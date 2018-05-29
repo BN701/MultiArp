@@ -91,9 +91,12 @@ struct Pattern : public ItemMenu
 
     Pattern();
     Pattern(const Pattern & p);
+    Pattern & operator = (const Pattern & p);
     ~Pattern();
 
-    void ResetMenuList();
+    void CopyContent(const Pattern & p);
+
+//    void ResetMenuList();
 
     menu_list_cursor_t CursorPos() { return m_MenuList.m_Cursor; }
     double LastRealTimeBeat() { return m_LastRealTimeBeat; }
@@ -128,7 +131,7 @@ struct Pattern : public ItemMenu
     }
     int PatternID() { return m_PatternID; }
 
-    virtual void SetRedraw();
+    virtual void SetRedraw() noexcept;
     virtual void SetVisible(bool val);
 
     command_menu_id_t PopUpMenuID()

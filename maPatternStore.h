@@ -46,17 +46,28 @@
 
 // class State;
 
+
+
 struct PatternStore : public ItemMenu
 {
     ItemMenu m_MenuListWindow;
-    std::vector<int>::size_type m_PosPlay;
-    std::vector<int>::size_type m_PosEdit;
-//    std::vector<int>::size_type m_PosPatternChain;
 
+    // Yes, we're storing iterators. But these are list iterators, so they stay valid
+    // unless a specific item is deleted. (
+
+    std::list<Pattern>::iterator m_PosPlay = m_Patterns.end();
+    std::list<Pattern>::iterator m_PosEdit = m_Patterns.end();
+
+    // We still need to track with a numeric counter, sometimes, but never use for pattern lookup.
+
+    int m_PosEditIndex = -1;
+//    int m_PosPlayIndex = -1;
+
+//    std::vector<int>::size_type m_PosPatternChain;
 //    int m_PatternChainMode;
     bool m_ResetOnPatternChange;
     bool m_PhaseIsZero;
-    bool m_EditPosFollowsPlay;
+//    bool m_EditPosFollowsPlay;
     bool m_NewPatternPending;
     int m_NewPattern;
     bool m_PatternChanged;
@@ -64,20 +75,20 @@ struct PatternStore : public ItemMenu
 
     PatternChain m_PatternChain;
 
-    std::vector<Pattern> m_Patterns;
-    std::vector<Pattern> m_Deleted;
+    std::list<Pattern> m_Patterns;
+    std::list<Pattern> m_Deleted;
 
     Pattern m_DefaultPattern; // Somewhere to keep 'global' data when not using a specific pattern.
     double m_StepValueMultiplier = 1.0;
 
     PatternStore(/*TranslateTable & table*/):
-        m_PosPlay(0),
-        m_PosEdit(0),
+//        m_PosPlay(0),
+//        m_PosEdit(0),
 //        m_PosPatternChain(0),
 //        m_PatternChainMode(PatternChain::off),
         m_ResetOnPatternChange(true),
         m_PhaseIsZero(false),
-        m_EditPosFollowsPlay(true),
+//        m_EditPosFollowsPlay(true),
         m_NewPatternPending(false),
         m_NewPattern(-1),
         m_PatternChanged(false),
@@ -104,14 +115,14 @@ struct PatternStore : public ItemMenu
     void SetNewPatternPending( int val );
     bool NewPatternPending(bool clearAndReset = true);
 
-    void SetEditFocusFollowsPlay(bool bVal)
-    {
-        m_EditPosFollowsPlay = bVal;
-        if ( m_EditPosFollowsPlay )
-            m_PosEdit = m_PosPlay;
-    }
+//    void SetEditFocusFollowsPlay(bool bVal)
+//    {
+//        m_EditPosFollowsPlay = bVal;
+//        if ( m_EditPosFollowsPlay )
+//            m_PosEdit = m_PosPlay;
+//    }
 
-    bool EditFocusFollowsPlay() { return m_EditPosFollowsPlay; }
+//    bool EditFocusFollowsPlay() { return m_EditPosFollowsPlay; }
     void SetResetOnPatternChange(bool bVal) { m_ResetOnPatternChange = bVal; }
     void SetPatternChainMode(PatternChain::pattern_chain_mode_t bVal) { m_PatternChain.SetMode(bVal); }
     PatternChain::pattern_chain_mode_t PatternChainMode() { return m_PatternChain.Mode(); }
@@ -121,13 +132,13 @@ struct PatternStore : public ItemMenu
     void SetStepValCurrentEditPattern(int i)
     {
         if ( !m_Patterns.empty() )
-            m_Patterns.at(m_PosEdit).SetStepValue(i);
+            m_PosEdit->SetStepValue(i);
     }
 
     void SetLabelCurrentEditPattern(const char * label)
     {
         if ( !m_Patterns.empty() )
-            m_Patterns.at(m_PosEdit).SetLabel(label);
+            m_PosEdit->SetLabel(label);
     }
 
     double StepValueCurrentPlayPattern()
@@ -135,7 +146,7 @@ struct PatternStore : public ItemMenu
         if ( m_Patterns.empty() )
             return 0;
         else
-            return m_Patterns.at(m_PosPlay).StepValue();
+            return m_PosPlay->StepValue();
     }
 
     void SetPhaseIsZero() { m_PhaseIsZero = true; }
@@ -145,7 +156,7 @@ struct PatternStore : public ItemMenu
 
     std::string EditPatternToString();
 
-    std::string PatternSelectionList(unsigned start, unsigned rows);
+//    std::string PatternSelectionList(unsigned start, unsigned rows);
 
     std::string PatternChainToString();
     std::string PatternChainToStringForDisplay(int firstRow, int rows);
@@ -166,19 +177,19 @@ struct PatternStore : public ItemMenu
     Pattern & CurrentPlayPattern();
     Pattern & CurrentEditPattern();
 
-    int CurrentPosEdit() { return m_PosEdit; }
-    int CurrentPosPlay() { return m_PosPlay; }
-    int CurrentEditPatternID() { return m_PosEdit + 1; }
-    int CurrentPlayPatternID() { return m_PosPlay + 1; }
+//    int CurrentPosEdit() { return m_PosEdit; }
+//    int CurrentPosPlay() { return m_PosPlay; }
+    int CurrentEditPatternID() { return m_PosEdit->PatternID(); }
+    int CurrentPlayPatternID() { return m_PosPlay->PatternID(); }
 
     double LastRealTimeBeat();
 
-    int AddEmptyPattern(std::vector<std::string> & tokens, int firstToken);
-    int CopyCurrentPattern();
+    void AddEmptyPattern(std::vector<std::string> & tokens, int firstToken);
+    void CopyCurrentPattern();
     void ClearCurrentPattern()
     {
-        m_Deleted.push_back(m_Patterns.at(m_PosEdit));
-        m_Patterns.at(m_PosEdit).Clear();
+        m_Deleted.push_back(*m_PosEdit);
+        m_PosEdit->Clear();
     }
 
     void DeleteCurrentPattern();
@@ -193,32 +204,34 @@ struct PatternStore : public ItemMenu
         return result;
     }
 
-    void SetPlayPos( std::vector<int>::size_type p );
-    void SetEditPos( std::vector<int>::size_type p );
-    void UpEditPos() { SetEditPos(m_PosEdit + 1); }
-    void DownEditPos() { SetEditPos(m_PosEdit - 1); }
+void SetPlayPos(std::list<Pattern>::iterator it);
+void SetEditPos(std::list<Pattern>::iterator it);
+//    void UpEditPos() { SetEditPos(m_PosEdit + 1); }
+//    void DownEditPos() { SetEditPos(m_PosEdit - 1); }
+    void UpEditPos();
+    void DownEditPos();
 
 
-    void UpListPos();
-    void DownListPos();
-    void UpRTListPos();
-    void DownRTListPos();
+//    void UpListPos();
+//    void DownListPos();
+//    void UpRTListPos();
+//    void DownRTListPos();
 
-    bool ValidPosition( std::vector<int>::size_type p )
-    {
-        return p >= 0 && p < m_Patterns.size();
-    }
+//    bool ValidPosition( std::vector<int>::size_type p )
+//    {
+//        return p >= 0 && p < m_Patterns.size();
+//    }
 
     void ResetCurrentPattern()
     {
         if ( !m_Patterns.empty() )
-            m_Patterns.at(m_PosEdit).ResetPosition();
+            m_PosEdit->ResetPosition();
     }
 
     void ResetAllPatterns()
     {
-        for ( std::vector<Pattern>::iterator i = m_Patterns.begin(); i != m_Patterns.end(); i++ )
-            (*i).ResetPosition();
+        for ( auto it = m_Patterns.begin(); it != m_Patterns.end(); it++ )
+            it->ResetPosition();
         m_PatternChain.ResetPosPlay();
 //        m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
     }
@@ -252,10 +265,6 @@ struct PatternStore : public ItemMenu
     void DeleteCurrentRealTimeList();
 
     virtual void SetStatus();
-    virtual void SetFocus()
-    {
-        ItemMenu::SetFocus();
-    }
 
     void OpenCurrentItemMenu();
 

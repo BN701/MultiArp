@@ -504,90 +504,90 @@ bool do_command(string commandString, int directCommand)
             break;
 
 
-        case C_CUE :
-            if ( tokens.size() < 2 )
-            {
-                set_status(STAT_POS_2, "Hint: play nn, where 'nn' is pattern number.");
-                break;
-            }
-#if defined(MA_BLUE)
-            iTemp = strtol(tokens[1].c_str(), NULL, 0);
-            if ( iTemp == 0 )
-            {
-               set_status(STAT_POS_2, "Invalid pattern number.");
-               break;
-            }
-#else
-            iTemp = stoi(tokens[1].c_str());
-#endif
-            iTemp -= 1;
-            if ( ! g_PatternStore.ValidPosition(iTemp) )
-            {
-               set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
-               break;
-            }
-            set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
-            g_PatternStore.SetNewPatternPending(iTemp);
-            break;
+//        case C_CUE :
+//            if ( tokens.size() < 2 )
+//            {
+//                set_status(STAT_POS_2, "Hint: play nn, where 'nn' is pattern number.");
+//                break;
+//            }
+//#if defined(MA_BLUE)
+//            iTemp = strtol(tokens[1].c_str(), NULL, 0);
+//            if ( iTemp == 0 )
+//            {
+//               set_status(STAT_POS_2, "Invalid pattern number.");
+//               break;
+//            }
+//#else
+//            iTemp = stoi(tokens[1].c_str());
+//#endif
+//            iTemp -= 1;
+//            if ( ! g_PatternStore.ValidPosition(iTemp) )
+//            {
+//               set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
+//               break;
+//            }
+//            set_status(STAT_POS_2, "Cueing pattern: %s", tokens[1].c_str());
+//            g_PatternStore.SetNewPatternPending(iTemp);
+//            break;
 
         case C_CUE_CURRENT :
             if ( ! g_PatternStore.Empty() )
             {
                 set_status(STAT_POS_2, "Cueing pattern: %s", g_PatternStore.CurrentEditPattern().ShortLabel());
-                g_PatternStore.SetNewPatternPending(g_PatternStore.CurrentPosEdit());
+                g_PatternStore.SetNewPatternPending(g_PatternStore.CurrentEditPatternID());
                 g_PatternStore.SetRedraw();
             }
             break;
 
-        case C_EDIT :
-            if ( tokens.size() < 2 )
-            {
-                // No value specified, just open the menu.
-                g_PatternStore.SetFocus();
-                g_PatternStore.SetStatus();
-//                show_status_after_navigation();
-            }
-            else
-            {
-#if defined(MA_BLUE)
-                iTemp = strtol(tokens[1].c_str(), NULL, 0);
-                if ( iTemp == 0 )
-                {
-                   set_status(STAT_POS_2, "Invalid pattern number.");
-                   break;
-                }
-#else
-                iTemp = stoi(tokens[1].c_str());
-#endif
-                iTemp -= 1;
-                if ( ! g_PatternStore.ValidPosition(iTemp) )
-                {
-                    set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
-                    break;
-                }
-                set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
-                g_PatternStore.SetEditPos(iTemp);
-//                update_pattern_status_panel();
-            }
-            break;
+//        case C_EDIT :
+//            if ( tokens.size() < 2 )
+//            {
+//                // No value specified, just open the menu.
+//                g_PatternStore.SetFocus();
+//                g_PatternStore.SetStatus();
+////                show_status_after_navigation();
+//            }
+//            else
+//            {
+//#if defined(MA_BLUE)
+//                iTemp = strtol(tokens[1].c_str(), NULL, 0);
+//                if ( iTemp == 0 )
+//                {
+//                   set_status(STAT_POS_2, "Invalid pattern number.");
+//                   break;
+//                }
+//#else
+//                iTemp = stoi(tokens[1].c_str());
+//#endif
+//                iTemp -= 1;
+//                if ( ! g_PatternStore.ValidPosition(iTemp) )
+//                {
+//                    set_status(STAT_POS_2, "Requested pattern number out of range at the moment.");
+//                    break;
+//                }
+//                set_status(STAT_POS_2, "Editing pattern: %s", tokens[1].c_str());
+//                g_PatternStore.SetEditPos(iTemp);
+////                update_pattern_status_panel();
+//            }
+//            break;
 
-        case C_EDIT_ITEM:
-//            g_PatternStore.OpenCurrentItemMenu();
-//            show_status_after_navigation();
-            break;
+//        case C_EDIT_ITEM:
+////            g_PatternStore.OpenCurrentItemMenu();
+////            show_status_after_navigation();
+//            break;
 
-       case C_EDIT_CURSOR_LOCK:
-           g_PatternStore.SetEditFocusFollowsPlay(true);
-           set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
-//           update_pattern_status_panel();
-           break;
-       case C_EDIT_CURSOR_UNLOCK:
-           g_PatternStore.SetEditFocusFollowsPlay(false);
-           set_status(STAT_POS_2, "Edit focus unlocked.");
-           break;
-       case C_EDIT_CURSOR_LOCK_STATUS:
-           set_status(STAT_POS_2, "Edit focus %s.", g_PatternStore.EditFocusFollowsPlay() ? "locked" : "unlocked");
-           break;
+//       case C_EDIT_CURSOR_LOCK:
+//           g_PatternStore.SetEditFocusFollowsPlay(true);
+//           set_status(STAT_POS_2, "Edit focus locked with playing pattern.");
+////           update_pattern_status_panel();
+//           break;
+//       case C_EDIT_CURSOR_UNLOCK:
+//           g_PatternStore.SetEditFocusFollowsPlay(false);
+//           set_status(STAT_POS_2, "Edit focus unlocked.");
+//           break;
+//       case C_EDIT_CURSOR_LOCK_STATUS:
+//           set_status(STAT_POS_2, "Edit focus %s.", g_PatternStore.EditFocusFollowsPlay() ? "locked" : "unlocked");
+//           break;
 
        case C_NEW_PATTERN :
             g_PatternStore.AddEmptyPattern(tokens, firstParameter);

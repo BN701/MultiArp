@@ -24,13 +24,16 @@ ItemMenu * ItemMenu::m_Focus = NULL;
 ItemMenu * ItemMenu::m_DefaultFocus = NULL;
 std::list<ItemMenu*> ItemMenu::m_RedrawList;
 
-//bool ItemMenu::m_RedrawMenuList = false;
-//int ItemMenu::m_ObjectCount = 0;
+//
+//  MenuList
+//
+////////////////////////////////////////////////////////////////////////////////
 
 menu_list_cursor_t MenuList::Add(ItemMenu * item, bool select)
 {
-    m_Items.push_back(item);
-    menu_list_cursor_t newItemPos = --m_Items.end();
+//    m_Items.push_back(item);
+//    menu_list_cursor_t newItemPos = --m_Items.end();
+    menu_list_cursor_t newItemPos = m_Items.insert(m_Items.end(), item);
     item->SetMenuList(this, newItemPos);
     item->SetMenuListRow(m_Items.size() - 1);
     if ( select )
@@ -234,6 +237,11 @@ bool MenuList::GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayI
     return display.GetDisplayInfo(m_DisplayObjectType, displayInfo);
 }
 
+//
+//  ItemMenu
+//
+////////////////////////////////////////////////////////////////////////////////
+
 ItemMenu::ItemMenu()
 {
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
@@ -245,6 +253,17 @@ ItemMenu::ItemMenu()
 //    m_TestString = "Set from ItemMenu constructor body.";
 }
 
+/*
+    Copy constructor called during reallocation as vectors grow. Our default copy behaviour copes
+    with this.
+    (I understand that since C++11 the move constructor will be called if declared 'noexcept', or
+    if the copy constructor isn't there. Well, in the first case the copy constructor *is* still called,
+    and taking it out completely leads to build errors inside STL. For now, I'm stuck needing both.)
+
+    Todo: Override default copy behaviour - i.e. don't mess with Menu List things - by setting a 'genuine
+          copy' flag ... or use copy assignment?
+*/
+
 ItemMenu::ItemMenu(const ItemMenu & m):
     m_GotFocus(m.m_GotFocus),
     m_Visible(m.m_Visible),
@@ -252,7 +271,6 @@ ItemMenu::ItemMenu(const ItemMenu & m):
     m_MenuListIndent(m.m_MenuListIndent),
     m_PopUpMenuID(m.m_PopUpMenuID),
     m_FirstField(m.m_FirstField),
-    m_FollowUp(m.m_FollowUp),
     m_ReturnFocus(m.m_ReturnFocus),
     m_DisplayObjectType(m.m_DisplayObjectType),
     m_Status(m.m_Status),
@@ -275,6 +293,57 @@ ItemMenu::ItemMenu(const ItemMenu & m):
 
     if ( m_MenuListPtr != NULL )
     {
+        *m_PosInMenuList = this;
+    }
+}
+
+ItemMenu & ItemMenu::operator = (const ItemMenu & m)
+{
+    m_MenuListIndent = m.m_MenuListIndent;
+    m_PopUpMenuID = m.m_PopUpMenuID;
+    m_FirstField = m.m_FirstField;
+    m_ReturnFocus = m.m_ReturnFocus;
+    m_DisplayObjectType = m.m_DisplayObjectType;
+    m_Status = m.m_Status;
+
+    return *this;
+}
+
+/*
+    Move constructor should be called when objects moved by vector deletion.
+    Behaviour should be exactly same as default copy constructor.
+*/
+
+ItemMenu::ItemMenu(ItemMenu && m) noexcept:
+    m_GotFocus(m.m_GotFocus),
+    m_Visible(m.m_Visible),
+    m_MenuListRow(m.m_MenuListRow),
+    m_MenuListIndent(m.m_MenuListIndent),
+    m_PopUpMenuID(m.m_PopUpMenuID),
+    m_FirstField(m.m_FirstField),
+    m_ReturnFocus(m.m_ReturnFocus),
+    m_DisplayObjectType(m.m_DisplayObjectType),
+    m_Status(m.m_Status),
+    m_Help(m.m_Help),
+    m_ItemID(m.m_ItemID)
+{
+//    m_TestString = "Set from ItemMenu copy constructor body.";
+
+    // Doing these is fine if we're being copied as part
+    // of a reallocation, as the original will be destroyed.
+
+    // If making a real copy, remove focus and remove from menu beforehand.
+
+    if ( m_GotFocus )
+    {
+        SetFocus();
+    }
+
+    if ( m.m_MenuListPtr != NULL )
+    {
+        m_MenuListPtr = m.m_MenuListPtr;
+        m.m_MenuListPtr = NULL;
+        m_PosInMenuList = m.m_PosInMenuList;
         *m_PosInMenuList = this;
     }
 }

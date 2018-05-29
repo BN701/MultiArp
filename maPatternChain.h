@@ -100,11 +100,6 @@ class PatternChain : public ItemMenu
 //        }
 //
         virtual void SetStatus();
-        virtual void SetFocus()
-        {
-            ItemMenu::SetFocus();
-            // SetStatus();
-        }
 
     protected:
         enum pattern_chain_menu_focus_t

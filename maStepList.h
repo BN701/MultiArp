@@ -48,6 +48,10 @@ struct StepList : public ItemMenu
         m_Help = "S-Left/Right: insert cluster, C-Left/Right: copy cluster, S-Del: delete";
     }
 
+    StepList(const StepList & other) = default;
+    StepList & operator = (const StepList & other) = default;
+    StepList(StepList && other) noexcept = default;
+
     ~StepList()
     {
     }

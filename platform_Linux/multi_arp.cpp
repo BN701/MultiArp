@@ -107,6 +107,55 @@ void sigterm_exit(int sig)
     exit(0);
 }
 
+#if 0
+
+// Testing move constructors
+
+class TestClass{
+
+public:
+    TestClass(int s):
+        size(s), arr(new int[s]){
+    }
+    ~TestClass(){
+        if (arr)
+            delete arr;
+    }
+    // copy constructor
+    TestClass(const TestClass& other):
+            size(other.size), arr(new int[other.size]){
+        std::copy(other.arr, other.arr + other.size, arr);
+    }
+
+    // move constructor
+    TestClass(TestClass&& other) {
+        arr=other.arr;
+        size=other.size;
+
+        other.arr=nullptr;
+        other.size=0;
+    }
+
+private:
+    int size;
+    int * arr;
+};
+
+int main(){
+    vector<TestClass> vec;
+
+    clock_t start=clock();
+    for(int i=0;i<500000;i++){
+        vec.push_back(TestClass(1000));
+    }
+    clock_t stop=clock();
+    cout<<stop-start<<endl;
+
+    return 0;
+}
+
+#else
+
 int main(int argc, char *argv[])
 {
     // Initialize ...
@@ -335,3 +384,4 @@ int main(int argc, char *argv[])
 #endif
 
 }
+#endif

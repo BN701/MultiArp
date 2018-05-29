@@ -42,11 +42,6 @@ class FeelMap : public ItemMenu
         bool Active() { return m_Active; }
 
         virtual void SetStatus();
-        virtual void SetFocus()
-        {
-            ItemMenu::SetFocus();
-            // SetStatus();
-        }
 
         void New(std::vector<std::string> & tokens);
         void Add();

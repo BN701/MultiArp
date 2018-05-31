@@ -69,7 +69,7 @@ void PatternStore::SetStatus()
     {
 //        if ( i > 0 )
 //            m_Status += ",";
-        if ( m_NewPatternPending && it->PatternID() == m_NewPattern )
+        if ( m_NewPatternPending && it->ShortLabelHash() == m_NewPattern )
             m_Status += '+';
         else if ( it == m_PosPlay )
             m_Status += '>';
@@ -135,19 +135,9 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
-const char * numbers[] = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
-
 void PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
 {
-//    auto pos = m_Patterns.insert(m_Patterns.end(), m_DefaultPattern);
-
-//    m_Patterns.emplace_back();
-//    if ( m_Patterns.empty() )
-//        return;
-
-    auto pos = m_Patterns.emplace(m_Patterns.end());
-
-    *pos = m_DefaultPattern;
+    // See if we've been given a full label to build (command line version, only).
 
     string label;
 
@@ -162,62 +152,33 @@ void PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
             label += ' ';
         }
     }
-    else
-    {
-        // Automatic label name.
 
-//        int n = p.SetPatternID();
-        int n = pos->SetPatternID();
-        while ( n > 0 )
-        {
-            label.insert(0, numbers[n % 10]);
-            n /= 10;
-        }
-    }
+    auto pos = m_Patterns.emplace(m_Patterns.end());
 
-//    p.SetShortLabel();
-//    p.SetLabel(label.c_str());
-//    p.SetReturnFocus(this);
+    *pos = m_DefaultPattern;
     pos->SetShortLabel();
-    pos->SetLabel(label.c_str());
+    m_PatternLookup[pos->ShortLabelHash()] = pos;
+
+    pos->SetLabel(label);
     pos->SetReturnFocus(this);
-
-//    if ( m_EditPosFollowsPlay )
-//        return m_Patterns.size() - 1;
-//    else
-//        return m_PosEdit = m_Patterns.size() - 1;
-
-//    unsigned pos = m_Patterns.size() - 1;
 
     SetEditPos(pos);
     SetRedraw();
-
-//    return pos;
 
 }
 
 void PatternStore::CopyCurrentPattern()
 {
-//    m_Patterns.push_back(*m_PosEdit);
-//    SetRedraw();
-//    m_Patterns.back().ResetPosition();
-//    m_Patterns.back().SetShortLabel();
-//    m_Patterns.back().SetLabel((m_Patterns.back().Label() + ", copy").c_str());
-//
-//    if ( m_EditPosFollowsPlay )
-//        return m_Patterns.size() - 1;
-//    else
-//        return m_PosEdit = m_Patterns.size() - 1;
-//    auto pos = m_Patterns.insert(m_Patterns.end(), *m_PosEdit);
-
     auto pos = m_PosEdit;
+
     pos = m_Patterns.emplace(++pos);
     *pos = *m_PosEdit;
     pos->ResetPosition();
     pos->SetShortLabel();
-    pos->SetLabel((m_Patterns.back().Label() + ", copy").c_str());
+    m_PatternLookup[pos->ShortLabelHash()] = pos;
 
-//    if ( ! m_EditPosFollowsPlay )
+    pos->SetLabel(m_Patterns.back().Label() + ", copy");
+
     SetEditPos(pos);
     SetRedraw();
 }
@@ -229,53 +190,44 @@ void PatternStore::DeleteCurrentPattern()
     if ( m_Patterns.empty() )
         return;
 
-    bool resetPlayPos = m_PosEdit == m_PosPlay;
+    bool resetPlayPos = false;
 
-    m_Deleted.push_back(*m_PosEdit);
-    auto pos = m_Patterns.erase(m_PosEdit);
+    if ( m_PosEdit == m_PosPlay )
+    {
+        resetPlayPos = true;
+        m_PosPlay->StopAllListGroups(g_State.NextPhaseZero());
+    }
+
+    // Get next position in list for resetting edit pos.
+    auto pos = m_PosEdit;
+    pos++;
+
+    // Erase lookup entry and move the pattern. (No copying takes place here.)
+    m_PatternLookup.erase(m_PosEdit->ShortLabelHash());
+    m_PosEdit->SetVisible(false);
+    m_Deleted.splice(m_Deleted.end(), m_Patterns, m_PosEdit);
 
     if ( m_Patterns.empty() )
     {
         m_MenuListWindow.SetRedraw();
         SetRedraw();
-        m_PosEdit = pos;
-        m_PosPlay = pos;
+        m_PosEdit = m_Patterns.end();
+        m_PosPlay = m_Patterns.end();
         m_PosEditIndex = -1;
-//        m_PosPlayIndex = -1;
     }
     else
     {
+        if ( pos == m_Patterns.end() )
+            --pos;
         m_PosEdit = pos;
-        m_PosEditIndex = distance(m_Patterns.begin(), pos);
+        m_PosEdit->SetVisible(true);
+        m_PosEdit->SetRedraw();
+        m_PosEditIndex = distance(m_Patterns.begin(), m_PosEdit);
 
         if ( resetPlayPos )
         {
-            SetNewPatternPending(m_PosEdit->PatternID());
+            SetNewPatternPending(m_PosEdit->ShortLabelHash());
         }
-
-//        // If the play pointer is above the pattern that was deleted,
-//        // move it down to keep it with the pattern it points at.
-//        //
-//        // Or, if the play pointer was pointing at the last pattern in
-//        // the list and that was deleted, it needs to point to the item
-//        // that's now at the end of the list.
-//        //
-//        // (If it was pointing at the pattern that was deleted, it now
-//        // points to the one that took its place.)
-//
-//        if ( m_PosPlay > m_PosEdit || m_PosPlay == m_Patterns.size() )
-//            m_PosPlay -= 1;
-//
-//        // The edit pointer stays in place and now points to next in
-//        // list (unless it was already at the end of the list).
-//
-//        if ( m_PosEdit == m_Patterns.size() )
-//            m_PosEdit -= 1;
-//
-//        for ( auto p = m_PosEdit; p < m_Patterns.size(); p++ )
-//            m_Patterns[p].ResetMenuList();
-//
-//        SetEditPos(m_PosEdit);
     }
 
     SetRedraw();
@@ -283,15 +235,15 @@ void PatternStore::DeleteCurrentPattern()
 
 void PatternStore::DeleteAllPatterns()
 {
-    while ( !m_Patterns.empty() )
-    {
-        m_Deleted.push_back(m_Patterns.back());
-        m_Patterns.erase(m_Patterns.end());
-    }
+    m_Deleted.splice(m_Deleted.end(), m_Patterns, m_Patterns.begin(), m_Patterns.end());
+
+    m_PatternLookup.clear();
 
     m_PosEdit = m_Patterns.end();
     m_PosPlay = m_Patterns.end();
     m_PosEditIndex = -1;
+
+    SetRedraw();
 }
 
 void PatternStore::PopDeletedPattern()
@@ -299,13 +251,18 @@ void PatternStore::PopDeletedPattern()
     if ( m_Deleted.empty() )
         return;
 
-    auto pos = m_Patterns.insert(m_Patterns.end(), m_Deleted.back());
-    m_Deleted.pop_back();
+    auto pos = m_PosEdit;
+    auto source = --m_Deleted.end();
 
-    SetEditPos(pos);
+    // Apparently 'source' remains valid and points into the destination container
+    // after the transfer.
+    m_Patterns.splice(++pos, m_Deleted, source);
+    m_PatternLookup[source->ShortLabelHash()] = source;
 
-//    if ( !m_EditPosFollowsPlay )
-//        m_PosEdit = m_Patterns.size() - 1;
+    SetEditPos(source);
+//    m_PosEdit->SetVisible(true);
+//    m_PosEdit->SetRedraw();
+//    SetRedraw();
 }
 
 
@@ -402,7 +359,7 @@ Pattern & PatternStore::CurrentEditPattern()
 //        m_Patterns[m_PosEdit].DownRTEditPos();
 //}
 
-void PatternStore::SetNewPatternPending( int val )
+void PatternStore::SetNewPatternPending( size_t val )
 {
     m_NewPattern = val;
     m_NewPatternPending = true;
@@ -420,48 +377,48 @@ void PatternStore::SetNewPatternPending( int val )
 }
 
 
-string PatternStore::SetNewPatternOrJump( int val )
-{
-    if ( m_PatternChain.Mode() == PatternChain::off )
-    {
-        if ( val >= 0 && static_cast<unsigned>(val) < m_Patterns.size() )
-        {
-            SetNewPatternPending(val);
-            return "Cueing pattern %i";
-        }
-        else
-#ifdef MA_BLUE
-            return "Requested pattern doesn't exist!";
-#else
-            throw string("Requested pattern doesn't exist!");
-#endif
-    }
-    else
-    {
-        if ( val >= 0 && static_cast<unsigned>(val) < m_PatternChain.size() )
-        {
-            m_PatternChain.at(m_PatternChain.PosPlay()).ClearRemaining();
-            m_PatternChain.SetJumpOverride(val);
-            return "Jumping to chain step %i";
-        }
-        else
-#ifdef MA_BLUE
-            return "Jump stage doesn't exist!";
-#else
-            throw string("Jump stage doesn't exist!");
-#endif
-    }
-}
+//string PatternStore::SetNewPatternOrJump( string val )
+//{
+//    if ( m_PatternChain.Mode() == PatternChain::off )
+//    {
+//        if ( m_PatternLookup.count(val) == 1 )
+//        {
+//            SetNewPatternPending(val);
+//            return "Cueing pattern %i";
+//        }
+//        else
+//#ifdef MA_BLUE
+//            return "Requested pattern doesn't exist!";
+//#else
+//            throw string("Requested pattern doesn't exist!");
+//#endif
+//    }
+//    else
+//    {
+//        if ( val >= 0 && static_cast<unsigned>(val) < m_PatternChain.size() )
+//        {
+//            m_PatternChain.at(m_PatternChain.PosPlay()).ClearRemaining();
+//            m_PatternChain.SetJumpOverride(val);
+//            return "Jumping to chain step %i";
+//        }
+//        else
+//#ifdef MA_BLUE
+//            return "Jump stage doesn't exist!";
+//#else
+//            throw string("Jump stage doesn't exist!");
+//#endif
+//    }
+//}
 
-void PatternStore::SetPlayPos( std::list<Pattern>::iterator p )
+void PatternStore::SetPlayPattern(size_t patternIdHash)
 {
-    if ( p == m_Patterns.end() )
+    if ( m_PatternLookup.count(patternIdHash) == 0 )
         return;
+
+    auto p = m_PatternLookup[patternIdHash];
 
     m_PosPlay = p;
     m_PosPlay->RunAllListGroups(g_State.Beat());
-//    if ( m_EditPosFollowsPlay /*&& m_PatternChainMode == PC_MODE_NONE*/ )
-//        m_PosEdit = m_PosPlay;
     m_PatternChanged = true; // Cleared again at the start of Step() ..
 
     if ( m_ResetOnPatternChange )
@@ -508,8 +465,8 @@ bool PatternStore::NewPatternPending(bool clearAndReset)
 
     if ( m_NewPatternPending )
     {
-        // Todo: Pattern Lookup
-//        SetPlayPos(m_NewPattern);
+        // Todo: OK to let this fail silently?
+        SetPlayPattern(m_NewPattern);
         m_NewPatternPending = false;
         SetRedraw();
         return true;
@@ -536,13 +493,13 @@ string PatternStore::PatternStatusPlay()
 
     string result;
     char buf[80];
-#if defined(MA_BLUE)
-    const char * format = "Play: %u";
-#else
-    const char * format = "Play: %lu";
-#endif
+//#if defined(MA_BLUE)
+//    const char * format = "Play: %u";
+//#else
+//    const char * format = "Play: %lu";
+//#endif
 
-    snprintf(buf, 80, format, m_PosPlay->PatternID());
+    snprintf(buf, 80, "Play: %s", m_PosPlay->ShortLabel());
     result += buf;
 
 #if defined(MA_BLUE)
@@ -582,7 +539,7 @@ string PatternStore::PatternStatusEdit()
     string result;
     char buf[80];
 
-    snprintf(buf, 80, "Edit: " U_FORMAT, m_PosEdit->PatternID());
+    snprintf(buf, 80, "Edit: %s", m_PosEdit->ShortLabel());
     result += buf;
 
 //    if (  ! m_Patterns.at(m_PosEdit).m_StepListSet.empty() )
@@ -820,7 +777,7 @@ string PatternStore::ToString()
 
     for ( auto it = m_Patterns.begin(); it != m_Patterns.end(); it++ )
     {
-        snprintf(buff, 100, "<< Pattern %i >>\n\n", it->PatternID());
+        snprintf(buff, 100, "<< Pattern %s >>\n\n", it->ShortLabel());
         result += buff;
         result += it->ToString("Pattern");
         result += "\n";
@@ -1268,7 +1225,7 @@ string PatternStore::ShowPatternPlayData()
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
         snprintf(buff, 100, "P %02u: ", m_PosEdit + 1);
 #else
-        snprintf(buff, 100, "P %02lu: ", m_PosEdit->PatternID());
+        snprintf(buff, 100, "P %s: ", m_PosEdit->ShortLabel());
 #endif
         result += buff;
     }

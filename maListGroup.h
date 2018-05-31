@@ -46,6 +46,8 @@ class ListGroup : public ItemMenu
         ListGroup(ListGroup & lg);
         ~ListGroup();
 
+        ListGroup & operator = (const ListGroup &);
+
         list_group_type Type() { return m_Type; }
         void ResetPosition();
         void SetStatus();

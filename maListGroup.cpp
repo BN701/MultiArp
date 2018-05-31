@@ -72,7 +72,6 @@ ListGroup::ListGroup(Pattern * p, list_group_type type):
     m_Type(type)
 {
     m_ListGroupsLookup[m_ListGroupID] = this;
-//    m_ListGroupsLookup.insert(m_ListGroupsLookup.end(), pair<int, ListGroup*>(m_ListGroupID, this) );
 }
 
 ListGroup::ListGroup(ListGroup & lg):
@@ -92,17 +91,6 @@ ListGroup::ListGroup(ListGroup & lg):
 {
     // If parent is being reallocated, old parent pointer is invalid!
 
-    // Todo: I don't think we can find out the new parent from here ...
-    // Do we have to find an alternative to parent pointers? I don't like
-    // relying on the parent copy constructor to update the parent pointer
-    // (though that's exactly what we're doing here).
-
-    // We won't know if this copy is part of a vector reallocation or a genuine copy.
-    // We have to assume the former and swap IDs around so lookups will seemlessly
-    // go to the new copy of the existing list before the old one is deleted.
-    // If a genuine copy is taking place, we must be aware that the original
-    // item must be used as new.
-
     int temp = m_ListGroupID;
     m_ListGroupID = lg.m_ListGroupID;
     lg.m_ListGroupID = temp;
@@ -116,6 +104,18 @@ ListGroup::~ListGroup()
 
     if ( it != m_ListGroupsLookup.end() && it->second == this )
         m_ListGroupsLookup.erase(m_ListGroupID);
+}
+
+ListGroup & ListGroup::operator = (const ListGroup & lg)
+{
+    ItemMenu::operator = (lg);
+    m_MidiChannel = lg.m_MidiChannel;
+    m_CurrentStepValue = lg.m_CurrentStepValue;
+    m_LastUsedStepValue = lg.m_LastUsedStepValue;
+    m_ListGroupMenuFocus = lg.m_ListGroupMenuFocus;
+    m_Beat = lg.m_Beat;
+    m_Phase = lg.m_Phase;
+    m_Tempo = lg.m_Tempo;
 }
 
 void ListGroup::ResetPosition()
@@ -891,7 +891,7 @@ void StepListGroup::Run(double startBeat)
 
 void StepListGroup::SetVisible(bool val)
 {
-    m_Visible = val;
+    ItemMenu::SetVisible(val);
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         it->SetVisible(val);
 }

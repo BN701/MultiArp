@@ -128,7 +128,7 @@ public:
     }
 
     // move constructor
-    TestClass(TestClass&& other) {
+    TestClass(TestClass&& other) noexcept {
         arr=other.arr;
         size=other.size;
 

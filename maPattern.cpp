@@ -65,9 +65,10 @@ Pattern::~Pattern()
 
 Pattern::Pattern(const Pattern & p):
     ItemMenu(p),
-    m_Pos(p.m_Pos),
+//    m_Pos(p.m_Pos),
     m_Label(p.m_Label),
     m_ShortLabel(p.m_ShortLabel),
+    m_ShortLabelHash(p.m_ShortLabelHash),
     m_StepValue(p.m_StepValue),
     m_Gate(p.m_Gate),
     m_GateHold(p.m_GateHold),
@@ -89,9 +90,10 @@ Pattern & Pattern::operator = (const Pattern & p)
 {
     ItemMenu::operator = (p);
 
-    m_Pos = p.m_Pos;
+//    m_Pos = p.m_Pos;
     m_Label = p.m_Label;
-    m_ShortLabel = p.m_ShortLabel;
+    m_ShortLabel = p.m_ShortLabel;      // If genuine copy, need to call SetShortLabel() again to generate unique ID.
+    m_ShortLabelHash = p.m_ShortLabelHash;  // Not sure about the validity of doing this, given the above.
     m_StepValue = p.m_StepValue;
     m_Gate = p.m_Gate;
     m_GateHold = p.m_GateHold;
@@ -106,20 +108,22 @@ void Pattern::CopyContent(const Pattern & p)
 {
     for ( auto it = p.m_ListGroups.begin(); it != p.m_ListGroups.end(); it++ )
     {
-        ListGroup * lgNew = NULL;
         switch( (*it)->Type() )
         {
             case ListGroup::lgtype_step:
-                lgNew = new StepListGroup(dynamic_cast<StepListGroup*>(*it));
+                m_ListGroups.emplace_back(new StepListGroup(this));
+                *dynamic_cast<StepListGroup*>(m_ListGroups.back()) = *dynamic_cast<StepListGroup*>(*it);
                 break;
             case ListGroup::lgtype_realtime:
-                lgNew = new RTListGroup(dynamic_cast<RTListGroup*>(*it));
+                m_ListGroups.emplace_back(new RTListGroup(this));
+                *dynamic_cast<RTListGroup*>(m_ListGroups.back()) = *dynamic_cast<RTListGroup*>(*it);
                 break;
         }
+
+        ListGroup * lgNew = m_ListGroups.back();
         if ( lgNew != NULL )
         {
-            m_ListGroups.push_back(lgNew);
-            lgNew->SetParent(this);
+//            lgNew->SetParent(this);
             lgNew->SetVisible(m_Visible);
             lgNew->AddToMenuList(m_MenuList);
         }
@@ -130,12 +134,8 @@ void Pattern::CopyContent(const Pattern & p)
     if ( !m_MenuList.m_Items.empty() )
     {
         m_MenuList.m_Cursor = m_MenuList.m_Items.begin();
-        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Items.end(); it++)
-        {
-            if ( it == p.m_MenuList.m_Cursor )
-                break;
+        for ( auto it = p.m_MenuList.m_Items.begin(); it != p.m_MenuList.m_Cursor; it++)
             m_MenuList.m_Cursor++;
-        }
     }
 }
 
@@ -165,11 +165,16 @@ void Pattern::CopyContent(const Pattern & p)
 //        m_MenuList.m_Cursor = m_MenuList.m_Items.end();
 //}
 
+int Pattern::SetPatternID()
+{
+    // Note that this is *not* a unique ID.
+    m_PatternID = ++m_PatternCount;
+    return m_PatternID;
+}
+
 void Pattern::Clear()
 {
     m_Label.clear();
-//        m_StepListSet.clear();
-//        m_RealTimeSet.clear();
     while ( ! m_ListGroups.empty() )
     {
         delete m_ListGroups.back();
@@ -184,20 +189,45 @@ void Pattern::Clear()
     m_Velocity = 64;
 }
 
-void Pattern::SetLabel(const char * label)
+
+void Pattern::SetLabel(string label)
 {
+    static const char * numbers[] =
+    {
+        "Zero",
+        "One",
+        "Two",
+        "Three",
+        "Four",
+        "Five",
+        "Six",
+        "Seven",
+        "Eight",
+        "Nine"
+    };
+
+    if ( label.empty() )
+    {
+        // Automatic label name.
+        int n = m_PatternID;
+        while ( n > 0 )
+        {
+            label.insert(0, numbers[n % 10]);
+            n /= 10;
+        }
+    }
     m_Label = label;
     SetRedraw();
 }
 
-void Pattern::SetShortLabel(const char * label)
+std::hash<std::string> str_hash;
+
+void Pattern::SetShortLabel()
 {
-    if ( label != NULL )
-        m_ShortLabel = label;
-    else if ( m_ShortLabel.empty() )
+    if ( m_ShortLabel.empty() )
     {
         char buff[10];
-        snprintf(buff, 10, "P%02i", m_PatternID);
+        snprintf(buff, 10, "P%02i", SetPatternID());
         m_ShortLabel = buff;
     }
     else
@@ -228,6 +258,8 @@ void Pattern::SetShortLabel(const char * label)
             }
         }
     }
+
+    m_ShortLabelHash = str_hash(m_ShortLabel);
 }
 
 void Pattern::SetRedraw() noexcept
@@ -246,14 +278,14 @@ void Pattern::SetRedraw() noexcept
 
 void Pattern::SetVisible(bool val)
 {
-    m_Visible = val;
+    ItemMenu::SetVisible(val);
     for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
         (*it)->SetVisible(val);
 }
 
 void Pattern::ResetPosition()
 {
-    m_Pos = 0;
+//    m_Pos = 0;
 //    m_TrigList.ResetPosition();
 
     for ( auto group = m_ListGroups.begin(); group != m_ListGroups.end(); group++ )

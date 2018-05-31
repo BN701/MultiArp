@@ -46,13 +46,10 @@ struct Pattern : public ItemMenu
 
     // Variables
 
-    std::vector<StepList>::size_type m_Pos = 0;
+//    std::vector<StepList>::size_type m_Pos = 0;
 //    std::vector<StepList>::size_type m_PosEdit;
-    std::vector<RealTimeList>::size_type m_PosRealTimeEdit = 0;
-    std::vector<StepList>::size_type m_LastRequestedPos = 0;
-
-    std::string m_Label = "Empty Pattern";
-    std::string m_ShortLabel;
+//    std::vector<RealTimeList>::size_type m_PosRealTimeEdit = 0;
+//    std::vector<StepList>::size_type m_LastRequestedPos = 0;
 
     double m_StepValue = 16;
     double m_Gate = 0.5;
@@ -73,11 +70,6 @@ struct Pattern : public ItemMenu
     std::vector<ListGroup *> m_ListGroups;
 
 //    std::vector<int> m_Trigs;
-
-//    std::vector<StepList> m_StepListSet;
-//    std::vector<RealTimeList> m_RealTimeSet;
-
-//    std::list<ItemMenu *>::iterator m_PosCursor;
 
     // Embedded objects
 
@@ -121,16 +113,6 @@ struct Pattern : public ItemMenu
 
     void Clear();
 
-    void SetLabel(const char * label);
-    void SetShortLabel(const char * label = NULL);
-
-    int SetPatternID()
-    {
-        m_PatternID = ++m_PatternCount;
-        return m_PatternID;
-    }
-    int PatternID() { return m_PatternID; }
-
     virtual void SetRedraw() noexcept;
     virtual void SetVisible(bool val);
 
@@ -147,23 +129,30 @@ struct Pattern : public ItemMenu
     std::string StepListManager(command_t command);
 
     void SetStepValue( double val ) { m_StepValue = val; }
-//    int StepListCount() { return m_StepListSet.size(); }
     int ListGroupCount() { return m_ListGroups.size(); }
-//    int RealTimeListCount() { return m_RealTimeSet.size(); }
 //    int TrigListCount() { return m_TrigList.Size(); }
     void ResetPosition();
 
     void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue, double globalBeat);
 
-    bool LabelEmpty()
-    {
-        return m_Label.empty();
-    }
+//    bool LabelEmpty()
+//    {
+//        return m_Label.empty();
+//    }
 
 //    size_t TrigPlayPosition() { return m_TrigList.PlayPosition(); }
     std::string Label() { return m_Label; }
     std::string Label(size_t width);
+
     const char * ShortLabel() { return m_ShortLabel.c_str(); }
+    void SetLabel(std::string label);
+//    void SetShortLabel(const char * label = NULL);
+    void SetShortLabel();
+
+    size_t ShortLabelHash() { return m_ShortLabelHash; };
+
+
+
 //    std::string TrigsToStringForDisplay();
     std::string ToString(const char * prefix);
     std::string Display(int mode, std::vector<PosInfo2> & highlights, int centre = 30, int width = 80, int rows = 11);
@@ -197,7 +186,6 @@ struct Pattern : public ItemMenu
     bool AllListsComplete();
 
     protected:
-        int m_PatternID = -1;
         virtual bool HandleKey(BaseUI::key_command_t k);
 
         void UpCursorPos()
@@ -209,6 +197,15 @@ struct Pattern : public ItemMenu
         {
             m_MenuList.DownCursorPos();
         }
+
+    private:
+        int m_PatternID = -1;   // Not unique, only incremented for new patterns, not copies.
+
+        int SetPatternID();
+
+        std::string m_Label = "Empty Pattern";
+        std::string m_ShortLabel;
+        size_t m_ShortLabelHash = -1;
 
 };
 

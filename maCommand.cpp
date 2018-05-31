@@ -483,9 +483,9 @@ bool do_command(string commandString, int directCommand)
            if ( tokens.size() > 1 )
            {
                size_t pos = commandString.find(' ') + 1;
-               g_PatternStore.CurrentEditPattern().SetLabel(commandString.substr(pos).c_str());
+               g_PatternStore.CurrentEditPattern().SetLabel(commandString.substr(pos));
            }
-           set_status(STAT_POS_2, "Pattern %i: %s",
+           set_status(STAT_POS_2, "Pattern %s: %s",
                g_PatternStore.CurrentEditPatternID(),
                g_PatternStore.CurrentEditPattern().Label(50).c_str());
            break;
@@ -534,7 +534,7 @@ bool do_command(string commandString, int directCommand)
             if ( ! g_PatternStore.Empty() )
             {
                 set_status(STAT_POS_2, "Cueing pattern: %s", g_PatternStore.CurrentEditPattern().ShortLabel());
-                g_PatternStore.SetNewPatternPending(g_PatternStore.CurrentEditPatternID());
+                g_PatternStore.SetNewPatternPending(g_PatternStore.CurrentEditPattern().ShortLabelHash());
                 g_PatternStore.SetRedraw();
             }
             break;
@@ -647,12 +647,12 @@ bool do_command(string commandString, int directCommand)
                 g_State.SetPatternReset(RESET_ALL);
                 set_status(STAT_POS_2, "All patterns will be reset.");
             }
-           else if ( g_PatternStore.EditPatternIsPlayPattern() )
-           {
-
-               g_State.SetPatternReset(RESET_CURRENT);
-               set_status(STAT_POS_2, "Current pattern will be reset.");
-           }
+//           else if ( g_PatternStore.EditPatternIsPlayPattern() )
+//           {
+//
+//               g_State.SetPatternReset(RESET_CURRENT);
+//               set_status(STAT_POS_2, "Current pattern will be reset.");
+//           }
            else
            {
                // Reset the edit pattern immediately.
@@ -1236,11 +1236,11 @@ bool do_command(string commandString, int directCommand)
 //            iTemp = stoi(tokens[0]);
             iTemp = strtol(tokens[0].c_str(), NULL, 0);
 #endif
-            if ( iTemp > 0 )
-                // Function returns a format string. Too obfuscated?
-                set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp - 1).c_str(), iTemp);
-            else
-                set_status(STAT_POS_2, "Phrase not recognised.");
+//            if ( iTemp > 0 )
+//                // Function returns a format string. Too obfuscated?
+//                set_status(STAT_POS_2, g_PatternStore.SetNewPatternOrJump(iTemp - 1).c_str(), iTemp);
+//            else
+            set_status(STAT_POS_2, "Phrase not recognised.");
             break;
         default :
             break;

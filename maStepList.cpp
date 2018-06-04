@@ -291,7 +291,7 @@ void StepList::InsertLeft()
         m_PosEdit = 0;
     }
     else
-        m_Clusters.insert(m_Clusters.begin() + m_PosEdit, *(new Cluster()));
+        m_Clusters.emplace(m_Clusters.begin() + m_PosEdit);
 }
 
 void StepList::InsertRight()
@@ -303,7 +303,7 @@ void StepList::InsertRight()
     }
     else
     {
-        m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, *(new Cluster()));
+        m_Clusters.emplace(m_Clusters.begin() + m_PosEdit + 1);
         m_PosEdit += 1;
     }
 }
@@ -340,34 +340,36 @@ Cluster * StepList::Step()
     if ( m_Clusters.empty() )
         return NULL;
 
-//    m_LastRequestedPos = m_Pos;
-    Cluster *pCluster = & m_Clusters[m_PosSL++];
+    Cluster *pCluster = NULL;
 
-    // Look ahead for rests.
-
-    if ( !pCluster->IsRest() )
+    if ( m_PosSL < m_Clusters.size() )
     {
-        vector<int>::size_type p = m_PosSL;
-        pCluster->m_StepLength = 0;
+        pCluster = & m_Clusters[m_PosSL];
 
-        do
+        // Look ahead for rests.
+
+        if ( !pCluster->IsRest() )
         {
-            if ( p == m_Clusters.size() )
-                p = 0;
+            vector<int>::size_type p = m_PosSL + 1;
+            pCluster->m_StepLength = 0;
 
-            if ( m_Clusters[p++].IsRest() )
-                pCluster->m_StepLength += 1;
-            else
-                break;
+            do
+            {
+                if ( p >= m_Clusters.size() )
+                    p = 0;
 
-        } while ( true );
+                if ( m_Clusters[p++].IsRest() )
+                    pCluster->m_StepLength += 1;
+                else
+                    break;
+
+            } while ( true );
+        }
     }
-    else
-        pCluster = NULL;
 
     // Set completion flag.
 
-    if ( m_PosSL >= m_Clusters.size() )
+    if ( ++m_PosSL >= m_Clusters.size() )
     {
         m_Complete = true;
         m_PosSL = 0;

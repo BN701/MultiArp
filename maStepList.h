@@ -31,14 +31,11 @@ struct StepList : public ItemMenu
 {
     std::vector<Cluster> m_Clusters;
     std::vector<Cluster>::size_type m_PosSL = 0;                  // Points to the next position to be retrieved.
-//    std::vector<Cluster>::size_type m_NowPlayingPos = 0;        // Updated by parent group when events are played.
     bool m_Complete = false;
 
 //    std::vector<PosInfo> m_PosInfo; // Store string element offsets and lengths for highlighting.
 
-    // std::string m_Label;
     static StepList EmptyList;
-
 
     StepList()
     {
@@ -134,7 +131,6 @@ struct StepList : public ItemMenu
 
     private:
         std::vector<Cluster>::size_type m_NowPlayingPos = -1;        // Updated by parent group when events are played.
-
 
 };
 

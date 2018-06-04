@@ -50,6 +50,8 @@ int open_seq(snd_seq_t **seq_handle, int in_ports[], int out_ports[], int num_in
         }
     }
 
+    snd_config_update_free_global();
+
     return(0);
 }
 

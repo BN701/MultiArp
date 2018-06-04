@@ -299,6 +299,8 @@ ItemMenu::ItemMenu(const ItemMenu & m):
 
 ItemMenu & ItemMenu::operator = (const ItemMenu & m)
 {
+    m_Visible = m.m_Visible;
+    m_ItemID = m.m_ItemID;
     m_MenuListIndent = m.m_MenuListIndent;
     m_PopUpMenuID = m.m_PopUpMenuID;
     m_FirstField = m.m_FirstField;

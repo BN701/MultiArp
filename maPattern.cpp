@@ -390,7 +390,6 @@ void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
 
 string Pattern::StepListManager(command_t command)
 {
-
     switch ( command )
     {
         case C_LIST_NEW:
@@ -1238,14 +1237,16 @@ void Pattern::CopyCurrentListGroup()
     switch ( pGroup->Type() )
     {
         case ListGroup::lgtype_step:
-            pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new StepListGroup(dynamic_cast<StepListGroup*>(pGroup)));
+            pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new StepListGroup(this));
+            *dynamic_cast<StepListGroup*>(pNewGroup) = *dynamic_cast<StepListGroup*>(pGroup);
             break;
         case ListGroup::lgtype_realtime:
-            pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new RTListGroup(dynamic_cast<RTListGroup*>(pGroup)));
+            pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new RTListGroup(this));
+            *dynamic_cast<RTListGroup*>(pNewGroup) = *dynamic_cast<RTListGroup*>(pGroup);
             break;
     }
 //    pGroup->SetFocus();
-    m_MenuList.Select(reselect);
+//    m_MenuList.Select(reselect);
 
     for ( auto it = m_ListGroups.begin() + pos; it != m_ListGroups.end(); it++ )
         (*it)->SetItemID((*it)->ItemID() + 1);

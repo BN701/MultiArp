@@ -182,7 +182,8 @@ struct PatternStore : public ItemMenu
     double LastRealTimeBeat();
 
     void AddEmptyPattern(std::vector<std::string> & tokens, int firstToken);
-    void CopyCurrentPattern();
+    void AddEmptyPattern(bool copyRight = true);
+    void CopyCurrentPattern(bool copyRight = true);
     void ClearCurrentPattern()
     {
         m_Deleted.push_back(*m_PosEdit);

@@ -55,6 +55,7 @@ AlsaSequencer::AlsaSequencer():
         exit(1);
     }
 
+    snd_config_update_free_global();    // Prevent valgrind leakcheck reporting a problem.
 }
 
 AlsaSequencer::~AlsaSequencer()

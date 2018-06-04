@@ -114,16 +114,24 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
         DownEditPos();
         break;
 
-    case BaseUI::key_up:
-//        UpEditPos();
-//        DownListPos();
-//        SetRedrawMenuList();
+    case BaseUI::key_cmd_copy_left:
+        CopyCurrentPattern(false);
         break;
 
-    case BaseUI::key_down:
-//        DownEditPos();
-//        UpListPos();
-//        SetRedrawMenuList();
+    case BaseUI::key_cmd_copy_right:
+        CopyCurrentPattern(true);
+        break;
+
+    case BaseUI::key_cmd_insert_left:
+        AddEmptyPattern(false);
+        break;
+
+    case BaseUI::key_cmd_insert_right:
+        AddEmptyPattern(true);
+        break;
+
+    case BaseUI::key_cmd_delete:
+        DeleteCurrentPattern();
         break;
 
     default:
@@ -153,25 +161,35 @@ void PatternStore::AddEmptyPattern(vector<std::string> & tokens, int firstToken)
         }
     }
 
-    auto pos = m_Patterns.emplace(m_Patterns.end());
+    AddEmptyPattern();
+    m_PosEdit->SetLabel(label);
+}
+
+void PatternStore::AddEmptyPattern(bool copyRight)
+{
+    auto pos = m_PosEdit;
+    if ( copyRight )
+        ++pos;
+
+    pos = m_Patterns.emplace(pos);
 
     *pos = m_DefaultPattern;
     pos->SetShortLabel();
     m_PatternLookup[pos->ShortLabelHash()] = pos;
 
-    pos->SetLabel(label);
     pos->SetReturnFocus(this);
 
     SetEditPos(pos);
     SetRedraw();
-
 }
 
-void PatternStore::CopyCurrentPattern()
+void PatternStore::CopyCurrentPattern(bool copyRight)
 {
     auto pos = m_PosEdit;
+    if ( copyRight )
+        ++pos;
 
-    pos = m_Patterns.emplace(++pos);
+    pos = m_Patterns.emplace(pos);
     *pos = *m_PosEdit;
     pos->ResetPosition();
     pos->SetShortLabel();

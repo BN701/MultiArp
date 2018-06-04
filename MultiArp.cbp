@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-O0" />
 					<Add option="-DDEBUG" />
 					<Add directory="./" />
 				</Compiler>
@@ -166,6 +167,7 @@
 		<Unit filename="platform_Linux/maCursesUI.cpp" />
 		<Unit filename="platform_Linux/maCursesUI.h" />
 		<Unit filename="platform_Linux/multi_arp.cpp" />
+		<Unit filename="vg-logs/vg.log" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -185,6 +185,9 @@ void PatternStore::AddEmptyPattern(bool copyRight)
 
 void PatternStore::CopyCurrentPattern(bool copyRight)
 {
+    if ( m_Patterns.empty() )
+        return;
+
     auto pos = m_PosEdit;
     if ( copyRight )
         ++pos;

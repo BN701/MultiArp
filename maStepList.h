@@ -112,6 +112,11 @@ struct StepList : public ItemMenu
     void CopyRight();
     void DeleteStep();
 
+    void MoveLeft();
+    void MoveRight();
+    void ShiftLeft();
+    void ShiftRight();
+
     void ResetPosition()
     {
         m_PosSL = 0;

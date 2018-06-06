@@ -255,21 +255,34 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_cmd_copy_left:
         CopyLeft();
         break;
-
     case BaseUI::key_cmd_copy_right:
         CopyRight();
         break;
-
     case BaseUI::key_cmd_insert_left:
         InsertLeft();
         break;
-
     case BaseUI::key_cmd_insert_right:
         InsertRight();
         break;
-
     case BaseUI::key_cmd_delete:
         DeleteStep();
+        break;
+
+    case BaseUI::key_cmd_move_left:
+        MoveLeft();
+        break;
+    case BaseUI::key_cmd_move_right:
+        MoveRight();
+        break;
+    case BaseUI::key_cmd_move_up:
+        break;
+    case BaseUI::key_cmd_move_down:
+        break;
+    case BaseUI::key_cmd_shift_left:
+        ShiftLeft();
+        break;
+    case BaseUI::key_cmd_shift_right:
+        ShiftRight();
         break;
 
     default:
@@ -322,6 +335,46 @@ void StepList::CopyRight()
     {
         m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, m_Clusters.at(m_PosEdit));
         m_PosEdit += 1;
+    }
+}
+
+void StepList::MoveLeft()
+{
+    if ( !m_Clusters.empty() && m_PosEdit > 0 )
+    {
+        Cluster temp = m_Clusters[m_PosEdit];
+        m_Clusters[m_PosEdit] = m_Clusters[m_PosEdit - 1];
+        m_Clusters[m_PosEdit - 1] = temp;
+        m_PosEdit--;
+    }
+}
+
+void StepList::MoveRight()
+{
+    if ( !m_Clusters.empty() && m_PosEdit < m_Clusters.size() - 1 )
+    {
+        Cluster temp = m_Clusters[m_PosEdit];
+        m_Clusters[m_PosEdit] = m_Clusters[m_PosEdit + 1];
+        m_Clusters[m_PosEdit + 1] = temp;
+        m_PosEdit++;
+    }
+}
+
+void StepList::ShiftLeft()
+{
+    if ( m_Clusters.size() > 1 )
+    {
+        m_Clusters.push_back(m_Clusters[0]);
+        m_Clusters.erase(m_Clusters.begin());
+    }
+}
+
+void StepList::ShiftRight()
+{
+    if ( m_Clusters.size() > 1 )
+    {
+        m_Clusters.insert(m_Clusters.begin(), m_Clusters.back());
+        m_Clusters.pop_back();
     }
 }
 

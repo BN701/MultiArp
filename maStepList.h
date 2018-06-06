@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "maItemMenu.h"
+struct StepListGroup;
 
 struct StepList : public ItemMenu
 {
@@ -37,7 +38,8 @@ struct StepList : public ItemMenu
 
     static StepList EmptyList;
 
-    StepList()
+    StepList(StepListGroup * parent = NULL):
+        m_Parent(parent)
     {
         m_DisplayObjectType = BaseUI::dot_step_list;
         m_PopUpMenuID = C_MENU_ID_STEPLIST;
@@ -71,9 +73,10 @@ struct StepList : public ItemMenu
         Add(chord);
     }
 
-    void Add(Cluster & chord)
+    void Insert(int pos, Cluster & cluster);
+    void Add(Cluster & cluster)
     {
-        m_Clusters.push_back(chord);
+        m_Clusters.push_back(cluster);
     }
 
     bool DeleteLast()
@@ -136,6 +139,8 @@ struct StepList : public ItemMenu
 
     private:
         std::vector<Cluster>::size_type m_NowPlayingPos = -1;        // Updated by parent group when events are played.
+
+        StepListGroup * m_Parent;
 
 };
 

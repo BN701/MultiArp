@@ -275,8 +275,22 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         MoveRight();
         break;
     case BaseUI::key_cmd_move_up:
-        break;
     case BaseUI::key_cmd_move_down:
+        if ( m_Parent != NULL && !m_Clusters.empty() && m_Parent->InsertNeighbour(k, m_Clusters[m_PosEdit], m_ItemID, m_PosEdit) )
+        {
+            DeleteStep();
+            switch ( k )
+            {
+                case BaseUI::key_cmd_move_up:
+                    HandleKey(BaseUI::key_cmd_up);
+                    break;
+                case BaseUI::key_cmd_move_down:
+                    HandleKey(BaseUI::key_cmd_down);
+                    break;
+                default:
+                    break;
+            }
+        }
         break;
     case BaseUI::key_cmd_shift_left:
         ShiftLeft();
@@ -335,6 +349,20 @@ void StepList::CopyRight()
     {
         m_Clusters.insert(m_Clusters.begin() + m_PosEdit + 1, m_Clusters.at(m_PosEdit));
         m_PosEdit += 1;
+    }
+}
+
+void StepList::Insert(int pos, Cluster & cluster)
+{
+    if ( pos >= m_Clusters.size() )
+    {
+        m_Clusters.emplace_back(cluster);
+        m_PosEdit = m_Clusters.size() - 1;
+    }
+    else
+    {
+        m_Clusters.emplace(m_Clusters.begin() + pos, cluster);
+        m_PosEdit = pos;
     }
 }
 

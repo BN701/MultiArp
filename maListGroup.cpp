@@ -494,7 +494,7 @@ StepListGroup::StepListGroup(StepListGroup * g):
 
 StepList * StepListGroup::NewStepList()
 {
-    m_StepListSet.emplace_back();
+    m_StepListSet.emplace_back(this);
     m_StepListSet.back().SetItemID(m_StepListSet.size() - 1);
     return & m_StepListSet.back();
 }
@@ -663,6 +663,26 @@ void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
         else
             menu.Select(m_StepListSet[pos].MenuPos());
     }
+}
+
+bool StepListGroup::InsertNeighbour(BaseUI::key_command_t key, Cluster & cluster, int itemID, int pos)
+{
+    switch ( key )
+    {
+        case BaseUI::key_cmd_move_up:
+            if ( --itemID < 0 )
+                return false;
+            break;
+        case BaseUI::key_cmd_move_down:
+            if ( ++itemID >= m_StepListSet.size() )
+                return false;
+            break;
+        default:
+            return false;
+    }
+
+    m_StepListSet[itemID].Insert(pos, cluster);
+    return true;
 }
 
 void StepListGroup::AddToMenuList(MenuList & m)

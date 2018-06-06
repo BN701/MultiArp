@@ -146,6 +146,8 @@ class StepListGroup : public ListGroup
         void CopyList(StepList * pItem, MenuList & menu);
         void DeleteList(StepList * pItem, MenuList & menu);
 
+        bool InsertNeighbour(BaseUI::key_command_t key, Cluster & cluster, int itemID, int pos);
+
         void StepTheLists( Cluster & cluster,
                         TrigRepeater & repeater,
                         double & stepValueMultiplier,

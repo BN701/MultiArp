@@ -134,6 +134,37 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
         DeleteCurrentPattern();
         break;
 
+    case BaseUI::key_cmd_undo:
+        PopDeletedPattern();
+        break;
+
+    case BaseUI::key_cmd_move_left:
+        if ( distance(m_Patterns.begin(), m_PosEdit) > 0 )
+        {
+            auto t = m_PosEdit--;
+            std::list<Pattern> temp;
+            temp.splice(temp.begin(), m_Patterns, t);
+            m_Patterns.splice(m_PosEdit, temp);
+            m_PosEdit = t;
+            m_PosEditIndex -= 1;
+            SetRedraw();
+        }
+        break;
+
+    case BaseUI::key_cmd_move_right:
+        if ( distance(m_PosEdit, m_Patterns.end() ) > 1 )
+        {
+            auto t = m_PosEdit;
+            ++(++m_PosEdit);
+            std::list<Pattern> temp;
+            temp.splice(temp.begin(), m_Patterns, t);
+            m_Patterns.splice(m_PosEdit, temp);
+            m_PosEdit = t;
+            m_PosEditIndex += 1;
+            SetRedraw();
+        }
+        break;
+
     default:
         return false;
     }

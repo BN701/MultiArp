@@ -68,10 +68,10 @@ map<int, const char *> CommandMenu::m_MenuTitles =
     {C_MENU_ID_LOOP, "Loop"},
     {C_MENU_ID_MIDI_MODE, "Capture"},
     {C_MENU_ID_TRIGS, "Trigs"},
-    {C_MENU_ID_STEPLIST, "Step"},
+    {C_MENU_ID_STEPLIST, "Step List"},
     {C_MENU_ID_STEPLIST_INSERT, "Insert"},
     {C_MENU_ID_STEPLIST_COPY, "Copy"},
-    {C_MENU_ID_STEPLIST_MORE, "List"},
+    {C_MENU_ID_STEPLIST_MORE, "Step"},
     {C_MENU_ID_CLUSTER, "Step Detail"},
     {C_MENU_ID_RTLIST, "Looper"}
 };
@@ -113,10 +113,12 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_SET_FULL, {false, C_COPY_GROUP, "Copy Layer", ""}},
     {C_MENU_ID_SET_FULL, {false, C_DELETE_GROUP, "Delete Layer", ""}},
 
-    // Step
-    {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_INSERT, "Insert Step", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_STEP_COPY_RIGHT, "Copy Step", ""}},
-    {C_MENU_ID_STEPLIST, {false, C_STEP_DELETE, "Delete Step", ""}},
+    // Step List
+    {C_MENU_ID_STEPLIST, {false, C_LIST_NEW, "New", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_LIST_COPY, "Copy", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_LIST_DELETE, "Delete", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_LIST_MOVE_UP, "Move Up", ""}},
+    {C_MENU_ID_STEPLIST, {false, C_LIST_MOVE_DOWN, "Move Down", ""}},
     {C_MENU_ID_STEPLIST, {true, C_MENU_ID_STEPLIST_MORE, "More ...", ""}},
 
     // Step -> Insert
@@ -127,12 +129,10 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_STEPLIST_COPY, {false, C_STEP_COPY_LEFT, "Left of cursor", ""}},
     {C_MENU_ID_STEPLIST_COPY, {false, C_STEP_COPY_RIGHT, "Right of cursor", ""}},
 
-    // List -> More
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_NEW, "New", ""}},
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_COPY, "Copy", ""}},
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_DELETE, "Delete", ""}},
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_MOVE_UP, "Move Up", ""}},
-    {C_MENU_ID_STEPLIST_MORE, {false, C_LIST_MOVE_DOWN, "Move Down", ""}},
+    // Step List -> More
+    {C_MENU_ID_STEPLIST_MORE, {true, C_MENU_ID_STEPLIST_INSERT, "Insert Step", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_STEP_COPY_RIGHT, "Copy Step", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {false, C_STEP_DELETE, "Delete Step", ""}},
 
     // Step Detail (Cluster)
     {C_MENU_ID_CLUSTER, {false, C_CLUSTER_INSERT_LEFT, "Insert Left", ""}},

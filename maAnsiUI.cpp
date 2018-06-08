@@ -84,7 +84,7 @@ AnsiUI::AnsiUI()
     Write("\033[12h");  // Echo off, maybe.
 //    Write("\033[?25l"); // Cursor off, maybe.
 
-    WriteXY(1, 6, "=> ");
+    WriteXY(COMMAND_PROMPT, "=> ");
 
 #endif
 
@@ -159,7 +159,7 @@ void AnsiUI::ResetScreen()
                                 // which would be lovely if that particular terminal emulator could send
                                 // reliable escape sequences (but it doesn't, and it just happens to use
                                 // ncurses. Hmm ...
-    WriteXY(1, 6, "=>");
+    WriteXY(COMMAND_PROMPT, "=>");
 }
 
 void AnsiUI::SendRestoreCursor()
@@ -314,7 +314,7 @@ void AnsiUI::Text(window_area_t area, int row, int col, const char * text, vecto
 void AnsiUI::Progress(double progress, double stepWidth, double beat, int pattern_progress,
                         double rtBeat, unsigned int queueSecs, unsigned int queueNano)
 {
-    int row = 2;
+    int row = 3;
     int col = 4;
     double width = 64;
 
@@ -377,9 +377,9 @@ void AnsiUI::Progress(double progress, double stepWidth, double beat, int patter
 //    move(scr_y, scr_x);
 //    refresh();
 
-    char text[80];
-    snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
-    Text(progress_panel, 0, 0, text);
+//    char text[80];
+//    snprintf(text, 80, " Beat%9.2f\n (Sec%6u:%u)", rtBeat, queueSecs, queueNano);
+//    Text(progress_panel, 0, 0, text);
 
 }
 
@@ -715,6 +715,7 @@ dot_position_table_t g_AnsiUI_DOT_Positions =
 {
     { BaseUI::dot_pattern_store, {4, 1, 60, 1} },
     { BaseUI::dot_pattern, {0, 12, 60, 10} },
+    { BaseUI::dot_pattern_store_menu_list, {0, 4, 70, 8} },
     { BaseUI::dot_pattern_menu_list, {0, 12, 70, 10} }
 };
 

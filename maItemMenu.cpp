@@ -232,10 +232,10 @@ ItemMenu * MenuList::CurrentItem()
 //    }
 //}
 //
-bool MenuList::GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo)    // Non-static
-{
-    return display.GetDisplayInfo(m_DisplayObjectType, displayInfo);
-}
+//bool MenuList::GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo)    // Non-static
+//{
+//    return display.GetDisplayInfo(m_DisplayObjectType, displayInfo);
+//}
 
 //
 //  ItemMenu
@@ -254,59 +254,83 @@ ItemMenu::ItemMenu()
 }
 
 /*
-    Copy constructor called during reallocation as vectors grow. Our default copy behaviour copes
-    with this.
-    (I understand that since C++11 the move constructor will be called if declared 'noexcept', or
-    if the copy constructor isn't there. Well, in the first case the copy constructor *is* still called,
-    and taking it out completely leads to build errors inside STL. For now, I'm stuck needing both.)
+    Our copy/move/assign behaviour needs copes with reallocation situations as container vectors grow.
 
-    Todo: Override default copy behaviour - i.e. don't mess with Menu List things - by setting a 'genuine
-          copy' flag ... or use copy assignment?
+    In theory, I should be able to set different behaviour in copy/assign and move. When moving,
+    the source object will be destroyed and any Menu List membership should to be transferred
+    to the new object. For copy/assign, membership should remain with the source object.
+
+    Since C++ I should be able to use a move constructor. I understand that these will only be called
+    if declared 'noexcept', or if the copy constructor isn't there. Well, in the first case the copy
+    constructor *is* still called, and taking it out completely leads to build errors inside STL.
+
+    For now, I'm stuck needing both and for genuine copy situations *when* objects are members of Menu
+    Lists* I need to create an empty object first and use ExplicitCopy().
 */
 
-ItemMenu::ItemMenu(const ItemMenu & m):
-    m_GotFocus(m.m_GotFocus),
-    m_Visible(m.m_Visible),
-    m_MenuListRow(m.m_MenuListRow),
-    m_MenuListIndent(m.m_MenuListIndent),
-    m_PopUpMenuID(m.m_PopUpMenuID),
-    m_FirstField(m.m_FirstField),
-    m_ReturnFocus(m.m_ReturnFocus),
-    m_DisplayObjectType(m.m_DisplayObjectType),
-    m_Status(m.m_Status),
-    m_Help(m.m_Help),
-    m_ItemID(m.m_ItemID),
-    m_MenuListPtr(m.m_MenuListPtr),
-    m_PosInMenuList(m.m_PosInMenuList)
+//ItemMenu::ItemMenu(const ItemMenu & m):
+//    m_GotFocus(m.m_GotFocus),
+//    m_Visible(m.m_Visible),
+//    m_MenuListRow(m.m_MenuListRow),
+//    m_MenuListIndent(m.m_MenuListIndent),
+//    m_PopUpMenuID(m.m_PopUpMenuID),
+//    m_FirstField(m.m_FirstField),
+//    m_ReturnFocus(m.m_ReturnFocus),
+//    m_DisplayObjectType(m.m_DisplayObjectType),
+//    m_Status(m.m_Status),
+//    m_Help(m.m_Help),
+//    m_ItemID(m.m_ItemID),
+//    m_MenuListPtr(m.m_MenuListPtr),
+//    m_PosInMenuList(m.m_PosInMenuList)
+//{
+////    m_TestString = "Set from ItemMenu copy constructor body.";
+//
+//    // Doing these is fine if we're being copied as part
+//    // of a reallocation, as the original will be destroyed.
+//
+//    // If making a real copy, remove focus and remove from menu beforehand.
+//
+//    if ( m_GotFocus )
+//    {
+//        SetFocus();
+//    }
+//
+//    if ( m_MenuListPtr != NULL )
+//    {
+//        *m_PosInMenuList = this;
+//    }
+//}
+
+ItemMenu::ItemMenu(const ItemMenu & m)
 {
-//    m_TestString = "Set from ItemMenu copy constructor body.";
-
-    // Doing these is fine if we're being copied as part
-    // of a reallocation, as the original will be destroyed.
-
-    // If making a real copy, remove focus and remove from menu beforehand.
-
-    if ( m_GotFocus )
-    {
-        SetFocus();
-    }
-
-    if ( m_MenuListPtr != NULL )
-    {
-        *m_PosInMenuList = this;
-    }
+    *this = m;
 }
 
 ItemMenu & ItemMenu::operator = (const ItemMenu & m)
 {
+    m_GotFocus = m.m_GotFocus;
     m_Visible = m.m_Visible;
     m_ItemID = m.m_ItemID;
     m_MenuListIndent = m.m_MenuListIndent;
+    m_MenuListRow = m.m_MenuListRow;
     m_PopUpMenuID = m.m_PopUpMenuID;
     m_FirstField = m.m_FirstField;
     m_ReturnFocus = m.m_ReturnFocus;
     m_DisplayObjectType = m.m_DisplayObjectType;
     m_Status = m.m_Status;
+    m_Help = m.m_Help;
+
+    if ( !m_ExplicitCopy )
+    {
+        if ( m_GotFocus )
+            SetFocus();
+
+        m_MenuListPtr = m.m_MenuListPtr;
+        m_PosInMenuList = m.m_PosInMenuList;
+
+        if ( m_MenuListPtr != NULL )
+            *m_PosInMenuList = this;
+    }
 
     return *this;
 }
@@ -316,38 +340,43 @@ ItemMenu & ItemMenu::operator = (const ItemMenu & m)
     Behaviour should be exactly same as default copy constructor.
 */
 
-ItemMenu::ItemMenu(ItemMenu && m) noexcept:
-    m_GotFocus(m.m_GotFocus),
-    m_Visible(m.m_Visible),
-    m_MenuListRow(m.m_MenuListRow),
-    m_MenuListIndent(m.m_MenuListIndent),
-    m_PopUpMenuID(m.m_PopUpMenuID),
-    m_FirstField(m.m_FirstField),
-    m_ReturnFocus(m.m_ReturnFocus),
-    m_DisplayObjectType(m.m_DisplayObjectType),
-    m_Status(m.m_Status),
-    m_Help(m.m_Help),
-    m_ItemID(m.m_ItemID)
+//ItemMenu::ItemMenu(ItemMenu && m) noexcept:
+//    m_GotFocus(m.m_GotFocus),
+//    m_Visible(m.m_Visible),
+//    m_MenuListRow(m.m_MenuListRow),
+//    m_MenuListIndent(m.m_MenuListIndent),
+//    m_PopUpMenuID(m.m_PopUpMenuID),
+//    m_FirstField(m.m_FirstField),
+//    m_ReturnFocus(m.m_ReturnFocus),
+//    m_DisplayObjectType(m.m_DisplayObjectType),
+//    m_Status(m.m_Status),
+//    m_Help(m.m_Help),
+//    m_ItemID(m.m_ItemID)
+//{
+////    m_TestString = "Set from ItemMenu copy constructor body.";
+//
+//    // Doing these is fine if we're being copied as part
+//    // of a reallocation, as the original will be destroyed.
+//
+//    // If making a real copy, remove focus and remove from menu beforehand.
+//
+//    if ( m_GotFocus )
+//    {
+//        SetFocus();
+//    }
+//
+//    if ( m.m_MenuListPtr != NULL )
+//    {
+//        m_MenuListPtr = m.m_MenuListPtr;
+//        m.m_MenuListPtr = NULL;
+//        m_PosInMenuList = m.m_PosInMenuList;
+//        *m_PosInMenuList = this;
+//    }
+//}
+
+ItemMenu::ItemMenu(ItemMenu && m) noexcept
 {
-//    m_TestString = "Set from ItemMenu copy constructor body.";
-
-    // Doing these is fine if we're being copied as part
-    // of a reallocation, as the original will be destroyed.
-
-    // If making a real copy, remove focus and remove from menu beforehand.
-
-    if ( m_GotFocus )
-    {
-        SetFocus();
-    }
-
-    if ( m.m_MenuListPtr != NULL )
-    {
-        m_MenuListPtr = m.m_MenuListPtr;
-        m.m_MenuListPtr = NULL;
-        m_PosInMenuList = m.m_PosInMenuList;
-        *m_PosInMenuList = this;
-    }
+    *this = m;
 }
 
 ItemMenu::~ItemMenu()
@@ -368,6 +397,22 @@ ItemMenu::~ItemMenu()
         m_MenuListPtr->Remove(m_PosInMenuList, true); // Allow removal even if selected.
 
     m_RedrawList.remove(this);
+}
+
+ItemMenu & ItemMenu::ExplicitCopy(const ItemMenu & m)
+{
+//    m_Visible = m.m_Visible;
+//    m_ItemID = m.m_ItemID;
+//    m_MenuListIndent = m.m_MenuListIndent;
+//    m_PopUpMenuID = m.m_PopUpMenuID;
+//    m_FirstField = m.m_FirstField;
+//    m_ReturnFocus = m.m_ReturnFocus;
+//    m_DisplayObjectType = m.m_DisplayObjectType;
+//    m_Status = m.m_Status;
+
+    m_ExplicitCopy = true;
+
+    return *this = m;
 }
 
 bool ItemMenu::MenuActive()
@@ -451,7 +496,7 @@ std::vector<screen_pos_t> & ItemMenu::GetFieldPositions()
         return g_FieldPositions;
 }
 
-bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & width, Rectangle & clearArea)    // Non-static
+bool ItemMenu::SetDisplayInfo(BaseUI & display, int & row, int & col, int & width, Rectangle & clearArea)    // Non-static
 {
     // Return true if visible.
 
@@ -462,7 +507,10 @@ bool ItemMenu::GetDisplayInfo(BaseUI & display, int & row, int & col, int & widt
 
     if ( m_MenuListPtr != NULL )
     {
-        if ( !m_MenuListPtr->GetDisplayInfo(display, displayInfo) )
+//        if ( !m_MenuListPtr->GetDisplayInfo(display, displayInfo) )
+//            return false;
+        display.GetDisplayInfo(m_MenuListPtr->m_DisplayObjectType, displayInfo);
+        if ( displayInfo == NULL )
             return false;
 
         // Make sure selected item is within scrolling window.

@@ -33,14 +33,14 @@
 // At the moment these are common to text and cairo UIs, so
 // maybe they should stay here.
 
-#define COMMAND_HOME 6,4
-#define STAT_POS_TOPLINE 0,0
-#define STAT_POS_STEP AnsiUI::progress_panel, 0,0
-#define STAT_POS_PATTERN AnsiUI::small_panel, 1,0
-#define STAT_POS_PATTERN_EDIT AnsiUI::small_panel, 2,0
-#define STAT_POS_2 5,4
-#define STAT_POS_MENU 1,4
-
+//#define COMMAND_HOME 3,4
+//#define STAT_POS_TOPLINE 0,0
+//#define STAT_POS_STEP AnsiUI::progress_panel, 0,0
+//#define STAT_POS_PATTERN AnsiUI::small_panel, 1,0
+//#define STAT_POS_PATTERN_EDIT AnsiUI::small_panel, 2,0
+//#define STAT_POS_2 2,4
+//#define STAT_POS_MENU 3,4
+//
 void set_status(int y, int x, const char *format, ... );
 void set_status_w(AnsiUI::window_area_t area, int y, int x, const char *format, ...);
 

@@ -184,7 +184,7 @@ unordered_map<string, command_t> g_CommandList =
     {"chain q", C_PATTERN_CHAIN_QUANTUM},
     {"c q", C_PATTERN_CHAIN_QUANTUM},
     {"chain clear", C_PATTERN_CHAIN_CLEAR},
-    {"chain new", C_PATTERN_CHAIN_NEW},
+//    {"chain new", C_PATTERN_CHAIN_NEW},
     {"chain delete", C_PATTERN_CHAIN_DELETE},
     {"chain jump", C_PATTERN_CHAIN_JUMP},
     {"chain help", C_PATTERN_CHAIN_HELP},
@@ -429,14 +429,11 @@ bool do_command(string commandString, int directCommand)
         {
 
         case C_MENU:
-//            if ( !g_PatternStore.Empty() )
-//                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
+//            if ( g_PatternStore.HasFocus() )
+//                g_CommandMenu.Open(C_MENU_ID_PATTERN_STORE);
 //            else
-//                g_CommandMenu.Open(C_MENU_ID_TOP);
-            if ( g_PatternStore.HasFocus() )
-                g_CommandMenu.Open(C_MENU_ID_TOP);
-            else
-                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
+//                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
+                g_CommandMenu.Open(ItemMenu::CurrentPopUpMenuID());
             break;
 
         case C_RUN :
@@ -545,7 +542,6 @@ bool do_command(string commandString, int directCommand)
 //                // No value specified, just open the menu.
 //                g_PatternStore.SetFocus();
 //                g_PatternStore.SetStatus();
-////                show_status_after_navigation();
 //            }
 //            else
 //            {
@@ -573,7 +569,6 @@ bool do_command(string commandString, int directCommand)
 
 //        case C_EDIT_ITEM:
 ////            g_PatternStore.OpenCurrentItemMenu();
-////            show_status_after_navigation();
 //            break;
 
 //       case C_EDIT_CURSOR_LOCK:
@@ -920,40 +915,41 @@ bool do_command(string commandString, int directCommand)
            }
             break;
 
-        case C_PATTERN_CHAIN :
-           if ( tokens.size() >= 2 )
-               g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
-           g_PatternStore.PatternChainForEdit().SetStatus();
-           g_PatternStore.PatternChainForEdit().SetFocus();
-//           show_status_after_navigation();
+        case C_PATTERN_CHAIN_NEW_LIST:
+            set_status(STAT_POS_2, g_PatternStore.PatternChainManager(command).c_str());
             break;
-        case C_PATTERN_CHAIN_OFF:
-           g_PatternStore.SetPatternChainMode(PatternChain::off);
-            break;
-        case C_PATTERN_CHAIN_NATURAL:
-           g_PatternStore.SetPatternChainMode(PatternChain::natural);
-            break;
-        case C_PATTERN_CHAIN_QUANTUM:
-           g_PatternStore.SetPatternChainMode(PatternChain::quantum);
-            break;
-        case C_PATTERN_CHAIN_CLEAR:
-           g_PatternStore.PatternChainForEdit().Clear();
-//            show_status_after_navigation();
-            break;
-        case C_PATTERN_CHAIN_NEW:
-           g_PatternStore.PatternChainForEdit().New();
-//            show_status_after_navigation();
-            break;
-        case C_PATTERN_CHAIN_DELETE:
-           g_PatternStore.PatternChainForEdit().Delete();
-           g_PatternStore.PatternChainForEdit().SetStatus();
-//            show_status_after_navigation();
-            break;
-        case C_PATTERN_CHAIN_JUMP:
-            break;
-        case C_PATTERN_CHAIN_HELP:
-            set_status(STAT_POS_2, "chain off|natural|quantum|jump|new|delete");
-            break;
+
+//        case C_PATTERN_CHAIN :
+//           if ( tokens.size() >= 2 )
+//               g_PatternStore.UpdatePatternChainFromSimpleString(commandString);
+//           g_PatternStore.PatternChainForEdit().SetStatus();
+//           g_PatternStore.PatternChainForEdit().SetFocus();
+//            break;
+//        case C_PATTERN_CHAIN_OFF:
+//           g_PatternStore.SetPatternChainMode(PatternChain::off);
+//            break;
+//        case C_PATTERN_CHAIN_NATURAL:
+//           g_PatternStore.SetPatternChainMode(PatternChain::natural);
+//            break;
+//        case C_PATTERN_CHAIN_QUANTUM:
+//           g_PatternStore.SetPatternChainMode(PatternChain::quantum);
+//            break;
+//        case C_PATTERN_CHAIN_CLEAR:
+//           g_PatternStore.PatternChainForEdit().Clear();
+//            break;
+//        case C_PATTERN_CHAIN_NEW:
+//           g_PatternStore.PatternChainForEdit().New();
+//            break;
+//        case C_PATTERN_CHAIN_DELETE:
+//           g_PatternStore.PatternChainForEdit().Delete();
+//           g_PatternStore.PatternChainForEdit().SetStatus();
+////            show_status_after_navigation();
+//            break;
+//        case C_PATTERN_CHAIN_JUMP:
+//            break;
+//        case C_PATTERN_CHAIN_HELP:
+//            set_status(STAT_POS_2, "chain off|natural|quantum|jump|new|delete");
+//            break;
 
         case C_LOAD:
         case C_STORE:

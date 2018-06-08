@@ -121,7 +121,8 @@ void update_progress_bar()
     g_TextUI.Progress(progress,
                     stepWidth,
                     g_State.Phase() + 1,
-                    g_PatternStore.CurrentPosPatternChain() + 1,
+//                    g_PatternStore.CurrentPosPatternChain() + 1,
+                    0,
                     g_PatternStore.LastRealTimeBeat(),
                     g_Sequencer.ScheduleTimeSeconds(),
                     g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
@@ -130,7 +131,8 @@ void update_progress_bar()
     g_CairoUI.Progress(progress,
                     stepWidth,
                     g_State.Phase() + 1,
-                    g_PatternStore.CurrentPosPatternChain() + 1,
+//                    g_PatternStore.CurrentPosPatternChain() + 1,
+                    0,
                     g_PatternStore.LastRealTimeBeat(),
                     g_Sequencer.ScheduleTimeSeconds(),
                     g_Sequencer.ScheduleTimeNanoSeconds() / 100000000);
@@ -405,11 +407,14 @@ void update_item_menus()
     // Todo: Perhaps one loop for each UI interested in updates, though the loop
     // eats the list as it progresses. Maybe each UI processes an item within the loop.
 
-    while ( ! ItemMenu::RedrawList().empty() )
+    while ( !ItemMenu::RedrawList().empty() )
     {
         // Make this a "while not empty" loop because GetDisplayInfo()
         // may trigger scrolling, in which case the dirty list will grow
         // and an iterator loop doesn't see the new entries.
+
+        // Todo: How is this going to work with multiple UIs? With scroll windows
+        // of different sizes, then an item may be visible in one UI but not another.
 
         ItemMenu * menuItem = ItemMenu::RedrawList().front();
         ItemMenu::RedrawList().pop_front();
@@ -418,7 +423,7 @@ void update_item_menus()
         Rectangle clearArea = {0, 0, 0, 0};   // Fill this in if an area of screen needs to be cleared first.
         int row, col, width;
 
-        if ( !menuItem->GetDisplayInfo(g_TextUI, row, col, width, clearArea) )  // Returns false means item not visible.
+        if ( !menuItem->SetDisplayInfo(g_TextUI, row, col, width, clearArea) )  // Returns false means item not visible.
             continue;
 
         if ( clearArea.m_iHeight > 0 )
@@ -463,41 +468,6 @@ void update_item_menus()
     }
 
     ItemMenu::RedrawList().clear();
-}
-
-void update_big_panel()
-{
-
-    return;
-
-    g_TextUI.ClearArea(BaseUI::big_panel);
-
-    if ( g_PatternStore.Empty() )
-        return;
-
-//    static vector<PosInfo2> highlights; // Reset every for every update for pages 1 & 2, persist for page 3.
-
-    MenuList & menus = g_PatternStore.CurrentEditPattern().m_MenuList;
-
-    for ( auto it = menus.m_Items.begin(); it != menus.m_Items.end(); it++ )
-    {
-        ItemMenu & menuItem = **it;
-        menuItem.SetStatus();
-        Rectangle clearArea = {0, 0, 0, 0};
-        int row, col, width;
-        if ( menuItem.GetDisplayInfo(g_TextUI, row, col, width, clearArea) )
-        {
-            g_TextUI.MapToFullScreen(BaseUI::big_panel, row, col);
-            set_status(row, col, menuItem.StatusString().c_str());
-        }
-        else
-            set_status(STAT_POS_MENU, menuItem.StatusString().c_str());
-//        char text[60];
-//        string pad((*menuItem)->DisplayIndent(), ' ');
-//        snprintf(text, 60, "%s%s%s", menuItem == cursor ? " -> " : "    ", pad.c_str(), (*menuItem)->StatusString().c_str());
-//        g_TextUI.Text(BaseUI::big_panel, row, 0, text, & highlights);
-    }
-
 }
 
 void show_translation_map_status()

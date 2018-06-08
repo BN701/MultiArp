@@ -22,6 +22,7 @@
 
 #include "maChainLink.h"
 #include "maPatternChain.h"
+#include "maPatternStore.h"
 #include "maUtility.h"
 
 
@@ -31,11 +32,23 @@ ChainLink::ChainLink()
 {
     //ctor
     m_Help = "In PC mode, enter number on command line to jump to stage.";
+
+    // Dodgy calling functions on a global object from here. We'll put
+    // proper member links in eventually.
+
+    m_PatternLabel = g_PatternStore.CurrentEditPatternID();
+    m_PatternHash = g_PatternStore.CurrentEditPatternHash();
 }
 
 ChainLink::~ChainLink()
 {
     //dtor
+}
+
+void ChainLink::SetPattern(std::string label, int hash)
+{
+    m_PatternLabel = label;
+    m_PatternHash = hash;
 }
 
 int ChainLink::Remaining()
@@ -59,7 +72,7 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
 
     char buff[50];
 
-    snprintf(buff, 50, "%02i", m_Pattern + 1);
+    snprintf(buff, 50, "%s", m_PatternLabel.c_str());
     result += buff;
 
     // Show nothing if we just play once (m_Repeats == 1).
@@ -120,7 +133,7 @@ string ChainLink::ToString()
 {
     char buff[50];
 
-    snprintf(buff, 50, "%i/%i/%i", m_Pattern, m_Repeats, m_Jump);
+    snprintf(buff, 50, "%s/%i/%i/%i", m_PatternLabel.c_str(), m_PatternHash, m_Repeats, m_Jump);
 
     return buff;
 }
@@ -129,23 +142,13 @@ void ChainLink::FromString(string & s)
 {
     vector<string> tokens = split(s.c_str(), '/');
 
-#ifdef MA_BLUE
-    if ( tokens.size() != 3 )
+    if ( tokens.size() != 4 )
         return;
 
-    m_Pattern = strtol(tokens.at(0).c_str(), NULL, 0);
-    m_Repeats = strtol(tokens.at(1).c_str(), NULL, 0);
-    m_Jump = strtol(tokens.at(2).c_str(), NULL, 0);
-
-    // Check 'errno' for proper handling.
-#else
-    if ( tokens.size() != 3 )
-        throw string("Pattern Chain parse error: nothing entered.");
-
-    m_Pattern = stoi(tokens.at(0));
-    m_Repeats = stoi(tokens.at(1));
-    m_Jump = stoi(tokens.at(2));
-#endif
+    m_PatternLabel = tokens[0];
+    m_PatternHash = stoi(tokens[1]);
+    m_Repeats = stoi(tokens[2]);
+    m_Jump = stoi(tokens[3]);
 }
 
 void ChainLink::SetStatus()
@@ -156,21 +159,21 @@ void ChainLink::SetStatus()
     m_FieldPositions.clear();
     m_Highlights.clear();
 
-    if ( m_GotFocus )
-        snprintf(buff, 50, "[Chain Slot %02i] ", m_ItemID);
-    else
-        snprintf(buff, 50, " Chain Slot %02i  ", m_ItemID);
+//    if ( m_GotFocus )
+//        snprintf(buff, 50, "[Chain Slot %02i] ", m_ItemID);
+//    else
+//        snprintf(buff, 50, " Chain Slot %02i  ", m_ItemID);
 
     InitStatus();
-    m_Status += buff;
+//    m_Status += buff;
 
-    m_Status += "Pattern ";
+//    m_Status += " ";
     pos = m_Status.size();
-    snprintf(buff, 50, "%i", m_Pattern + 1);
+    snprintf(buff, 50, "%s", m_PatternLabel.c_str());
     m_Status += buff;
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ", Play ";
+    m_Status += ", Repeat ";
     pos = m_Status.size();
     if ( m_Repeats >= 0 )
     {
@@ -181,18 +184,18 @@ void ChainLink::SetStatus()
         m_Status += "(hold)";
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ", Jump ";
-    pos = m_Status.size();
-    if ( m_Jump >= 0 )
-    {
-        snprintf(buff, 50, "%i", m_Jump + 1);
-        m_Status += buff;
-    }
-    else
-        m_Status += "(off)";
-    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
+//    m_Status += ", Jump ";
+//    pos = m_Status.size();
+//    if ( m_Jump >= 0 )
+//    {
+//        snprintf(buff, 50, "%i", m_Jump + 1);
+//        m_Status += buff;
+//    }
+//    else
+//        m_Status += "(off)";
+//    m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
-    m_Status += ' ';
+    m_Status += ", ";
     pos = m_Status.size();
     m_Status += "Jump Here";
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
@@ -200,74 +203,64 @@ void ChainLink::SetStatus()
     m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
-//bool ChainLink::HandleKey(key_type_t k)
 bool ChainLink::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-//    case enter:
-    case BaseUI::key_return:
-        if ( m_PosEdit == 3 && m_Parent != NULL )
+    case BaseUI::key_cmd_back:
+        if ( m_MenuListPtr != NULL )
         {
-            m_Parent->at(m_Parent->PosPlay()).ClearRemaining();
-            m_Parent->SetJumpOverride(m_ItemID - 1);
+            m_MenuListPtr->m_Container->SetRedraw();
+            m_MenuListPtr->DownCursorPos();
+            m_MenuListPtr->Remove(m_PosInMenuList);
         }
-        else
-            ReturnFocus();
         break;
 
-//    case back_space:
-    case BaseUI::key_backspace:
-        ReturnFocus();
-        break;
-
-//    case left:
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         if ( m_PosEdit > 0 )
             m_PosEdit -= 1;
         break;
-//    case right:
-    case BaseUI::key_right:
-        if ( m_PosEdit < 3 )
+
+    case BaseUI::key_cmd_right:
+        if ( m_PosEdit < 2 )
             m_PosEdit += 1;
         break;
-//    case up:
-    case BaseUI::key_up:
+
+    case BaseUI::key_cmd_inc:
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            m_Pattern += 1;
-//            m_FollowUp = update_pattern_browser;
+            g_PatternStore.UpEditPos();
+            m_PatternLabel = g_PatternStore.CurrentEditPatternID();
+            m_PatternHash = g_PatternStore.CurrentEditPatternHash();
             break;
         case 1:     // Repeats
             m_Repeats += 1;
             break;
-        case 2:     // Jump
-            m_Jump += 1;
-            break;
+//        case 2:     // Jump
+//            m_Jump += 1;
+//            break;
         default:
             break;
         }
         break;
-//    case down:
-    case BaseUI::key_down:
+
+    case BaseUI::key_cmd_dec:
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            if ( m_Pattern > 0 )
-            {
-                m_Pattern -= 1;
-//                m_FollowUp = update_pattern_browser;
-            }
+            g_PatternStore.DownEditPos();
+            m_PatternLabel = g_PatternStore.CurrentEditPatternID();
+            m_PatternHash = g_PatternStore.CurrentEditPatternHash();
             break;
         case 1:     // Repeats
             if ( m_Repeats > -1 )
                 m_Repeats -= 1;
             break;
-        case 2:     // Jump
-            if ( m_Jump > -1 )
-                m_Jump -= 1;
-            break;
+//        case 2:     // Jump
+//            if ( m_Jump > -1 )
+//                m_Jump -= 1;
+//            break;
         default:
             break;
         }
@@ -278,7 +271,7 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-//    SetStatus();
+    SetRedraw();
 
     return true;
 }

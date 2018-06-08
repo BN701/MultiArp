@@ -34,7 +34,7 @@ using namespace std;
 PatternChain::PatternChain()
 {
     //ctor
-//    m_Help = "S-Left/Right: new item before/after cursor, S-Del: delete current item";
+    m_PopUpMenuID = C_MENU_ID_PATTERN_CHAIN;
 }
 
 PatternChain::~PatternChain()
@@ -73,67 +73,67 @@ string PatternChain::ToStringForDisplay(unsigned firstRow, unsigned rows)
     return result;
 }
 
-void PatternChain::FromSimpleString(string s)
-{
-    // Scan past first token, which should be 'chain', though we don't check.
-
-    vector<string> tokens = split(s.c_str(), ' ');
-
-    if ( tokens.size() == 1 )
-#ifdef MA_BLUE
-        return;
-#else
-        throw string("Pattern Chain parse error: nothing entered.");
-#endif
-
-    std::vector<ChainLink> newChain;
-
-    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
-    {
-#ifndef MA_BLUE
-        try
-        {
-#endif
-            size_t pos;
-#if defined(MA_BLUE)
-            const char *startPtr = it->c_str();
-            char *endPtr;
-            int pattern = strtol(startPtr, &endPtr, 0) - 1;
-            if ( errno != 0 )
-                continue;
-            pos = endPtr - startPtr;
-#else
-            int pattern = stoi(*it, &pos) - 1;
-#endif
-            if ( pattern < 0 )
-                continue;
-
-            int repeats = 1;
-            if ( pos < (*it).size() )
-            {
-                pos = (*it).find('x');
-                if ( pos != string::npos )
-                    repeats = strtol((*it).substr(pos + 1).c_str(), NULL, 0);
-            }
-
-            newChain.emplace_back();
-            newChain.back().SetPattern(pattern);
-            newChain.back().SetRepeats(repeats - 1);
-#ifndef MA_BLUE
-        }
-        catch ( invalid_argument )
-        {
-            // Do nothing and carry on with next token.
-        }
-#endif
-    }
-
-    if ( !newChain.empty() )
-    {
-        m_Chain = newChain;
-        m_PosEdit = 0;
-    }
-}
+//void PatternChain::FromSimpleString(string s)
+//{
+//    // Scan past first token, which should be 'chain', though we don't check.
+//
+//    vector<string> tokens = split(s.c_str(), ' ');
+//
+//    if ( tokens.size() == 1 )
+//#ifdef MA_BLUE
+//        return;
+//#else
+//        throw string("Pattern Chain parse error: nothing entered.");
+//#endif
+//
+//    std::vector<ChainLink> newChain;
+//
+//    for ( vector<string>::iterator it = tokens.begin() + 1; it < tokens.end(); it++ )
+//    {
+//#ifndef MA_BLUE
+//        try
+//        {
+//#endif
+//            size_t pos;
+//#if defined(MA_BLUE)
+//            const char *startPtr = it->c_str();
+//            char *endPtr;
+//            int pattern = strtol(startPtr, &endPtr, 0) - 1;
+//            if ( errno != 0 )
+//                continue;
+//            pos = endPtr - startPtr;
+//#else
+//            int pattern = stoi(*it, &pos) - 1;
+//#endif
+//            if ( pattern < 0 )
+//                continue;
+//
+//            int repeats = 1;
+//            if ( pos < (*it).size() )
+//            {
+//                pos = (*it).find('x');
+//                if ( pos != string::npos )
+//                    repeats = strtol((*it).substr(pos + 1).c_str(), NULL, 0);
+//            }
+//
+//            newChain.emplace_back();
+//            newChain.back().SetPattern(pattern);
+//            newChain.back().SetRepeats(repeats - 1);
+//#ifndef MA_BLUE
+//        }
+//        catch ( invalid_argument )
+//        {
+//            // Do nothing and carry on with next token.
+//        }
+//#endif
+//    }
+//
+//    if ( !newChain.empty() )
+//    {
+//        m_Chain = newChain;
+//        m_PosEdit = 0;
+//    }
+//}
 
 void PatternChain::FromString(string s)
 {
@@ -286,7 +286,7 @@ void PatternChain::SetStatus()
         return;
     }
 
-    m_Status += " Mode: ";
+    m_Status += " ";
     pos = m_Status.size();
     m_Status += pc_mode_names.at(m_PatternChainMode);
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
@@ -296,13 +296,13 @@ void PatternChain::SetStatus()
     {
         m_Status += " ";
         pos = m_Status.size();
-        snprintf(buff, 20, "%i:", i + 1);
-        m_Status += buff;
+//        snprintf(buff, 20, "%i:", i + 1);
+//        m_Status += buff;
         m_Status += m_Chain.at(i).ToStringForDisplay(true, 1);
         m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
     }
 
-    if ( ! m_Chain.empty() )
+    if ( m_GotFocus && !m_Chain.empty() )
         m_Highlights.push_back(m_FieldPositions.at(m_MenuFocus));
 }
 
@@ -310,18 +310,30 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
-    case BaseUI::key_return:
+    case BaseUI::key_cmd_enter:
+//        if ( ! m_Clusters.empty() )
+//        {
+//            Cluster & c = m_Clusters.at(m_PosEdit);
+//            c.SetItemID(m_PosEdit + 1);
+//            c.SetDisplayIndent(m_MenuListIndent + 2);
+//            c.SetVisible(m_Visible);
+//            m_MenuListPtr->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
+//            c.SetReturnFocus(this);  // Override return focus.
+//        }
         if ( m_MenuFocus >= num_pc_menu_items && m_PosEdit < m_Chain.size() )
         {
-            ChainLink & link = m_Chain.at(m_PosEdit);
+            ChainLink & link = m_Chain[m_PosEdit];
             link.SetItemID(m_PosEdit + 1);
-            link.SetFocus();
-            link.SetStatus();
+//            link.SetFocus();
+//            link.SetStatus();
+            link.SetDisplayIndent(m_MenuListIndent + 2);
+            link.SetVisible(m_Visible);
+            m_MenuListPtr->InsertAfter(m_PosInMenuList, & link, true);  // This selects it, too.
             link.SetParent(this);       // Specific pointer to PatternChain.
             link.SetReturnFocus(this);  // Generic return pointer to ItemMenu object.
         }
         break;
-    case BaseUI::key_left:
+    case BaseUI::key_cmd_left:
         if ( m_MenuFocus > 0 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
@@ -330,7 +342,7 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
 //        if ( m_PosEdit > 0 )
 //            m_PosEdit -= 1;
         break;
-    case BaseUI::key_right:
+    case BaseUI::key_cmd_right:
         if ( m_MenuFocus < num_pc_menu_items + m_Chain.size() - 1 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
@@ -339,45 +351,53 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
 //        if ( m_PosEdit < m_Chain.size() - 1 )
 //            m_PosEdit += 1;
         break;
-    case BaseUI::key_up:
-        switch (m_MenuFocus)
+
+    case BaseUI::key_cmd_back:
+    case BaseUI::key_cmd_copy_left:
+    case BaseUI::key_cmd_copy_right:
+    case BaseUI::key_cmd_move_left:
+    case BaseUI::key_cmd_move_right:
+    case BaseUI::key_cmd_move_up:
+    case BaseUI::key_cmd_move_down:
+    case BaseUI::key_cmd_shift_left:
+    case BaseUI::key_cmd_shift_right:
+    case BaseUI::key_cmd_undo:
+        break;
+
+    case BaseUI::key_cmd_inc:
+    case BaseUI::key_cmd_dec:
+    case BaseUI::key_cmd_inc_2:
+    case BaseUI::key_cmd_dec_2:
+        if ( !m_Chain.empty() )
         {
-        case mode:
-            NextPatternChainMode(-1);
-            break;
-        default:
-            break;
+            m_Chain[m_PosEdit].HandleKey(k);
         }
         break;
 
-    case BaseUI::key_down:
-        switch (m_MenuFocus)
-        {
-        case mode:
-            NextPatternChainMode(1);
-            break;
-        default:
-            break;
-        }
-        break;
+    case BaseUI::key_cmd_up:
+        m_MenuListPtr->DownCursorPos();
+        return true;
 
+    case BaseUI::key_cmd_down:
+        m_MenuListPtr->UpCursorPos();
+        return true;
 
-    case BaseUI::key_shift_right:
-    case BaseUI::key_shift_left:
+    case BaseUI::key_cmd_insert_left:
+    case BaseUI::key_cmd_insert_right:
         switch (m_MenuFocus)
         {
         case mode:
             if ( !m_Chain.empty() )
                 break;
         default:
-            if ( k == BaseUI::key_shift_right)
+            if ( k == BaseUI::key_cmd_insert_left)
                 m_PosEdit += 1;
             New();
             break;
         }
         break;
 
-    case BaseUI::key_shift_delete:
+    case BaseUI::key_cmd_delete:
         switch (m_MenuFocus)
         {
         case mode:
@@ -394,7 +414,7 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_MenuFocus == 0;
 
-//    SetStatus();
+    SetRedraw();
 
     return true;
 }

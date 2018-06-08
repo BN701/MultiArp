@@ -130,7 +130,8 @@ enum command_t
     C_PATTERN_CHAIN_NATURAL,
     C_PATTERN_CHAIN_QUANTUM,
     C_PATTERN_CHAIN_CLEAR,
-    C_PATTERN_CHAIN_NEW,
+    C_PATTERN_CHAIN_NEW_LIST,
+    C_PATTERN_CHAIN_NEW_ENTRY,
     C_PATTERN_CHAIN_DELETE,
     C_PATTERN_CHAIN_JUMP,
     C_PATTERN_CHAIN_HELP,
@@ -198,7 +199,7 @@ enum command_t
 
 
 bool do_command(std::string commandList, int directCommand = C_NONE);
-//void do_command_menu(command_menu_id_t menu = C_MENU_ID_TOP);
+//void do_command_menu(command_menu_id_t menu = C_MENU_ID_PATTERN_STORE);
 
 //bool handle_key_input(ItemMenu::key_type_t curKey, xcb_keysym_t sym);
 bool handle_key_input(BaseUI::key_command_t key);

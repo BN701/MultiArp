@@ -56,7 +56,7 @@ class MenuList
 
 //        void OpenCurrentItem();
 //        void OpenCurrentItem(ItemMenu * returnFocus);
-        bool GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo);
+//        bool GetDisplayInfo(BaseUI & display, MenuListDisplayInfo * & displayInfo);
 
         ItemMenu * CurrentItem();
         menu_list_cursor_t FindFirstNonMatching(int type);
@@ -87,9 +87,11 @@ class ItemMenu
     public:
         ItemMenu();
         ItemMenu(const ItemMenu & val);
-        ItemMenu & operator=(const ItemMenu &); // Needed because we have a move constructor.
+        virtual ItemMenu & operator = (const ItemMenu &);
         ItemMenu(ItemMenu && val) noexcept;
         virtual ~ItemMenu();
+
+        virtual ItemMenu & ExplicitCopy(const ItemMenu & m);
 
 //        enum follow_up_action_t
 //        {
@@ -158,6 +160,14 @@ class ItemMenu
 //            return t;
 //        }
 
+        static command_menu_id_t CurrentPopUpMenuID()
+        {
+            if ( m_Focus != NULL )
+                return m_Focus->m_PopUpMenuID;
+            else
+                return C_MENU_ID_NONE;
+        }
+
         command_menu_id_t PopUpMenuID()
         {
             return m_PopUpMenuID;
@@ -185,7 +195,7 @@ class ItemMenu
 
         void ClearMenuList() { m_MenuListPtr = NULL; }
 
-        bool GetDisplayInfo(BaseUI & display, int & row, int & col, int & width, Rectangle & clearArea);
+        bool SetDisplayInfo(BaseUI & display, int & row, int & col, int & width, Rectangle & clearArea);
 
         static void ClearRedrawList() { m_RedrawList.clear(); }
         static std::list<ItemMenu *> & RedrawList() { return m_RedrawList; }
@@ -227,6 +237,8 @@ class ItemMenu
         std::string m_Help;
 
         int m_ItemID = -1;
+
+        bool m_ExplicitCopy = false;
 
         MenuList * m_MenuListPtr = NULL;
         menu_list_cursor_t m_PosInMenuList; // This is an iterator to a list, so I think I read it's safe to store.

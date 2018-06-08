@@ -78,27 +78,6 @@ class PatternChain : public ItemMenu
         void New();
         void Delete();
 
-//        void New()
-//        {
-//            m_Chain.emplace_back();
-//            m_PosEdit = m_Chain.size() - 1;
-//            SetStatus();
-//        }
-//
-//        void Delete()
-//        {
-//            m_Chain.pop_back();
-//            if ( m_PosEdit >= m_Chain.size() )
-//            {
-//                m_PosEdit = m_Chain.size() - 1;
-//                // Menu focus will also be at max, so reset it.
-//                m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
-//            }
-//            if ( m_PosPlay >= m_Chain.size() )
-//                m_PosPlay = m_Chain.size() - 1;
-//            SetStatus();
-//        }
-//
         virtual void SetStatus();
 
     protected:
@@ -108,7 +87,6 @@ class PatternChain : public ItemMenu
             num_pc_menu_items
         };
 
-//        virtual bool HandleKey(key_type_t k);
         virtual bool HandleKey(BaseUI::key_command_t k);
         void NextPatternChainMode( int dir );
 

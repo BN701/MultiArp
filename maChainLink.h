@@ -28,12 +28,16 @@ class PatternChain;
 
 class ChainLink : public ItemMenu
 {
+    friend PatternChain;
+
     public:
         ChainLink();
         virtual ~ChainLink();
 
-        int Pattern() { return m_Pattern; }
-        void SetPattern(int val) { m_Pattern = val; }
+        std::string & PatternLabel() { return m_PatternLabel; }
+        int PatternHash() { return m_PatternHash; }
+        void SetPattern(std::string label, int hash);
+
         int Repeats() { return m_Repeats; }
         void ClearRemaining() { m_Remaining = -1; }
         int Remaining();
@@ -53,7 +57,10 @@ class ChainLink : public ItemMenu
         virtual bool HandleKey(BaseUI::key_command_t k);
 
     private:
-        int m_Pattern = 0;
+//        int m_PatternID = 0;
+        std::string m_PatternLabel = " - "; // A pattern's 'short label'
+        size_t m_PatternHash = -1;
+
         int m_Repeats = 0;              // Zero means no repeat. Set to -1 for indefinite repeat.
         int m_Remaining = -1;           // -1 means initialize in RepeatsRemaining().
         int m_Jump = -1;

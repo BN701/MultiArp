@@ -83,9 +83,11 @@ struct Pattern : public ItemMenu
 
     Pattern();
     Pattern(const Pattern & p);
-    Pattern & operator = (const Pattern & p);
+//    virtual Pattern & operator = (const Pattern & p);
+    virtual Pattern & operator = (const ItemMenu & p);
     ~Pattern();
 
+//    Pattern & ExplicitCopy(const Pattern & p);
     void CopyContent(const Pattern & p);
 
 //    void ResetMenuList();
@@ -133,7 +135,7 @@ struct Pattern : public ItemMenu
 //    int TrigListCount() { return m_TrigList.Size(); }
     void ResetPosition();
 
-    void Step(Cluster & cluster, TrigRepeater & repeater, double & stepValueMultiplier, double phase, double stepValue, double globalBeat);
+    void Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double & stepValueMultiplier, double phase, double stepValue, double globalBeat);
 
 //    bool LabelEmpty()
 //    {

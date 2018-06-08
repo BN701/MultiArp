@@ -50,7 +50,7 @@
 
 struct PatternStore : public ItemMenu
 {
-    ItemMenu m_MenuListWindow;
+    ItemMenu m_PatternWindow;   // Dummy screen area that we can clear when there are no patterns to fill it.
 
     // Yes, we're storing iterators. But these are list iterators, so they stay valid
     // unless a specific item is deleted. (
@@ -75,7 +75,11 @@ struct PatternStore : public ItemMenu
     bool m_PatternChanged;
     bool m_UsePatternPlayData;
 
-    PatternChain m_PatternChain;
+    MenuList m_MenuList;
+
+    std::vector<PatternChain>::iterator m_ChainActive = m_PatternChains.end();
+    std::vector<PatternChain>::iterator m_ChainEdit = m_PatternChains.end();
+    std::vector<PatternChain> m_PatternChains;
 
     std::list<Pattern> m_Patterns;
     std::list<Pattern> m_Deleted;
@@ -84,6 +88,7 @@ struct PatternStore : public ItemMenu
     double m_StepValueMultiplier = 1.0;
 
     PatternStore(/*TranslateTable & table*/):
+        m_MenuList(this, &m_Visible),
 //        m_PosPatternChain(0),
 //        m_PatternChainMode(PatternChain::off),
         m_ResetOnPatternChange(true),
@@ -94,15 +99,32 @@ struct PatternStore : public ItemMenu
         m_UsePatternPlayData(false)
     {
         m_DisplayObjectType = BaseUI::dot_pattern_store;
-        m_MenuListWindow.ClearStatus();
-        m_MenuListWindow.SetVisible(true);
-        m_MenuListWindow.SetType(BaseUI::dot_pattern_menu_list);
+        m_PopUpMenuID = C_MENU_ID_PATTERN_STORE;
+
+        m_MenuList.Add(this, true);
+        m_MenuListIndent = 0;
+        m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_store_menu_list;
+
+        m_PatternWindow.ClearStatus();
+        m_PatternWindow.SetVisible(true);
+        m_PatternWindow.SetType(BaseUI::dot_pattern_menu_list);
+
         m_Visible = true;
         SetRedraw();
     };
 
+    ~PatternStore()
+    {
+        ItemMenu::m_MenuListPtr = NULL; // Prevent ItemMenu destructor from attempting
+                                        // to remove ourselves from the menu list that
+                                        // will already have been cleared.
+    }
+
     bool Empty() { return m_Patterns.empty(); }
-    bool PatternChainEmpty() { return m_PatternChain.empty(); }
+    bool PatternChainsEmpty() { return m_PatternChains.empty(); }
+
+    std::string PatternChainManager(command_t command);
+    void AddPatternChain();
 
     std::string PatternStatusPlay();
     std::string PatternStatusEdit();
@@ -123,9 +145,9 @@ struct PatternStore : public ItemMenu
 
 //    bool EditFocusFollowsPlay() { return m_EditPosFollowsPlay; }
     void SetResetOnPatternChange(bool bVal) { m_ResetOnPatternChange = bVal; }
-    void SetPatternChainMode(PatternChain::pattern_chain_mode_t bVal) { m_PatternChain.SetMode(bVal); }
-    PatternChain::pattern_chain_mode_t PatternChainMode() { return m_PatternChain.Mode(); }
-    std::vector<ChainLink>::size_type CurrentPosPatternChain() { return m_PatternChain.PosPlay(); }
+//    void SetPatternChainMode(PatternChain::pattern_chain_mode_t bVal) { m_PatternChain.SetMode(bVal); }
+//    PatternChain::pattern_chain_mode_t PatternChainMode() { return m_PatternChain.Mode(); }
+//    std::vector<ChainLink>::size_type CurrentPosPatternChain() { return m_PatternChain.PosPlay(); }
 //    bool EditPatternIsPlayPattern() { return m_PosEdit == m_PosPlay; }
 
     void SetStepValCurrentEditPattern(int i)
@@ -150,7 +172,7 @@ struct PatternStore : public ItemMenu
 
     void SetPhaseIsZero() { m_PhaseIsZero = true; }
 
-    void Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue, double globalBeat);
+    void Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double phase, double stepValue, double globalBeat);
     double StepValueMultiplier() { return m_StepValueMultiplier; }
 
     std::string EditPatternToString();
@@ -176,8 +198,29 @@ struct PatternStore : public ItemMenu
     Pattern & CurrentPlayPattern();
     Pattern & CurrentEditPattern();
 
-    const char * CurrentEditPatternID() { return m_PosEdit->ShortLabel(); }
-    const char * CurrentPlayPatternID() { return m_PosPlay->ShortLabel(); }
+    const char * CurrentEditPatternID()
+    {
+        if ( !m_Patterns.empty() )
+            return m_PosEdit->ShortLabel();
+        else
+            return " - ";
+    }
+
+    int CurrentEditPatternHash()
+    {
+        if ( !m_Patterns.empty() )
+            return m_PosEdit->ShortLabelHash();
+        else
+            return -1;
+    }
+
+    const char * CurrentPlayPatternID()
+    {
+        if ( !m_Patterns.empty() )
+            return m_PosPlay->ShortLabel();
+        else
+            return " - ";
+    }
 
     double LastRealTimeBeat();
 
@@ -228,7 +271,8 @@ struct PatternStore : public ItemMenu
     {
         for ( auto it = m_Patterns.begin(); it != m_Patterns.end(); it++ )
             it->ResetPosition();
-        m_PatternChain.ResetPosPlay();
+        if ( !m_PatternChains.empty() )
+            m_ChainActive->ResetPosPlay();
 //        m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
     }
 
@@ -252,7 +296,7 @@ struct PatternStore : public ItemMenu
     FeelMap & FeelMapForEdit(bool setFocus = true);
     FeelMap & FeelMapForPlay();
 
-    PatternChain & PatternChainForEdit() { return m_PatternChain; }
+//    PatternChain & PatternChainForEdit() { return m_PatternChain; }
 
     void SetUsePatternPlayData( bool val );
     bool UsePatternPlayData() { return m_UsePatternPlayData; }

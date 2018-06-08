@@ -46,9 +46,9 @@ Pattern::Pattern():
 //    m_TestString = "Set from Pattern Constructor.";
 
     m_PopUpMenuID = C_MENU_ID_PATTERN;
+    m_DisplayObjectType = BaseUI::dot_pattern;
     m_MenuList.Add(this);
     m_MenuListIndent = 0;
-    m_DisplayObjectType = BaseUI::dot_pattern;
     m_MenuList.m_DisplayObjectType = BaseUI::dot_pattern_menu_list;
 }
 
@@ -57,40 +57,51 @@ Pattern::~Pattern()
     for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
         delete *it;
 
-//    m_MenuList.m_Items.clear();
-    ItemMenu::m_MenuListPtr = NULL;    // Prevent ItemMenu destructor from attempting
+    ItemMenu::m_MenuListPtr = NULL; // Prevent ItemMenu destructor from attempting
                                     // to remove ourselves from the menu list that
                                     // will already have been cleared.
 }
 
+//Pattern::Pattern(const Pattern & p):
+//    ItemMenu(p),
+////    m_Pos(p.m_Pos),
+//    m_Label(p.m_Label),
+//    m_ShortLabel(p.m_ShortLabel),
+//    m_ShortLabelHash(p.m_ShortLabelHash),
+//    m_StepValue(p.m_StepValue),
+//    m_Gate(p.m_Gate),
+//    m_GateHold(p.m_GateHold),
+//    m_Velocity(p.m_Velocity),
+//    m_MenuList(this, &m_Visible)    // Initialized, not copied
+//{
+//    m_Visible = false;
+//    m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
+//
+//    m_MenuList.Add(this);
+//
+//    // This is a copy constructor, so we have to copy each List Group
+//
+//    CopyContent(p);
+//
+//}
+
 Pattern::Pattern(const Pattern & p):
-    ItemMenu(p),
-//    m_Pos(p.m_Pos),
-    m_Label(p.m_Label),
-    m_ShortLabel(p.m_ShortLabel),
-    m_ShortLabelHash(p.m_ShortLabelHash),
-    m_StepValue(p.m_StepValue),
-    m_Gate(p.m_Gate),
-    m_GateHold(p.m_GateHold),
-    m_Velocity(p.m_Velocity),
     m_MenuList(this, &m_Visible)    // Initialized, not copied
 {
-    m_Visible = false;
     m_MenuList.m_DisplayObjectType = p.m_MenuList.m_DisplayObjectType;
-
     m_MenuList.Add(this);
 
-    // This is a copy constructor, so we have to copy each List Group
-
-    CopyContent(p);
-
+    *this = p;
 }
 
-Pattern & Pattern::operator = (const Pattern & p)
+//Pattern & Pattern::operator = (const Pattern & p)
+Pattern & Pattern::operator = (const ItemMenu & m)
 {
-    ItemMenu::operator = (p);
+    ItemMenu::operator = (m);
 
-//    m_Pos = p.m_Pos;
+    const Pattern & p = *dynamic_cast<const Pattern*>(&m);
+
+    m_Visible = p.m_Visible;
     m_Label = p.m_Label;
     m_ShortLabel = p.m_ShortLabel;      // If genuine copy, need to call SetShortLabel() again to generate unique ID.
     m_ShortLabelHash = p.m_ShortLabelHash;  // Not sure about the validity of doing this, given the above.
@@ -104,6 +115,24 @@ Pattern & Pattern::operator = (const Pattern & p)
     return *this;
 }
 
+//Pattern & Pattern::ExplicitCopy(const Pattern & p)
+//{
+//    ItemMenu::ExplicitCopy(p);
+//
+////    m_Pos = p.m_Pos;
+//    m_Label = p.m_Label;
+//    m_ShortLabel = p.m_ShortLabel;      // If genuine copy, need to call SetShortLabel() again to generate unique ID.
+//    m_ShortLabelHash = p.m_ShortLabelHash;  // Not sure about the validity of doing this, given the above.
+//    m_StepValue = p.m_StepValue;
+//    m_Gate = p.m_Gate;
+//    m_GateHold = p.m_GateHold;
+//    m_Velocity = p.m_Velocity;
+//
+//    CopyContent(p);
+//
+//    return *this;
+//}
+
 void Pattern::CopyContent(const Pattern & p)
 {
     for ( auto it = p.m_ListGroups.begin(); it != p.m_ListGroups.end(); it++ )
@@ -112,11 +141,11 @@ void Pattern::CopyContent(const Pattern & p)
         {
             case ListGroup::lgtype_step:
                 m_ListGroups.emplace_back(new StepListGroup(this));
-                *dynamic_cast<StepListGroup*>(m_ListGroups.back()) = *dynamic_cast<StepListGroup*>(*it);
+                dynamic_cast<StepListGroup*>(m_ListGroups.back())->ExplicitCopy(*dynamic_cast<StepListGroup*>(*it));
                 break;
             case ListGroup::lgtype_realtime:
                 m_ListGroups.emplace_back(new RTListGroup(this));
-                *dynamic_cast<RTListGroup*>(m_ListGroups.back()) = *dynamic_cast<RTListGroup*>(*it);
+                dynamic_cast<RTListGroup*>(m_ListGroups.back())->ExplicitCopy(*dynamic_cast<RTListGroup*>(*it));
                 break;
         }
 
@@ -298,7 +327,7 @@ void Pattern::ResetPosition()
 }
 
 
-void Pattern::Step(Cluster & cluster, TrigRepeater & repeater,
+void Pattern::Step(/*Cluster & cluster, TrigRepeater & repeater,*/
     double & stepValueMultiplier, double phase, double stepValue, double globalBeat)
 {
     // Add in step based events, if any, and step position.
@@ -1238,11 +1267,11 @@ void Pattern::CopyCurrentListGroup()
     {
         case ListGroup::lgtype_step:
             pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new StepListGroup(this));
-            *dynamic_cast<StepListGroup*>(pNewGroup) = *dynamic_cast<StepListGroup*>(pGroup);
+            dynamic_cast<StepListGroup*>(pNewGroup)->ExplicitCopy(*dynamic_cast<StepListGroup*>(pGroup));
             break;
         case ListGroup::lgtype_realtime:
             pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new RTListGroup(this));
-            *dynamic_cast<RTListGroup*>(pNewGroup) = *dynamic_cast<RTListGroup*>(pGroup);
+            dynamic_cast<RTListGroup*>(pNewGroup)->ExplicitCopy(*dynamic_cast<RTListGroup*>(pGroup));
             break;
     }
 //    pGroup->SetFocus();

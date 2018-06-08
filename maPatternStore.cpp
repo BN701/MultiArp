@@ -50,7 +50,7 @@ using namespace std;
 
 PatternStore g_PatternStore;
 Pattern Pattern::EmptyPattern;
-//ItemMenu PatternStore::m_MenuListWindow;
+//ItemMenu PatternStore::m_PatternWindow;
 
 void PatternStore::SetStatus()
 {
@@ -105,6 +105,14 @@ bool PatternStore::HandleKey(BaseUI::key_command_t k)
             }
         }
         break;
+
+    case BaseUI::key_cmd_up:
+        m_MenuList.DownCursorPos();
+        return true;
+
+    case BaseUI::key_cmd_down:
+        m_MenuList.UpCursorPos();
+        return true;
 
     case BaseUI::key_cmd_left:
         UpEditPos();
@@ -204,7 +212,7 @@ void PatternStore::AddEmptyPattern(bool copyRight)
 
     pos = m_Patterns.emplace(pos);
 
-    *pos = m_DefaultPattern;
+    pos->ExplicitCopy(m_DefaultPattern);
     pos->SetShortLabel();
     m_PatternLookup[pos->ShortLabelHash()] = pos;
 
@@ -224,7 +232,7 @@ void PatternStore::CopyCurrentPattern(bool copyRight)
         ++pos;
 
     pos = m_Patterns.emplace(pos);
-    *pos = *m_PosEdit;
+    pos->ExplicitCopy(*m_PosEdit);
     pos->ResetPosition();
     pos->SetShortLabel();
     m_PatternLookup[pos->ShortLabelHash()] = pos;
@@ -261,7 +269,7 @@ void PatternStore::DeleteCurrentPattern()
 
     if ( m_Patterns.empty() )
     {
-        m_MenuListWindow.SetRedraw();
+        m_PatternWindow.SetRedraw();
         SetRedraw();
         m_PosEdit = m_Patterns.end();
         m_PosPlay = m_Patterns.end();
@@ -366,25 +374,17 @@ double PatternStore::LastRealTimeBeat()
 Pattern & PatternStore::CurrentPlayPattern()
 {
     if ( m_Patterns.empty() )
-#ifdef MA_BLUE
         return Pattern::EmptyPattern;
-#else
-        throw string("Pattern Store is Empty.");
-#endif
-
-    return *m_PosPlay;
+    else
+        return *m_PosPlay;
 }
 
 Pattern & PatternStore::CurrentEditPattern()
 {
     if ( m_Patterns.empty() )
-#ifdef MA_BLUE
         return Pattern::EmptyPattern;
-#else
-        throw string("Pattern Store is Empty.");
-#endif
-
-    return *m_PosEdit;
+    else
+        return *m_PosEdit;
 }
 
 //void PatternStore::UpListPos()
@@ -528,14 +528,14 @@ bool PatternStore::NewPatternPending(bool clearAndReset)
 }
 
 
-string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
-{
-    if ( m_Patterns.empty() )
-        return "No patterns loaded.\n";
-
-    return m_PatternChain.ToStringForDisplay(firstRow, rows);
-
-}
+//string PatternStore::PatternChainToStringForDisplay(int firstRow, int rows)
+//{
+//    if ( m_Patterns.empty() )
+//        return "No patterns loaded.\n";
+//
+//    return m_PatternChain.ToStringForDisplay(firstRow, rows);
+//
+//}
 
 string PatternStore::PatternStatusPlay()
 {
@@ -560,24 +560,24 @@ string PatternStore::PatternStatusPlay()
     const char * format2 = ", Chain: %c [%lu/%lu]";
 #endif
 
-    switch ( m_PatternChain.Mode() )
-    {
-        case PatternChain::off :
-            strcpy(buf, ", Chain: Off");
-            break;
-
-        case PatternChain::natural :
-            snprintf(buf, 80, format2, 'N', m_PatternChain.PosPlay() + 1, m_PatternChain.size());
-            break;
-
-        case PatternChain::quantum :
-            snprintf(buf, 80, format2, 'Q', m_PatternChain.PosPlay() + 1, m_PatternChain.size());
-            break;
-        default:
-            break;
-    }
-
-    result += buf;
+//    switch ( m_PatternChain.Mode() )
+//    {
+//        case PatternChain::off :
+//            strcpy(buf, ", Chain: Off");
+//            break;
+//
+//        case PatternChain::natural :
+//            snprintf(buf, 80, format2, 'N', m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+//            break;
+//
+//        case PatternChain::quantum :
+//            snprintf(buf, 80, format2, 'Q', m_PatternChain.PosPlay() + 1, m_PatternChain.size());
+//            break;
+//        default:
+//            break;
+//    }
+//
+//    result += buf;
 
     return result;
 }
@@ -631,7 +631,7 @@ string PatternStore::PatternOverview()
     return buff;
 }
 
-void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase, double stepValue, double globalBeat)
+void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double phase, double stepValue, double globalBeat)
 {
     /*
         As long as PatternChanged() is called for every step, we
@@ -641,6 +641,7 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
     if ( m_Patterns.empty() )
         return;
 
+#if 0
     if ( m_PatternChain.Mode() != PatternChain::off && ! m_PatternChain.empty() )
     {
         bool changePattern = false;
@@ -699,28 +700,28 @@ void PatternStore::Step(Cluster & cluster, TrigRepeater & repeater, double phase
             break;
         }
     }
-
+#endif
     m_PhaseIsZero = false;
 
-    m_PosPlay->Step(cluster, repeater, m_StepValueMultiplier, phase, stepValue, globalBeat);
+    m_PosPlay->Step(/*cluster, repeater,*/ m_StepValueMultiplier, phase, stepValue, globalBeat);
 }
 
-void PatternStore::UpdatePatternChainFromSimpleString(string s)
-{
-    m_PatternChain.FromSimpleString(s);
-    m_PatternChain.ResetPosPlay();
-}
+//void PatternStore::UpdatePatternChainFromSimpleString(string s)
+//{
+//    m_PatternChain.FromSimpleString(s);
+//    m_PatternChain.ResetPosPlay();
+//}
 
-void PatternStore::UpdatePatternChainFromString(string s)
-{
-    m_PatternChain.FromString(s);
-    m_PatternChain.ResetPosPlay();
-}
+//void PatternStore::UpdatePatternChainFromString(string s)
+//{
+//    m_PatternChain.FromString(s);
+//    m_PatternChain.ResetPosPlay();
+//}
 
-string PatternStore::PatternChainToString()
-{
-    return m_PatternChain.ToString();
-}
+//string PatternStore::PatternChainToString()
+//{
+//    return m_PatternChain.ToString();
+//}
 
 string PatternStore::EditPatternToString()
 {
@@ -810,11 +811,11 @@ string PatternStore::ToString()
     string result;
 
     result += "<< Pattern Store >>\n\n";
-    result += PatternChainToString();
-    result += "\n\n";
+//    result += PatternChainToString();
+//    result += "\n\n";
 
-    snprintf(buff, 100, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChain.Mode()));
-    result += buff;
+//    snprintf(buff, 100, "Store %s %i\n", ps_element_names.at(ps_name_pattern_chain_mode), static_cast<int>(m_PatternChain.Mode()));
+//    result += buff;
     snprintf(buff, 100, "Store %s %s\n", ps_element_names.at(ps_name_reset_on_pattern_change), m_ResetOnPatternChange ? "On" : "Off");
     result += buff;
 //    snprintf(buff, 100, "Store %s %s\n", ps_element_names.at(ps_name_edit_focus_follows_play), m_EditPosFollowsPlay ? "On" : "Off");
@@ -857,9 +858,9 @@ void PatternStore::SetFieldsFromString(string s)
 #endif
             switch (e)
             {
-            case ps_name_pattern_chain_mode:
-                m_PatternChain.SetMode(static_cast<PatternChain::pattern_chain_mode_t>(strtol(token.c_str(), NULL, 0)));
-                break;
+//            case ps_name_pattern_chain_mode:
+//                m_PatternChain.SetMode(static_cast<PatternChain::pattern_chain_mode_t>(strtol(token.c_str(), NULL, 0)));
+//                break;
             case ps_name_reset_on_pattern_change:
                 m_ResetOnPatternChange = token == "on";
                 break;
@@ -920,8 +921,8 @@ bool PatternStore::FromString(string s, int & created, int & updates)
         }
         else if ( s.find("Chain ") == 0 )
         {
-            UpdatePatternChainFromString(s);
-            updates += 1;
+//            UpdatePatternChainFromString(s);
+//            updates += 1;
             return true;
         }
         else if ( s.find("Store ") == 0 )
@@ -1302,3 +1303,25 @@ string PatternStore::ShowPatternPlayData()
     return result;
 }
 
+string PatternStore::PatternChainManager(command_t command)
+{
+    switch ( command )
+    {
+        case C_PATTERN_CHAIN_NEW_LIST:
+            AddPatternChain();
+            return string("New Pattern Chain added.");
+        default:
+            return string("Unknown Pattern Chain command");
+    }
+}
+
+void PatternStore::AddPatternChain()
+{
+    m_ChainEdit = m_PatternChains.emplace(m_ChainEdit);
+
+    m_ChainEdit->SetVisible(true);
+    m_ChainEdit->SetDisplayIndent(2);
+    m_MenuList.Add(&*m_ChainEdit, false);
+
+    m_ChainEdit->SetRedraw();
+}

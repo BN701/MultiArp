@@ -56,8 +56,9 @@ struct screen_pos_t
 enum command_menu_id_t
 {
     C_MENU_ID_NONE,
-    C_MENU_ID_TOP,
+    C_MENU_ID_PATTERN_STORE,
     C_MENU_ID_PATTERN,
+    C_MENU_ID_PATTERN_CHAIN,
     C_MENU_ID_SET,
     C_MENU_ID_SET_FULL,
     C_MENU_ID_SETTINGS,
@@ -99,7 +100,7 @@ class CommandMenu
 {
     public:
         bool Active() { return m_Active; }
-        void Open(int menu = C_MENU_ID_TOP);
+        void Open(int menu = C_MENU_ID_PATTERN_STORE);
         void Show();
         void Choose(int i);
         bool HandleKey(BaseUI::key_command_t key);

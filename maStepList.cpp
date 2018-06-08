@@ -209,12 +209,10 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         {
             Cluster & c = m_Clusters.at(m_PosEdit);
             c.SetItemID(m_PosEdit + 1);
-//            c.SetFocus();
             c.SetDisplayIndent(m_MenuListIndent + 2);
             c.SetVisible(m_Visible);
             m_MenuListPtr->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
-            c.SetReturnFocus(this);                         // Override return focus.
-//            MenuInsert(m_PosInMenuList, & c);
+            c.SetReturnFocus(this);  // Override return focus.
         }
         break;
 
@@ -248,7 +246,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_cmd_dec_2:
         if ( !m_Clusters.empty() )
         {
-            m_Clusters.at(m_PosEdit).HandleKey(k);
+            m_Clusters[m_PosEdit].HandleKey(k);
         }
         break;
 

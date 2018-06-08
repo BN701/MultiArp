@@ -354,8 +354,6 @@ int main(int argc, char *argv[])
         {
             bool keyDataValid = false;
             BaseUI::key_command_t key;
-            // ItemMenu::key_type_t curKey = ItemMenu::no_key;
-            // xcb_keysym_t sym = 0;
 
             if ( pfd[0].revents & POLLIN )
             {

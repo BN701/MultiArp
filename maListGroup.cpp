@@ -106,18 +106,35 @@ ListGroup::~ListGroup()
         m_ListGroupsLookup.erase(m_ListGroupID);
 }
 
-ListGroup & ListGroup::operator = (const ListGroup & lg)
+//ListGroup & ListGroup::ExplicitCopy(const ListGroup & lg)
+//{
+//    ItemMenu::ExplicitCopy(lg);
+//    m_MidiChannel = lg.m_MidiChannel;
+//    m_CurrentStepValue = lg.m_CurrentStepValue;
+//    m_StepEdit = m_CurrentStepValue;        // If these are left at default values they'll show up in Status as pending edits.
+//    m_StepPending = m_CurrentStepValue;
+//    m_LastUsedStepValue = lg.m_LastUsedStepValue;
+//    m_ListGroupMenuFocus = lg.m_ListGroupMenuFocus;
+//    m_Beat = lg.m_Beat;
+//    m_Phase = lg.m_Phase;
+//    m_Tempo = lg.m_Tempo;
+//}
+
+ItemMenu & ListGroup::operator = (const ItemMenu & m)
 {
-    ItemMenu::operator = (lg);
-    m_MidiChannel = lg.m_MidiChannel;
-    m_CurrentStepValue = lg.m_CurrentStepValue;
+    ItemMenu::operator = (m);
+
+    const ListGroup & g = *dynamic_cast<const ListGroup*>(&m);
+
+    m_MidiChannel = g.m_MidiChannel;
+    m_CurrentStepValue = g.m_CurrentStepValue;
     m_StepEdit = m_CurrentStepValue;        // If these are left at default values they'll show up in Status as pending edits.
     m_StepPending = m_CurrentStepValue;
-    m_LastUsedStepValue = lg.m_LastUsedStepValue;
-    m_ListGroupMenuFocus = lg.m_ListGroupMenuFocus;
-    m_Beat = lg.m_Beat;
-    m_Phase = lg.m_Phase;
-    m_Tempo = lg.m_Tempo;
+    m_LastUsedStepValue = g.m_LastUsedStepValue;
+    m_ListGroupMenuFocus = g.m_ListGroupMenuFocus;
+    m_Beat = g.m_Beat;
+    m_Phase = g.m_Phase;
+    m_Tempo = g.m_Tempo;
 }
 
 void ListGroup::ResetPosition()
@@ -492,6 +509,14 @@ StepListGroup::StepListGroup(StepListGroup * g):
     m_StepListSet = g->m_StepListSet;
 }
 
+ItemMenu & StepListGroup::operator = (const ItemMenu & m)
+{
+    ListGroup::operator = (m);
+
+    const StepListGroup & g = *dynamic_cast<const StepListGroup*>(&m);
+    m_StepListSet = g.m_StepListSet;
+}
+
 StepList * StepListGroup::NewStepList()
 {
     m_StepListSet.emplace_back(this);
@@ -648,11 +673,12 @@ void StepListGroup::MoveList(StepList * pItem, MenuList & menu, bool up)
         // Swap two items. The process is the same regardless
         // of which one was selected.
 
-        StepList temp = m_StepListSet[pos];
-        m_StepListSet[pos] = m_StepListSet[pos - 1];
+        StepList temp;
+        temp.ExplicitCopy(m_StepListSet[pos]);
+        m_StepListSet[pos].ExplicitCopy(m_StepListSet[pos - 1]);
         m_StepListSet[pos].SetItemID(pos);
 
-        m_StepListSet[pos - 1] = temp;
+        m_StepListSet[pos - 1].ExplicitCopy(temp);
         m_StepListSet[pos - 1].SetItemID(pos - 1);
 
         menu.Insert(menuInsertPos, &m_StepListSet[pos - 1]);

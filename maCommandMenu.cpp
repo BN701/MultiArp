@@ -59,8 +59,9 @@ std::map<int, int> CommandMenu::m_LastChoices;
 map<int, const char *> CommandMenu::m_MenuTitles =
 {
     {C_MENU_ID_NONE, ""},
-    {C_MENU_ID_TOP, "Pattern"},
+    {C_MENU_ID_PATTERN_STORE, "Pattern Store"},
     {C_MENU_ID_PATTERN, "Current Pattern"},
+    {C_MENU_ID_PATTERN_CHAIN, "Chain"},
     {C_MENU_ID_SET, "Layer"},
     {C_MENU_ID_SET_FULL, "Layer"},
     {C_MENU_ID_SETTINGS, "Settings"},
@@ -79,14 +80,15 @@ map<int, const char *> CommandMenu::m_MenuTitles =
 multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
 {
     // Pattern Store
-//    {C_MENU_ID_TOP, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
-//    {C_MENU_ID_TOP, {true, C_MENU_ID_SET, "Layer", ""}},
-    {C_MENU_ID_TOP, {false, C_NEW_PATTERN, "New", ""}},
-    {C_MENU_ID_TOP, {false, C_CUE_CURRENT, "Cue", ""}},
-    {C_MENU_ID_TOP, {false, C_COPY, "Copy", ""}},
-    {C_MENU_ID_TOP, {false, C_DELETE, "Delete", ""}},
-    {C_MENU_ID_TOP, {false, C_UNDO_PATTERN_DELETE, "Undo", ""}},
-    {C_MENU_ID_TOP, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
+//    {C_MENU_ID_PATTERN_STORE, {true, C_MENU_ID_PATTERN, "Pattern", ""}},
+//    {C_MENU_ID_PATTERN_STORE, {true, C_MENU_ID_SET, "Layer", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_NEW_PATTERN, "New", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_CUE_CURRENT, "Cue", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_COPY, "Copy", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_DELETE, "Delete", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_UNDO_PATTERN_DELETE, "Undo", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_PATTERN_CHAIN_NEW_LIST, "New Chain", ""}},
+    {C_MENU_ID_PATTERN_STORE, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
     // Pattern Store -> Settings
     {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
@@ -101,6 +103,12 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
+
+    // Pattern Store -> Chain
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Copy", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Delete", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Move Up", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Move Down", ""}},
 
     // Sequencer
     {C_MENU_ID_SEQUENCE, {false, C_LIST_NEW, "New List", ""}},
@@ -216,7 +224,10 @@ void CommandMenu::Open(int menu)
 void CommandMenu::Show()
 {
     set_status(COMMAND_HOME, m_MenuString.c_str());
-    g_TextUI.HighlightLastWrite(m_FieldPositions[m_MenuChoice].offset, m_FieldPositions[m_MenuChoice].length, CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
+    if ( !m_FieldPositions.empty() )
+        g_TextUI.HighlightLastWrite(m_FieldPositions[m_MenuChoice].offset,
+                m_FieldPositions[m_MenuChoice].length,
+                CP_MENU_HIGHLIGHT, BaseUI::attr_bold);
 }
 
 void CommandMenu::ClearAll()

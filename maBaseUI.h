@@ -171,6 +171,7 @@ class BaseUI
             dot_pattern_store,
             dot_pattern,
             dot_pattern_menu_list,
+            dot_pattern_store_menu_list,
             dot_step_list_group,
             dot_rt_list_group,
             dot_step_list,
@@ -250,5 +251,15 @@ class BaseUI
         bool m_BigPanelHold = false;
 
 };
+
+#define COMMAND_PROMPT 1,2 // This one is col, row, unlike the others.
+#define COMMAND_HOME 2,4
+#define STAT_POS_TOPLINE 0,0
+#define STAT_POS_STEP AnsiUI::progress_panel, 0,0
+#define STAT_POS_PATTERN AnsiUI::small_panel, 1,0
+#define STAT_POS_PATTERN_EDIT AnsiUI::small_panel, 2,0
+#define STAT_POS_2 1,4
+#define STAT_POS_MENU 3,4
+
 
 #endif // BASEUI_H

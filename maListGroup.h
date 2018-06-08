@@ -44,9 +44,10 @@ class ListGroup : public ItemMenu
 
         ListGroup(Pattern * p, list_group_type type);
         ListGroup(ListGroup & lg);
+        virtual ItemMenu & operator = (const ItemMenu & m);
         ~ListGroup();
 
-        ListGroup & operator = (const ListGroup &);
+//        virtual ListGroup & ExplicitCopy(const ListGroup &);
 
         list_group_type Type() { return m_Type; }
         void ResetPosition();
@@ -139,6 +140,7 @@ class StepListGroup : public ListGroup
 
         StepListGroup(Pattern * p);
         StepListGroup(StepListGroup * g);
+        virtual ItemMenu & operator = (const ItemMenu &);
 
         StepList * NewStepList();
         void MoveListUp(StepList * pItem, MenuList & menu);

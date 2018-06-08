@@ -224,17 +224,18 @@ void queue_next_step(snd_seq_event_t *ev)
 
     // Step the Pattern Store
 
-    Cluster nextCluster;
-    TrigRepeater repeater;
-    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
+//    TrigRepeater repeater;
+//    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
 
     if ( g_State.RunState() || g_DeferStop-- > 0 )
-    {
-        g_PatternStore.Step(nextCluster, repeater, g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
-        if ( g_ListBuilder.RealTimeRecord() )
-            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
-    }
+        g_PatternStore.Step(/*nextCluster, repeater,*/ g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
+    else
+        return;
 
+    if ( !g_ListBuilder.RealTimeRecord() )
+        return;
+
+    Cluster nextCluster = *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     if ( nextCluster.Empty() )
        return;
 
@@ -257,7 +258,7 @@ void queue_next_step(snd_seq_event_t *ev)
     double stepLengthMilliSecs = 240000.0/(tempo * g_State.LastUsedStepValue());
     unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + g_PatternStore.GateLength()));
 
-    repeater.Init(tempo, stepLengthMilliSecs);
+//    repeater.Init(tempo, stepLengthMilliSecs);
 
     for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
     {
@@ -292,15 +293,16 @@ void queue_next_step(snd_seq_event_t *ev)
 
        int64_t queue_time_delta = 0;
        int interval = 0;
-       repeater.Reset(noteVelocity);
+//       repeater.Reset(noteVelocity);
 
        do
        {
-           int note = translator.TranslateUsingNoteMap(noteNumber, interval);
+//           int note = translator.TranslateUsingNoteMap(noteNumber, interval);
+           int note = noteNumber;
            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
            g_Sequencer.ScheduleNote(note, noteVelocity, duration);
        }
-       while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
+       while ( false /*repeater.Step(queue_time_delta, interval, noteVelocity)*/ );
     }
 
 }

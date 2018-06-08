@@ -48,7 +48,7 @@ struct StepList : public ItemMenu
     }
 
     StepList(const StepList & other) = default;
-    StepList & operator = (const StepList & other) = default;
+    virtual StepList & operator = (const StepList & other) = default;
     StepList(StepList && other) noexcept = default;
 
     ~StepList()

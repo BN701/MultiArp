@@ -327,9 +327,16 @@ bool RealTimeList::HandleKey(BaseUI::key_command_t k)
         }
         break;
 
-    case BaseUI::key_backspace:
-    case BaseUI::key_escape:
-        ReturnFocus();
+    case BaseUI::key_cmd_back:
+//        ReturnFocus();
+        // Surprise!! When I eventually get round to putting real time
+        // looper support back in here I will have probably forgotten the
+        // day I put this bit in (whilst working on Pattern Chaining.)
+        if ( m_MenuListPtr != NULL )
+        {
+            auto pos = m_MenuListPtr->ReverseFind(BaseUI::dot_rt_list_group);
+            m_MenuListPtr->Select(pos);
+        }
         break;
 
     case BaseUI::key_left:

@@ -26,6 +26,7 @@
 #include "maChainLink.h"
 #include "maItemMenu.h"
 
+class PatternStore;
 
 class PatternChain : public ItemMenu
 {
@@ -38,18 +39,26 @@ class PatternChain : public ItemMenu
             num_pattern_chain_modes
         };
 
-        PatternChain();
+        PatternChain(PatternStore * store = NULL);
         virtual ~PatternChain();
 
-        ChainLink & at(std::vector<ChainLink>::size_type pos) { return m_Chain.at(pos); }
+        ChainLink & operator [] (std::vector<ChainLink>::size_type pos) { return m_Chain[pos]; }
         bool empty() { return m_Chain.empty(); }
         std::vector<ChainLink>::size_type size() { return m_Chain.size(); }
-        void SetMode(pattern_chain_mode_t val) { m_PatternChainMode = val; }
+        void SetMode(pattern_chain_mode_t val);
         pattern_chain_mode_t Mode() { return m_PatternChainMode; }
 
         std::vector<ChainLink>::size_type PosPlay() { return m_PosPlay; }
-        void SetPosPlay( int val ) { m_PosPlay = static_cast<std::vector<ChainLink>::size_type>(val); }
-        void ResetPosPlay() { m_PosPlay = 0; }
+        void SetPosPlay( int val )
+        {
+            m_PosPlay = static_cast<std::vector<ChainLink>::size_type>(val);
+            SetRedraw();
+        }
+        void ResetPosPlay()
+        {
+            m_PosPlay = 0;
+            SetRedraw();
+        }
 
         std::string ToStringForDisplay(unsigned firstRow, unsigned rows);
         std::string ToString();
@@ -79,6 +88,7 @@ class PatternChain : public ItemMenu
         void Delete();
 
         virtual void SetStatus();
+        virtual void SetFocus() noexcept;
 
     protected:
         enum pattern_chain_menu_focus_t
@@ -97,6 +107,7 @@ class PatternChain : public ItemMenu
 
     private:
 
+        PatternStore * m_PatternStore = NULL;
         std::vector<ChainLink> m_Chain;
         pattern_chain_mode_t m_PatternChainMode = off;
 

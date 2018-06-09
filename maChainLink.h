@@ -25,17 +25,18 @@
 #include "maItemMenu.h"
 
 class PatternChain;
+class PatternStore;
 
 class ChainLink : public ItemMenu
 {
     friend PatternChain;
 
     public:
-        ChainLink();
+        ChainLink(PatternStore * store = NULL);
         virtual ~ChainLink();
 
         std::string & PatternLabel() { return m_PatternLabel; }
-        int PatternHash() { return m_PatternHash; }
+        size_t PatternHash() { return m_PatternHash; }
         void SetPattern(std::string label, int hash);
 
         int Repeats() { return m_Repeats; }
@@ -68,6 +69,7 @@ class ChainLink : public ItemMenu
         int m_PosEdit = 0;
 
         PatternChain * m_Parent = NULL;
+        PatternStore * m_PatternStore = NULL;
 };
 
 #endif // CHAINLINK_H

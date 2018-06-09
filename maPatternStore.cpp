@@ -490,6 +490,15 @@ void PatternStore::SetEditPos( std::list<Pattern>::iterator p )
     m_PosEdit->SetRedraw();
 }
 
+void PatternStore::SetEditPos(size_t hash)
+{
+    if ( m_PatternLookup.count(hash) == 0 )
+        return;
+
+    SetEditPos(m_PatternLookup[hash]);
+
+}
+
 void PatternStore::UpEditPos()
 {
     // Move towards beginning of pattern list.
@@ -641,11 +650,14 @@ void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double p
     if ( m_Patterns.empty() )
         return;
 
-#if 0
-    if ( m_PatternChain.Mode() != PatternChain::off && ! m_PatternChain.empty() )
+#if 1
+//    if ( m_PatternChain.Mode() != PatternChain::off && ! m_PatternChain.empty() )
+    if ( m_ActiveChain >= 0 && m_ActiveChain < m_PatternChains.size() )
     {
         bool changePattern = false;
-        switch ( m_PatternChain.Mode() )
+        PatternChain & currentChain = m_PatternChains[m_ActiveChain];
+
+        switch ( currentChain.Mode() )
         {
             case PatternChain::natural :
                 if ( m_PosPlay->AllListsComplete() )
@@ -662,40 +674,31 @@ void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double p
 
         while ( changePattern ) // Not a loop, just something we can 'break' out of.
         {
-            int next = m_PatternChain.JumpOverride();
+            int nextLink = currentChain.JumpOverride();
 
             // TODO: Can probably do this internally to PatternChain at some point.
 
-            if ( next < 0 && m_PatternChain.at(m_PatternChain.PosPlay()).Remaining() > 0 )
+            if ( nextLink < 0 && currentChain[currentChain.PosPlay()].Remaining() > 0 )
                 break;
 
-            if ( next < 0 )
-                next = m_PatternChain.at(m_PatternChain.PosPlay()).Jump();
+//            if ( nextLink < 0 )
+//                nextLink = currentChain[currentChain.PosPlay()].Jump();
 
-            if ( next < 0 )
-                next = m_PatternChain.PosPlay() + 1;
+            if ( nextLink < 0 )
+                nextLink = currentChain.PosPlay() + 1;
 
-            if ( static_cast<unsigned>(next) >= m_PatternChain.size() )
-                next = 0;
+            if ( static_cast<unsigned>(nextLink) >= currentChain.size() )
+                nextLink = 0;
 
-            m_PatternChain.SetPosPlay(next);
+            currentChain.SetPosPlay(nextLink);
 
             // Don't change play pointer if new pattern out of range.
 
-            unsigned pos = m_PatternChain.at(m_PatternChain.PosPlay()).Pattern();
+            size_t patternIdHash = currentChain[currentChain.PosPlay()].PatternHash();
 
-            // Todo: Pattern Lookup
-            if ( pos < m_Patterns.size() )
-            {
-//                m_PosPlay = pos;
-//                if ( m_EditPosFollowsPlay )
-//                    m_PosEdit = m_PosPlay;
-            }
+            SetPlayPattern(patternIdHash);
 
-            m_PatternChanged = true;
-
-            if ( m_ResetOnPatternChange )
-                m_PosPlay->ResetPosition();
+            SetRedraw();
 
             break;
         }
@@ -1317,11 +1320,26 @@ string PatternStore::PatternChainManager(command_t command)
 
 void PatternStore::AddPatternChain()
 {
-    m_ChainEdit = m_PatternChains.emplace(m_ChainEdit);
+    m_PatternChains.emplace_back(this);
 
-    m_ChainEdit->SetVisible(true);
-    m_ChainEdit->SetDisplayIndent(2);
-    m_MenuList.Add(&*m_ChainEdit, false);
+    PatternChain & chain = m_PatternChains.back();
+    chain.SetVisible(true);
+    chain.SetDisplayIndent(2);
+    m_MenuList.Add(&chain, false);
 
-    m_ChainEdit->SetRedraw();
+    chain.SetRedraw();
 }
+
+void PatternStore::SetActivePatternChain(PatternChain * chain)
+{
+    m_ActiveChain = -1;
+    for ( auto it = m_PatternChains.begin(); it != m_PatternChains.end(); ++it )
+        if ( chain == &*it )
+        {
+            it->SetMode(PatternChain::quantum);
+            m_ActiveChain = it - m_PatternChains.begin();
+        }
+        else
+            it->SetMode(PatternChain::off);
+}
+

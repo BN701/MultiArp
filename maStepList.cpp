@@ -217,7 +217,12 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         break;
 
     case BaseUI::key_cmd_back:
-        ReturnFocus();
+//        ReturnFocus();
+        if ( m_MenuListPtr != NULL )
+        {
+            auto pos = m_MenuListPtr->ReverseFind(BaseUI::dot_step_list_group);
+            m_MenuListPtr->Select(pos);
+        }
         break;
 
     case BaseUI::key_cmd_left:

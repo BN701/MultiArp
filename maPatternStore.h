@@ -77,9 +77,11 @@ struct PatternStore : public ItemMenu
 
     MenuList m_MenuList;
 
-    std::vector<PatternChain>::iterator m_ChainActive = m_PatternChains.end();
-    std::vector<PatternChain>::iterator m_ChainEdit = m_PatternChains.end();
+    std::vector<PatternChain>::size_type m_ActiveChain = -1;
+//    std::vector<PatternChain>::size_type m_ChainEdit = -1;
     std::vector<PatternChain> m_PatternChains;
+
+    void SetActivePatternChain(PatternChain * chain);
 
     std::list<Pattern> m_Patterns;
     std::list<Pattern> m_Deleted;
@@ -206,7 +208,7 @@ struct PatternStore : public ItemMenu
             return " - ";
     }
 
-    int CurrentEditPatternHash()
+    size_t CurrentEditPatternHash()
     {
         if ( !m_Patterns.empty() )
             return m_PosEdit->ShortLabelHash();
@@ -247,6 +249,7 @@ struct PatternStore : public ItemMenu
 
     void SetPlayPattern(size_t patternIdHash);
     void SetEditPos(std::list<Pattern>::iterator it);
+    void SetEditPos(size_t hash);
     void UpEditPos();
     void DownEditPos();
 
@@ -271,8 +274,8 @@ struct PatternStore : public ItemMenu
     {
         for ( auto it = m_Patterns.begin(); it != m_Patterns.end(); it++ )
             it->ResetPosition();
-        if ( !m_PatternChains.empty() )
-            m_ChainActive->ResetPosPlay();
+        if ( m_ActiveChain >= 0 && m_ActiveChain < m_PatternChains.size() )
+            m_PatternChains[m_ActiveChain].ResetPosPlay();
 //        m_PosPatternChain = 0; // This seems odd, but it's incremented immediately on phase
     }
 

@@ -28,16 +28,13 @@
 
 using namespace std;
 
-ChainLink::ChainLink()
+ChainLink::ChainLink(PatternStore * store):
+    m_PatternStore(store)
 {
     //ctor
-    m_Help = "In PC mode, enter number on command line to jump to stage.";
 
-    // Dodgy calling functions on a global object from here. We'll put
-    // proper member links in eventually.
-
-    m_PatternLabel = g_PatternStore.CurrentEditPatternID();
-    m_PatternHash = g_PatternStore.CurrentEditPatternHash();
+    m_PatternLabel = m_PatternStore->CurrentEditPatternID();
+    m_PatternHash = m_PatternStore->CurrentEditPatternHash();
 }
 
 ChainLink::~ChainLink()
@@ -58,10 +55,16 @@ int ChainLink::Remaining()
     if ( m_Repeats < 0 )
         return 1;
 
+    if ( m_GotFocus )
+        SetRedraw();
+    else
+        m_Parent->SetRedraw();
+
     // Initialize remaining loop count.
 
     if ( m_Remaining == -1 )
         m_Remaining = m_Repeats;
+
 
     return m_Remaining--;
 }
@@ -97,22 +100,22 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
     {
         if ( m_Remaining >= 0 )
         {
-            snprintf(buff, 50, " x%02i", m_Remaining + 1);
+            snprintf(buff, 50, "x%02i", m_Remaining + 1);
             result += buff;
         }
         else if ( m_Repeats > 0 )
         {
-            snprintf(buff, 50, " x%02i", m_Repeats + 1);
+            snprintf(buff, 50, "x%02i", m_Repeats + 1);
             result += buff;
         }
         else if ( m_Repeats < 0 )
-            result += " H";
+            result += "-Hold";
 
-        if ( m_Repeats >= 0 && m_Jump >= 0 )
-        {
-            snprintf(buff, 50, " >%02i", m_Jump + 1);
-            result += buff;
-        }
+//        if ( m_Repeats >= 0 && m_Jump >= 0 )
+//        {
+//            snprintf(buff, 50, " >%02i", m_Jump + 1);
+//            result += buff;
+//        }
     }
 
     bool odd = true;
@@ -230,7 +233,7 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            g_PatternStore.UpEditPos();
+            g_PatternStore.DownEditPos();
             m_PatternLabel = g_PatternStore.CurrentEditPatternID();
             m_PatternHash = g_PatternStore.CurrentEditPatternHash();
             break;
@@ -249,7 +252,7 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            g_PatternStore.DownEditPos();
+            g_PatternStore.UpEditPos();
             m_PatternLabel = g_PatternStore.CurrentEditPatternID();
             m_PatternHash = g_PatternStore.CurrentEditPatternHash();
             break;

@@ -26,12 +26,14 @@
 #include <unordered_map>
 
 #include "maPatternChain.h"
+#include "maPatternStore.h"
 #include "maUtility.h"
 
 using namespace std;
 
 
-PatternChain::PatternChain()
+PatternChain::PatternChain(PatternStore * store):
+    m_PatternStore(store)
 {
     //ctor
     m_PopUpMenuID = C_MENU_ID_PATTERN_CHAIN;
@@ -173,13 +175,15 @@ void PatternChain::New()
 {
     if ( m_PosEdit >= m_Chain.size() )
     {
-        m_Chain.emplace_back();
+        m_Chain.emplace_back(m_PatternStore);
         m_PosEdit = m_Chain.size() - 1;
     }
     else
     {
-        m_Chain.insert(m_Chain.begin() + m_PosEdit, ChainLink() );
+        m_Chain.insert(m_Chain.begin() + m_PosEdit, ChainLink(m_PatternStore) );
     }
+    // Todo: This is going to break when the pattern chain vector reallocates.
+    m_Chain[m_PosEdit].SetParent(this);
 
     m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_PosEdit + num_pc_menu_items);
 
@@ -259,6 +263,16 @@ string PatternChain::ToString()
 
 }
 
+void PatternChain::SetMode(pattern_chain_mode_t val)
+{
+    if ( m_PatternChainMode != val )
+    {
+        m_PatternChainMode = val;
+        SetRedraw();
+    }
+}
+
+
 void PatternChain::NextPatternChainMode( int dir )
 {
     int m = static_cast<int>(m_PatternChainMode) + dir;
@@ -294,11 +308,14 @@ void PatternChain::SetStatus()
 
     for ( unsigned i = 0; i < m_Chain.size(); i++ )
     {
-        m_Status += " ";
+        if ( m_PosPlay == i )
+            m_Status += '>';
+        else
+            m_Status += ' ';
         pos = m_Status.size();
 //        snprintf(buff, 20, "%i:", i + 1);
 //        m_Status += buff;
-        m_Status += m_Chain.at(i).ToStringForDisplay(true, 1);
+        m_Status += m_Chain[i].ToStringForDisplay(false, 1);
         m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
     }
 
@@ -306,31 +323,41 @@ void PatternChain::SetStatus()
         m_Highlights.push_back(m_FieldPositions.at(m_MenuFocus));
 }
 
+void PatternChain::SetFocus() noexcept
+{
+    ItemMenu::SetFocus();
+    if ( !m_Chain.empty() && m_PosEdit >= 0 && m_PosEdit < m_Chain.size() )
+    {
+        m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
+    }
+}
+
 bool PatternChain::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
     case BaseUI::key_cmd_enter:
-//        if ( ! m_Clusters.empty() )
-//        {
-//            Cluster & c = m_Clusters.at(m_PosEdit);
-//            c.SetItemID(m_PosEdit + 1);
-//            c.SetDisplayIndent(m_MenuListIndent + 2);
-//            c.SetVisible(m_Visible);
-//            m_MenuListPtr->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
-//            c.SetReturnFocus(this);  // Override return focus.
-//        }
-        if ( m_MenuFocus >= num_pc_menu_items && m_PosEdit < m_Chain.size() )
+        if ( m_MenuFocus < num_pc_menu_items )
         {
-            ChainLink & link = m_Chain[m_PosEdit];
-            link.SetItemID(m_PosEdit + 1);
-//            link.SetFocus();
-//            link.SetStatus();
-            link.SetDisplayIndent(m_MenuListIndent + 2);
-            link.SetVisible(m_Visible);
-            m_MenuListPtr->InsertAfter(m_PosInMenuList, & link, true);  // This selects it, too.
-            link.SetParent(this);       // Specific pointer to PatternChain.
-            link.SetReturnFocus(this);  // Generic return pointer to ItemMenu object.
+            // Only one option at the moment.
+
+            // Just toggle mode to quantum (or off). If turning
+            // on, also make sure everything else is turned off.
+
+            if ( m_PatternChainMode == off )
+                m_PatternStore->SetActivePatternChain(this);
+            else
+                m_PatternStore->SetActivePatternChain(NULL);
+        }
+        else if ( m_PosEdit >= 0 && m_PosEdit < m_Chain.size() )
+        {
+            ChainLink & l = m_Chain[m_PosEdit];
+            l.SetItemID(m_PosEdit + 1);
+            l.SetDisplayIndent(m_MenuListIndent + 2);
+            l.SetVisible(m_Visible);
+            m_MenuListPtr->InsertAfter(m_PosInMenuList, & l, true);  // This selects it, too.
+            l.SetParent(this);       // Specific pointer to PatternChain.
+            l.SetReturnFocus(this);  // Generic return pointer to ItemMenu object.
         }
         break;
     case BaseUI::key_cmd_left:
@@ -338,21 +365,26 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
             m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
+            m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
         }
-//        if ( m_PosEdit > 0 )
-//            m_PosEdit -= 1;
         break;
     case BaseUI::key_cmd_right:
         if ( m_MenuFocus < num_pc_menu_items + m_Chain.size() - 1 )
         {
             m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
             m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
+            m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
         }
-//        if ( m_PosEdit < m_Chain.size() - 1 )
-//            m_PosEdit += 1;
         break;
 
     case BaseUI::key_cmd_back:
+        if ( m_MenuListPtr != NULL )
+        {
+            auto pos = m_MenuListPtr->ReverseFind(BaseUI::dot_pattern_store);
+            m_MenuListPtr->Select(pos);
+        }
+        break;
+
     case BaseUI::key_cmd_copy_left:
     case BaseUI::key_cmd_copy_right:
     case BaseUI::key_cmd_move_left:
@@ -390,7 +422,7 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
             if ( !m_Chain.empty() )
                 break;
         default:
-            if ( k == BaseUI::key_cmd_insert_left)
+            if ( k == BaseUI::key_cmd_insert_right)
                 m_PosEdit += 1;
             New();
             break;

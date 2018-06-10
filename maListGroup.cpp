@@ -519,7 +519,7 @@ ItemMenu & StepListGroup::operator = (const ItemMenu & m)
     {
         for ( auto it = g.m_StepListSet.begin(); it != g.m_StepListSet.end(); it++ )
         {
-            m_StepListSet.emplace_back();
+            m_StepListSet.emplace_back(this);
             m_StepListSet.back().ExplicitCopy(*it);
         }
     }

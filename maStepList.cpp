@@ -42,6 +42,15 @@ using namespace std;
 //
 //////////////////////////////////////////////////////////////////////////
 
+ItemMenu & StepList::operator = (const ItemMenu & m)
+{
+    ItemMenu::operator = (m);
+
+    const StepList & g = *dynamic_cast<const StepList*>(&m);
+
+    m_Clusters = g.m_Clusters;
+}
+
 string StepList::ToString(bool fullFormat)
 {
     string result;

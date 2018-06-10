@@ -327,95 +327,95 @@ void Pattern::ResetPosition()
 }
 
 
-void Pattern::Step(/*Cluster & cluster, TrigRepeater & repeater,*/
-    double & stepValueMultiplier, double phase, double stepValue, double globalBeat)
-{
-    // Add in step based events, if any, and step position.
-
-// TODO:LG
-//    if ( ! m_StepListSet.empty() )
-//    {
-//        unsigned loopCheck = 0;
+//void Pattern::Step(/*Cluster & cluster, TrigRepeater & repeater,*/
+//    double & stepValueMultiplier, double phase, double stepValue, double globalBeat)
+//{
+//    // Add in step based events, if any, and step position.
 //
-//        if ( m_TrigList.Empty() )
-//        {
-//            if ( m_Pos >= m_StepListSet.size() )
-//                m_Pos = 0;
-//
-//            m_LastRequestedPos = m_Pos;
-//
-//            Cluster * result = m_StepListSet[m_Pos++].Step();
-//
-//            if ( result != NULL )
-//            {
-//                cluster.SetStepsTillNextNote(result->StepsTillNextNote());
-//                cluster += *result;
-//            }
-//        }
-//        else while ( loopCheck < m_TrigList.Size() ) // Loop only if skipping entries.
-//        {
-//            TrigListItem * trigItem = m_TrigList.Step();
-//
-//            if ( trigItem->Skip() )
-//            {
-//                loopCheck += 1;
-//                continue;
-//            }
-//
-//            if ( trigItem->Mute() )
-//                break;
-//
-//            stepValueMultiplier = trigItem->Multiplier();
-//
-//            repeater = trigItem->Repeater();
-//
-//            for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
-//            {
-//                // Just ignore list number if list doesn't exist.
-//
-//                if ( static_cast<unsigned>(*it) < m_StepListSet.size() )
-//                {
-//                    m_LastRequestedPos = *it;
-//
-//                    Cluster * result = m_StepListSet.at(*it).Step();
-//
-//                    if ( result != NULL )
-//                    {
-//                        cluster.SetStepsTillNextNote(result->StepsTillNextNote());
-//                        cluster += *result;
-//                    }
-//                }
-//            }
-//
-//            break;
-//        }
-//    }
-//
-//    // All notes collected so far are from step lists, so they won't have any
-//    // phase start times set. Fix that now ...
-//
-//    cluster.SetPhaseAllNotes(phase);
-//
-//    // Collect any real time events.
-//
-//    if ( ! m_RealTimeSet.empty() )
-//    {
-//        for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
-//            it->Step2(cluster, phase, stepValue, m_RealTimeBeat);
-//
-//        if ( lround(1000.0 * m_RealTimeBeat) > 0 )
-//        {
-//            m_RealTimeComplete = true;
-//            for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
-//                m_RealTimeComplete &= it->PhazeIsZero();
-//            if ( m_RealTimeComplete )
-//                m_RealTimeBeat = 0;
-//        }
-//    }
-//
-//    m_LastRealTimeBeat = m_RealTimeBeat;
-//    m_RealTimeBeat += 4.0 / stepValue;
-}
+//// TODO:LG
+////    if ( ! m_StepListSet.empty() )
+////    {
+////        unsigned loopCheck = 0;
+////
+////        if ( m_TrigList.Empty() )
+////        {
+////            if ( m_Pos >= m_StepListSet.size() )
+////                m_Pos = 0;
+////
+////            m_LastRequestedPos = m_Pos;
+////
+////            Cluster * result = m_StepListSet[m_Pos++].Step();
+////
+////            if ( result != NULL )
+////            {
+////                cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+////                cluster += *result;
+////            }
+////        }
+////        else while ( loopCheck < m_TrigList.Size() ) // Loop only if skipping entries.
+////        {
+////            TrigListItem * trigItem = m_TrigList.Step();
+////
+////            if ( trigItem->Skip() )
+////            {
+////                loopCheck += 1;
+////                continue;
+////            }
+////
+////            if ( trigItem->Mute() )
+////                break;
+////
+////            stepValueMultiplier = trigItem->Multiplier();
+////
+////            repeater = trigItem->Repeater();
+////
+////            for ( vector<int>::iterator it = trigItem->Trigs().begin(); it < trigItem->Trigs().end(); it++ )
+////            {
+////                // Just ignore list number if list doesn't exist.
+////
+////                if ( static_cast<unsigned>(*it) < m_StepListSet.size() )
+////                {
+////                    m_LastRequestedPos = *it;
+////
+////                    Cluster * result = m_StepListSet.at(*it).Step();
+////
+////                    if ( result != NULL )
+////                    {
+////                        cluster.SetStepsTillNextNote(result->StepsTillNextNote());
+////                        cluster += *result;
+////                    }
+////                }
+////            }
+////
+////            break;
+////        }
+////    }
+////
+////    // All notes collected so far are from step lists, so they won't have any
+////    // phase start times set. Fix that now ...
+////
+////    cluster.SetPhaseAllNotes(phase);
+////
+////    // Collect any real time events.
+////
+////    if ( ! m_RealTimeSet.empty() )
+////    {
+////        for ( vector<RealTimeList>::iterator it = m_RealTimeSet.begin(); it < m_RealTimeSet.end(); it++ )
+////            it->Step2(cluster, phase, stepValue, m_RealTimeBeat);
+////
+////        if ( lround(1000.0 * m_RealTimeBeat) > 0 )
+////        {
+////            m_RealTimeComplete = true;
+////            for ( auto it = m_RealTimeSet.begin(); it != m_RealTimeSet.end(); it++ )
+////                m_RealTimeComplete &= it->PhazeIsZero();
+////            if ( m_RealTimeComplete )
+////                m_RealTimeBeat = 0;
+////        }
+////    }
+////
+////    m_LastRealTimeBeat = m_RealTimeBeat;
+////    m_RealTimeBeat += 4.0 / stepValue;
+//}
 
 string Pattern::StepListManager(command_t command)
 {

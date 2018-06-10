@@ -65,24 +65,10 @@ class PatternChain : public ItemMenu
         void FromString(std::string s);
         void FromSimpleString(std::string s);
 
-        void SetJumpOverride( int val )
-        {
-            m_JumpOverride = val;
-        }
+        void SetJumpOverride(ChainLink * l);
+        int JumpOverride();
 
-        int JumpOverride()
-        {
-            int t = m_JumpOverride;
-            m_JumpOverride = -1;
-            return t;
-        }
-
-        void Clear()
-        {
-            m_Chain.clear();
-            m_PosEdit = 0;
-//            SetStatus();
-        }
+        void Clear();
 
         void New();
         void Delete();

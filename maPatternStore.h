@@ -264,6 +264,8 @@ struct PatternStore : public ItemMenu
 //        return p >= 0 && p < m_Patterns.size();
 //    }
 
+    void StopCurrentPlayPattern();
+
     void ResetCurrentPattern()
     {
         if ( !m_Patterns.empty() )

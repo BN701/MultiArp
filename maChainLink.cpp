@@ -55,18 +55,24 @@ int ChainLink::Remaining()
     if ( m_Repeats < 0 )
         return 1;
 
-    if ( m_GotFocus )
-        SetRedraw();
-    else
-        m_Parent->SetRedraw();
+    m_Parent->SetRedraw();  // Update the pattern chain display.
 
     // Initialize remaining loop count.
 
     if ( m_Remaining == -1 )
         m_Remaining = m_Repeats;
 
-
     return m_Remaining--;
+}
+
+bool ChainLink::RemainingIsOne()
+{
+    if ( m_Repeats < 0 )
+        return false;
+    else if ( m_Remaining == -1 )
+        return m_Repeats == 0;
+    else
+        return m_Remaining == 0;
 }
 
 string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
@@ -206,10 +212,19 @@ void ChainLink::SetStatus()
     m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 }
 
+
 bool ChainLink::HandleKey(BaseUI::key_command_t k)
 {
     switch ( k )
     {
+    case BaseUI::key_cmd_enter:
+        if ( m_PosEdit == 2 && m_Parent != NULL )
+        {
+//            m_Parent->[m_Parent->PosPlay()].ClearRemaining();
+            m_Parent->SetJumpOverride(this);
+        }
+        break;
+
     case BaseUI::key_cmd_back:
         if ( m_MenuListPtr != NULL )
         {
@@ -233,9 +248,9 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            g_PatternStore.DownEditPos();
-            m_PatternLabel = g_PatternStore.CurrentEditPatternID();
-            m_PatternHash = g_PatternStore.CurrentEditPatternHash();
+            m_PatternStore->DownEditPos();
+            m_PatternLabel = m_PatternStore->CurrentEditPatternID();
+            m_PatternHash = m_PatternStore->CurrentEditPatternHash();
             break;
         case 1:     // Repeats
             m_Repeats += 1;
@@ -252,9 +267,9 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            g_PatternStore.UpEditPos();
-            m_PatternLabel = g_PatternStore.CurrentEditPatternID();
-            m_PatternHash = g_PatternStore.CurrentEditPatternHash();
+            m_PatternStore->UpEditPos();
+            m_PatternLabel = m_PatternStore->CurrentEditPatternID();
+            m_PatternHash = m_PatternStore->CurrentEditPatternHash();
             break;
         case 1:     // Repeats
             if ( m_Repeats > -1 )

@@ -364,7 +364,7 @@ void PatternStore::PopDeletedPattern()
 
 double PatternStore::LastRealTimeBeat()
 {
-    if ( m_Patterns.empty() )
+    if ( m_Patterns.empty() || m_PosPlay == m_Patterns.end() )
         return 0;
     else
         return m_PosPlay->LastRealTimeBeat();
@@ -373,7 +373,7 @@ double PatternStore::LastRealTimeBeat()
 
 Pattern & PatternStore::CurrentPlayPattern()
 {
-    if ( m_Patterns.empty() )
+    if ( m_Patterns.empty() || m_PosPlay == m_Patterns.end() )
         return Pattern::EmptyPattern;
     else
         return *m_PosPlay;
@@ -387,29 +387,12 @@ Pattern & PatternStore::CurrentEditPattern()
         return *m_PosEdit;
 }
 
-//void PatternStore::UpListPos()
-//{
-//    if ( !m_Patterns.empty() )
-//        m_Patterns[m_PosEdit].UpCursorPos();
-//}
-//
-//void PatternStore::DownListPos()
-//{
-//    if ( !m_Patterns.empty() )
-//        m_Patterns[m_PosEdit].DownCursorPos();
-//}
-//
-//void PatternStore::UpRTListPos()
-//{
-//    if ( !m_Patterns.empty() )
-//        m_Patterns[m_PosEdit].UpRTEditPos();
-//}
-//
-//void PatternStore::DownRTListPos()
-//{
-//    if ( !m_Patterns.empty() )
-//        m_Patterns[m_PosEdit].DownRTEditPos();
-//}
+void PatternStore::StopCurrentPlayPattern()
+{
+    if ( m_PosPlay != m_Patterns.end() )
+        m_PosPlay->StopAllListGroups(g_State.NextPhaseZero());
+}
+
 
 void PatternStore::SetNewPatternPending( size_t val )
 {
@@ -428,39 +411,6 @@ void PatternStore::SetNewPatternPending( size_t val )
     SetRedraw();
 }
 
-
-//string PatternStore::SetNewPatternOrJump( string val )
-//{
-//    if ( m_PatternChain.Mode() == PatternChain::off )
-//    {
-//        if ( m_PatternLookup.count(val) == 1 )
-//        {
-//            SetNewPatternPending(val);
-//            return "Cueing pattern %i";
-//        }
-//        else
-//#ifdef MA_BLUE
-//            return "Requested pattern doesn't exist!";
-//#else
-//            throw string("Requested pattern doesn't exist!");
-//#endif
-//    }
-//    else
-//    {
-//        if ( val >= 0 && static_cast<unsigned>(val) < m_PatternChain.size() )
-//        {
-//            m_PatternChain.at(m_PatternChain.PosPlay()).ClearRemaining();
-//            m_PatternChain.SetJumpOverride(val);
-//            return "Jumping to chain step %i";
-//        }
-//        else
-//#ifdef MA_BLUE
-//            return "Jump stage doesn't exist!";
-//#else
-//            throw string("Jump stage doesn't exist!");
-//#endif
-//    }
-//}
 
 void PatternStore::SetPlayPattern(size_t patternIdHash)
 {
@@ -560,7 +510,7 @@ string PatternStore::PatternStatusPlay()
 //    const char * format = "Play: %lu";
 //#endif
 
-    snprintf(buf, 80, "Play: %s", m_PosPlay->ShortLabel());
+    snprintf(buf, 80, "Play: %s", m_PosPlay != m_Patterns.end() ? m_PosPlay->ShortLabel() : "");
     result += buf;
 
 #if defined(MA_BLUE)
@@ -650,8 +600,6 @@ void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double p
     if ( m_Patterns.empty() )
         return;
 
-#if 1
-//    if ( m_PatternChain.Mode() != PatternChain::off && ! m_PatternChain.empty() )
     if ( m_ActiveChain >= 0 && m_ActiveChain < m_PatternChains.size() )
     {
         bool changePattern = false;
@@ -660,7 +608,7 @@ void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double p
         switch ( currentChain.Mode() )
         {
             case PatternChain::natural :
-                if ( m_PosPlay->AllListsComplete() )
+                if ( m_PosPlay != m_Patterns.end() && m_PosPlay->AllListsComplete() )
                     changePattern = true;
                 break;
 
@@ -702,11 +650,13 @@ void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double p
 
             break;
         }
+
+        if ( m_PosPlay != m_Patterns.end() && currentChain[currentChain.PosPlay()].RemainingIsOne() )
+            m_PosPlay->StopAllListGroups(g_State.NextPhaseZero());
     }
-#endif
+
     m_PhaseIsZero = false;
 
-    m_PosPlay->Step(/*cluster, repeater,*/ m_StepValueMultiplier, phase, stepValue, globalBeat);
 }
 
 //void PatternStore::UpdatePatternChainFromSimpleString(string s)
@@ -1062,7 +1012,7 @@ string PatternStore::ListManager(string commandString, vector<string> & tokens)
 
 TranslateTable & PatternStore::TranslateTableForPlay()
 {
-    if ( m_UsePatternPlayData && !m_Patterns.empty() /* && m_Patterns.at(m_PosEdit).TranslateTableValid() */ )
+    if ( m_UsePatternPlayData && !m_Patterns.empty() && m_PosPlay != m_Patterns.end() /* && m_Patterns.at(m_PosEdit).TranslateTableValid() */ )
         return m_PosPlay->PatternTranslateTable();
     else
         return m_DefaultPattern.PatternTranslateTable();
@@ -1086,7 +1036,7 @@ TranslateTable & PatternStore::TranslateTableForEdit(bool setFocus)
 
 FeelMap & PatternStore::FeelMapForPlay()
 {
-    if ( m_UsePatternPlayData && !m_Patterns.empty() /* && m_PosEdit->TranslateTableValid() */ )
+    if ( m_UsePatternPlayData && !m_Patterns.empty() && m_PosPlay != m_Patterns.end() /* && m_PosEdit->TranslateTableValid() */ )
         return m_PosPlay->PatternFeelMap();
     else
         return m_DefaultPattern.PatternFeelMap();

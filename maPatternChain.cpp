@@ -451,4 +451,24 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
+void PatternChain::SetJumpOverride(ChainLink * l)
+{
+    m_Chain[m_PosPlay].ClearRemaining();
+    m_PatternStore->StopCurrentPlayPattern();
+    m_JumpOverride = l - & m_Chain[0];  // This works as long as m_Chain is a vector.
+}
+
+int PatternChain::JumpOverride()
+{
+    int t = m_JumpOverride;
+    m_JumpOverride = -1;
+    return t;
+}
+
+void PatternChain::Clear()
+{
+    m_Chain.clear();
+    m_PosEdit = 0;
+//            SetStatus();
+}
 

@@ -42,6 +42,7 @@ class ChainLink : public ItemMenu
         int Repeats() { return m_Repeats; }
         void ClearRemaining() { m_Remaining = -1; }
         int Remaining();
+        bool RemainingIsOne();
         void SetRepeats(int val) { m_Repeats = val; }
         int Jump() { return m_Jump; }
         void SetJump(int val) { m_Jump = val; }

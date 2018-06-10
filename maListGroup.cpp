@@ -514,7 +514,17 @@ ItemMenu & StepListGroup::operator = (const ItemMenu & m)
     ListGroup::operator = (m);
 
     const StepListGroup & g = *dynamic_cast<const StepListGroup*>(&m);
-    m_StepListSet = g.m_StepListSet;
+
+    if ( m_ExplicitCopy )
+    {
+        for ( auto it = g.m_StepListSet.begin(); it != g.m_StepListSet.end(); it++ )
+        {
+            m_StepListSet.emplace_back();
+            m_StepListSet.back().ExplicitCopy(*it);
+        }
+    }
+    else
+        m_StepListSet = g.m_StepListSet;
 }
 
 StepList * StepListGroup::NewStepList()

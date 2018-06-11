@@ -80,7 +80,14 @@ class PatternChain : public ItemMenu
         void Clear();
 
         void New();
+        void Insert(int pos, ChainLink & link);
         void Delete();
+        void CopyLeft();
+        void CopyRight();
+        void MoveLeft();
+        void MoveRight();
+        void ShiftLeft();
+        void ShiftRight();
 
         virtual void SetStatus();
         virtual void SetFocus() noexcept;
@@ -101,7 +108,10 @@ class PatternChain : public ItemMenu
         std::vector<ChainLink>::size_type m_JumpOverride = -1;
 
     private:
-
+        void UpdateMenuFocus()
+        {
+            m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_PosEdit + num_pc_menu_items);
+        }
         PatternStore * m_PatternStore = NULL;
         std::vector<ChainLink> m_Chain;
         pattern_chain_mode_t m_PatternChainMode = off;

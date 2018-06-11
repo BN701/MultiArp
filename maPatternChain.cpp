@@ -183,23 +183,32 @@ void PatternChain::New()
         m_Chain.insert(m_Chain.begin() + m_PosEdit, ChainLink(m_PatternStore) );
     }
 
-    m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_PosEdit + num_pc_menu_items);
+    UpdateMenuFocus();
 
-    for ( auto it = m_Chain.begin(); it != m_Chain.end(); it++ )
-        if ( it->Jump() >= static_cast<int>(m_PosEdit) )
-            it->SetJump(it->Jump() + 1 );
+//    for ( auto it = m_Chain.begin(); it != m_Chain.end(); it++ )
+//        if ( it->Jump() >= static_cast<int>(m_PosEdit) )
+//            it->SetJump(it->Jump() + 1 );
 
+}
+
+void PatternChain::Insert(int pos, ChainLink & link)
+{
+    if ( pos > m_Chain.size() )
+        pos = m_Chain.size();
+    m_Chain.insert(m_Chain.begin() + pos, link);
+    m_PosEdit = pos;
+    UpdateMenuFocus();
 }
 
 void PatternChain::Delete()
 {
     m_Chain.erase(m_Chain.begin() + m_PosEdit);
 
-    for ( auto it = m_Chain.begin(); it != m_Chain.end(); it++ )
-        if ( it->Jump() == static_cast<int>(m_PosEdit) )
-            it->SetJump(-1);
-        else if ( it->Jump() > static_cast<int>(m_PosEdit) )
-            it->SetJump(it->Jump() - 1 );
+//    for ( auto it = m_Chain.begin(); it != m_Chain.end(); it++ )
+//        if ( it->Jump() == static_cast<int>(m_PosEdit) )
+//            it->SetJump(-1);
+//        else if ( it->Jump() > static_cast<int>(m_PosEdit) )
+//            it->SetJump(it->Jump() - 1 );
 
     if ( m_PosEdit >= m_Chain.size() )
     {
@@ -207,10 +216,71 @@ void PatternChain::Delete()
         // Menu focus will also be at max, so reset it.
         m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
     }
+
     if ( m_PosPlay >= m_Chain.size() )
         m_PosPlay = m_Chain.size() - 1;
 
 //    SetStatus();
+}
+
+void PatternChain::CopyLeft()
+{
+    if ( !m_Chain.empty() )
+    {
+        m_Chain.insert(m_Chain.begin() + m_PosEdit, m_Chain[m_PosEdit]);
+    }
+}
+
+void PatternChain::CopyRight()
+{
+    if ( !m_Chain.empty() )
+    {
+        m_Chain.insert(m_Chain.begin() + m_PosEdit + 1, m_Chain[m_PosEdit]);
+        m_PosEdit += 1;
+        UpdateMenuFocus();
+    }
+}
+
+void PatternChain::MoveLeft()
+{
+    if ( !m_Chain.empty() && m_PosEdit > 0 )
+    {
+        ChainLink temp = m_Chain[m_PosEdit];
+        m_Chain[m_PosEdit] = m_Chain[m_PosEdit - 1];
+        m_Chain[m_PosEdit - 1] = temp;
+        m_PosEdit--;
+        UpdateMenuFocus();
+    }
+}
+
+void PatternChain::MoveRight()
+{
+    if ( !m_Chain.empty() && m_PosEdit < m_Chain.size() - 1 )
+    {
+        ChainLink temp = m_Chain[m_PosEdit];
+        m_Chain[m_PosEdit] = m_Chain[m_PosEdit + 1];
+        m_Chain[m_PosEdit + 1] = temp;
+        m_PosEdit++;
+        UpdateMenuFocus();
+    }
+}
+
+void PatternChain::ShiftLeft()
+{
+    if ( m_Chain.size() > 1 )
+    {
+        m_Chain.push_back(m_Chain[0]);
+        m_Chain.erase(m_Chain.begin());
+    }
+}
+
+void PatternChain::ShiftRight()
+{
+    if ( m_Chain.size() > 1 )
+    {
+        m_Chain.insert(m_Chain.begin(), m_Chain.back());
+        m_Chain.pop_back();
+    }
 }
 
 #if defined(MA_BLUE)
@@ -299,7 +369,19 @@ void PatternChain::SetStatus()
 
     m_Status += " ";
     pos = m_Status.size();
-    m_Status += pc_mode_names.at(m_PatternChainMode);
+    switch (m_PatternChainMode)
+    {
+        case natural:
+            m_Status += "-N-";
+            break;
+        case quantum:
+            m_Status += "-Q-";
+            break;
+        default:
+            m_Status += "---";
+            break;
+    }
+//    m_Status += pc_mode_names.at(m_PatternChainMode);
     m_FieldPositions.emplace_back(pos, m_Status.size() - pos);
 
 
@@ -331,113 +413,145 @@ void PatternChain::SetFocus() noexcept
 
 bool PatternChain::HandleKey(BaseUI::key_command_t k)
 {
+    // Keys valid for all menu positions ...
+
     switch ( k )
     {
-    case BaseUI::key_cmd_enter:
-        if ( m_MenuFocus < num_pc_menu_items )
-        {
-            // Only one option at the moment.
+        case BaseUI::key_cmd_left:
+            if ( m_MenuFocus > 0 )
+            {
+                m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
+                m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
+                m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
+            }
+            break;
+        case BaseUI::key_cmd_right:
+            if ( m_MenuFocus < num_pc_menu_items + m_Chain.size() - 1 )
+            {
+                m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
+                m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
+                m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
+            }
+            break;
+        case BaseUI::key_cmd_up:
+            m_MenuListPtr->DownCursorPos();
+            return true;
 
-            // Just toggle mode to quantum (or off). If turning
-            // on, also make sure everything else is turned off.
+        case BaseUI::key_cmd_down:
+            m_MenuListPtr->UpCursorPos();
+            return true;
 
-            if ( m_PatternChainMode == off )
-                m_PatternStore->SetActivePatternChain(this);
-            else
-                m_PatternStore->SetActivePatternChain(NULL);
-        }
-        else if ( m_PosEdit >= 0 && m_PosEdit < m_Chain.size() )
-        {
-            ChainLink & l = m_Chain[m_PosEdit];
-            l.SetItemID(m_PosEdit + 1);
-            l.SetDisplayIndent(m_MenuListIndent + 2);
-            l.SetVisible(m_Visible);
-            m_MenuListPtr->InsertAfter(m_PosInMenuList, & l, true);  // This selects it, too.
-            l.SetReturnFocus(this);  // Generic return pointer to ItemMenu object.
-        }
-        break;
-    case BaseUI::key_cmd_left:
-        if ( m_MenuFocus > 0 )
-        {
-            m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus - 1);
-            m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
-            m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
-        }
-        break;
-    case BaseUI::key_cmd_right:
-        if ( m_MenuFocus < num_pc_menu_items + m_Chain.size() - 1 )
-        {
-            m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_MenuFocus + 1);
-            m_PosEdit = max(m_MenuFocus - num_pc_menu_items, 0);
-            m_PatternStore->SetEditPos(m_Chain[m_PosEdit].m_PatternHash);
-        }
-        break;
+        case BaseUI::key_cmd_back:
+            if ( m_MenuListPtr != NULL )
+            {
+                auto pos = m_MenuListPtr->ReverseFind(BaseUI::dot_pattern_store);
+                m_MenuListPtr->Select(pos);
+            }
+            break;
 
-    case BaseUI::key_cmd_back:
-        if ( m_MenuListPtr != NULL )
-        {
-            auto pos = m_MenuListPtr->ReverseFind(BaseUI::dot_pattern_store);
-            m_MenuListPtr->Select(pos);
-        }
-        break;
-
-    case BaseUI::key_cmd_copy_left:
-    case BaseUI::key_cmd_copy_right:
-    case BaseUI::key_cmd_move_left:
-    case BaseUI::key_cmd_move_right:
-    case BaseUI::key_cmd_move_up:
-    case BaseUI::key_cmd_move_down:
-    case BaseUI::key_cmd_shift_left:
-    case BaseUI::key_cmd_shift_right:
-    case BaseUI::key_cmd_undo:
-        break;
-
-    case BaseUI::key_cmd_inc:
-    case BaseUI::key_cmd_dec:
-    case BaseUI::key_cmd_inc_2:
-    case BaseUI::key_cmd_dec_2:
-        if ( !m_Chain.empty() )
-        {
-            m_Chain[m_PosEdit].HandleKey(k);
-        }
-        break;
-
-    case BaseUI::key_cmd_up:
-        m_MenuListPtr->DownCursorPos();
-        return true;
-
-    case BaseUI::key_cmd_down:
-        m_MenuListPtr->UpCursorPos();
-        return true;
-
-    case BaseUI::key_cmd_insert_left:
-    case BaseUI::key_cmd_insert_right:
-        switch (m_MenuFocus)
-        {
-        case mode:
-            if ( !m_Chain.empty() )
-                break;
-        default:
+        case BaseUI::key_cmd_insert_left:
+        case BaseUI::key_cmd_insert_right:
             if ( k == BaseUI::key_cmd_insert_right)
                 m_PosEdit += 1;
             New();
             break;
-        }
-        break;
 
-    case BaseUI::key_cmd_delete:
-        switch (m_MenuFocus)
-        {
-        case mode:
+        case BaseUI::key_cmd_shift_left:
+            ShiftLeft();
             break;
+        case BaseUI::key_cmd_shift_right:
+            ShiftRight();
+            break;
+
         default:
-            Delete();
             break;
-        }
-        break;
+    }
 
-    default:
-        return false;
+    if ( m_MenuFocus < num_pc_menu_items )
+    {
+        switch ( k )
+        {
+            case BaseUI::key_cmd_enter:
+                // Just toggle mode to quantum (or off). If turning
+                // on, also make sure everything else is turned off.
+                if ( m_PatternChainMode == off )
+                    m_PatternStore->SetActivePatternChain(this);
+                else
+                    m_PatternStore->SetActivePatternChain(NULL);
+                break;
+            default:
+                break;
+        }
+    }
+    else
+    {
+        // Entry manipulation.
+
+        switch ( k )
+        {
+            case BaseUI::key_cmd_enter:
+            {
+                ChainLink & l = m_Chain[m_PosEdit];
+                l.SetItemID(m_PosEdit + 1);
+                l.SetDisplayIndent(m_MenuListIndent + 2);
+                l.SetVisible(m_Visible);
+                m_MenuListPtr->InsertAfter(m_PosInMenuList, & l, true);  // This selects it, too.
+                l.SetReturnFocus(this);
+            }
+            break;
+
+            case BaseUI::key_cmd_undo:
+                break;
+
+            case BaseUI::key_cmd_inc:
+            case BaseUI::key_cmd_dec:
+            case BaseUI::key_cmd_inc_2:
+            case BaseUI::key_cmd_dec_2:
+                if ( !m_Chain.empty() )
+                {
+                    m_Chain[m_PosEdit].HandleKey(k);
+                }
+                break;
+
+            case BaseUI::key_cmd_delete:
+                Delete();
+                break;
+
+            case BaseUI::key_cmd_copy_left:
+                CopyLeft();
+                break;
+            case BaseUI::key_cmd_copy_right:
+                CopyRight();
+                break;
+
+            case BaseUI::key_cmd_move_left:
+                MoveLeft();
+                break;
+            case BaseUI::key_cmd_move_right:
+                MoveRight();
+                break;
+            case BaseUI::key_cmd_move_up:
+            case BaseUI::key_cmd_move_down:
+                if ( !m_Chain.empty() && m_PatternStore->InsertNeighbour(k, m_Chain[m_PosEdit], this, m_PosEdit) )
+                {
+                    Delete();
+                    switch ( k )
+                    {
+                        case BaseUI::key_cmd_move_up:
+                            k = BaseUI::key_cmd_up;
+                            break;
+                        case BaseUI::key_cmd_move_down:
+                            k = BaseUI::key_cmd_down;
+                            break;
+                        default:
+                            break;
+                    }
+                    HandleKey(k);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     m_FirstField = m_MenuFocus == 0;

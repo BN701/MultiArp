@@ -915,7 +915,11 @@ bool do_command(string commandString, int directCommand)
            }
             break;
 
-        case C_PATTERN_CHAIN_NEW_LIST:
+        case C_PATTERN_CHAIN_NEW:
+        case C_PATTERN_CHAIN_COPY:
+        case C_PATTERN_CHAIN_MOVE_UP:
+        case C_PATTERN_CHAIN_MOVE_DOWN:
+        case C_PATTERN_CHAIN_DELETE:
             set_status(STAT_POS_2, g_PatternStore.PatternChainManager(command).c_str());
             break;
 

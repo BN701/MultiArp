@@ -446,7 +446,12 @@ void PatternStore::SetEditPos(size_t hash)
         return;
 
     SetEditPos(m_PatternLookup[hash]);
+}
 
+void PatternStore::ResetEditPos()
+{
+    if ( !m_Patterns.empty() )
+        SetEditPos(m_Patterns.begin());
 }
 
 void PatternStore::UpEditPos()
@@ -467,6 +472,29 @@ void PatternStore::DownEditPos()
         auto pos = m_PosEdit;
         SetEditPos(++pos);
     }
+}
+
+bool PatternStore::InsertNeighbour(BaseUI::key_command_t key, ChainLink & link, PatternChain * chain, int pos)
+{
+    int chainIndex = chain - & m_PatternChains[0];
+
+    switch ( key )
+    {
+        case BaseUI::key_cmd_move_up:
+            if ( --chainIndex < 0 )
+                return false;
+            break;
+        case BaseUI::key_cmd_move_down:
+            if ( ++chainIndex >= m_PatternChains.size() )
+                return false;
+            break;
+        default:
+            return false;
+    }
+
+    m_PatternChains[chainIndex].Insert(pos, link);
+
+    return true;
 }
 
 bool PatternStore::NewPatternPending(bool clearAndReset)
@@ -1260,9 +1288,21 @@ string PatternStore::PatternChainManager(command_t command)
 {
     switch ( command )
     {
-        case C_PATTERN_CHAIN_NEW_LIST:
+        case C_PATTERN_CHAIN_NEW:
             AddPatternChain();
             return string("New Pattern Chain added.");
+        case C_PATTERN_CHAIN_COPY:
+            CopyPatternChain();
+            return string("Pattern Chain copied.");
+        case C_PATTERN_CHAIN_MOVE_UP:
+            MovePatternChain(false);
+            return string("Pattern Chain moved.");
+        case C_PATTERN_CHAIN_MOVE_DOWN:
+            MovePatternChain(true);
+            return string("Pattern Chain moved.");
+        case C_PATTERN_CHAIN_DELETE:
+            DeletePatternChain();
+            return string("Pattern Chain deleted.");
         default:
             return string("Unknown Pattern Chain command");
     }
@@ -1280,6 +1320,97 @@ void PatternStore::AddPatternChain()
     chain.SetRedraw();
 }
 
+void PatternStore::AddChainsToMenu()
+{
+    for ( auto it = m_PatternChains.begin(); it != m_PatternChains.end(); it++ )
+        m_MenuList.Add(&*it);
+}
+
+void PatternStore::RemoveChainsFromMenu()
+{
+    for ( auto it = m_PatternChains.begin(); it != m_PatternChains.end(); it++ )
+        m_MenuList.Remove(it->MenuPos());
+}
+
+void PatternStore::CopyPatternChain()
+{
+    int chainIndex = dynamic_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
+
+    m_MenuList.ClearCursor();
+    RemoveChainsFromMenu();
+
+    auto pos = m_PatternChains.insert(m_PatternChains.begin() + chainIndex + 1, m_PatternChains[chainIndex]);
+
+    // Default copy constructor will have set whatever was in the original.
+    pos->SetMode(PatternChain::off);
+    pos->ResetPosPlay();
+
+    AddChainsToMenu();
+    m_MenuList.Select(&*pos);
+
+    if ( m_ActiveChain > chainIndex )
+        ++m_ActiveChain;
+}
+
+void PatternStore::MovePatternChain(bool incIndex )
+{
+    if ( m_PatternChains.size() < 2 )
+        return;
+
+    int chainIndex = dynamic_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
+
+    if ( incIndex )
+    {
+        if ( chainIndex >= m_PatternChains.size() )
+            return;
+    }
+    else
+    {
+        if ( chainIndex == 0 )
+            return;
+        chainIndex -= 1;
+    }
+
+    // Now treat everything as for inc index.
+
+    if ( m_ActiveChain == chainIndex )
+        ++m_ActiveChain;
+    else if ( m_ActiveChain == chainIndex + 1 )
+        --m_ActiveChain;
+
+    m_MenuList.ClearCursor();
+    RemoveChainsFromMenu();
+
+    PatternChain temp = m_PatternChains[chainIndex];
+    m_PatternChains[chainIndex] = m_PatternChains[chainIndex + 1];
+    m_PatternChains[chainIndex + 1] = temp;
+
+    AddChainsToMenu();
+
+    if ( incIndex )
+        m_MenuList.Select(&*(m_PatternChains.begin() + chainIndex + 1));
+    else
+        m_MenuList.Select(&*(m_PatternChains.begin() + chainIndex));
+}
+
+void PatternStore::DeletePatternChain()
+{
+    int chainIndex = dynamic_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
+
+    m_MenuList.ClearCursor();
+    RemoveChainsFromMenu();
+
+    m_PatternChains.erase(m_PatternChains.begin() + chainIndex);
+
+    AddChainsToMenu();
+    m_MenuList.Select(this);    // Select the pattern store.
+
+    if ( m_ActiveChain > chainIndex )
+        --m_ActiveChain;
+    else if ( m_ActiveChain == chainIndex )
+        SetActivePatternChain(NULL);
+}
+
 void PatternStore::SetActivePatternChain(PatternChain * chain)
 {
     m_ActiveChain = -1;
@@ -1291,23 +1422,24 @@ void PatternStore::SetActivePatternChain(PatternChain * chain)
             m_ActiveChain = it - m_PatternChains.begin();
         }
         else
+        {
             it->SetMode(PatternChain::off);
+            it->ResetPosPlay();
+        }
 
     if ( m_PosPlay == m_Patterns.end() )
         return;
 
-    if ( chain != NULL )
-    {
-        // Stop current pattern.
-        m_PosPlay->StopAllListGroups(g_State.NextPhaseZero());
-    }
-    else
+    if ( chain == NULL )
     {
         // Clear 'stop' state on current pattern.
         m_PosPlay->ClearStopAllListGroups();
     }
-
-
+    else
+    {
+        // Stop current pattern.
+        m_PosPlay->StopAllListGroups(g_State.NextPhaseZero());
+    }
 }
 
 void PatternStore::SetJumpOverride(ChainLink * link)

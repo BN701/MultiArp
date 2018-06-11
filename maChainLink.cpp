@@ -33,8 +33,8 @@ ChainLink::ChainLink(PatternStore * store):
 {
     //ctor
 
-    m_PatternLabel = m_PatternStore->CurrentEditPatternID();
-    m_PatternHash = m_PatternStore->CurrentEditPatternHash();
+//    m_PatternLabel = m_PatternStore->CurrentEditPatternID();
+//    m_PatternHash = m_PatternStore->CurrentEditPatternHash();
 }
 
 ChainLink::~ChainLink()
@@ -96,11 +96,11 @@ string ChainLink::ToStringForDisplay(bool forMenu, unsigned width)
         else if ( m_Repeats < 0 )
             result += " Hold";
 
-        if ( m_Repeats >= 0 && m_Jump >= 0 )
-        {
-            snprintf(buff, 50, ">%02i", m_Jump + 1);
-            result += buff;
-        }
+//        if ( m_Repeats >= 0 && m_Jump >= 0 )
+//        {
+//            snprintf(buff, 50, ">%02i", m_Jump + 1);
+//            result += buff;
+//        }
     }
     else
     {
@@ -142,7 +142,8 @@ string ChainLink::ToString()
 {
     char buff[50];
 
-    snprintf(buff, 50, "%s/%i/%i/%i", m_PatternLabel.c_str(), m_PatternHash, m_Repeats, m_Jump);
+//    snprintf(buff, 50, "%s/%i/%i/%i", m_PatternLabel.c_str(), m_PatternHash, m_Repeats, m_Jump);
+    snprintf(buff, 50, "%s/%i/%i", m_PatternLabel.c_str(), m_PatternHash, m_Repeats);
 
     return buff;
 }
@@ -157,7 +158,7 @@ void ChainLink::FromString(string & s)
     m_PatternLabel = tokens[0];
     m_PatternHash = stoi(tokens[1]);
     m_Repeats = stoi(tokens[2]);
-    m_Jump = stoi(tokens[3]);
+//    m_Jump = stoi(tokens[3]);
 }
 
 void ChainLink::SetStatus()
@@ -248,7 +249,10 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            m_PatternStore->DownEditPos();
+            if ( m_PatternHash == -1 )
+                m_PatternStore->ResetEditPos();
+            else
+                m_PatternStore->DownEditPos();
             m_PatternLabel = m_PatternStore->CurrentEditPatternID();
             m_PatternHash = m_PatternStore->CurrentEditPatternHash();
             break;
@@ -267,7 +271,10 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
         switch ( m_PosEdit )
         {
         case 0:     // Pattern
-            m_PatternStore->UpEditPos();
+            if ( m_PatternHash == -1 )
+                m_PatternStore->ResetEditPos();
+            else
+                m_PatternStore->UpEditPos();
             m_PatternLabel = m_PatternStore->CurrentEditPatternID();
             m_PatternHash = m_PatternStore->CurrentEditPatternHash();
             break;

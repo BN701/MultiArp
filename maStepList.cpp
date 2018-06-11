@@ -294,14 +294,15 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
             switch ( k )
             {
                 case BaseUI::key_cmd_move_up:
-                    HandleKey(BaseUI::key_cmd_up);
+                    k = BaseUI::key_cmd_up;
                     break;
                 case BaseUI::key_cmd_move_down:
-                    HandleKey(BaseUI::key_cmd_down);
+                    k = BaseUI::key_cmd_down;
                     break;
                 default:
                     break;
             }
+            HandleKey(k);
         }
         break;
     case BaseUI::key_cmd_shift_left:

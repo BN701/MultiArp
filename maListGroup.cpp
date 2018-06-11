@@ -767,20 +767,20 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
     {
         unsigned loopCheck = 0;
 
-        for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
-            it->SetNowPlayingPos(-1);
-
-        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
-        {
-            update_pair & u = m_DeferredUpdates.front();
-            if ( u.list_id < m_StepListSet.size() )
-            {
-                StepList & l = m_StepListSet[u.list_id];
-                l.SetNowPlayingPos(u.list_pos);
-            }
-        }
-
-        m_DeferredUpdates.clear();
+//        for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+//            it->SetNowPlayingPos(-1);
+//
+//        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
+//        {
+//            update_pair & u = m_DeferredUpdates.front();
+//            if ( u.list_id < m_StepListSet.size() )
+//            {
+//                StepList & l = m_StepListSet[u.list_id];
+//                l.SetNowPlayingPos(u.list_pos);
+//            }
+//        }
+//
+//        m_DeferredUpdates.clear();
 
         if ( m_TrigList.Empty() )
         {
@@ -871,6 +871,23 @@ bool StepListGroup::Step()
 {
 //    uint64_t queueTimeUsec = 0;
 //    double nextBeatSwung;
+
+    // Update any 'now playing' info.
+
+    for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
+        it->SetNowPlayingPos(-1);
+
+    for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
+    {
+        update_pair & u = m_DeferredUpdates.front();
+        if ( u.list_id < m_StepListSet.size() )
+        {
+            StepList & l = m_StepListSet[u.list_id];
+            l.SetNowPlayingPos(u.list_pos);
+        }
+    }
+
+    m_DeferredUpdates.clear();
 
     if ( !ListGroup::Step() )
         return false;

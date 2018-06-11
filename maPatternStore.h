@@ -125,6 +125,11 @@ struct PatternStore : public ItemMenu
 
     std::string PatternChainManager(command_t command);
     void AddPatternChain();
+    void CopyPatternChain();
+    void MovePatternChain(bool increaseIndex);
+    void DeletePatternChain();
+    void AddChainsToMenu();
+    void RemoveChainsFromMenu();
     void SetActivePatternChain(PatternChain * chain);
     void SetJumpOverride(ChainLink * link);
 
@@ -250,8 +255,11 @@ struct PatternStore : public ItemMenu
     void SetPlayPattern(size_t patternIdHash);
     void SetEditPos(std::list<Pattern>::iterator it);
     void SetEditPos(size_t hash);
+    void ResetEditPos();
     void UpEditPos();
     void DownEditPos();
+
+    bool InsertNeighbour(BaseUI::key_command_t key, ChainLink & link, PatternChain * chain, int pos);
 
 
 //    void UpListPos();

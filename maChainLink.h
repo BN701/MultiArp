@@ -44,8 +44,8 @@ class ChainLink : public ItemMenu
         int Remaining();
         bool RemainingIsOne();
         void SetRepeats(int val) { m_Repeats = val; }
-        int Jump() { return m_Jump; }
-        void SetJump(int val) { m_Jump = val; }
+//        int Jump() { return m_Jump; }
+//        void SetJump(int val) { m_Jump = val; }
 
         std::string ToString();
         std::string ToStringForDisplay(bool forMenu = false, unsigned width = 12);
@@ -64,7 +64,7 @@ class ChainLink : public ItemMenu
 
         int m_Repeats = 0;              // Zero means no repeat. Set to -1 for indefinite repeat.
         int m_Remaining = -1;           // -1 means initialize in RepeatsRemaining().
-        int m_Jump = -1;
+//        int m_Jump = -1;
 
         int m_PosEdit = 0;
 

@@ -87,7 +87,7 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_PATTERN_STORE, {false, C_COPY, "Copy", ""}},
     {C_MENU_ID_PATTERN_STORE, {false, C_DELETE, "Delete", ""}},
     {C_MENU_ID_PATTERN_STORE, {false, C_UNDO_PATTERN_DELETE, "Undo", ""}},
-    {C_MENU_ID_PATTERN_STORE, {false, C_PATTERN_CHAIN_NEW_LIST, "New Chain", ""}},
+    {C_MENU_ID_PATTERN_STORE, {false, C_PATTERN_CHAIN_NEW, "New Chain", ""}},
     {C_MENU_ID_PATTERN_STORE, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
     // Pattern Store -> Settings
@@ -105,10 +105,10 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
 
     // Pattern Store -> Chain
-    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Copy", ""}},
-    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Delete", ""}},
-    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Move Up", ""}},
-    {C_MENU_ID_PATTERN_CHAIN, {false, C_NONE, "Move Down", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_PATTERN_CHAIN_COPY, "Copy", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_PATTERN_CHAIN_DELETE, "Delete", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_PATTERN_CHAIN_MOVE_UP, "Move Up", ""}},
+    {C_MENU_ID_PATTERN_CHAIN, {false, C_PATTERN_CHAIN_MOVE_DOWN, "Move Down", ""}},
 
     // Sequencer
     {C_MENU_ID_SEQUENCE, {false, C_LIST_NEW, "New List", ""}},

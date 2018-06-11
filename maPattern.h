@@ -180,6 +180,7 @@ struct Pattern : public ItemMenu
     void RunAllListGroups(double startBeat);
     void StopAllListGroups();
     void StopAllListGroups(double lastBeat);
+    void ClearStopAllListGroups();
     void DeleteCurrentListGroup();
 
     void DeleteCurrentList();

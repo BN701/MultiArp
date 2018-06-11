@@ -81,8 +81,6 @@ struct PatternStore : public ItemMenu
 //    std::vector<PatternChain>::size_type m_ChainEdit = -1;
     std::vector<PatternChain> m_PatternChains;
 
-    void SetActivePatternChain(PatternChain * chain);
-
     std::list<Pattern> m_Patterns;
     std::list<Pattern> m_Deleted;
 
@@ -127,6 +125,8 @@ struct PatternStore : public ItemMenu
 
     std::string PatternChainManager(command_t command);
     void AddPatternChain();
+    void SetActivePatternChain(PatternChain * chain);
+    void SetJumpOverride(ChainLink * link);
 
     std::string PatternStatusPlay();
     std::string PatternStatusEdit();

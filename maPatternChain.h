@@ -48,6 +48,15 @@ class PatternChain : public ItemMenu
         void SetMode(pattern_chain_mode_t val);
         pattern_chain_mode_t Mode() { return m_PatternChainMode; }
 
+        int Remaining()
+        {
+            SetRedraw();
+            if ( m_PosPlay >= 0 && m_PosPlay < m_Chain.size() )
+                return m_Chain[m_PosPlay].Remaining();
+            else
+                return 0;
+        }
+
         std::vector<ChainLink>::size_type PosPlay() { return m_PosPlay; }
         void SetPosPlay( int val )
         {
@@ -56,7 +65,7 @@ class PatternChain : public ItemMenu
         }
         void ResetPosPlay()
         {
-            m_PosPlay = 0;
+            m_PosPlay = -1;
             SetRedraw();
         }
 
@@ -88,7 +97,7 @@ class PatternChain : public ItemMenu
 
         pattern_chain_menu_focus_t m_MenuFocus = mode;
         std::vector<ChainLink>::size_type m_PosEdit = 0;
-        std::vector<ChainLink>::size_type m_PosPlay = 0;
+        std::vector<ChainLink>::size_type m_PosPlay = -1;
         std::vector<ChainLink>::size_type m_JumpOverride = -1;
 
     private:

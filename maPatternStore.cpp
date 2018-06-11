@@ -626,7 +626,7 @@ void PatternStore::Step(/*Cluster & cluster, TrigRepeater & repeater,*/ double p
 
             // TODO: Can probably do this internally to PatternChain at some point.
 
-            if ( nextLink < 0 && currentChain[currentChain.PosPlay()].Remaining() > 0 )
+            if ( nextLink < 0 && currentChain.Remaining() > 0 )
                 break;
 
 //            if ( nextLink < 0 )
@@ -1287,9 +1287,34 @@ void PatternStore::SetActivePatternChain(PatternChain * chain)
         if ( chain == &*it )
         {
             it->SetMode(PatternChain::quantum);
+            it->ResetPosPlay();
             m_ActiveChain = it - m_PatternChains.begin();
         }
         else
             it->SetMode(PatternChain::off);
+
+    if ( m_PosPlay == m_Patterns.end() )
+        return;
+
+    if ( chain != NULL )
+    {
+        // Stop current pattern.
+        m_PosPlay->StopAllListGroups(g_State.NextPhaseZero());
+    }
+    else
+    {
+        // Clear 'stop' state on current pattern.
+        m_PosPlay->ClearStopAllListGroups();
+    }
+
+
 }
 
+void PatternStore::SetJumpOverride(ChainLink * link)
+{
+    if ( m_ActiveChain >= 0 && m_ActiveChain < m_PatternChains.size() )
+    {
+        PatternChain & chain = m_PatternChains[m_ActiveChain];
+        chain.SetJumpOverride(link);
+    }
+}

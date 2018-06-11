@@ -182,8 +182,6 @@ void PatternChain::New()
     {
         m_Chain.insert(m_Chain.begin() + m_PosEdit, ChainLink(m_PatternStore) );
     }
-    // Todo: This is going to break when the pattern chain vector reallocates.
-    m_Chain[m_PosEdit].SetParent(this);
 
     m_MenuFocus = static_cast<pattern_chain_menu_focus_t>(m_PosEdit + num_pc_menu_items);
 
@@ -191,7 +189,6 @@ void PatternChain::New()
         if ( it->Jump() >= static_cast<int>(m_PosEdit) )
             it->SetJump(it->Jump() + 1 );
 
-//    SetStatus();
 }
 
 void PatternChain::Delete()
@@ -356,7 +353,6 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
             l.SetDisplayIndent(m_MenuListIndent + 2);
             l.SetVisible(m_Visible);
             m_MenuListPtr->InsertAfter(m_PosInMenuList, & l, true);  // This selects it, too.
-            l.SetParent(this);       // Specific pointer to PatternChain.
             l.SetReturnFocus(this);  // Generic return pointer to ItemMenu object.
         }
         break;
@@ -453,9 +449,14 @@ bool PatternChain::HandleKey(BaseUI::key_command_t k)
 
 void PatternChain::SetJumpOverride(ChainLink * l)
 {
-    m_Chain[m_PosPlay].ClearRemaining();
-    m_PatternStore->StopCurrentPlayPattern();
-    m_JumpOverride = l - & m_Chain[0];  // This works as long as m_Chain is a vector.
+    // This works as long as m_Chain is a vector.
+
+    if ( l >= & m_Chain[0] && l <= & m_Chain.back() )
+    {
+        m_Chain[m_PosPlay].ClearRemaining();
+        m_PatternStore->StopCurrentPlayPattern();
+        m_JumpOverride = l - & m_Chain[0];
+    }
 }
 
 int PatternChain::JumpOverride()

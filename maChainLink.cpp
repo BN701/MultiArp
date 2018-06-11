@@ -55,7 +55,7 @@ int ChainLink::Remaining()
     if ( m_Repeats < 0 )
         return 1;
 
-    m_Parent->SetRedraw();  // Update the pattern chain display.
+//    m_Parent->SetRedraw();  // Update the pattern chain display.
 
     // Initialize remaining loop count.
 
@@ -218,10 +218,10 @@ bool ChainLink::HandleKey(BaseUI::key_command_t k)
     switch ( k )
     {
     case BaseUI::key_cmd_enter:
-        if ( m_PosEdit == 2 && m_Parent != NULL )
+        if ( m_PosEdit == 2 /*&& m_Parent != NULL*/ )
         {
 //            m_Parent->[m_Parent->PosPlay()].ClearRemaining();
-            m_Parent->SetJumpOverride(this);
+            m_PatternStore->SetJumpOverride(this);
         }
         break;
 

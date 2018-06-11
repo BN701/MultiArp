@@ -51,7 +51,6 @@ class ChainLink : public ItemMenu
         std::string ToStringForDisplay(bool forMenu = false, unsigned width = 12);
         void FromString(std::string & s);
 
-        void SetParent( PatternChain * val ) { m_Parent = val; }
         virtual void SetStatus();
 
     protected:
@@ -69,7 +68,6 @@ class ChainLink : public ItemMenu
 
         int m_PosEdit = 0;
 
-        PatternChain * m_Parent = NULL;
         PatternStore * m_PatternStore = NULL;
 };
 

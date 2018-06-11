@@ -358,6 +358,20 @@ void ListGroup::Stop(double lastBeat)
     m_LastBeat = lastBeat - 0.01;
 }
 
+void ListGroup::ClearStop()
+{
+    m_Stopping = false;
+    if ( !m_Running )
+    {
+        // Emergency restart! Seems to work but I'm sure it can
+        // be broken if we try hard enough.
+        m_Running = true;
+        double beatInc = 4.0 / m_CurrentStepValue;
+        m_Beat -= beatInc;
+        Step();
+    }
+}
+
 // Static callback routing lookup.
 
 bool ListGroup::Step(int listGroupID)

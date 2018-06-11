@@ -67,6 +67,7 @@ class ListGroup : public ItemMenu
 
         void Stop();
         void Stop(double lastBeat);
+        void ClearStop();
 
 //        void NewListGroup();
 

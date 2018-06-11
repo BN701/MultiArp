@@ -1350,6 +1350,14 @@ void Pattern::StopAllListGroups(double lastBeat)
     SetRedraw();
 }
 
+void Pattern::ClearStopAllListGroups()
+{
+    for ( auto it = m_ListGroups.begin(); it != m_ListGroups.end(); it++ )
+        (*it)->ClearStop();
+
+    SetRedraw();
+}
+
 void Pattern::ReplaceList(StepList & noteList)
 {
 // TODO:LG

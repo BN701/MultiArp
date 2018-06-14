@@ -99,8 +99,11 @@ Pattern & Pattern::operator = (const ItemMenu & m)
 {
     ItemMenu::operator = (m);
 
+#if defined(MA_BLUE)
+    const Pattern & p = *static_cast<const Pattern*>(&m);
+#else
     const Pattern & p = *dynamic_cast<const Pattern*>(&m);
-
+#endif
     m_Visible = p.m_Visible;
     m_Label = p.m_Label;
     m_ShortLabel = p.m_ShortLabel;      // If genuine copy, need to call SetShortLabel() again to generate unique ID.
@@ -141,11 +144,11 @@ void Pattern::CopyContent(const Pattern & p)
         {
             case ListGroup::lgtype_step:
                 m_ListGroups.emplace_back(new StepListGroup(this));
-                dynamic_cast<StepListGroup*>(m_ListGroups.back())->ExplicitCopy(*dynamic_cast<StepListGroup*>(*it));
+                static_cast<StepListGroup*>(m_ListGroups.back())->ExplicitCopy(*static_cast<StepListGroup*>(*it));
                 break;
             case ListGroup::lgtype_realtime:
                 m_ListGroups.emplace_back(new RTListGroup(this));
-                dynamic_cast<RTListGroup*>(m_ListGroups.back())->ExplicitCopy(*dynamic_cast<RTListGroup*>(*it));
+                static_cast<RTListGroup*>(m_ListGroups.back())->ExplicitCopy(*static_cast<RTListGroup*>(*it));
                 break;
         }
 
@@ -432,11 +435,18 @@ string Pattern::StepListManager(command_t command)
             {
                 menu_list_cursor_t pos = m_MenuList.ReverseFind(BaseUI::dot_step_list_group);
                 if ( pos != m_MenuList.m_Items.end() )
+#if defined(MA_BLUE)
+                    pGroup = static_cast<StepListGroup*>(*pos);
+#else
                     pGroup = dynamic_cast<StepListGroup*>(*pos);
+#endif
             }
             else
+#if defined(MA_BLUE)
+                pGroup = static_cast<StepListGroup*>(pItem);
+#else
                 pGroup = dynamic_cast<StepListGroup*>(pItem);
-
+#endif
             if ( pGroup == NULL )
                 return "Pattern Step List Manager: Not a step list or step list group.";
 
@@ -454,11 +464,23 @@ string Pattern::StepListManager(command_t command)
         {
             // Make sure we have a step list pointer.
 
-            StepList * pStepList = dynamic_cast<StepList*>(m_MenuList.CurrentItem());
-
-            if ( pStepList == NULL )
+#if defined(MA_BLUE)
+            if ( ! m_MenuList.CurrentItem()->CheckType(BaseUI::dot_step_list) )
                 return "Pattern Step List Manager: Not a step list.";
 
+            StepList * pStepList = static_cast<StepList*>(m_MenuList.CurrentItem());
+
+            StepListGroup * pGroup = NULL;
+
+            menu_list_cursor_t pos = m_MenuList.ReverseFind(BaseUI::dot_step_list_group);
+            if ( pos == m_MenuList.m_Items.end() || ! (*pos)->CheckType(BaseUI::dot_step_list_group))
+                return "Pattern Step List Manager: Can't find containing step list group.";
+
+            pGroup = static_cast<StepListGroup*>(*pos);
+#else
+            StepList * pStepList = dynamic_cast<StepList*>(m_MenuList.CurrentItem());
+            if ( pStepList == NULL )
+                return "Pattern Step List Manager: Not a step list.";
             // Get the current group.
 
             StepListGroup * pGroup = NULL;
@@ -469,6 +491,7 @@ string Pattern::StepListManager(command_t command)
 
             if ( pGroup == NULL )
                 return "Pattern Step List Manager: Can't find containing step list group.";
+#endif
 
             switch ( command )
             {
@@ -496,9 +519,15 @@ string Pattern::StepListManager(command_t command)
         case C_STEP_COPY_RIGHT:
         case C_STEP_DELETE:
         {
+#if defined(MA_BLUE)
+            if ( !m_MenuList.CurrentItem()->CheckType(BaseUI::dot_step_list) )
+                return "Pattern Step List Manager: Not a step list.";
+            StepList * pStepList = static_cast<StepList*>(m_MenuList.CurrentItem());
+#else
             StepList * pStepList = dynamic_cast<StepList*>(m_MenuList.CurrentItem());
             if ( pStepList == NULL )
                 return "Pattern Step List Manager: Not a step list.";
+#endif
             switch (command)
             {
                 case C_STEP_INSERT_LEFT:
@@ -528,9 +557,15 @@ string Pattern::StepListManager(command_t command)
         case C_CLUSTER_COPY_RIGHT:
         case C_CLUSTER_DELETE:
         {
+#if defined(MA_BLUE)
+            if ( !m_MenuList.CurrentItem()->CheckType(BaseUI::dot_cluster) )
+                return "Pattern Step List Manager: Not a step list step (Cluster).";
+            Cluster * pCluster = static_cast<Cluster*>(m_MenuList.CurrentItem());
+#else
             Cluster * pCluster = dynamic_cast<Cluster*>(m_MenuList.CurrentItem());
             if ( pCluster == NULL )
                 return "Pattern Step List Manager: Not a step list step (Cluster).";
+#endif
             switch ( command )
             {
                 case C_CLUSTER_INSERT_LEFT:
@@ -1249,33 +1284,36 @@ void Pattern::NewListGroup(ListGroup::list_group_type type)
 
 void Pattern::CopyCurrentListGroup()
 {
-    ListGroup * pNewGroup = NULL;
-    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
-    if ( pGroup == NULL )
+    if ( !m_MenuList.CursorPosValid() )
         return;
 
+    ItemMenu * pItem = *m_MenuList.m_Cursor;
+
+    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+        return;
+
+    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
     int pos = pGroup->ItemID() + 1;
 
     // Move focus elsewhere while we make copies.
-//    pGroup->ReturnFocus();
     auto reselect = m_MenuList.ClearCursor();
 
     pGroup->RemoveListsFromMenu();
     auto menuInsertPos = m_MenuList.Remove(pGroup->MenuPos());
 
+    ListGroup * pNewGroup = NULL;
+
     switch ( pGroup->Type() )
     {
         case ListGroup::lgtype_step:
             pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new StepListGroup(this));
-            dynamic_cast<StepListGroup*>(pNewGroup)->ExplicitCopy(*dynamic_cast<StepListGroup*>(pGroup));
+            static_cast<StepListGroup*>(pNewGroup)->ExplicitCopy(*static_cast<StepListGroup*>(pGroup));
             break;
         case ListGroup::lgtype_realtime:
             pNewGroup = *m_ListGroups.insert(m_ListGroups.begin() + pos, new RTListGroup(this));
-            dynamic_cast<RTListGroup*>(pNewGroup)->ExplicitCopy(*dynamic_cast<RTListGroup*>(pGroup));
+            static_cast<RTListGroup*>(pNewGroup)->ExplicitCopy(*static_cast<RTListGroup*>(pGroup));
             break;
     }
-//    pGroup->SetFocus();
-//    m_MenuList.Select(reselect);
 
     for ( auto it = m_ListGroups.begin() + pos; it != m_ListGroups.end(); it++ )
         (*it)->SetItemID((*it)->ItemID() + 1);
@@ -1292,9 +1330,15 @@ void Pattern::CopyCurrentListGroup()
 
 void Pattern::DeleteCurrentListGroup()
 {
-    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
-    if ( pGroup == NULL )
+    if ( !m_MenuList.CursorPosValid() )
         return;
+
+    ItemMenu * pItem = *m_MenuList.m_Cursor;
+
+    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+        return;
+
+    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
 
     int pos = pGroup->ItemID();
     m_ListGroups.erase(m_ListGroups.begin() + pos);
@@ -1309,10 +1353,15 @@ void Pattern::DeleteCurrentListGroup()
 
 void Pattern::RunCurrentListGroup()
 {
-    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
-    if ( pGroup == NULL )
+    if ( !m_MenuList.CursorPosValid() )
         return;
 
+    ItemMenu * pItem = *m_MenuList.m_Cursor;
+
+    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+        return;
+
+    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
     pGroup->Run(g_State.Beat());
     pGroup->SetRedraw();
 }
@@ -1326,9 +1375,15 @@ void Pattern::RunAllListGroups(double startBeat)
 
 void Pattern::StopCurrentListGroup()
 {
-    ListGroup * pGroup = dynamic_cast<ListGroup*>(*m_MenuList.m_Cursor);
-    if ( pGroup == NULL )
+    if ( !m_MenuList.CursorPosValid() )
         return;
+
+    ItemMenu * pItem = *m_MenuList.m_Cursor;
+
+    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+        return;
+
+    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
 
     pGroup->Stop();
     pGroup->SetRedraw();

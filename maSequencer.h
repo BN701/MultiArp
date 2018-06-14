@@ -50,7 +50,7 @@ class Sequencer
 
 
         bool ScheduleNote(uint8_t note, uint8_t vel, uint16_t len, uint8_t midiChannel = 255);
-        bool ScheduleNextCallBack();
+        bool ScheduleNextCallBack(int raw0 = -1, int raw1 = -1, int raw2 = -1);
 
         snd_seq_event_t * GetEvent(uint64_t);
         void PopEvent();

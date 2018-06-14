@@ -46,9 +46,13 @@ ItemMenu & StepList::operator = (const ItemMenu & m)
 {
     ItemMenu::operator = (m);
 
+#if defined(MA_BLUE)
+    const StepList & g = *static_cast<const StepList*>(&m);
+#else
     const StepList & g = *dynamic_cast<const StepList*>(&m);
-
+#endif
     m_Clusters = g.m_Clusters;
+    return *this;
 }
 
 string StepList::ToString(bool fullFormat)

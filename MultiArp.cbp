@@ -39,7 +39,9 @@
 				<Option compiler="gcc" />
 				<Option parameters="2&gt; log.txt" />
 				<Compiler>
+					<Add option="-fno-rtti" />
 					<Add option="-g" />
+					<Add option="-O0" />
 					<Add option="-DDEBUG" />
 					<Add option="-DMA_BLUE" />
 					<Add option="-DMA_BLUE_PC" />
@@ -54,6 +56,7 @@
 				<Option parameters="This is -midi=6 the -step=4 title -midi=nonsense -midi=-7 -step=4.05 -step= -midi= -step=nonsense -step=0" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-fno-rtti" />
 					<Add option="-DMA_BLUE" />
 					<Add directory="./" />
 				</Compiler>

@@ -156,8 +156,8 @@ void ChainLink::FromString(string & s)
         return;
 
     m_PatternLabel = tokens[0];
-    m_PatternHash = stoi(tokens[1]);
-    m_Repeats = stoi(tokens[2]);
+    m_PatternHash = strtol(tokens[1].c_str(), NULL, 0);
+    m_Repeats = strtol(tokens[2].c_str(), NULL, 0);
 //    m_Jump = stoi(tokens[3]);
 }
 

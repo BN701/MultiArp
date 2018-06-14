@@ -20,6 +20,28 @@
 #include <cmath>
 #include "maState.h"
 
+using namespace std;
+
+#ifdef MA_BLUE
+
+#include <math.h>
+#include "maSequencer.h"
+
+#else
+
+#define LINK_PLATFORM_LINUX
+#include <ableton/Link.hpp>
+
+// Global Link instance.
+
+extern ableton::Link g_Link;
+extern chrono::microseconds g_LinkStartTime;
+
+#include "platform_Linux/maAlsaSequencer.h"
+
+#endif // MA_BLUE
+
+
 State g_State;  // Global State instance.
 
 State::State()
@@ -31,6 +53,44 @@ State::~State()
 {
     //dtor
 }
+
+int64_t State::TimeAtBeat(double beat)
+{
+#if defined(MA_BLUE)
+    return (beat - m_BeatLastTempoChange) * 60000000/m_Tempo + m_TimeLastTempoChange;
+#else
+//    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+    ableton::Link::SessionState timeline = g_Link.captureAppSessionState();
+    chrono::microseconds t_next_usec = timeline.timeAtBeat(beat, m_Quantum);
+
+    if ( g_LinkStartTime.count() < 0 )
+    {
+       g_LinkStartTime = t_next_usec;
+       return 0;
+    }
+    else
+    {
+       return t_next_usec.count() - g_LinkStartTime.count();
+    }
+#endif
+}
+
+double State::Tempo()
+{
+#if defined(MA_BLUE)
+    return m_Tempo;
+#else
+//    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+    ableton::Link::SessionState timeline = g_Link.captureAppSessionState();
+    return timeline.tempo();
+#endif
+}
+
+double State::PhaseAtBeat(double beat)
+{
+    return fmod(beat, m_Quantum);
+}
+
 
 void State::Step(double stepValueMultiplier)
 {

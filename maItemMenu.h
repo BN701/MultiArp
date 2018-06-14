@@ -53,6 +53,7 @@ class MenuList
         menu_list_cursor_t Select(menu_list_cursor_t pos/*, bool setReturnFocus = true*/);
         menu_list_cursor_t Select(ItemMenu * item);
         ItemMenu* ClearCursor();
+        bool CursorPosValid() { return m_Cursor != m_Items.end(); }
 
 //        void OpenCurrentItem();
 //        void OpenCurrentItem(ItemMenu * returnFocus);

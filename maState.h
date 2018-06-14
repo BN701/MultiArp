@@ -69,9 +69,13 @@ class State
         double CurrentPhaseZero() { return m_Beat - m_Phase; }
         void SetBeat(double val) { m_Beat = val; }
 
+        int64_t TimeAtBeat(double beat);
+        double PhaseAtBeat(double beat);
+
         bool PhaseIsZero();
 //        bool LastStep();
         double Phase() { return m_Phase; }
+        double Tempo();
         void SetPhase(double val) { m_Phase = val; }
 
         int PatternReset() { return m_PatternReset; }
@@ -100,7 +104,6 @@ class State
 #if defined(MA_BLUE)
     public:
 
-        double Tempo() { return m_Tempo; }
         void SetTempo( double val ) { m_Tempo = val; }
 
         double TimeLineMicros() { return m_TimeLineMicros; }
@@ -109,7 +112,9 @@ class State
 
     private:
         double m_Tempo = 120.0;
-        double m_TimeLineMicros = 0;  // Incremented by every call to step, tracking beat position, adjusted for tempo.
+        int64_t m_TimeLineMicros = 0;  // Incremented by every call to step, tracking beat position, adjusted for tempo.
+        int64_t m_TimeLastTempoChange = 0;
+        double m_BeatLastTempoChange = 0;
 #endif
 
 };

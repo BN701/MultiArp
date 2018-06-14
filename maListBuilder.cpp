@@ -22,7 +22,7 @@
 #include "maBaseUI.h"
 #include "maListBuilder.h"
 
-#ifdef MA_BLUE
+#if defined(MA_BLUE)
 #include <cstdio>
 
 #include "maState.h"
@@ -45,14 +45,20 @@ using namespace std;
 ofstream fLog;
 #endif
 
-extern ableton::Link g_Link;
-ListBuilder g_ListBuilder(&g_Link);
-
 ListBuilder::ListBuilder()
 {
     //ctor
 }
-#if !defined(MA_BLUE)
+
+#if defined(MA_BLUE)
+
+ListBuilder g_ListBuilder;
+
+#else
+
+extern ableton::Link g_Link;
+ListBuilder g_ListBuilder(&g_Link);
+
 ListBuilder::ListBuilder(ableton::Link * linkInstance):
     m_Link(linkInstance)
 {
@@ -232,7 +238,7 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                 if ( m_Link == NULL )
                     throw string("ListBuilder::HandleMidi() - Expecting Ableton Link Instance to be set.");
                 chrono::microseconds t_now = m_Link->clock().micros();
-                ableton::Link::Timeline timeline = m_Link->captureAppTimeline();
+                ableton::Link::SessionState timeline = m_Link->captureAppSessionState();
                 double beat = timeline.beatAtTime(t_now, m_LinkQuantum);
 #endif
                 // Create notes for note-on, complete notes and calculate

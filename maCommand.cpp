@@ -429,11 +429,7 @@ bool do_command(string commandString, int directCommand)
         {
 
         case C_MENU:
-//            if ( g_PatternStore.HasFocus() )
-//                g_CommandMenu.Open(C_MENU_ID_PATTERN_STORE);
-//            else
-//                g_CommandMenu.Open(g_PatternStore.CurrentEditPattern().PopUpMenuID());
-                g_CommandMenu.Open(ItemMenu::CurrentPopUpMenuID());
+            g_CommandMenu.Open(ItemMenu::CurrentPopUpMenuID());
             break;
 
         case C_RUN :
@@ -991,23 +987,23 @@ bool do_command(string commandString, int directCommand)
                g_PatternStore.LoadPatternPlayData(PLAY_DATA_GATE).c_str());
             break;
         case C_LOAD_VELOCITY:
-           set_status(STAT_POS_2, "Pattern %i: %s",
+            set_status(STAT_POS_2, "Pattern %i: %s",
                g_PatternStore.CurrentEditPatternID(),
                g_PatternStore.LoadPatternPlayData(PLAY_DATA_VELO).c_str());
             break;
         case C_LOAD_SCALE:
-           set_status(STAT_POS_2, "Pattern %i: %s",
+            set_status(STAT_POS_2, "Pattern %i: %s",
                g_PatternStore.CurrentEditPatternID(),
                g_PatternStore.LoadPatternPlayData(PLAY_DATA_SCALE).c_str());
             break;
         case C_LOAD_ALL:
-           set_status(STAT_POS_2, "Pattern %i: %s",
+            set_status(STAT_POS_2, "Pattern %i: %s",
                g_PatternStore.CurrentEditPatternID(),
                g_PatternStore.LoadPatternPlayData().c_str());
             break;
 
         case C_USE:
-           set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
+            set_status(STAT_POS_2, g_PatternStore.ShowPatternPlayData().c_str());
             break;
         case C_USE_GLOBAL_PLAYDATA:
            g_PatternStore.SetUsePatternPlayData(false);
@@ -1451,8 +1447,6 @@ map<int, int> g_KeyCommandMap =
 {
     {BaseUI::key_return, BaseUI::key_cmd_enter},
     {BaseUI::key_backspace, BaseUI::key_cmd_back},
-    {BaseUI::key_ctrl_up, BaseUI::key_cmd_up},
-    {BaseUI::key_ctrl_down, BaseUI::key_cmd_down},
     {BaseUI::key_left, BaseUI::key_cmd_left},
     {BaseUI::key_right, BaseUI::key_cmd_right},
     {BaseUI::key_up, BaseUI::key_cmd_up},
@@ -1466,13 +1460,13 @@ map<int, int> g_KeyCommandMap =
     {BaseUI::key_alt_right, BaseUI::key_cmd_move_right},
     {BaseUI::key_alt_up, BaseUI::key_cmd_move_up},
     {BaseUI::key_alt_down, BaseUI::key_cmd_move_down},
-    {BaseUI::key_alt_page_up, BaseUI::key_cmd_shift_left},
-    {BaseUI::key_alt_page_down, BaseUI::key_cmd_shift_right},
+    {BaseUI::key_ctrl_shift_left, BaseUI::key_cmd_shift_left},
+    {BaseUI::key_ctrl_shift_right, BaseUI::key_cmd_shift_right},
     {BaseUI::key_ctrl_delete, BaseUI::key_cmd_undo},
     {BaseUI::key_shift_up, BaseUI::key_cmd_inc},
     {BaseUI::key_shift_down, BaseUI::key_cmd_dec},
-    {BaseUI::key_alt_shift_up, BaseUI::key_cmd_inc_2},
-    {BaseUI::key_alt_shift_down, BaseUI::key_cmd_dec_2}
+    {BaseUI::key_ctrl_up, BaseUI::key_cmd_inc_2},
+    {BaseUI::key_ctrl_down, BaseUI::key_cmd_dec_2},
 };
 
 bool handle_key_input(BaseUI::key_command_t key)

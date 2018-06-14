@@ -1256,11 +1256,7 @@ string PatternStore::ShowPatternPlayData()
 
     if ( usePatternPlayData )
     {
-#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
-        snprintf(buff, 100, "P %02u: ", m_PosEdit + 1);
-#else
         snprintf(buff, 100, "P %s: ", m_PosEdit->ShortLabel());
-#endif
         result += buff;
     }
     else
@@ -1334,8 +1330,11 @@ void PatternStore::RemoveChainsFromMenu()
 
 void PatternStore::CopyPatternChain()
 {
+#if defined(MA_BLUE)
+    int chainIndex = static_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
+#else
     int chainIndex = dynamic_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
-
+#endif
     m_MenuList.ClearCursor();
     RemoveChainsFromMenu();
 
@@ -1357,8 +1356,11 @@ void PatternStore::MovePatternChain(bool incIndex )
     if ( m_PatternChains.size() < 2 )
         return;
 
+#if defined(MA_BLUE)
+    int chainIndex = static_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
+#else
     int chainIndex = dynamic_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
-
+#endif
     if ( incIndex )
     {
         if ( chainIndex >= m_PatternChains.size() )
@@ -1395,8 +1397,11 @@ void PatternStore::MovePatternChain(bool incIndex )
 
 void PatternStore::DeletePatternChain()
 {
+#if defined(MA_BLUE)
+    int chainIndex = static_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
+#else
     int chainIndex = dynamic_cast<PatternChain*>(*m_MenuList.m_Cursor) - & m_PatternChains[0];
-
+#endif
     m_MenuList.ClearCursor();
     RemoveChainsFromMenu();
 

@@ -20,9 +20,9 @@
 
 #include "maAlsaSequencer.h"
 
-//#if !defined(MA_BLUE)
+#if !defined(MA_BLUE)
 AlsaSequencer g_Sequencer;
-//#endif
+#endif
 
 AlsaSequencer::AlsaSequencer():
     m_MidiChannel(0)

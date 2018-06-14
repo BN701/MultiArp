@@ -95,7 +95,7 @@ void set_top_line()
 #if defined(MA_BLUE)
                         g_State.Tempo(),
 #else
-                        g_Link.captureAppTimeline().tempo(),
+                        g_Link.captureAppSessionState().tempo(),
 #endif
                         g_State.Quantum(),
                         g_State.RunState(),
@@ -105,7 +105,7 @@ void set_top_line()
 #ifndef MA_BLUE
     g_CairoUI.SetTopLine(g_Sequencer.MidiChannel() + 1,
                         g_State.CurrentStepValue(),
-                        g_Link.captureAppTimeline().tempo(),
+                        g_Link.captureAppSessionState().tempo(),
                         g_State.Quantum(),
                         g_State.RunState(),
                         g_State.RecState(),

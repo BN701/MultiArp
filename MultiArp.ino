@@ -148,11 +148,12 @@ void setup()
 
     g_TextUI.ResetScreen();
     set_top_line();
-    queue_next_step(0, NULL);
+    queue_next_step(NULL);
 
 }
 
 int loopCount = 0;
+queue<snd_seq_event_t> ticks;
 
 void loop()
 {
@@ -234,7 +235,7 @@ void loop()
     // Midi send queue ...
 
     uint8_t midiChannel = g_Sequencer.MidiChannel() + 1; // usbMIDI not zero based, it seems.
-    bool callStep = false;
+//    bool callStep = false;
     bool sendNow = false;
 
     int eventsProcessed = 0;
@@ -246,7 +247,7 @@ void loop()
                 // This is our 'tick', so schedule everything
                 // that should happen next, including the
                 // next tick.
-                callStep = true;    // Defer until we've sent out all other midi.
+                ticks.push(*ev);
                 digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 //                queue_next_step(0);
                 break;
@@ -265,10 +266,11 @@ void loop()
         eventsProcessed++;
     }
 
-    if ( callStep )
+    while ( !ticks.empty() )
     {
+        queue_next_step(&ticks.front());
+        ticks.pop();
 //        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-        queue_next_step(0, NULL);
     }
 
     if ( sendNow )
@@ -276,6 +278,8 @@ void loop()
 //        g_TextUI.FWriteXY(4, 8, "Events: %i", eventsProcessed);
         usbMIDI.send_now();
     }
+
+    update_item_menus();
 
 #if 0
     // Occasional debug code ...

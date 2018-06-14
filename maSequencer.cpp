@@ -23,9 +23,9 @@
 #include <cstdio>
 #include <cstring>
 
-//#if defined(MA_BLUE)
+#if defined(MA_BLUE)
 Sequencer g_Sequencer;
-//#endif
+#endif
 
 Sequencer::Sequencer()
 {
@@ -134,9 +134,12 @@ bool Sequencer::ScheduleNote(uint8_t note, uint8_t vel, uint16_t len, uint8_t mi
     return ScheduleEvent(ev);
 }
 
-bool Sequencer::ScheduleNextCallBack()
+bool Sequencer::ScheduleNextCallBack(int raw0, int raw1, int raw2)
 {
     snd_seq_event_t ev = {0};
     ev.type = SND_SEQ_EVENT_ECHO;
-    return ScheduleEvent(ev);
+    ev.data.raw32.d[0] = raw0;
+    ev.data.raw32.d[1] = raw1;
+    ev.data.raw32.d[2] = raw2;
+   return ScheduleEvent(ev);
 }

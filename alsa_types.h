@@ -9,6 +9,14 @@
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 typedef unsigned char snd_seq_event_type_t;
 
+typedef struct snd_seq_ev_raw8 {
+	unsigned char d[12];		/**< 8 bit value */
+} snd_seq_ev_raw8_t;
+
+typedef struct snd_seq_ev_raw32 {
+	unsigned int d[3];		/**< 32 bit value */
+} snd_seq_ev_raw32_t;
+
 typedef struct snd_seq_real_time {
 	unsigned int tv_sec;	/* seconds */
 	unsigned int tv_nsec;	/* nanoseconds */
@@ -56,8 +64,8 @@ typedef struct snd_seq_event {
 	union {				/* event data... */
 		struct snd_seq_ev_note note;
 		struct snd_seq_ev_ctrl control;
-//		struct snd_seq_ev_raw8 raw8;
-//		struct snd_seq_ev_raw32 raw32;
+		struct snd_seq_ev_raw8 raw8;
+		struct snd_seq_ev_raw32 raw32;
 //		struct snd_seq_ev_ext ext;
 //		struct snd_seq_ev_queue_control queue;
 //		union snd_seq_timestamp time;

@@ -110,14 +110,28 @@ class ListGroup : public ItemMenu
 //        double m_QuantumEdit = 4;
 //        double m_QuantumPending = 4;
 
-        // Step() working data used by derived functions.
-        uint64_t m_QueueTimeUsec;
+//        // Step() working data used by derived functions.
+        uint64_t m_TickTimeUsec;
         double m_NextBeatSwung;
         double m_Tempo;
 
         bool m_Running = false;
         bool m_Stopping = false;
         double m_LastBeat = 0;
+#if defined(MA_BLUE)
+//    public:
+
+//        double Tempo() { return m_Tempo; }
+//        void SetTempo( double val ) { m_Tempo = val; }
+
+//        double TimeLineMicros() { return m_TimeLineMicros; }
+
+//        double BeatFromEvent(snd_seq_event_t *ev);
+
+//    private:
+//        double m_Tempo = 120.0;
+//        double m_TimeLineMicros = 0;  // Incremented by every call to step, tracking beat position, adjusted for tempo.
+#endif
 
 };
 

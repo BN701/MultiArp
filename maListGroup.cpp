@@ -26,8 +26,7 @@
 #include "maTranslateTable.h"
 #include "maUtility.h"
 
-#include <algorithm>
-#include <cmath>
+//#include <algorithm>
 #include <unordered_map>
 
 #if defined(MA_BLUE)
@@ -45,19 +44,21 @@ using namespace std;
 
 #else
 
-#define LINK_PLATFORM_LINUX
-#include <ableton/Link.hpp>
-
-// Global Link instance.
-
-extern ableton::Link g_Link;
-extern chrono::microseconds g_LinkStartTime;
+#include <cmath>
 
 #include "platform_Linux/maAlsaSequencer.h"
 
-#endif // MA_BLUE
+//#define LINK_PLATFORM_LINUX
+//#include <ableton/Link.hpp>
+//
+//// Global Link instance.
+//
+//extern ableton::Link g_Link;
+//extern chrono::microseconds g_LinkStartTime;
+//
+//#include "platform_Linux/maAlsaSequencer.h"
 
-//extern State g_State;
+#endif // MA_BLUE
 
 //
 //  ListGroup
@@ -86,7 +87,7 @@ ListGroup::ListGroup(ListGroup & lg):
     m_Phase(lg.m_Phase),
     m_StepEdit(lg.m_StepEdit),
     m_StepPending(lg.m_StepPending),
-    m_Tempo(lg.m_Tempo),
+//    m_Tempo(lg.m_Tempo),
     m_Running(lg.m_Running)
 {
     // If parent is being reallocated, old parent pointer is invalid!
@@ -124,8 +125,11 @@ ItemMenu & ListGroup::operator = (const ItemMenu & m)
 {
     ItemMenu::operator = (m);
 
+#if defined(MA_BLUE)
+    const ListGroup & g = *static_cast<const ListGroup*>(&m);
+#else
     const ListGroup & g = *dynamic_cast<const ListGroup*>(&m);
-
+#endif
     m_MidiChannel = g.m_MidiChannel;
     m_CurrentStepValue = g.m_CurrentStepValue;
     m_StepEdit = m_CurrentStepValue;        // If these are left at default values they'll show up in Status as pending edits.
@@ -134,7 +138,7 @@ ItemMenu & ListGroup::operator = (const ItemMenu & m)
     m_ListGroupMenuFocus = g.m_ListGroupMenuFocus;
     m_Beat = g.m_Beat;
     m_Phase = g.m_Phase;
-    m_Tempo = g.m_Tempo;
+//    m_Tempo = g.m_Tempo;
 }
 
 void ListGroup::ResetPosition()
@@ -421,29 +425,27 @@ bool ListGroup::Step()
         return false;   // Break the cycle, 'unenforced'.
     }
 
-#if defined(MA_BLUE)
-    m_TimeLineMicros += beatInc * 60000000 / m_Tempo;
-#endif
-
-    // Get time of next step from Link.
+    // Get time of next step.
 
     double nextBeatStrict = m_Beat;    // This is absolute beat value since the clock started,
 
-//->    double nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
+//    m_nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
     m_NextBeatSwung = nextBeatStrict;
 
-#if defined(MA_BLUE)
-   // MA_BLUE Todo: Convert beat (phase) to schedule time
-//   chrono::microseconds t_next_usec(llround(nextBeat * 60000000/120));
+//#if defined(MA_BLUE)
+//    m_TimeLineMicros += beatInc * 60000000 / g_State.Tempo();
+//
+//    m_Phase = fmod(nextBeatStrict, g_State.Quantum());
+//#else
+//    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+//    chrono::microseconds t_next_usec = timeline.timeAtBeat(m_NextBeatSwung, g_State.Quantum());
+//
+//    m_Phase = timeline.phaseAtTime(t_next_usec, g_State.Quantum());
+//#endif
 
-    g_State.SetPhase(fmod(nextBeatStrict, g_State.Quantum()));
-
-#else
-    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-    chrono::microseconds t_next_usec = timeline.timeAtBeat(m_NextBeatSwung, g_State.Quantum());
-
-    m_Phase = timeline.phaseAtTime(t_next_usec, g_State.Quantum());
-#endif
+//    double timeLineMicros = g_State.TimeAtBeat(m_Beat);
+    m_TickTimeUsec = g_State.TimeAtBeat(m_Beat);
+    m_Phase = g_State.PhaseAtBeat(m_Beat);
 
     if ( equals(m_Phase, 0) )
     {
@@ -462,36 +464,36 @@ bool ListGroup::Step()
 
 //    uint64_t queue_time_usec = 0;
 
-#ifdef MA_BLUE
-//    m_QueueTimeUsec = llround(nextBeat * 60000000/120);
-    m_QueueTimeUsec = g_State.TimeLineMicros();
+//#ifdef MA_BLUE
+////    m_TickTimeUsec = llround(nextBeat * 60000000/120);
+//    m_TickTimeUsec = m_TimeLineMicros;
+//#else
+//    if ( g_LinkStartTime.count() < 0 )
+//    {
+//       g_LinkStartTime = t_next_usec;
+//       m_TickTimeUsec = 0;
+//    }
+//    else
+//    {
+//       m_TickTimeUsec = (t_next_usec.count() - g_LinkStartTime.count());
+//    }
+//#endif
+
     m_Tempo = g_State.Tempo();
-#else
-    if ( g_LinkStartTime.count() < 0 )
-    {
-       g_LinkStartTime = t_next_usec;
-       m_QueueTimeUsec = 0;
-    }
-    else
-    {
-       m_QueueTimeUsec = (t_next_usec.count() - g_LinkStartTime.count());
-    }
+//    m_Tempo = timeline.tempo();
 
-    m_Tempo = timeline.tempo();
-#endif
+//    if ( m_TickTimeUsec < 0 )
+//    {
+//       // Sometimes at start up link appears to go backwards, especially if
+//       // there's another instance of the app running. For now, just keep
+//       // reschedule and hope things settle down. This is probably our count
+//       // in, though I haven't thought it through properly.
+//    //        raise(SIGINT);
+//       m_TickTimeUsec = 0;
+//    }
 
-
-    if ( m_QueueTimeUsec < 0 )
-    {
-       // Sometimes at start up link appears to go backwards, especially if
-       // there's another instance of the app running. For now, just keep
-       // reschedule and hope things settle down. This is probably our count
-       // in, though I haven't thought it through properly.
-    //        raise(SIGINT);
-       m_QueueTimeUsec = 0;
-    }
-
-    g_Sequencer.SetScheduleTime(m_QueueTimeUsec);
+//    g_Sequencer.SetScheduleTime(m_TickTimeUsec);
+    g_Sequencer.SetScheduleTime(m_TickTimeUsec);
 
     // Schedule an event to be fired back to our own app which prompts another
     // arpeggio to be placed in the queue.
@@ -527,8 +529,11 @@ ItemMenu & StepListGroup::operator = (const ItemMenu & m)
 {
     ListGroup::operator = (m);
 
+#if defined(MA_BLUE)
+    const StepListGroup & g = *static_cast<const StepListGroup*>(&m);
+#else
     const StepListGroup & g = *dynamic_cast<const StepListGroup*>(&m);
-
+#endif
     if ( m_ExplicitCopy )
     {
         for ( auto it = g.m_StepListSet.begin(); it != g.m_StepListSet.end(); it++ )
@@ -767,21 +772,6 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
     {
         unsigned loopCheck = 0;
 
-//        for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
-//            it->SetNowPlayingPos(-1);
-//
-//        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
-//        {
-//            update_pair & u = m_DeferredUpdates.front();
-//            if ( u.list_id < m_StepListSet.size() )
-//            {
-//                StepList & l = m_StepListSet[u.list_id];
-//                l.SetNowPlayingPos(u.list_pos);
-//            }
-//        }
-//
-//        m_DeferredUpdates.clear();
-
         if ( m_TrigList.Empty() )
         {
             StepList * l = NULL;
@@ -940,7 +930,7 @@ bool StepListGroup::Step()
        double phaseAdjust = note->Phase() - m_Phase;
        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/m_Tempo);
 
-       int64_t queue_time_adjusted = m_QueueTimeUsec + timeAdjust;
+       int64_t queue_time_adjusted = m_TickTimeUsec + timeAdjust;
 
        if ( note->m_NoteVelocity > 0 )
            noteVelocity = note->m_NoteVelocity;

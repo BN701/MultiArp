@@ -199,6 +199,9 @@ int main(int argc, char *argv[])
     bool keep_going = true;
 
     int loopCount = 0;
+
+    queue<snd_seq_event_t> ticks;
+
     while ( keep_going )
     {
         loopCount++;
@@ -206,7 +209,7 @@ int main(int argc, char *argv[])
         auto elapsed = chrono::high_resolution_clock::now() - start;
         uint64_t microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
 
-        bool callStep = false;
+//        bool callStep = false;
 //        bool gotEvent = false;
         while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(microseconds) )
         {
@@ -214,12 +217,13 @@ int main(int argc, char *argv[])
             switch (ev->type)
             {
                 case SND_SEQ_EVENT_ECHO:
-                    // This is our 'tick', so schedule everything
-                    // that should happen next, including the
-                    // next tick.
+                    // This is our 'tick'. All 'next step' processing happens from
+                    // here, so hold off dealing with it until all other midi output
+                    // for this time has been sent.
 //                    queue_next_step(0);
 //                    fprintf(stderr, "%12i - Tick, in loop, deferring ...\n", loopCount);
-                    callStep = true;
+//                    callStep = true;
+                    ticks.push(*ev);
                     break;
                 case SND_SEQ_EVENT_NOTEON:
 //                    fprintf(stderr, "%12i - Note on.\n", loopCount);
@@ -233,9 +237,10 @@ int main(int argc, char *argv[])
             g_Sequencer.PopEvent();
         }
 
-        if ( callStep )
+        while ( !ticks.empty() )
         {
-            queue_next_step(0);
+            queue_next_step(&ticks.front());
+            ticks.pop();
 #if 0
             fprintf(stderr, "%12i - Tick, deferred, pre-step.\n", loopCount);
             for ( auto it = g_Sequencer.EventQueue().begin(); it != g_Sequencer.EventQueue().end(); it++ )
@@ -300,6 +305,9 @@ int main(int argc, char *argv[])
                 }
             }
         }
+
+        update_item_menus();
+
     }
 
 #else

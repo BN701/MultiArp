@@ -637,6 +637,7 @@ BaseUI::key_command_t AnsiUI::GetCSISequence(int firstChar)
     return key;
 }
 
+
 BaseUI::key_command_t AnsiUI::KeyInput()
 {
     int c = Read();
@@ -650,6 +651,21 @@ BaseUI::key_command_t AnsiUI::KeyInput()
                 return GetCSISequence(c);
             default:
                 break;
+        }
+    }
+    else
+    {
+        static list<char> LastTen;
+        LastTen.push_back(c);
+        if ( LastTen.size() == 11 )
+            LastTen.pop_front();
+        string s;
+        for ( auto it = LastTen.begin(); it != LastTen.end(); ++it )
+        {
+            char buff[20];
+            snprintf(buff, 20, "%02x ", *it);
+            s += buff;
+            FWriteXY(0, 24, "%s", s.c_str());
         }
     }
 

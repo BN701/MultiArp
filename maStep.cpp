@@ -164,7 +164,7 @@ void queue_next_step(snd_seq_event_t *ev)
     g_State.SetPhase(fmod(nextBeatStrict, g_State.Quantum()));
 
 #else
-    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
+    ableton::Link::SessionState timeline = g_Link.captureAppSessionState();
     chrono::microseconds t_next_usec = timeline.timeAtBeat(nextBeatSwung, g_State.Quantum());
 
     g_State.SetPhase(timeline.phaseAtTime(t_next_usec, g_State.Quantum()));

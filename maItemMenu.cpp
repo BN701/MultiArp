@@ -90,7 +90,11 @@ menu_list_cursor_t MenuList::Remove(menu_list_cursor_t pos, bool setCursorToEnd)
             m_LastCursorPos = -1;
         }
         else
+#if !defined(MA_BLUE)
             throw "MenuList::Remove(), should't try to remove current selection.";
+#else
+            return m_Items.end();
+#endif
     }
 
     menu_list_cursor_t result = m_Items.erase(pos);

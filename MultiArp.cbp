@@ -107,8 +107,6 @@
 		<Unit filename="maCommand.h" />
 		<Unit filename="maCommandMenu.cpp" />
 		<Unit filename="maCommandMenu.h" />
-		<Unit filename="maControl.cpp" />
-		<Unit filename="maControl.h" />
 		<Unit filename="maFeelMap.cpp" />
 		<Unit filename="maFeelMap.h" />
 		<Unit filename="maItemMenu.cpp" />
@@ -117,6 +115,8 @@
 		<Unit filename="maListBuilder.h" />
 		<Unit filename="maListGroup.cpp" />
 		<Unit filename="maListGroup.h" />
+		<Unit filename="maMidiControl.cpp" />
+		<Unit filename="maMidiControl.h" />
 		<Unit filename="maNotes.cpp" />
 		<Unit filename="maNotes.h" />
 		<Unit filename="maPattern.cpp" />

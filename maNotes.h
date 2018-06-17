@@ -124,6 +124,8 @@ struct Cluster : public ItemMenu
         m_DisplayObjectType = BaseUI::dot_cluster;
         m_PopUpMenuID = C_MENU_ID_CLUSTER;
         m_Help = "S-Left/Right: insert note, C-Left/Right: copy note, S-Del: delete";
+        // Todo: Should an empty cluster, which behaves as a rest, contain an actual rest?
+        m_Notes.emplace_back();
     }
 
     Cluster & operator+=(const Cluster & rhs)

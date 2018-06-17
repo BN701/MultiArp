@@ -179,6 +179,16 @@ int CommandMenu::InitMenuPos(int menu)
 
 void CommandMenu::Open(int menu)
 {
+    // If menu key pressed a second time, close everything down.
+    if ( m_Active && ( menu == m_CurrentMenuID || (! m_MenuStack.empty() && menu == m_MenuStack.front().m_ID )))
+    {
+        // If already open, toggle to closed.
+        ClearAll();
+        set_status(COMMAND_HOME, "");
+        set_status(STAT_POS_2, "");
+        return;
+    }
+
     m_Active = true;
     m_MenuString = "";
     m_CurrentMenu = m_MenuItems.equal_range(menu);
@@ -272,20 +282,18 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
 
     switch ((int) key)
     {
-        case '/':
-            set_status(STAT_POS_2, "");
-            set_status(COMMAND_HOME, "");
-            ClearAll();
-            break;
+//        case '/':
+//        case BaseUI::key_cmd_menu:
+//            set_status(STAT_POS_2, "");
+//            set_status(COMMAND_HOME, "");
+//            ClearAll();
+//            break;
 
-        case BaseUI::key_return:
+        case BaseUI::key_cmd_enter:
             Choose(m_MenuChoice);
             break;
 
-        case BaseUI::key_backspace:
-//            if ( m_MenuStack.empty() )
-//                break;
-//            m_MenuStack.pop_back();
+        case BaseUI::key_cmd_back:
             if ( ! m_MenuStack.empty() )
             {
                 CommandMenuChoice m = m_MenuStack.back();
@@ -293,7 +301,6 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
                 Open(m.m_ID);
             }
             else
-//                Open();
             {
                 set_status(STAT_POS_2, "");
                 set_status(COMMAND_HOME, "");
@@ -301,7 +308,7 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
             }
             break;
 
-        case BaseUI::key_left:
+        case BaseUI::key_cmd_left:
             if ( m_MenuChoice  > 0 )
             {
                 m_MenuChoice -= 1;
@@ -309,7 +316,7 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
             }
             break;
 
-        case BaseUI::key_right:
+        case BaseUI::key_cmd_right:
             if ( m_MenuChoice < m_Choices - 1 )
             {
                 m_MenuChoice += 1;
@@ -327,8 +334,21 @@ bool CommandMenu::HandleKey(BaseUI::key_command_t key)
         case '8':
             Choose(key - '1');
             break;
-        default:
+
+        case BaseUI::key_choice_1:
+        case BaseUI::key_choice_2:
+        case BaseUI::key_choice_3:
+        case BaseUI::key_choice_4:
+        case BaseUI::key_choice_5:
+        case BaseUI::key_choice_6:
+        case BaseUI::key_choice_7:
+        case BaseUI::key_choice_8:
+        case BaseUI::key_choice_9:
+            Choose(key - BaseUI::key_choice_1);
             break;
+
+        default:
+            return false;
     }
 
     return true;

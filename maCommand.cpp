@@ -1445,6 +1445,7 @@ void load_from_string(string s, int & created, int & updated )
 
 map<int, int> g_KeyCommandMap =
 {
+    {'/', BaseUI::key_cmd_menu},
     {BaseUI::key_return, BaseUI::key_cmd_enter},
     {BaseUI::key_backspace, BaseUI::key_cmd_back},
     {BaseUI::key_left, BaseUI::key_cmd_left},
@@ -1483,6 +1484,12 @@ bool handle_key_input(BaseUI::key_command_t key)
         g_TextUI.SendRestoreCursor();
 #endif
 
+    // Remap key strokes into generic ItemMenu commands.
+
+    auto pos = g_KeyCommandMap.find(key);
+    if ( pos != g_KeyCommandMap.end() )
+        key = static_cast<BaseUI::key_command_t>(pos->second);
+
     // If command menu is open it eats all keys.
 
     if ( g_CommandMenu.HandleKey(key) )
@@ -1493,7 +1500,7 @@ bool handle_key_input(BaseUI::key_command_t key)
     // Look for menu key (currently '/') to open command menu, but only if
     // we haven't already started a command string.
 
-    if ( commandString.empty() && key == static_cast<BaseUI::key_command_t>('/') )
+    if ( commandString.empty() && key == BaseUI::key_cmd_menu )
     {
         do_command("", C_MENU);
         return true;
@@ -1539,7 +1546,7 @@ bool handle_key_input(BaseUI::key_command_t key)
         break;
 #endif
 
-    case BaseUI::key_return: // Enter
+    case BaseUI::key_cmd_enter: // Enter
         if ( !commandString.empty() )
         {
             result = do_command(commandString);
@@ -1565,7 +1572,7 @@ bool handle_key_input(BaseUI::key_command_t key)
 //            key = BaseUI::key_cmd_enter;
         break;
 
-    case BaseUI::key_backspace: // XK_BackSpace:
+    case BaseUI::key_cmd_back: // XK_BackSpace:
         if ( !commandString.empty() )
         {
             commandString.pop_back();
@@ -1667,11 +1674,11 @@ bool handle_key_input(BaseUI::key_command_t key)
     if ( keyUsed )
         return result;
 
-    // Remap key strokes into generic ItemMenu commands.
-
-    auto pos = g_KeyCommandMap.find(key);
-    if ( pos != g_KeyCommandMap.end() )
-        key = static_cast<BaseUI::key_command_t>(pos->second);
+//    // Remap key strokes into generic ItemMenu commands.
+//
+//    auto pos = g_KeyCommandMap.find(key);
+//    if ( pos != g_KeyCommandMap.end() )
+//        key = static_cast<BaseUI::key_command_t>(pos->second);
 
     // Send key strokes off to active ItemMenu.
 

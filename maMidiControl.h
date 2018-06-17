@@ -17,9 +17,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef MACONTROL_H_INCLUDED
-#define MACONTROL_H_INCLUDED
+#ifndef MAMIDICONTROL_H_INCLUDED
+#define MAMIDICONTROL_H_INCLUDED
 
 void handle_midi_control_event(unsigned int param, int value);
 
-#endif // MACONTROL_H_INCLUDED
+#endif // MAMIDICONTROL_H_INCLUDED

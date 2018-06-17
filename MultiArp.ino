@@ -185,7 +185,10 @@ void loop()
         // sure they have their reasons.
 
         int type = usbMIDI.getType();
-        g_TextUI.FWriteXY(0, 21, "Midi: %0x", type);
+        int data1 = usbMIDI.getData1();
+        int data2 = usbMIDI.getData2();
+
+        g_TextUI.FWriteXY(0, 21, "Midi: %0x, %03i, %03i", type, data1, data2);
 
         switch (type)
         {
@@ -195,8 +198,10 @@ void loop()
             case usbMIDI.NoteOn:                //  0x90	Note On
                 ev.type = SND_SEQ_EVENT_NOTEON;
                 break;
-            case usbMIDI.AfterTouchPoly:        //  0xA0	Polyphonic AfterTouch
             case usbMIDI.ControlChange:	        //  0xB0	Control Change / Channel Mode
+                ev.type = SND_SEQ_EVENT_CONTROLLER;
+                break;
+            case usbMIDI.AfterTouchPoly:        //  0xA0	Polyphonic AfterTouch
             case usbMIDI.ProgramChange:	        //  0xC0	Program Change
             case usbMIDI.AfterTouchChannel:	    //  0xD0	Channel (monophonic) AfterTouch
             case usbMIDI.PitchBend:	            //  0xE0	Pitch Bend
@@ -221,9 +226,14 @@ void loop()
             case SND_SEQ_EVENT_NOTEOFF:
                 ev.time.time.tv_sec = g_SysTimeMicros / 1000000;
                 ev.time.time.tv_nsec = (g_SysTimeMicros % 1000000) * 1000;
-                ev.data.note.note = usbMIDI.getData1();
-                ev.data.note.velocity = usbMIDI.getData2();
+                ev.data.note.note = data1;
+                ev.data.note.velocity = data2;
                 g_TextUI.FWriteXY(0, 22, "Type: %0x Note: %i, Vel: %i)", ev.type, ev.data.note.note, ev.data.note.velocity);
+                handle_midi_event(& ev);
+                break;
+            case SND_SEQ_EVENT_CONTROLLER:
+                ev.data.control.param = data1;
+                ev.data.control.value = data2;
                 handle_midi_event(& ev);
                 break;
             default:

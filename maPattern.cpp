@@ -1289,10 +1289,10 @@ void Pattern::CopyCurrentListGroup()
 
     ItemMenu * pItem = *m_MenuList.m_Cursor;
 
-    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+    if ( ! pItem->CheckType(BaseUI::dot_step_list_group) && ! pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
-    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
+    ListGroup * pGroup = static_cast<ListGroup*>(pItem);
     int pos = pGroup->ItemID() + 1;
 
     // Move focus elsewhere while we make copies.
@@ -1338,7 +1338,7 @@ void Pattern::DeleteCurrentListGroup()
     if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
-    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
+    ListGroup * pGroup = static_cast<ListGroup*>(pItem);
 
     int pos = pGroup->ItemID();
     m_ListGroups.erase(m_ListGroups.begin() + pos);
@@ -1361,7 +1361,7 @@ void Pattern::RunCurrentListGroup()
     if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
-    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
+    ListGroup * pGroup = static_cast<ListGroup*>(pItem);
     pGroup->Run(g_State.Beat());
     pGroup->SetRedraw();
 }
@@ -1383,7 +1383,7 @@ void Pattern::StopCurrentListGroup()
     if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
-    ListGroup * pGroup = static_cast<ListGroup*>(pGroup);
+    ListGroup * pGroup = static_cast<ListGroup*>(pItem);
 
     pGroup->Stop();
     pGroup->SetRedraw();

@@ -41,7 +41,7 @@ extern chrono::microseconds g_LinkStartTime;
 
 #endif // MA_BLUE
 
-#include "maControl.h"
+#include "maMidiControl.h"
 #include "maItemMenu.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"

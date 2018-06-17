@@ -141,6 +141,7 @@ class BaseUI
             key_alt_page_up,
             key_alt_page_down,
             key_cmd_base,
+            key_cmd_menu,
             key_cmd_enter,
             key_cmd_back,
             key_cmd_up,
@@ -162,7 +163,16 @@ class BaseUI
             key_cmd_inc,
             key_cmd_inc_2,
             key_cmd_dec,
-            key_cmd_dec_2
+            key_cmd_dec_2,
+            key_choice_1,
+            key_choice_2,
+            key_choice_3,
+            key_choice_4,
+            key_choice_5,
+            key_choice_6,
+            key_choice_7,
+            key_choice_8,
+            key_choice_9
         };
 
         enum display_object_type_t  // Hopefully just use these for sanity checks.

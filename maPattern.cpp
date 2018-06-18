@@ -1335,7 +1335,7 @@ void Pattern::DeleteCurrentListGroup()
 
     ItemMenu * pItem = *m_MenuList.m_Cursor;
 
-    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+    if ( ! pItem->CheckType(BaseUI::dot_step_list_group) && ! pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
     ListGroup * pGroup = static_cast<ListGroup*>(pItem);
@@ -1358,7 +1358,7 @@ void Pattern::RunCurrentListGroup()
 
     ItemMenu * pItem = *m_MenuList.m_Cursor;
 
-    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+    if ( ! pItem->CheckType(BaseUI::dot_step_list_group) && ! pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
     ListGroup * pGroup = static_cast<ListGroup*>(pItem);
@@ -1380,7 +1380,7 @@ void Pattern::StopCurrentListGroup()
 
     ItemMenu * pItem = *m_MenuList.m_Cursor;
 
-    if ( !pItem->CheckType(BaseUI::dot_step_list_group) || !pItem->CheckType(BaseUI::dot_rt_list_group) )
+    if ( ! pItem->CheckType(BaseUI::dot_step_list_group) && ! pItem->CheckType(BaseUI::dot_rt_list_group) )
         return;
 
     ListGroup * pGroup = static_cast<ListGroup*>(pItem);

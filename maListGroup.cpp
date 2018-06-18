@@ -645,12 +645,19 @@ void StepListGroup::DeleteList(StepList * pItem, MenuList & menu)
             menu.Select(m_StepListSet.back().MenuPos());
 
 
-        // Renumber lists in the deferred update queue (and remove the deleted list, if present).
+        // Look for deleted list and remove it, if present.
 
         for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
             if ( it->list_id == pos )
+            {
                 m_DeferredUpdates.erase(it);
-            else if ( it->list_id > pos )
+                break;
+            }
+
+        // Renumber remaining lists.
+
+        for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
+            if ( it->list_id > pos )
                 it->list_id--;
     }
 }

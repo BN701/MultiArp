@@ -201,7 +201,7 @@ class ItemMenu
         static void ClearRedrawList() { m_RedrawList.clear(); }
         static std::list<ItemMenu *> & RedrawList() { return m_RedrawList; }
 
-        virtual void SetRedraw() noexcept
+        virtual void SetRedraw(bool setReturnFocus = false) noexcept
         {
             if ( m_Visible )
             {
@@ -210,6 +210,8 @@ class ItemMenu
                 // to make sure.
                 m_RedrawList.remove(this);
                 m_RedrawList.push_back(this);
+                if ( setReturnFocus && m_ReturnFocus != NULL )
+                    m_ReturnFocus->SetRedraw(setReturnFocus);
             }
         }
 

@@ -367,13 +367,19 @@ bool Note::HandleKey(BaseUI::key_command_t k)
 {
     double inc = 0.1;
     int note_inc = 1;
+    note_edit_menu_focus_t editFocus;
+
+    if ( m_Visible )
+        editFocus = m_NoteEditFocus;
+    else
+        editFocus = nef_note_number;
 
     switch ( k )
     {
-//    case BaseUI::key_return:
     case BaseUI::key_cmd_back:
         if ( m_MenuListPtr != NULL )
         {
+            SetVisible(false);
             m_MenuListPtr->m_Container->SetRedraw();
             m_MenuListPtr->DownCursorPos();
             m_MenuListPtr->Remove(m_PosInMenuList);
@@ -406,7 +412,7 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         inc = 0.01;
         note_inc = 12;
     case BaseUI::key_cmd_inc:
-        switch ( m_NoteEditFocus )
+        switch ( editFocus )
         {
         case nef_note_number:
             if ( m_NoteNumber + note_inc < 128 )
@@ -422,13 +428,17 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         default:
             break;
         }
+//        if ( m_ReturnFocus != NULL )
+//        {
+//            m_ReturnFocus->SetRedraw();
+//        }
         break;
 
     case BaseUI::key_cmd_dec_2:
         inc = 0.01;
         note_inc = 12;
     case BaseUI::key_cmd_dec:
-        switch ( m_NoteEditFocus )
+        switch ( editFocus )
         {
         case nef_note_number:
             if ( m_NoteNumber - note_inc >= -1 )
@@ -446,6 +456,8 @@ bool Note::HandleKey(BaseUI::key_command_t k)
         default:
             break;
         }
+//        if ( m_ReturnFocus != NULL )
+//            m_ReturnFocus->SetRedraw();
         break;
 
     default:
@@ -454,7 +466,7 @@ bool Note::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_NoteEditFocus == 0;
 
-    SetRedraw();
+    SetRedraw(m_NoteEditFocus == nef_note_number);
 
     return true;
 }
@@ -561,7 +573,7 @@ void Cluster::SetStatus()
         m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
     }
 
-    if ( !m_FieldPositions.empty() )
+    if ( m_GotFocus && !m_FieldPositions.empty() )
         m_Highlights.push_back(m_FieldPositions.at(m_PosEdit));
 
 }
@@ -587,6 +599,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
     case BaseUI::key_cmd_back:
         if ( m_MenuListPtr != NULL )
         {
+            SetVisible(false);
             m_MenuListPtr->m_Container->SetRedraw();
             m_MenuListPtr->DownCursorPos();
             m_MenuListPtr->Remove(m_PosInMenuList);
@@ -625,6 +638,8 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             m_PosEdit = 0;
         }
         m_Notes.at(m_PosEdit).HandleKey(k);
+//        if ( m_ReturnFocus != NULL )
+//            m_ReturnFocus->SetRedraw();
         break;
 
     case BaseUI::key_cmd_copy_left:
@@ -653,7 +668,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
 
     m_FirstField = m_PosEdit == 0;
 
-    SetRedraw();
+    SetRedraw(true);
 
     return true;
 }

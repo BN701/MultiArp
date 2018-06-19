@@ -50,15 +50,16 @@
 
 struct PatternStore : public ItemMenu
 {
-    ItemMenu m_PatternWindow;   // Dummy screen area that we can clear when there are no patterns to fill it.
+    ItemMenu m_PatternWindow;   // Dummy screen area that we can clear when
+                                // there are no patterns to fill it.
 
     // Yes, we're storing iterators. But these are list iterators, so they stay valid
-    // unless a specific item is deleted. (
+    // unless a specific item is deleted.
 
     std::list<Pattern>::iterator m_PosPlay = m_Patterns.end();
     std::list<Pattern>::iterator m_PosEdit = m_Patterns.end();
 
-    // We still need to track with a numeric counter, sometimes, but never use for pattern lookup.
+    // We still need to track with a numeric counter sometimes, but never use for pattern lookup.
 
     int m_PosEditIndex = -1;
 //    int m_PosPlayIndex = -1;
@@ -122,7 +123,7 @@ struct PatternStore : public ItemMenu
 
     bool Empty() { return m_Patterns.empty(); }
     bool PatternChainsEmpty() { return m_PatternChains.empty(); }
-
+    bool PatternChainActive() { return m_ActiveChain != -1; }
     std::string PatternChainManager(command_t command);
     void AddPatternChain();
     void CopyPatternChain();

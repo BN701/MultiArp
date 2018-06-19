@@ -115,6 +115,7 @@ class ListGroup : public ItemMenu
         double m_NextBeatSwung;
         double m_Tempo;
 
+        bool m_CanRun = false;
         bool m_Running = false;
         bool m_Stopping = false;
         double m_LastBeat = 0;

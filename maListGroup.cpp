@@ -20,6 +20,7 @@
 //#include "maNotes.h"
 #include "maListGroup.h"
 #include "maPattern.h"
+#include "maPatternStore.h"
 //#include "maRealTimeList.h"
 //#include "maStepList.h"
 #include "maState.h"
@@ -87,7 +88,7 @@ ListGroup::ListGroup(ListGroup & lg):
     m_Phase(lg.m_Phase),
     m_StepEdit(lg.m_StepEdit),
     m_StepPending(lg.m_StepPending),
-//    m_Tempo(lg.m_Tempo),
+    m_CanRun(lg.m_CanRun),
     m_Running(lg.m_Running)
 {
     // If parent is being reallocated, old parent pointer is invalid!
@@ -107,20 +108,6 @@ ListGroup::~ListGroup()
         m_ListGroupsLookup.erase(m_ListGroupID);
 }
 
-//ListGroup & ListGroup::ExplicitCopy(const ListGroup & lg)
-//{
-//    ItemMenu::ExplicitCopy(lg);
-//    m_MidiChannel = lg.m_MidiChannel;
-//    m_CurrentStepValue = lg.m_CurrentStepValue;
-//    m_StepEdit = m_CurrentStepValue;        // If these are left at default values they'll show up in Status as pending edits.
-//    m_StepPending = m_CurrentStepValue;
-//    m_LastUsedStepValue = lg.m_LastUsedStepValue;
-//    m_ListGroupMenuFocus = lg.m_ListGroupMenuFocus;
-//    m_Beat = lg.m_Beat;
-//    m_Phase = lg.m_Phase;
-//    m_Tempo = lg.m_Tempo;
-//}
-
 ItemMenu & ListGroup::operator = (const ItemMenu & m)
 {
     ItemMenu::operator = (m);
@@ -138,7 +125,7 @@ ItemMenu & ListGroup::operator = (const ItemMenu & m)
     m_ListGroupMenuFocus = g.m_ListGroupMenuFocus;
     m_Beat = g.m_Beat;
     m_Phase = g.m_Phase;
-//    m_Tempo = g.m_Tempo;
+    m_CanRun = g.m_CanRun;
 }
 
 void ListGroup::ResetPosition()
@@ -167,6 +154,8 @@ void ListGroup::SetStatus()
     pos = m_Status.size();
     if ( m_Running )
         m_Status += "Running";
+    else if ( m_CanRun )
+        m_Status += "Can Run";
     else
         m_Status += "Stopped";
     m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
@@ -192,22 +181,6 @@ void ListGroup::SetStatus()
         m_Status += buff;
     }
 
-
-//    m_Status += " Q:";
-//    pos = m_Status.size();
-//    snprintf(buff, 50, "%05.2f", m_QuantumEdit);
-//    m_Status += buff;
-//    m_FieldPositions.emplace_back(pos, static_cast<int>(m_Status.size() - pos));
-//
-//    if ( !equals(m_Quantum, m_QuantumEdit) )
-//    {
-//        if ( !equals(m_Quantum, m_QuantumPending) )
-//            snprintf(buff, 50, ">%05.2f>%05.2f", m_QuantumPending, m_Quantum);
-//        else
-//            snprintf(buff, 50, ">%05.2f", m_Quantum);
-//        m_Status += buff;
-//    }
-
     m_Status += m_Progress;
 
     if ( m_GotFocus && !m_FieldPositions.empty() )
@@ -225,9 +198,10 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
         switch ( m_ListGroupMenuFocus )
         {
         case lgp_run_stop:
+            m_CanRun = ! m_CanRun;
             if ( m_Running )
                 Stop();
-            else
+            else if ( ! g_PatternStore.PatternChainActive() )
                 Run(g_State.NextPhaseZero());
             break;
         case lgp_step_value:
@@ -333,22 +307,13 @@ bool ListGroup::HandleKey(BaseUI::key_command_t k)
 
 void ListGroup::Run(double startBeat)
 {
-#if defined(MA_BLUE)
-   // MA_BLUE Todo: Do something here to work out a sensible start beat.
-#else
-#if 0
-    chrono::microseconds t_now = g_Link.clock().micros();
-    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-    double beat = timeline.beatAtTime(t_now, m_Quantum);
-    double phase = timeline.phaseAtTime(t_now, m_Quantum);
-    m_Beat = beat - phase + m_Quantum - 1;
-#endif
-#endif
-//    m_Beat = startBeat;
-    m_Beat = startBeat - 4.0/m_CurrentStepValue;
-    m_Running = true;
-    m_Stopping = false;
-    Step();
+    if ( m_CanRun )
+    {
+        m_Beat = startBeat - 4.0/m_CurrentStepValue;
+        m_Running = true;
+        m_Stopping = false;
+        Step();
+    }
 }
 
 void ListGroup::Stop()

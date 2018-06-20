@@ -35,6 +35,7 @@
 //};
 
 class ItemMenu;
+class Cluster;
 
 typedef std::list<ItemMenu *> menu_list_t;
 typedef std::list<ItemMenu *>::iterator menu_list_cursor_t;
@@ -137,6 +138,8 @@ class ItemMenu
             m_GotFocus = true;
         }
 
+        ItemMenu * CurrentFocus() { return m_Focus; }
+
         bool HasFocus() { return m_GotFocus; }
 
         static void SetDefaultFocus() { m_DefaultFocus = m_Focus; }
@@ -219,6 +222,8 @@ class ItemMenu
         void SetMenuPos(menu_list_cursor_t pos) { m_PosInMenuList = pos; }
         menu_list_cursor_t MenuPos() { return m_PosInMenuList; }
 //        std::string m_TestString = "Set from ItemMenu class definition.";
+
+        virtual void Update(Cluster * chord) {};
 
     protected:
         static ItemMenu * m_Focus;

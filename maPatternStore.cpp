@@ -736,6 +736,28 @@ string PatternStore::EditPatternToString()
 //    return result;
 //}
 
+void PatternStore::UpdatePattern(Cluster * chord)
+{
+    if ( m_Patterns.empty() )
+        return;
+
+    // Go straight to whatever has input focus, regardless of pattern.
+
+    if ( CurrentFocus() != NULL )
+        CurrentFocus()->Update(chord);
+
+//    switch ( CurrentFocus()->Type() )
+//    {
+//        case BaseUI::dot_step_list:
+//        case BaseUI::dot_cluster:
+//        case BaseUI::dot_note:
+//            CurrentFocus()->Update(chord);
+//            break;
+//        default:
+//            break;
+//    }
+}
+
 void PatternStore::UpdatePattern(StepList & noteList)
 {
     if ( m_Patterns.empty() )

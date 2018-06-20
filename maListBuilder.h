@@ -40,6 +40,7 @@ enum midi_input_modes_t
 //    MIDI_INPUT_OFF = 0,
     MIDI_INPUT_QUICK,
     MIDI_INPUT_STEP,
+    MIDI_INPUT_CHORD,
     MIDI_INPUT_REAL_TIME,
     MIDI_INPUT_FILE
 };
@@ -62,7 +63,7 @@ class ListBuilder
         {
             m_StepList.Clear();
             m_Captured.Clear();
-            m_OpenNotes.clear();
+            m_OpenNoteMap.clear();
             m_RealTimeList.clear();
             m_RealTimeUndoIndex.clear();
         }
@@ -75,6 +76,7 @@ class ListBuilder
 
         void SetMidiInputMode( int val );
         int MidiInputMode();
+        bool ChordMode() { return m_MidiInputMode = MIDI_INPUT_CHORD; }
         bool RealTimeRecord() { return m_MidiInputMode == MIDI_INPUT_REAL_TIME; }
         int MidiInputModeAsColour(std::vector<int> choices) { return choices.at(m_MidiInputMode); }
         bool MidiInputModeChanged();    // Call once and clear flag.
@@ -87,8 +89,8 @@ class ListBuilder
 #ifndef MA_BLUE
         ableton::Link * m_Link = NULL;
 #endif // MA_BLUE
-        int m_MidiInputMode = MIDI_INPUT_STEP;
-        int m_openNotes = 0;
+        int m_MidiInputMode = MIDI_INPUT_CHORD;
+        int m_OpenNotes = 0;
 //        Note m_Activity;   // Something to show what's coming in.
         Cluster m_Captured;
         StepList m_StepList;
@@ -96,7 +98,7 @@ class ListBuilder
         double m_LinkQuantum;
         double m_BeatAtLastPhaseZero;
 
-        std::map<unsigned char, Note> m_OpenNotes;
+        std::map<unsigned char, Note> m_OpenNoteMap;
         std::map<double, Note> m_RealTimeList;
         std::vector<std::map<double, Note>::iterator> m_RealTimeUndoIndex;
 

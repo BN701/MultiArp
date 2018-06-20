@@ -488,6 +488,16 @@ bool Note::IncrementAndCheckTarget()
     return m_Moved >= m_Target;
 }
 
+void Note::Update(Cluster * chord)
+{
+    if ( chord != NULL && !chord->Empty() )
+    {
+        this->Set(chord->m_Notes.front());
+        SetRedraw(true);
+    }
+
+}
+
 
 //
 // Cluster
@@ -673,6 +683,20 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
     return true;
 }
 
+Note & Cluster::Add(Note & note)
+{
+    for ( auto it = m_Notes.begin(); it != m_Notes.end(); ++it )
+    {
+        if ( it->m_NoteNumber == note.m_NoteNumber )
+            return *it;
+        else if ( it->m_NoteNumber > note.m_NoteNumber )
+            return *m_Notes.insert(it, note);
+    }
+
+    return *m_Notes.insert(m_Notes.end(), note);
+}
+
+
 void Cluster::InsertLeft()
 {
     if ( m_Notes.empty() )
@@ -725,3 +749,13 @@ void Cluster::DeleteNote()
     }
 }
 
+void Cluster::Update(Cluster * chord)
+{
+    if ( chord != NULL )
+    {
+        Clear();
+        *this += *chord;
+        SetRedraw(true);
+    }
+
+}

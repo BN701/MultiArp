@@ -101,6 +101,7 @@ enum command_t
     C_MIDI,
     C_MIDI_REAL_TIME,
     C_MIDI_STEP,
+    C_MIDI_CHORD,
     C_MIDI_QUICK,
 //    C_MIDI_OFF,
 

@@ -518,7 +518,7 @@ void AnsiUI::ShowNoteTransforms(vector<InOutPair> & pairs)
 //    wrefresh(panel);
 }
 
-const char * g_midiModeNames[] = {"Q ", "S ", "RT"};
+const char * g_midiModeNames[] = {"Q ", "S ", "Ch", "RT"};
 
 void AnsiUI::SetTopLine(int midiChannel, double stepValue, double tempo, double quantum, int runState, int recState, int midiInputMode)
 {

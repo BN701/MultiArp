@@ -497,13 +497,16 @@ void handle_midi_event(snd_seq_event_t *ev)
             }
             else if ( g_ListBuilder.HandleMidi(ev) )
             {
-               // HandleMidi() only returns true in QUICK entry
-               // mode, where midi input alone is used to manage
-               // notelist updates.
+                // HandleMidi() only returns true in QUICK or CHORD entry
+                // mode, where midi input alone is used to manage
+                // notelist updates.
 
-               g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-               g_ListBuilder.Clear();
-               set_status(STAT_POS_2, "");
+                if ( g_ListBuilder.ChordMode() )
+                    g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList().FirstCluster());
+                else
+                    g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
+                g_ListBuilder.Clear();
+                set_status(STAT_POS_2, "");
 //               update_big_panel();
             }
             else /*if ( ev->type == SND_SEQ_EVENT_NOTEON )*/

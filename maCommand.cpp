@@ -852,6 +852,11 @@ bool do_command(string commandString, int directCommand)
             set_status(STAT_POS_2, "Midi Input set to QUICK mode.");
             set_top_line();
             break;
+        case C_MIDI_CHORD:
+            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_CHORD);
+            set_status(STAT_POS_2, "Midi Input set to CHORD mode.");
+            set_top_line();
+            break;
 //        case C_MIDI_OFF:
 //            g_ListBuilder.SetMidiInputMode(MIDI_INPUT_OFF);
 //            set_status(STAT_POS_2, "Midi Input OFF.");

@@ -90,6 +90,14 @@ struct StepList : public ItemMenu
             return false;
     }
 
+    Cluster * FirstCluster()
+    {
+        if ( m_Clusters.empty() )
+            return NULL;
+        else
+            return & m_Clusters.front();
+    }
+
     // True if mpos is zero after completing a cycle.
     // False if any other position, or immediately after a reset.
 
@@ -125,6 +133,8 @@ struct StepList : public ItemMenu
         m_PosSL = 0;
         m_Complete = false;
     }
+
+    virtual void Update(Cluster * chord);
 
     std::string ToString(bool fullFormat = true);
 //    std::string ToStringForDisplay(int & offset, int & length);

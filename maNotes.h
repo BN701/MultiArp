@@ -82,6 +82,14 @@ struct Note : public ItemMenu
         m_DisplayObjectType = BaseUI::dot_note;
     }
 
+    void Set(Note & n)
+    {
+        m_NoteNumber = n.m_NoteNumber;
+        m_NoteVelocity = n.m_NoteVelocity;
+        m_Length = n.m_Length;
+        m_Phase = n.m_Phase;
+    }
+
     std::string ToString(bool fullFormat = true);
     bool NoteFromString(std::string);
 
@@ -96,7 +104,9 @@ struct Note : public ItemMenu
     void SetLength( double val ) { m_Length = val; }
     double Length() { return m_Length; }
 
+    virtual void Update(Cluster * chord);
     virtual void SetStatus();
+
     protected:
         enum note_edit_menu_focus_t
         {
@@ -124,8 +134,8 @@ struct Cluster : public ItemMenu
         m_DisplayObjectType = BaseUI::dot_cluster;
         m_PopUpMenuID = C_MENU_ID_CLUSTER;
         m_Help = "S-Left/Right: insert note, C-Left/Right: copy note, S-Del: delete";
-        // Todo: Should an empty cluster, which behaves as a rest, contain an actual rest?
-        m_Notes.emplace_back();
+        // Todo: Should an empty cluster, which behaves as a rest, contain an actual rest? No ...
+        // m_Notes.emplace_back();
     }
 
     Cluster & operator+=(const Cluster & rhs)
@@ -139,21 +149,25 @@ struct Cluster : public ItemMenu
 
     Note & Add(int n, int v = -1)
     {
-        m_Notes.push_back(Note(n, v));
-        return m_Notes.back();
+//        m_Notes.push_back(Note(n, v));
+//        return m_Notes.back();
+        Note note(n, v);
+        return Add(note);
     }
 
-    Note & Add(Note & note)
-    {
-        m_Notes.push_back(note);
-        return m_Notes.back();
-    }
+    Note & Add(Note & note);
+//    {
+//        m_Notes.push_back(note);
+//        return m_Notes.back();
+//    }
 
     void InsertLeft();
     void InsertRight();
     void CopyLeft();
     void CopyRight();
     void DeleteNote();
+
+    virtual void Update(Cluster * chord);
 
     void Clear() { m_Notes.clear(); }
     bool Empty() { return m_Notes.empty(); }

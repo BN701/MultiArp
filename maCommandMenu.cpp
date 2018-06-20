@@ -102,6 +102,7 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     // Pattern Store -> Settings -> Capture
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_QUICK, "Quick", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_STEP, "Step", ""}},
+    {C_MENU_ID_MIDI_MODE, {false, C_MIDI_CHORD, "Chord", ""}},
     {C_MENU_ID_MIDI_MODE, {false, C_MIDI_REAL_TIME, "Real Time", ""}},
 
     // Pattern Store -> Chain

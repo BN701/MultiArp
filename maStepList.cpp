@@ -329,27 +329,35 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
 
 void StepList::InsertLeft()
 {
+    vector<Cluster>::iterator it;
+
     if ( m_Clusters.empty() )
     {
-        m_Clusters.emplace_back();
+        it = m_Clusters.emplace(m_Clusters.end());
         m_PosEdit = 0;
     }
     else
-        m_Clusters.emplace(m_Clusters.begin() + m_PosEdit);
+        it = m_Clusters.emplace(m_Clusters.begin() + m_PosEdit);
+
+    it->InsertRight();
 }
 
 void StepList::InsertRight()
 {
+    vector<Cluster>::iterator it;
+
     if ( m_Clusters.empty() )
     {
-        m_Clusters.emplace_back();
+        it = m_Clusters.emplace(m_Clusters.end());
         m_PosEdit = 0;
     }
     else
     {
-        m_Clusters.emplace(m_Clusters.begin() + m_PosEdit + 1);
+        it = m_Clusters.emplace(m_Clusters.begin() + m_PosEdit + 1);
         m_PosEdit += 1;
     }
+
+    it->InsertRight();
 }
 
 void StepList::CopyLeft()
@@ -431,6 +439,26 @@ void StepList::DeleteStep()
         if ( m_PosEdit == m_Clusters.size() )
             m_PosEdit -= 1;
     }
+}
+
+void StepList::Update(Cluster * chord)
+{
+    if ( chord != NULL )
+    {
+        if ( m_Clusters.empty() )
+        {
+            m_Clusters.emplace_back(*chord);
+            m_PosEdit = 0;
+        }
+        else
+        {
+            auto pos = m_PosEdit + 1;
+            m_Clusters.emplace(m_Clusters.begin() + pos, *chord);
+            m_PosEdit = pos;
+        }
+        SetRedraw();
+    }
+
 }
 
 Cluster * StepList::Step()

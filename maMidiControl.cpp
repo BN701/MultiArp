@@ -318,7 +318,9 @@ void control(control_message_t message, int value)
 
 void handle_midi_control_event(unsigned int param, int value)
 {
-    set_status(STAT_POS_2, "Midi: CC=%i, Val=%i", param, value);
+//    set_status(STAT_POS_2, "Midi: CC=%i, Val=%i", param, value);
+
+    // Look up incoming control message and obtain internal midi handling message.
 
     message_map_t & message_map = g_MessageMap_OP1;     // Todo: replace with proper lookup at some point.
 

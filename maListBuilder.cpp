@@ -127,6 +127,9 @@ char ListBuilder::MidiInputModeAsChar()
         case MIDI_INPUT_QUICK:
             return 'Q';
 
+        case MIDI_INPUT_CHORD:
+            return 'C';
+
         default:
             return 'X';
 
@@ -145,7 +148,7 @@ std::string ListBuilder::ToString()
 #else
                 const char * format = " Open: %lu, captured: %lu";
 #endif
-                snprintf(buff, 100, format, m_OpenNotes.size(), m_RealTimeList.size());
+                snprintf(buff, 100, format, m_OpenNoteMap.size(), m_RealTimeList.size());
                 return buff;
             }
             break;
@@ -254,11 +257,11 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                     Note note(ev->data.note.note, ev->data.note.velocity);
                     note.SetPhase(beat);    // Temporarily store beat in the notes Phase member.
 
-                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
-                    if ( it != m_OpenNotes.end() )
-                        m_OpenNotes.at(ev->data.note.note) = note;
+                    map<unsigned char,Note>::iterator it = m_OpenNoteMap.find(ev->data.note.note);
+                    if ( it != m_OpenNoteMap.end() )
+                        m_OpenNoteMap.at(ev->data.note.note) = note;
                     else
-                        m_OpenNotes.insert(make_pair(ev->data.note.note, note));
+                        m_OpenNoteMap.insert(make_pair(ev->data.note.note, note));
 #if LOG_ON
                     snprintf(buff, 100, " opening %3i\n", ev->data.note.note);
                     fLog << buff;
@@ -266,11 +269,11 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                 }
                 else
                 {
-                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
-                    if ( it != m_OpenNotes.end() )
+                    map<unsigned char,Note>::iterator it = m_OpenNoteMap.find(ev->data.note.note);
+                    if ( it != m_OpenNoteMap.end() )
                     {
-                        Note note = m_OpenNotes.at(ev->data.note.note);
-                        m_OpenNotes.erase(it);
+                        Note note = m_OpenNoteMap.at(ev->data.note.note);
+                        m_OpenNoteMap.erase(it);
 
                         double beatStart = note.Phase();
                         note.SetLength(beat - beatStart);
@@ -320,25 +323,25 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
                     Note note(ev->data.note.note, ev->data.note.velocity);
                     note.SetPhase(inBeat);    // Temporarily store beat in the notes Phase member.
 
-                    map<unsigned char,Note>::iterator it = m_OpenNotes.find(ev->data.note.note);
-                    if ( it != m_OpenNotes.end() )
-                        m_OpenNotes.at(ev->data.note.note) = note;
+                    map<unsigned char,Note>::iterator it = m_OpenNoteMap.find(ev->data.note.note);
+                    if ( it != m_OpenNoteMap.end() )
+                        m_OpenNoteMap.at(ev->data.note.note) = note;
                     else
-                        m_OpenNotes.insert(make_pair(ev->data.note.note, note));
+                        m_OpenNoteMap.insert(make_pair(ev->data.note.note, note));
                 }
                 else
                 {
-                    map<unsigned char,Note>::iterator openPair = m_OpenNotes.find(ev->data.note.note);
-                    if ( openPair != m_OpenNotes.end() )
+                    map<unsigned char,Note>::iterator openPair = m_OpenNoteMap.find(ev->data.note.note);
+                    if ( openPair != m_OpenNoteMap.end() )
                     {
                         double beatStart = openPair->second.Phase();
                         openPair->second.SetLength(inBeat - beatStart);
 
                         m_RealTimeList.insert(make_pair(openPair->second.Phase(), openPair->second));
-                        m_OpenNotes.erase(openPair);
+                        m_OpenNoteMap.erase(openPair);
 
-//                        Note note = m_OpenNotes.at(ev->data.note.note);
-//                        m_OpenNotes.erase(it);
+//                        Note note = m_OpenNoteMap.at(ev->data.note.note);
+//                        m_OpenNoteMap.erase(it);
 //
 //                        double beatStart = note.Phase();
 //                        note.SetLength(inBeat - beatStart);
@@ -352,8 +355,9 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
             return false;
 
         case MIDI_INPUT_STEP:
+        case MIDI_INPUT_CHORD:
 
-            // Build the current chord and addto the note list when all keys
+            // Build the current chord and add to the note list when all keys
             // are released. Keep adding chords - which can be single notes,
             // of course - until something else, probably a keypress, uses and
             // clears the notelist.
@@ -361,30 +365,30 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
             {
                 m_Captured.Add(ev->data.note.note, ev->data.note.velocity);
-                m_openNotes += 1;
+                m_OpenNotes += 1;
             }
-            else if ( m_openNotes > 0 )
+            else if ( m_OpenNotes > 0 )
             {
-                m_openNotes -= 1;
+                m_OpenNotes -= 1;
             }
-            if ( m_openNotes == 0 )
+            if ( m_OpenNotes == 0 )
             {
                 m_StepList.Add(m_Captured);
                 m_Captured.Clear();
             }
-            return false;
+            return m_MidiInputMode == MIDI_INPUT_CHORD && m_OpenNotes == 0;
 
         case MIDI_INPUT_QUICK:
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
             {
                 m_StepList.Add(ev->data.note.note, ev->data.note.velocity);
-                m_openNotes += 1;
+                m_OpenNotes += 1;
             }
-            else if ( m_openNotes > 0 )
+            else if ( m_OpenNotes > 0 )
             {
-                m_openNotes -= 1;
+                m_OpenNotes -= 1;
             }
-            return m_openNotes == 0; // Tell calling function we have a complete notelist.
+            return m_OpenNotes == 0; // Tell calling function we have a complete notelist.
 
         default:
 //            m_Activity.m_NoteNumber = ev->data.note.note;

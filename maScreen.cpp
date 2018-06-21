@@ -483,10 +483,13 @@ void show_translation_status()
 
 void show_listbuilder_status()
 {
-    std::string temp = g_ListBuilder.ToString();
-    int len = temp.size();
-    if ( len > 60 )
-        set_status(STAT_POS_2, "%c: ...%s", g_ListBuilder.MidiInputModeAsChar(), temp.c_str() + len - 60 );
-    else
-        set_status(STAT_POS_2, "%c:%s", g_ListBuilder.MidiInputModeAsChar(), temp.c_str());
+    if ( g_State.RecState() )
+    {
+        std::string temp = g_ListBuilder.ToString();
+        int len = temp.size();
+        if ( len > 60 )
+            set_status(STAT_POS_2, "%c: ...%s", g_ListBuilder.MidiInputModeAsChar(), temp.c_str() + len - 60 );
+        else
+            set_status(STAT_POS_2, "%c:%s", g_ListBuilder.MidiInputModeAsChar(), temp.c_str());
+    }
 }

@@ -192,9 +192,9 @@ struct PatternStore : public ItemMenu
 
     std::string ToString();
     bool FromString(std::string s, int & created, int & updates);
-    void UpdatePattern(Cluster * notes);
-    void UpdatePattern(StepList & noteList);
-    void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
+//    void UpdatePattern(Cluster * notes);
+//    void UpdatePattern(StepList & noteList);
+//    void UpdatePattern(std::map<double,Note> & realTimeList, double quantum);
 #ifndef MA_BLUE
     void UpdatePatternFromMidiFile(std::string s);
 #endif

@@ -134,7 +134,8 @@ struct StepList : public ItemMenu
         m_Complete = false;
     }
 
-    virtual void Update(Cluster * chord);
+    virtual void Update(Cluster & chord);
+    virtual void Update(StepList & stepList);
 
     std::string ToString(bool fullFormat = true);
 //    std::string ToStringForDisplay(int & offset, int & length);

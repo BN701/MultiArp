@@ -21,6 +21,7 @@
 
 #include "maBaseUI.h"
 #include "maListBuilder.h"
+#include "maScreen.h"
 
 #if defined(MA_BLUE)
 #include <cstdio>
@@ -171,28 +172,49 @@ std::string ListBuilder::ToString()
 }
 
 
+void ListBuilder::SetPhaseIsZero(double beat, double quantum)
+{
+    m_BeatAtLastPhaseZero = beat;
+    m_LinkQuantum = quantum;
+}
+
+
 bool ListBuilder::HandleKeybInput(int key)
 {
+    if ( !g_State.RecState() )
+        return false;
+
     switch (key)
     {
-        case BaseUI::key_return:
+        case BaseUI::key_cmd_midi_commit:
             switch ( m_MidiInputMode )
             {
             case MIDI_INPUT_REAL_TIME:
-                return !m_RealTimeList.empty();
-
+                if ( !m_RealTimeList.empty() )
+                {
+                    ItemMenu::UpdateFocusItem(m_RealTimeList, g_State.Quantum());
+                    Clear();
+                    return true;
+                }
+                break;
             case MIDI_INPUT_STEP:
-                return !m_StepList.Empty();
-
+                if ( !m_StepList.Empty() )
+                {
+                    ItemMenu::UpdateFocusItem(m_StepList);
+                    Clear();
+                    return true;
+                }
+                break;
             default:
-                return false;
+                break;
             }
+            return false;
 
-        case BaseUI::key_space:
+        case BaseUI::key_cmd_midi_rest:
             m_StepList.Add();
             return true;
 
-        case BaseUI::key_backspace:
+        case BaseUI::key_cmd_midi_clear_last:
             switch ( m_MidiInputMode )
             {
             case MIDI_INPUT_REAL_TIME:
@@ -215,16 +237,19 @@ bool ListBuilder::HandleKeybInput(int key)
     }
 }
 
-void ListBuilder::SetPhaseIsZero(double beat, double quantum)
-{
-    m_BeatAtLastPhaseZero = beat;
-    m_LinkQuantum = quantum;
-}
-
 bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
 {
+    if ( ! (m_TemporaryRecordOverride || g_State.RecState()) )
+    {
+        Note n;   // Something to show what's coming in.
+        n.m_NoteNumber = ev->data.note.note;
+        set_status(STAT_POS_2, "Midi: %s", n.ToString(false).c_str());
+        return false;
+    }
 
-    switch ( m_MidiInputMode )
+    int inputMode = m_TemporaryRecordOverride ? MIDI_INPUT_CHORD : m_MidiInputMode;
+
+    switch ( inputMode )
     {
         case MIDI_INPUT_REAL_TIME:
             {
@@ -355,28 +380,34 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
             return false;
 
         case MIDI_INPUT_STEP:
+            if ( ev->type == SND_SEQ_EVENT_NOTEON )
+            {
+                m_Captured.Add(ev->data.note.note, ev->data.note.velocity);
+                m_OpenNotes += 1;
+            }
+            else if ( --m_OpenNotes <= 0 )  // I guess we might receive a stray note-off before any note-ons.
+            {
+                m_StepList.Add(m_Captured);
+                m_Captured.Clear();
+            }
+            break;
+
         case MIDI_INPUT_CHORD:
 
-            // Build the current chord and add to the note list when all keys
-            // are released. Keep adding chords - which can be single notes,
-            // of course - until something else, probably a keypress, uses and
-            // clears the notelist.
+            // Build the current chord until all notes released.
 
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
             {
                 m_Captured.Add(ev->data.note.note, ev->data.note.velocity);
                 m_OpenNotes += 1;
             }
-            else if ( m_OpenNotes > 0 )
+            else if ( --m_OpenNotes <= 0 )
             {
-                m_OpenNotes -= 1;
+                ItemMenu::UpdateFocusItem(m_Captured);
+                Clear();
+                return true;
             }
-            if ( m_OpenNotes == 0 )
-            {
-                m_StepList.Add(m_Captured);
-                m_Captured.Clear();
-            }
-            return m_MidiInputMode == MIDI_INPUT_CHORD && m_OpenNotes == 0;
+            break;
 
         case MIDI_INPUT_QUICK:
             if ( ev->type == SND_SEQ_EVENT_NOTEON )
@@ -388,13 +419,19 @@ bool ListBuilder::HandleMidi(snd_seq_event_t *ev, double inBeat)
             {
                 m_OpenNotes -= 1;
             }
-            return m_OpenNotes == 0; // Tell calling function we have a complete notelist.
+            if ( m_OpenNotes == 0 )
+            {
+                ItemMenu::UpdateFocusItem(g_ListBuilder.CurrentList());
+                Clear();
+                return true;
+            }
+            break;
 
         default:
-//            m_Activity.m_NoteNumber = ev->data.note.note;
-            return false;
+            break;
     }
 
+    return false;
 }
 
 

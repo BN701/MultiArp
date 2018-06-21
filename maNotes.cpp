@@ -17,6 +17,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include "maListBuilder.h"
 #include "maNotes.h"
 
 #include <algorithm>
@@ -488,14 +489,13 @@ bool Note::IncrementAndCheckTarget()
     return m_Moved >= m_Target;
 }
 
-void Note::Update(Cluster * chord)
+void Note::Update(Cluster & chord)
 {
-    if ( chord != NULL && !chord->Empty() )
+    if ( !chord.Empty() )
     {
-        this->Set(chord->m_Notes.front());
+        this->Set(chord.m_Notes.front());
         SetRedraw(true);
     }
-
 }
 
 
@@ -613,6 +613,7 @@ bool Cluster::HandleKey(BaseUI::key_command_t k)
             m_MenuListPtr->m_Container->SetRedraw();
             m_MenuListPtr->DownCursorPos();
             m_MenuListPtr->Remove(m_PosInMenuList);
+            g_ListBuilder.SetTemporaryRecordOverride(false);
         }
         break;
 
@@ -749,13 +750,9 @@ void Cluster::DeleteNote()
     }
 }
 
-void Cluster::Update(Cluster * chord)
+void Cluster::Update(Cluster & chord)
 {
-    if ( chord != NULL )
-    {
-        Clear();
-        *this += *chord;
-        SetRedraw(true);
-    }
-
+    Clear();
+    *this += chord;
+    SetRedraw(true);
 }

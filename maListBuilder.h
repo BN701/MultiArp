@@ -84,8 +84,9 @@ class ListBuilder
         void SetPhaseIsZero(double beat, double quantum);
 
         Cluster * Step(double phase, double stepValue);
+        void SetTemporaryRecordOverride( bool val ) { m_TemporaryRecordOverride = val; }
 
-    protected:
+    private:
 #ifndef MA_BLUE
         ableton::Link * m_Link = NULL;
 #endif // MA_BLUE
@@ -98,11 +99,12 @@ class ListBuilder
         double m_LinkQuantum;
         double m_BeatAtLastPhaseZero;
 
+        bool m_TemporaryRecordOverride = false;
+
         std::map<unsigned char, Note> m_OpenNoteMap;
         std::map<double, Note> m_RealTimeList;
         std::vector<std::map<double, Note>::iterator> m_RealTimeUndoIndex;
 
-    private:
 };
 
 extern ListBuilder g_ListBuilder;

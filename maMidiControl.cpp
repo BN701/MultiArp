@@ -46,14 +46,15 @@ enum control_message_t
     CM_MIDI_DOWN,
     CM_MIDI_REST,
     CM_MIDI_DELETE,
-    CM_MIDI_CONFIRM,
+    CM_MIDI_COMMIT,
+    CM_MIDI_CLEAR_LAST,
     CM_MIDI_REC,
     CM_MIDI_RUN,
     CM_MIDI_STOP,
     CM_MIDI_MOD_INSERT,
     CM_MIDI_MOD_COPY,
     CM_MIDI_MOD_MOVE,
-    CM_MIDI_MOD_ROTATE,
+    CM_MIDI_MOD_SHIFT,
     CM_MIDI_ROTATE_LEFT,
     CM_MIDI_ROTATE_RIGHT,
     CM_MIDI_CHOICE_1,
@@ -86,17 +87,17 @@ message_map_t g_MessageMap_OP1 =
     {12, CM_MIDI_RIGHT},        // Track 2
     {13, CM_MIDI_UP},           // Track 3
     {14, CM_MIDI_DOWN},         // Track 4
-    {15, CM_MIDI_NOP},          // Lift
+    {15, CM_MIDI_MOD_SHIFT},    // Lift
     {16, CM_MIDI_NOP},          // Drop
     {17, CM_MIDI_NOP},          // Scissors
     {26, CM_MIDI_NOP},          // Seq
     {38, CM_MIDI_REC},          // Rec
     {39, CM_MIDI_RUN},          // Play
     {40, CM_MIDI_STOP},         // Stop
-    {41, CM_MIDI_ROTATE_LEFT},  // '<'
-    {42, CM_MIDI_ROTATE_RIGHT}, // '>'
-    {48, CM_MIDI_CONFIRM},      // Mic
-    {49, CM_MIDI_DELETE},       // Disc/Com
+    {41, CM_MIDI_NOP},          // '<'
+    {42, CM_MIDI_NOP},          // '>'
+    {48, CM_MIDI_COMMIT},       // Mic
+    {49, CM_MIDI_REST},         // Disc/Com
     {50, CM_MIDI_CHOICE_1},     // '1'
     {51, CM_MIDI_CHOICE_2},     // '2'
     {52, CM_MIDI_CHOICE_3},     // '3'
@@ -111,29 +112,27 @@ message_map_t g_MessageMap_OP1 =
     {67, CM_MIDI_NOP},          // Encoder press, orange
 };
 
-unordered_map<unsigned int, BaseUI::key_command_t> g_SimpleCommandMap =
-{
-    {CM_MIDI_BACK, BaseUI::key_cmd_back},
-    {CM_MIDI_ENTER, BaseUI::key_cmd_enter},
-    {CM_MIDI_ROTATE_LEFT, BaseUI::key_cmd_shift_left},
-    {CM_MIDI_ROTATE_RIGHT, BaseUI::key_cmd_shift_right},
-    {CM_MIDI_CHOICE_1, BaseUI::key_choice_1},
-    {CM_MIDI_CHOICE_2, BaseUI::key_choice_2},
-    {CM_MIDI_CHOICE_3, BaseUI::key_choice_3},
-    {CM_MIDI_CHOICE_4, BaseUI::key_choice_4},
-    {CM_MIDI_CHOICE_5, BaseUI::key_choice_5},
-    {CM_MIDI_CHOICE_6, BaseUI::key_choice_6},
-    {CM_MIDI_CHOICE_7, BaseUI::key_choice_7},
-    {CM_MIDI_CHOICE_8, BaseUI::key_choice_8},
-    {CM_MIDI_CHOICE_9, BaseUI::key_choice_9}
-};
+//unordered_map<unsigned int, BaseUI::key_command_t> g_SimpleCommandMap =
+//{
+//    {CM_MIDI_BACK, BaseUI::key_cmd_back},
+//    {CM_MIDI_ENTER, BaseUI::key_cmd_enter},
+//    {CM_MIDI_CHOICE_1, BaseUI::key_choice_1},
+//    {CM_MIDI_CHOICE_2, BaseUI::key_choice_2},
+//    {CM_MIDI_CHOICE_3, BaseUI::key_choice_3},
+//    {CM_MIDI_CHOICE_4, BaseUI::key_choice_4},
+//    {CM_MIDI_CHOICE_5, BaseUI::key_choice_5},
+//    {CM_MIDI_CHOICE_6, BaseUI::key_choice_6},
+//    {CM_MIDI_CHOICE_7, BaseUI::key_choice_7},
+//    {CM_MIDI_CHOICE_8, BaseUI::key_choice_8},
+//    {CM_MIDI_CHOICE_9, BaseUI::key_choice_9}
+//};
 
 void control(control_message_t message, int value)
 {
     static bool modInsert = false;
     static bool modCopy = false;
     static bool modMove = false;
-    static bool modRotate = false;
+    static bool modShift = false;
 
     // Do we have a modifier key?
 
@@ -150,8 +149,8 @@ void control(control_message_t message, int value)
         case CM_MIDI_MOD_MOVE:
             modMove = value != 0;
             break;
-        case CM_MIDI_MOD_ROTATE:
-            modRotate = value != 0;
+        case CM_MIDI_MOD_SHIFT:
+            modShift = value != 0;
             break;
         default:
             newModState = false;
@@ -173,6 +172,7 @@ void control(control_message_t message, int value)
             else
                 key = BaseUI::key_cmd_dec;
             break;
+
         case CM_MIDI_ENC_2:
             if ( value == 1 )   // Todo: This value may be OP1 specific.
                 key = BaseUI::key_cmd_inc_2;
@@ -186,6 +186,7 @@ void control(control_message_t message, int value)
             else
                 message = CM_MIDI_LEFT;
             break;
+
         case CM_MIDI_ENC_4:
             if ( value == 1 )   // Todo: This value may be OP1 specific.
                 message = CM_MIDI_UP;
@@ -210,14 +211,36 @@ void control(control_message_t message, int value)
 
     // Check for further key mappings or handle message directly.
 
-    if ( g_SimpleCommandMap.count(message) == 1 )
-    {
-        key = g_SimpleCommandMap[message];
-    }
-    else
+//    if ( g_SimpleCommandMap.count(message) == 1 )
+//    {
+//        key = g_SimpleCommandMap[message];
+//    }
+//    else
     {
         switch (message)
         {
+            case CM_MIDI_ENTER:
+                if ( /* g_State.RecState() && */ g_ListBuilder.HandleKeybInput(BaseUI::key_cmd_midi_commit) )
+                {
+//                    if ( g_ListBuilder.RealTimeRecord() )
+////                        g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+//                        ItemMenu::UpdateFocusItem(g_ListBuilder.RealTimeList(), g_State.Quantum());
+//                    else
+//                        ItemMenu::UpdateFocusItem(g_ListBuilder.CurrentList());
+//                    g_ListBuilder.Clear();
+                    set_status(STAT_POS_2, "");
+                }
+                else
+                    key = BaseUI::key_cmd_enter;
+                break;
+
+            case CM_MIDI_BACK:
+                if ( /* g_State.RecState() && */ g_ListBuilder.HandleKeybInput(BaseUI::key_cmd_midi_clear_last) )
+                    show_listbuilder_status();
+                else
+                    key = BaseUI::key_cmd_back;
+                break;
+
             case CM_MIDI_MENU:
                 do_command("", C_MENU);
                 break;
@@ -235,27 +258,42 @@ void control(control_message_t message, int value)
                 break;
 
             case CM_MIDI_REST:
-                if ( g_State.RecState() && g_ListBuilder.HandleKeybInput(BaseUI::key_space) )
+                if ( /* g_State.RecState() && */ g_ListBuilder.HandleKeybInput(BaseUI::key_cmd_midi_rest) )
                     show_listbuilder_status();
                 break;
 
-            case CM_MIDI_DELETE:
-                if ( g_State.RecState() && g_ListBuilder.HandleKeybInput(BaseUI::key_backspace) )
-                    show_listbuilder_status();
-                else
+            case CM_MIDI_CLEAR_LAST:
+                break;
+
+            case CM_MIDI_COMMIT:
+                break;
+
+            case CM_MIDI_CHOICE_1:
+                key = BaseUI::key_choice_1;
+                break;
+            case CM_MIDI_CHOICE_2:
+                key = BaseUI::key_choice_2;
+                break;
+            case CM_MIDI_CHOICE_3:
+                key = BaseUI::key_choice_3;
+                break;
+            case CM_MIDI_CHOICE_4:
+                key = BaseUI::key_choice_4;
+                break;
+            case CM_MIDI_CHOICE_5:
+                key = BaseUI::key_choice_5;
+                break;
+            case CM_MIDI_CHOICE_6:
+                key = BaseUI::key_choice_6;
+                break;
+            case CM_MIDI_CHOICE_7:
+                key = BaseUI::key_choice_7;
+                break;
+            case CM_MIDI_CHOICE_8:
+                if ( modShift )
                     key = BaseUI::key_cmd_delete;
-                break;
-
-            case CM_MIDI_CONFIRM:
-                if ( g_State.RecState() && g_ListBuilder.HandleKeybInput(BaseUI::key_return) )
-                {
-                    if ( g_ListBuilder.RealTimeRecord() )
-                        g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
-                    else
-                        g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-                    g_ListBuilder.Clear();
-                    set_status(STAT_POS_2, "");
-                }
+                else
+                    key = BaseUI::key_choice_8;
                 break;
 
             case CM_MIDI_LEFT:
@@ -265,7 +303,7 @@ void control(control_message_t message, int value)
                     key = BaseUI::key_cmd_copy_left;
                 else if ( modMove)
                     key = BaseUI::key_cmd_move_left;
-                else if ( modRotate )
+                else if ( modShift )
                     key = BaseUI::key_cmd_shift_left;
                 else
                     key = BaseUI::key_cmd_left;
@@ -277,7 +315,7 @@ void control(control_message_t message, int value)
                     key = BaseUI::key_cmd_copy_right;
                 else if ( modMove)
                     key = BaseUI::key_cmd_move_right;
-                else if ( modRotate )
+                else if ( modShift )
                     key = BaseUI::key_cmd_shift_right;
                 else
                     key = BaseUI::key_cmd_right;
@@ -295,14 +333,6 @@ void control(control_message_t message, int value)
                     key = BaseUI::key_cmd_down;
                 break;
 
-    //        case CM_MIDI_BACK:
-    //            key = BaseUI::key_cmd_back;
-    //            break;
-    //
-    //        case CM_MIDI_ENTER:
-    //            key = BaseUI::key_cmd_enter;
-    //            break;
-    //
             default:
                 break;
         }

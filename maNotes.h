@@ -104,7 +104,7 @@ struct Note : public ItemMenu
     void SetLength( double val ) { m_Length = val; }
     double Length() { return m_Length; }
 
-    virtual void Update(Cluster * chord);
+    virtual void Update(Cluster & chord);
     virtual void SetStatus();
 
     protected:
@@ -167,7 +167,7 @@ struct Cluster : public ItemMenu
     void CopyRight();
     void DeleteNote();
 
-    virtual void Update(Cluster * chord);
+    virtual void Update(Cluster & chord);
 
     void Clear() { m_Notes.clear(); }
     bool Empty() { return m_Notes.empty(); }

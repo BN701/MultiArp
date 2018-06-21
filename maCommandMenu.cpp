@@ -67,7 +67,7 @@ map<int, const char *> CommandMenu::m_MenuTitles =
     {C_MENU_ID_SETTINGS, "Settings"},
     {C_MENU_ID_SEQUENCE, "Sequence"},
     {C_MENU_ID_LOOP, "Loop"},
-    {C_MENU_ID_MIDI_MODE, "Capture"},
+    {C_MENU_ID_MIDI_MODE, "Rec Mode"},
     {C_MENU_ID_TRIGS, "Trigs"},
     {C_MENU_ID_STEPLIST, "Step List"},
     {C_MENU_ID_STEPLIST_INSERT, "Insert"},
@@ -91,7 +91,7 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_PATTERN_STORE, {true, C_MENU_ID_SETTINGS, "Settings", ""}},
 
     // Pattern Store -> Settings
-    {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Capture", ""}},
+    {C_MENU_ID_SETTINGS, {true, C_MENU_ID_MIDI_MODE, "Rec Mode", ""}},
 
     // Pattern Store -> Pattern
     {C_MENU_ID_PATTERN, {false, C_NEW_STEP_GROUP, "New Sequence Layer", ""}},
@@ -142,6 +142,7 @@ multimap<int, CommandMenuItem> CommandMenu::m_MenuItems =
     {C_MENU_ID_STEPLIST_MORE, {true, C_MENU_ID_STEPLIST_INSERT, "Insert Step", ""}},
     {C_MENU_ID_STEPLIST_MORE, {false, C_STEP_COPY_RIGHT, "Copy Step", ""}},
     {C_MENU_ID_STEPLIST_MORE, {false, C_STEP_DELETE, "Delete Step", ""}},
+    {C_MENU_ID_STEPLIST_MORE, {true, C_MENU_ID_MIDI_MODE, "Rec Mode", ""}},
 
     // Step Detail (Cluster)
     {C_MENU_ID_CLUSTER, {false, C_CLUSTER_INSERT_LEFT, "Insert Left", ""}},

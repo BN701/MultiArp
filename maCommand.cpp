@@ -1558,13 +1558,14 @@ bool handle_key_input(BaseUI::key_command_t key)
             commandString.clear();
             keyUsed = true;
         }
-        else if ( g_ListBuilder.HandleKeybInput(key) )
+        else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_cmd_midi_commit) )
         {
-            if ( g_ListBuilder.RealTimeRecord() )
-                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
-            else
-                g_PatternStore.UpdatePattern(g_ListBuilder.CurrentList());
-            g_ListBuilder.Clear();
+//            if ( g_ListBuilder.RealTimeRecord() )
+////                g_PatternStore.UpdatePattern(g_ListBuilder.RealTimeList(), g_State.Quantum());
+//                ItemMenu::UpdateFocusItem(g_ListBuilder.RealTimeList(), g_State.Quantum());
+//            else
+//                ItemMenu::UpdateFocusItem(g_ListBuilder.CurrentList());
+//            g_ListBuilder.Clear();
             set_status(STAT_POS_2, "");
             keyUsed = true;
         }
@@ -1583,7 +1584,7 @@ bool handle_key_input(BaseUI::key_command_t key)
             commandString.pop_back();
             keyUsed = true;
         }
-        else if ( g_ListBuilder.HandleKeybInput(key) )
+        else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_cmd_midi_clear_last) )
         {
             show_listbuilder_status();
             keyUsed = true;
@@ -1605,7 +1606,7 @@ bool handle_key_input(BaseUI::key_command_t key)
             set_status(COMMAND_HOME, commandString.c_str());
             keyUsed = true;
         }
-        else if ( g_ListBuilder.HandleKeybInput(key) )
+        else if ( g_ListBuilder.HandleKeybInput(BaseUI::key_cmd_midi_rest) )
         {
             show_listbuilder_status();
             keyUsed = true;

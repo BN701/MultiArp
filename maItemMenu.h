@@ -36,6 +36,8 @@
 
 class ItemMenu;
 class Cluster;
+class Note;
+class StepList;
 
 typedef std::list<ItemMenu *> menu_list_t;
 typedef std::list<ItemMenu *>::iterator menu_list_cursor_t;
@@ -95,13 +97,6 @@ class ItemMenu
 
         virtual ItemMenu & ExplicitCopy(const ItemMenu & m);
 
-//        enum follow_up_action_t
-//        {
-//            none,
-//            update_pattern_browser,
-//            num_follow_up_actions
-//        };
-
         int ItemID() { return m_ItemID; }
         void SetItemID( int val ) { m_ItemID = val; }
 
@@ -116,6 +111,24 @@ class ItemMenu
             else if ( m_DefaultFocus != NULL )
                 m_DefaultFocus->SetFocus();
 
+        }
+
+        static void UpdateFocusItem(Cluster & chord)
+        {
+            if ( m_Focus != NULL )
+                m_Focus->Update(chord);
+        }
+
+        static void UpdateFocusItem(StepList & stepList)
+        {
+            if ( m_Focus != NULL )
+                m_Focus->Update(stepList);
+        }
+
+        static void UpdateFocusItem(std::map<double,Note> & realTimeList, double quantum)
+        {
+            if ( m_Focus != NULL )
+                m_Focus->Update(realTimeList, quantum);
         }
 
         // These two should be overriden, but don't make them pure as we
@@ -223,9 +236,12 @@ class ItemMenu
         menu_list_cursor_t MenuPos() { return m_PosInMenuList; }
 //        std::string m_TestString = "Set from ItemMenu class definition.";
 
-        virtual void Update(Cluster * chord) {};
 
     protected:
+        virtual void Update(Cluster & chord) {};
+        virtual void Update(StepList & stepList) {};
+        virtual void Update(std::map<double,Note> & realTimeList, double quantum) {};
+
         static ItemMenu * m_Focus;
         static ItemMenu * m_DefaultFocus;   // Use this for return focus if nothing else has been set.
         static std::list<ItemMenu*> m_RedrawList;

@@ -19,6 +19,7 @@
 
 #include "maNotes.h"
 
+#include "maListBuilder.h"
 #include "maListGroup.h"
 #include "maRealTimeList.h"
 #include "maStepList.h"
@@ -226,6 +227,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
             c.SetVisible(m_Visible);
             m_MenuListPtr->InsertAfter(m_PosInMenuList, & c, true);  // This selects it, too.
             c.SetReturnFocus(this);  // Override return focus.
+            g_ListBuilder.SetTemporaryRecordOverride(true);
         }
         break;
 
@@ -441,24 +443,26 @@ void StepList::DeleteStep()
     }
 }
 
-void StepList::Update(Cluster * chord)
+void StepList::Update(Cluster & chord)
 {
-    if ( chord != NULL )
+    if ( m_Clusters.empty() )
     {
-        if ( m_Clusters.empty() )
-        {
-            m_Clusters.emplace_back(*chord);
-            m_PosEdit = 0;
-        }
-        else
-        {
-            auto pos = m_PosEdit + 1;
-            m_Clusters.emplace(m_Clusters.begin() + pos, *chord);
-            m_PosEdit = pos;
-        }
-        SetRedraw();
+        m_Clusters.emplace_back(chord);
+        m_PosEdit = 0;
     }
+    else
+    {
+        auto pos = m_PosEdit + 1;
+        m_Clusters.emplace(m_Clusters.begin() + pos, chord);
+        m_PosEdit = pos;
+    }
+    SetRedraw();
+}
 
+void StepList::Update(StepList & stepList)
+{
+    m_Clusters = stepList.m_Clusters;
+    SetRedraw();
 }
 
 Cluster * StepList::Step()

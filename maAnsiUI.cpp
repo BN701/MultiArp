@@ -726,9 +726,11 @@ BaseUI::key_command_t AnsiUI::KeyInput()
     return key;
 }
 
-// These rectangles are initialized as {x, y, w, h }
+// These rectangles are initialized as {col, row, w, h }
 dot_position_table_t g_AnsiUI_DOT_Positions =
 {
+    { BaseUI::dot_top_line_status, {0, 0, 80, 1} },
+    { BaseUI::dot_progress_bar, {4, 3, 60, 1} },
     { BaseUI::dot_pattern_store, {4, 1, 60, 1} },
     { BaseUI::dot_pattern, {0, 12, 60, 10} },
     { BaseUI::dot_pattern_store_menu_list, {0, 4, 70, 8} },

@@ -26,10 +26,10 @@
 #include <queue>
 
 #include "maItemMenu.h"
-//#include "maPattern.h"
 #include "maRealTimeList.h"
 #include "maStepList.h"
 #include "maTrigList.h"
+#include "maUtility.h"
 
 class Pattern;
 
@@ -53,7 +53,7 @@ class ListGroup : public ItemMenu
         void ResetPosition();
         void SetStatus();
         bool HandleKey(BaseUI::key_command_t k);
-        void SetParent(Pattern * p) { m_Parent = p; }
+        void SetParent(Pattern * p) { m_ParentPattern = p; }
 
         static bool Step(int ListGroupID);
 
@@ -73,7 +73,7 @@ class ListGroup : public ItemMenu
 
     protected:
 
-        Pattern * m_Parent = NULL;
+        Pattern * m_ParentPattern = NULL;
 
         enum listgroup_params_menu_focus_t
         {

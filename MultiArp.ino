@@ -5,8 +5,6 @@
 #include <string>
 #include <unordered_map>
 
-#include <avr/wdt.h>
-
 #include "maAnsiUI.h"
 #include "maCommand.h"
 #include "maListBuilder.h"
@@ -19,7 +17,7 @@
 using namespace std;
 
 // These (one of many variants that I tried) get us round
-// "undefined reference to _write
+// "undefined reference to _write"
 extern "C"{
     int _write();
 }
@@ -30,42 +28,57 @@ extern "C"{
 
 // Watchdog things
 
-void startup_early_hook()
-{
-    WDOG_TOVALL = (1000); // The next 2 lines sets the time-out value. This is the value that the watchdog timer compare itself to.
+void printResetType() {
+  if (RCM_SRS1 & RCM_SRS1_SACKERR)   Serial.println("[RCM_SRS1] - Stop Mode Acknowledge Error Reset");
+  if (RCM_SRS1 & RCM_SRS1_MDM_AP)    Serial.println("[RCM_SRS1] - MDM-AP Reset");
+  if (RCM_SRS1 & RCM_SRS1_SW)        Serial.println("[RCM_SRS1] - Software Reset");
+  if (RCM_SRS1 & RCM_SRS1_LOCKUP)    Serial.println("[RCM_SRS1] - Core Lockup Event Reset");
+  if (RCM_SRS0 & RCM_SRS0_POR)       Serial.println("[RCM_SRS0] - Power-on Reset");
+  if (RCM_SRS0 & RCM_SRS0_PIN)       Serial.println("[RCM_SRS0] - External Pin Reset");
+  if (RCM_SRS0 & RCM_SRS0_WDOG)      Serial.println("[RCM_SRS0] - Watchdog(COP) Reset");
+  if (RCM_SRS0 & RCM_SRS0_LOC)       Serial.println("[RCM_SRS0] - Loss of External Clock Reset");
+  if (RCM_SRS0 & RCM_SRS0_LOL)       Serial.println("[RCM_SRS0] - Loss of Lock in PLL Reset");
+  if (RCM_SRS0 & RCM_SRS0_LVD)       Serial.println("[RCM_SRS0] - Low-voltage Detect Reset");
+}
+
+
+#ifdef __cplusplus
+extern "C" {
+void startup_early_hook();
+}
+extern "C" {
+#endif
+  void startup_early_hook() {
+#if 1
+    // clock source 0 LPO 1khz, 4 s timeout
+    WDOG_TOVALL = 5000; // The next 2 lines sets the time-out value. This is the value that the watchdog timer compare itself to.
     WDOG_TOVALH = 0;
     WDOG_STCTRLH = (WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_WDOGEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN); // Enable WDG
-    //WDOG_PRESC = 0; // prescaler
+#else
+    // bus clock  4s timeout
+    uint32_t ticks = 4000 * (F_BUS / 1000); // ms
+    WDOG_TOVALL = ticks & 0xffff; // The next 2 lines sets the time-out value. This is the value that the watchdog timer compare itself to.
+    WDOG_TOVALH = (ticks >> 16) & 0xffff;
+    WDOG_STCTRLH = (WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_CLKSRC | WDOG_STCTRLH_WDOGEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN);
+#endif
+    WDOG_PRESC = 0; // prescaler
+  }
+#ifdef __cplusplus
 }
+#endif
+
 
 volatile int deliberateStall = 0;
 volatile uint8_t dogCount = 0;
-IntervalTimer wdTimer;
 
+DMAMEM int g_debug_step = -1;
+DMAMEM int reboot_count = 0;
 
 void DogHandler()
 {
-    // Can we just grab the programcounter first, every time,
+    // Can we just grab the program counter first, every time,
     // but only do something with it if we think there's a problem.
 
-#if 0
-  // Setup a pointer to the program counter. It goes in a register so we
-  // don't mess up the stack.
-  uint8_t upStack = (uint8_t*)SP;
-
-  // The stack pointer on the AVR micro points to the next available location
-  // so we want to go back one location to get the first byte of the address
-  // pushed onto the stack when the interrupt was triggered. There will be
-  // PROGRAM_COUNTER_SIZE bytes there.
-  ++upStack;
-//void CApplicationMonitor::WatchdogInterruptHandler(uint8_t *puProgramAddress)
-//  CApplicationMonitorHeader Header;
-//
-//  LoadHeader(Header);
-//  memcpy(m_CrashReport.m_auAddress, puProgramAddress, PROGRAM_COUNTER_SIZE);
-//  SaveCurrentReport(Header.m_uNextReport);
-
-#endif
 
 //  Serial.print("Kicking the dog! ");
 //  Serial.println(dogCount++);
@@ -74,7 +87,9 @@ void DogHandler()
         static bool firstTime = true;
         if ( firstTime )
         {
-            Serial.print("\033[12;20H !!! Main loop stopped ... !!! ");
+            char message[50];
+            snprintf(message, 50, "\033[12;20H !!! Main loop stopped, step: %i ... !!!", g_debug_step);
+            Serial.print(message);
             // Adding (reverse) attribute here seems to affect other writes.
 //            Serial.print("\033[12;25H\033[5m Main loop stopped ... !!! ");
             // First time doesn't work. We seem to need second or third
@@ -125,6 +140,8 @@ uint64_t UpdateSysTimeMicros()
     return g_SysTimeMicros = (static_cast<uint64_t>(time_wraps) << 32) + current_u;
 }
 
+string last_debug_step_before_reboot;
+
 void setup()
 {
     pinMode(LED_BUILTIN, OUTPUT);
@@ -135,18 +152,20 @@ void setup()
     g_PatternStore.SetFocus();
     ItemMenu::SetDefaultFocus();
 
-    Serial.begin(115200);
-    delay(1000); // Do this else the following print() is missed.
+//    Serial.begin(115200);
+//    delay(1000); // Do this else the following print() is missed.
     // You have about 6 secs to open the serial monitor before a watchdog reset
     while(!Serial);
     delay(100);
-//    printResetType();
-    wdTimer.begin(DogHandler, 500000); // kick the dog every 500msec
-
-    g_TextUI.FWriteXY(0, 0, "Hello, world ...");
-    delay(1000);
+//    wdTimer.begin(DogHandler, 500000); // kick the dog every 500msec
 
     g_TextUI.ResetScreen();
+    g_TextUI.FWriteXY(0, 0, "Hello, world (%i) ...\n\n", g_debug_step);
+    printResetType();
+    delay(2000);
+
+    g_TextUI.ResetScreen();
+    g_TextUI.FWriteXY(4, 1, "Last debug step before reboot: %i", g_debug_step);
     set_top_line();
     queue_next_step(NULL);
 
@@ -154,9 +173,18 @@ void setup()
 
 int loopCount = 0;
 queue<snd_seq_event_t> ticks;
+elapsedMillis dog_time = 0;
 
 void loop()
 {
+    if ( dog_time > 1000 )
+    {
+        DogHandler();
+        dog_time = 0;
+    }
+
+    g_debug_step = 0;
+
     dogCount = 0;
 
     UpdateSysTimeMicros();
@@ -168,14 +196,22 @@ void loop()
 
     if ( Serial.available() > 0 )
     {
+        g_debug_step = 10;
         BaseUI::key_command_t key = g_TextUI.KeyInput();
-        handle_key_input(key);
+        g_debug_step = 101;
+        if ( ! handle_key_input(key) )
+        {
+            g_debug_step = 1011;
+            set_status(STAT_POS_2, "Deliberate stall to force watchdog restart ...");
+            while (true);
+        }
     }
 
     // Midi read ... (I don't know if there's an input queue or how big it is, we'll have to experiment)
 
     while ( usbMIDI.read() )
     {
+        g_debug_step = 20;
         //  ... and should be buffer incoming events ourselves or handle
         // them as we see them. (We'll do the latter, to begin with.)
 
@@ -251,6 +287,7 @@ void loop()
     int eventsProcessed = 0;
     while ( snd_seq_event_t * ev = g_Sequencer.GetEvent(g_SysTimeMicros) )
     {
+        g_debug_step = 30;
         switch (ev->type)
         {
             case SND_SEQ_EVENT_ECHO:
@@ -276,18 +313,28 @@ void loop()
         eventsProcessed++;
     }
 
+//    int debug_loop_count = 0;
     while ( !ticks.empty() )
     {
+        g_debug_step = 40;
         queue_next_step(&ticks.front());
         ticks.pop();
 //        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+//        if ( ++debug_loop_count > 100 )
+//        {
+//            set_status(STAT_POS_2, "Breaking out of tick loop ...");
+//            break;
+//        }
     }
 
     if ( sendNow )
     {
 //        g_TextUI.FWriteXY(4, 8, "Events: %i", eventsProcessed);
+        g_debug_step = 50;
         usbMIDI.send_now();
     }
+
+    g_debug_step = 60;
 
     update_item_menus();
 
@@ -305,4 +352,5 @@ void loop()
         g_TextUI.FWriteXY(4, 9, " micros:%14llu", g_SysTimeMicros);
     }
 #endif
+    g_debug_step = 70;
 }

@@ -39,7 +39,7 @@ struct StepList : public ItemMenu
     static StepList EmptyList;
 
     StepList(StepListGroup * parent = NULL):
-        m_Parent(parent)
+        m_ParentListGroup(parent)
     {
         m_DisplayObjectType = BaseUI::dot_step_list;
         m_PopUpMenuID = C_MENU_ID_STEPLIST;
@@ -151,7 +151,7 @@ struct StepList : public ItemMenu
     private:
         std::vector<Cluster>::size_type m_NowPlayingPos = -1;        // Updated by parent group when events are played.
 
-        StepListGroup * m_Parent;
+        StepListGroup * m_ParentListGroup;
 
 };
 

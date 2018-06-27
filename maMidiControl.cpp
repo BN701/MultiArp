@@ -90,14 +90,14 @@ message_map_t g_MessageMap_OP1 =
     {15, CM_MIDI_MOD_SHIFT},    // Lift
     {16, CM_MIDI_NOP},          // Drop
     {17, CM_MIDI_NOP},          // Scissors
-    {26, CM_MIDI_NOP},          // Seq
+    {26, CM_MIDI_ENTER},        // Seq
     {38, CM_MIDI_REC},          // Rec
     {39, CM_MIDI_RUN},          // Play
     {40, CM_MIDI_STOP},         // Stop
     {41, CM_MIDI_NOP},          // '<'
     {42, CM_MIDI_NOP},          // '>'
-    {48, CM_MIDI_COMMIT},       // Mic
-    {49, CM_MIDI_REST},         // Disc/Com
+    {48, CM_MIDI_REST},         // Mic
+    {49, CM_MIDI_BACK},         // Disc/Com
     {50, CM_MIDI_CHOICE_1},     // '1'
     {51, CM_MIDI_CHOICE_2},     // '2'
     {52, CM_MIDI_CHOICE_3},     // '3'

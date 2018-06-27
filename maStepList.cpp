@@ -294,7 +294,7 @@ bool StepList::HandleKey(BaseUI::key_command_t k)
         break;
     case BaseUI::key_cmd_move_up:
     case BaseUI::key_cmd_move_down:
-        if ( m_Parent != NULL && !m_Clusters.empty() && m_Parent->InsertNeighbour(k, m_Clusters[m_PosEdit], m_ItemID, m_PosEdit) )
+        if ( m_ParentListGroup != NULL && !m_Clusters.empty() && m_ParentListGroup->InsertNeighbour(k, m_Clusters[m_PosEdit], m_ItemID, m_PosEdit) )
         {
             DeleteStep();
             switch ( k )

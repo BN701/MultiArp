@@ -76,7 +76,7 @@ class ListBuilder
 
         void SetMidiInputMode( int val );
         int MidiInputMode();
-        bool ChordMode() { return m_MidiInputMode = MIDI_INPUT_CHORD; }
+        bool ChordMode() { return m_MidiInputMode == MIDI_INPUT_CHORD; }
         bool RealTimeRecord() { return m_MidiInputMode == MIDI_INPUT_REAL_TIME; }
         int MidiInputModeAsColour(std::vector<int> choices) { return choices.at(m_MidiInputMode); }
         bool MidiInputModeChanged();    // Call once and clear flag.

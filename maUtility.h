@@ -25,8 +25,16 @@
 
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 #include "alsa_types.h"
+
+#define DEBUG_STEP(x) g_debug_step = x
+extern int g_debug_step;
+
 #else
+
 #include <alsa/asoundlib.h>
+
+#define DEBUG_STEP
+
 #endif
 
 

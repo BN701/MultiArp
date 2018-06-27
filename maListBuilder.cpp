@@ -27,7 +27,6 @@
 #include <cstdio>
 
 #include "maState.h"
-//extern State g_State;
 
 #else
 #include <alsa/asoundlib.h>

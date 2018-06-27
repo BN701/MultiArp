@@ -141,5 +141,5 @@ bool Sequencer::ScheduleNextCallBack(int raw0, int raw1, int raw2)
     ev.data.raw32.d[0] = raw0;
     ev.data.raw32.d[1] = raw1;
     ev.data.raw32.d[2] = raw2;
-   return ScheduleEvent(ev);
+    return ScheduleEvent(ev);
 }

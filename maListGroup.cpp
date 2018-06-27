@@ -70,7 +70,7 @@ int ListGroup::m_ListGroupCounter = 0;
 map<int, ListGroup*> ListGroup::m_ListGroupsLookup;
 
 ListGroup::ListGroup(Pattern * p, list_group_type type):
-    m_Parent(p),
+    m_ParentPattern(p),
     m_Type(type)
 {
     m_ListGroupsLookup[m_ListGroupID] = this;
@@ -78,7 +78,7 @@ ListGroup::ListGroup(Pattern * p, list_group_type type):
 
 ListGroup::ListGroup(ListGroup & lg):
     ItemMenu(lg),
-    m_Parent(lg.m_Parent),
+    m_ParentPattern(lg.m_ParentPattern),
     m_Type(lg.m_Type),
     m_MidiChannel(lg.m_MidiChannel),
     m_CurrentStepValue(lg.m_CurrentStepValue),
@@ -345,9 +345,11 @@ void ListGroup::ClearStop()
 
 bool ListGroup::Step(int listGroupID)
 {
+    DEBUG_STEP(4011);
     auto pos = m_ListGroupsLookup.find(listGroupID);
     if ( pos == m_ListGroupsLookup.end() )
         return false;
+    DEBUG_STEP(4012);
     pos->second->Step();
 //    m_ListGroupsLookup[listGroupID]->Step();
     return true;
@@ -357,6 +359,7 @@ bool ListGroup::Step(int listGroupID)
 
 bool ListGroup::Step()
 {
+    DEBUG_STEP(401231);
     if ( !m_Running )
         return false; // Break the cycle, enforced.
 
@@ -368,17 +371,18 @@ bool ListGroup::Step()
     // happens now or at the end of this function. It'll be processed when
     // this has all completed.)
 
+    DEBUG_STEP(401232);
 #if 1
     snprintf(m_Progress, 20, " - %5.2f", m_Phase + 1);
 #else
     snprintf(m_Progress, 20, " %5.2f - %.2f", m_Phase + 1, m_Beat);
 #endif
+    DEBUG_STEP(401233);
     SetRedraw();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
-//    g_State.Step(g_PatternStore.StepValueMultiplier());
-//    m_LastUsedStepValue = m_CurrentStepValue;
+    DEBUG_STEP(401234);
     double stepValueMultiplier = 1.0;
     double beatInc = 4.0 * stepValueMultiplier / m_CurrentStepValue;
     m_Beat += beatInc;
@@ -397,67 +401,19 @@ bool ListGroup::Step()
 //    m_nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
     m_NextBeatSwung = nextBeatStrict;
 
-//#if defined(MA_BLUE)
-//    m_TimeLineMicros += beatInc * 60000000 / g_State.Tempo();
-//
-//    m_Phase = fmod(nextBeatStrict, g_State.Quantum());
-//#else
-//    ableton::Link::Timeline timeline = g_Link.captureAppTimeline();
-//    chrono::microseconds t_next_usec = timeline.timeAtBeat(m_NextBeatSwung, g_State.Quantum());
-//
-//    m_Phase = timeline.phaseAtTime(t_next_usec, g_State.Quantum());
-//#endif
-
-//    double timeLineMicros = g_State.TimeAtBeat(m_Beat);
     m_TickTimeUsec = g_State.TimeAtBeat(m_Beat);
     m_Phase = g_State.PhaseAtBeat(m_Beat);
 
     if ( equals(m_Phase, 0) )
     {
         m_CurrentStepValue = m_StepPending;
-//        m_Quantum = m_QuantumPending;
     }
-
-//    if ( g_State.PhaseIsZero() )
-//    {
-//       do_phase0_updates();
-//       g_PatternStore.SetPhaseIsZero();
-//       g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
-//    }
 
     // Set next schedule time on the queue
 
-//    uint64_t queue_time_usec = 0;
-
-//#ifdef MA_BLUE
-////    m_TickTimeUsec = llround(nextBeat * 60000000/120);
-//    m_TickTimeUsec = m_TimeLineMicros;
-//#else
-//    if ( g_LinkStartTime.count() < 0 )
-//    {
-//       g_LinkStartTime = t_next_usec;
-//       m_TickTimeUsec = 0;
-//    }
-//    else
-//    {
-//       m_TickTimeUsec = (t_next_usec.count() - g_LinkStartTime.count());
-//    }
-//#endif
 
     m_Tempo = g_State.Tempo();
-//    m_Tempo = timeline.tempo();
 
-//    if ( m_TickTimeUsec < 0 )
-//    {
-//       // Sometimes at start up link appears to go backwards, especially if
-//       // there's another instance of the app running. For now, just keep
-//       // reschedule and hope things settle down. This is probably our count
-//       // in, though I haven't thought it through properly.
-//    //        raise(SIGINT);
-//       m_TickTimeUsec = 0;
-//    }
-
-//    g_Sequencer.SetScheduleTime(m_TickTimeUsec);
     g_Sequencer.SetScheduleTime(m_TickTimeUsec);
 
     // Schedule an event to be fired back to our own app which prompts another
@@ -831,14 +787,14 @@ void StepListGroup::StepTheLists(Cluster & cluster, TrigRepeater & repeater,
 
 bool StepListGroup::Step()
 {
-//    uint64_t queueTimeUsec = 0;
-//    double nextBeatSwung;
 
     // Update any 'now playing' info.
 
+    DEBUG_STEP(40121);
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         it->SetNowPlayingPos(-1);
 
+    DEBUG_STEP(40122);
     for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
     {
         update_pair & u = m_DeferredUpdates.front();
@@ -851,22 +807,23 @@ bool StepListGroup::Step()
 
     m_DeferredUpdates.clear();
 
+    DEBUG_STEP(40123);
     if ( !ListGroup::Step() )
         return false;
 
+    DEBUG_STEP(40124);
     Cluster nextCluster;
     TrigRepeater repeater;
-    TranslateTable & translator = m_Parent->m_TranslateTable;
+    TranslateTable & translator = m_ParentPattern->m_TranslateTable;
     double stepValueMultiplier; // Todo: work out how to use this from here (it's filled in
                                 // from the TrigList via StepTheLists() ...
 
     if ( g_State.RunState() /*|| g_DeferStop-- > 0*/ )
     {
         StepTheLists(nextCluster, repeater, stepValueMultiplier, m_Phase, m_CurrentStepValue, m_NextBeatSwung);
-//        if ( g_ListBuilder.RealTimeRecord() )
-//            nextCluster += *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     }
 
+    DEBUG_STEP(40125);
     if ( nextCluster.Empty() )
        return true;
 
@@ -880,55 +837,65 @@ bool StepListGroup::Step()
          Step length in mSec = 1000*240/TV
     */
 
+    DEBUG_STEP(40126);
     double stepLengthMilliSecs = 240000.0/(m_Tempo * m_CurrentStepValue);
-    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + m_Parent->m_Gate));
+    unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + m_ParentPattern->m_Gate));
 
+    DEBUG_STEP(40127);
     repeater.Init(m_Tempo, stepLengthMilliSecs);
 
     for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
     {
-       int noteNumber = note->m_NoteNumber;
+        DEBUG_STEP(40128);
+        int noteNumber = note->m_NoteNumber;
 
-       if ( noteNumber < 0 )
+        if ( noteNumber < 0 )
            continue;
 
-       unsigned char noteVelocity;
+        unsigned char noteVelocity;
 
-       // For real time events, move the note ahead or behind
-       // the phase value of the step itself. (We can't move
-       // too far ahead, obviously, but there's no mechanism
-       // yet for dealing with that situation if it happens.)
+        // For real time events, move the note ahead or behind
+        // the phase value of the step itself. (We can't move
+        // too far ahead, obviously, but there's no mechanism
+        // yet for dealing with that situation if it happens.)
 
-       double phaseAdjust = note->Phase() - m_Phase;
-       int64_t timeAdjust = llround(60000000.0 * phaseAdjust/m_Tempo);
+        DEBUG_STEP(40129);
+        double phaseAdjust = note->Phase() - m_Phase;
+        int64_t timeAdjust = llround(60000000.0 * phaseAdjust/m_Tempo);
 
-       int64_t queue_time_adjusted = m_TickTimeUsec + timeAdjust;
+        int64_t queue_time_adjusted = m_TickTimeUsec + timeAdjust;
 
-       if ( note->m_NoteVelocity > 0 )
+        if ( note->m_NoteVelocity > 0 )
            noteVelocity = note->m_NoteVelocity;
-       else
-           noteVelocity = m_Parent->m_Velocity;
+        else
+           noteVelocity = m_ParentPattern->m_Velocity;
 
-       double noteLength = note->Length();
-       if ( lround(noteLength * 100) > 0 )
-       {
+        double noteLength = note->Length();
+        if ( lround(noteLength * 100) > 0 )
+        {
            // Note length here is in beats. Convert to milliseconds.
            duration = lround(60000.0 * noteLength / m_Tempo);
-       }
+        }
 
-       int64_t queue_time_delta = 0;
-       int interval = 0;
-       repeater.Reset(noteVelocity);
+        DEBUG_STEP(401291);
+        int64_t queue_time_delta = 0;
+        int interval = 0;
+        repeater.Reset(noteVelocity);
 
-       do
-       {
-           int note = translator.TranslateUsingNoteMap(noteNumber, interval);
-           g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-           g_Sequencer.ScheduleNote(note, noteVelocity, duration, m_MidiChannel);
-       }
-       while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
+        do
+        {
+            DEBUG_STEP(401292);
+            int note = translator.TranslateUsingNoteMap(noteNumber, interval);
+//            int note = noteNumber;
+            DEBUG_STEP(401293);
+            g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
+            DEBUG_STEP(401294);
+            g_Sequencer.ScheduleNote(note, noteVelocity, duration, m_MidiChannel);
+        }
+        while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
 
+    DEBUG_STEP(401295);
     return true;
 }
 

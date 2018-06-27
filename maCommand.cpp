@@ -54,10 +54,10 @@ extern AnsiUI g_TextUI;
 
 unordered_map<string, command_t> g_CommandList =
 {
-#if !defined(MA_BLUE) || defined(MA_BLUE_PC)
+//#if !defined(MA_BLUE) || defined(MA_BLUE_PC)
     {"exit", C_EXIT},
     {"quit", C_EXIT},
-#endif
+//#endif
 
     {"/", C_MENU},
 

@@ -45,6 +45,7 @@ extern chrono::microseconds g_LinkStartTime;
 #include "maItemMenu.h"
 #include "maListBuilder.h"
 #include "maPatternStore.h"
+#include "maProgressDisplay.h"
 #include "maScreen.h"
 #include "maState.h"
 #include "maStep.h"
@@ -76,7 +77,8 @@ void do_UI_updates()
     // Every step ...
 
 //    update_big_panel();
-    update_progress_bar();
+//    update_progress_bar();
+    g_ProgressBar.Update();
 }
 
 void do_phase0_updates()
@@ -134,33 +136,43 @@ void queue_next_step(snd_seq_event_t *ev)
 
     if ( ev != NULL && ev->type == SND_SEQ_EVENT_ECHO )
     {
+        DEBUG_STEP(401);
         int listGroupID = ev->data.raw32.d[0];
         if ( ListGroup::Step(listGroupID) )
+        {
+            DEBUG_STEP(4012);
             return;
+        }
     }
+
 
     // Now process global step events ...
 
     // We're called when ALSA has played the events we scheduled last time we were here,
     // so updating position info at this point should reflect what we are hearing.
 
+    DEBUG_STEP(402);
     do_UI_updates();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
+    DEBUG_STEP(403);
     g_State.Step(g_PatternStore.StepValueMultiplier());
 
     // Get time of next step from Link.
 
 
+    DEBUG_STEP(404);
     double nextBeatStrict = g_State.Beat();    // This is absolute beat value since the clock started,
 
+    DEBUG_STEP(405);
     double nextBeatSwung = g_PatternStore.FeelMapForPlay().Adjust(nextBeatStrict);
 
 #ifdef MA_BLUE
    // MA_BLUE Todo: Convert beat (phase) to schedule time
 //   chrono::microseconds t_next_usec(llround(nextBeat * 60000000/120));
 
+    DEBUG_STEP(406);
     g_State.SetPhase(fmod(nextBeatStrict, g_State.Quantum()));
 
 #else
@@ -178,10 +190,13 @@ void queue_next_step(snd_seq_event_t *ev)
 //
     if ( g_State.PhaseIsZero() )
     {
-       do_phase0_updates();
-       g_PatternStore.SetPhaseIsZero();
-       g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
+        DEBUG_STEP(407);
+        do_phase0_updates();
+        g_PatternStore.SetPhaseIsZero();
+        g_ListBuilder.SetPhaseIsZero(g_State.Beat(), g_State.Quantum());
     }
+
+    DEBUG_STEP(408);
 
     // Set next schedule time on the queue
 
@@ -212,6 +227,7 @@ void queue_next_step(snd_seq_event_t *ev)
        queue_time_usec = 0;
     }
 
+    DEBUG_STEP(409);
     g_Sequencer.SetScheduleTime(queue_time_usec);
 
     // Schedule an event to be fired back to our own app which prompts another
@@ -220,6 +236,7 @@ void queue_next_step(snd_seq_event_t *ev)
     // TODO: We used to do this after scheduling all midi events. Have there
     //       been any noticable effects of doing it before?
 
+    DEBUG_STEP(4091);
     g_Sequencer.ScheduleNextCallBack();
 
     // Step the Pattern Store
@@ -227,14 +244,22 @@ void queue_next_step(snd_seq_event_t *ev)
 //    TrigRepeater repeater;
 //    TranslateTable & translator = g_PatternStore.TranslateTableForPlay();
 
+    DEBUG_STEP(4092);
     if ( g_State.RunState() || g_DeferStop-- > 0 )
+    {
         g_PatternStore.Step(/*nextCluster, repeater,*/ g_State.Phase(), g_State.LastUsedStepValue(), nextBeatSwung);
+    }
     else
+    {
+        DEBUG_STEP(4093);
         return;
+    }
 
+    DEBUG_STEP(4093);
     if ( !g_ListBuilder.RealTimeRecord() )
         return;
 
+    DEBUG_STEP(4094);
     Cluster nextCluster = *g_ListBuilder.Step(g_State.Phase(), g_State.LastUsedStepValue());
     if ( nextCluster.Empty() )
        return;
@@ -245,6 +270,7 @@ void queue_next_step(snd_seq_event_t *ev)
     double tempo = timeline.tempo();
 #endif
 
+    DEBUG_STEP(4095);
     /*
          V, Step Value, is 4 x 'steps per beat'. (This gives the familiar
          eighth, sixteenths, etc). T, tempo, is 'beats per minute'.

@@ -86,9 +86,6 @@ AnsiUI g_TextUI;
 CairoUI g_CairoUI(false);
 #endif
 
-//State g_State;
-//PatternStore g_PatternStore;
-
 // Static instances of empty items
 // for use by member functions that
 // return references when no patterns

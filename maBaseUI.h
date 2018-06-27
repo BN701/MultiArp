@@ -181,6 +181,8 @@ class BaseUI
         enum display_object_type_t  // Hopefully just use these for sanity checks.
         {
             dot_base,
+            dot_top_line_status,
+            dot_progress_bar,
             dot_pattern_store,
             dot_pattern,
             dot_pattern_menu_list,

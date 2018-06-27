@@ -87,6 +87,7 @@
 			<Add library="../midifile/lib/libmidifile.a" />
 			<Add directory="/usr/lib/x86_64-linux-gnu" />
 		</Linker>
+		<Unit filename="../WatchDog-2/WatchDog-2.ino" />
 		<Unit filename="MultiArp.ino" />
 		<Unit filename="Test Files/More Test Data.txt" />
 		<Unit filename="Test Files/Nice Clips, Autumn 2017.txt" />
@@ -125,6 +126,8 @@
 		<Unit filename="maPatternChain.h" />
 		<Unit filename="maPatternStore.cpp" />
 		<Unit filename="maPatternStore.h" />
+		<Unit filename="maProgressDisplay.cpp" />
+		<Unit filename="maProgressDisplay.h" />
 		<Unit filename="maRealTimeList.cpp" />
 		<Unit filename="maRealTimeList.h" />
 		<Unit filename="maScreen.cpp" />

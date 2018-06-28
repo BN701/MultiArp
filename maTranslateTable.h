@@ -231,15 +231,15 @@ class TranslateTable : public ItemMenu
         // int m_Intervals[12];        // Lists steps, in semitones, for each degree.
         std::vector<int> m_Intervals;
 
-        int m_DegreeShiftSemis;
-        int m_DegreeShift;
-        int m_Root;
-        int m_ScaleDegrees;
-        int m_Transpose;
+        int m_DegreeShiftSemis = 0;
+        int m_DegreeShift = 0;
+        int m_Root = 0;
+        int m_ScaleDegrees = 0;
+        int m_Transpose = 0;
 
-        scale_t m_Scale;
-        scale_premap_mode_t m_PremapMode;
-        accidentals_mode_t m_AccidentalsMode;
+        scale_t m_Scale = major;
+        scale_premap_mode_t m_PremapMode = premap_off;
+        accidentals_mode_t m_AccidentalsMode = accmode_upper;
 
         bool m_NewTransposePending;
         int m_NewTranspose;

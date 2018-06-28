@@ -20,6 +20,7 @@
 #include "maUtility.h"
 
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
@@ -267,3 +268,25 @@ bool equals_3(double val1, double val2)
     return lround(1000.0 * val1) == lround(1000.0 * val2);
 }
 
+uint32_t FreeMem()
+{
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+// for Teensy 3.0. Does it work anywhere else?
+    uint32_t stackTop = 0;
+    uint32_t heapTop = 0;
+
+    // current position of the stack.
+    stackTop = (uint32_t) &stackTop;
+
+    // current position of heap.
+    void* hTop = malloc(1);
+    heapTop = (uint32_t) hTop;
+    free(hTop);
+    // The difference is (approximately) the free, available ram.
+    return stackTop - heapTop;
+#else
+    // I don't have any code for other platforms.
+    return 0;
+#endif
+
+}

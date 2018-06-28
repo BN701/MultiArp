@@ -35,6 +35,9 @@
 #include "maState.h"
 #include "maStep.h"
 
+#define __DEBUG_FILE_ID__ 1
+#include "maUtility.h"
+
 //
 // Use of MA_BLUE in this file is to create a PC platform
 // that can be used to test and debug MA_BLUE configurations
@@ -78,6 +81,12 @@ std::chrono::microseconds g_LinkStartTime(-1);
 #endif
 
 using namespace std;
+
+// Temp test ...
+int g_debug_step = -1;
+int g_debug_file = -1;
+int g_debug_lineno = -1;
+// End temp test
 
 // Global instances.
 
@@ -157,6 +166,7 @@ int main(int argc, char *argv[])
 {
     // Initialize ...
 
+    DEBUG_POS_AUTO;
     // Termination handlers.
 
 //    signal(SIGINT, sigterm_exit);

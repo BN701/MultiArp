@@ -26,14 +26,23 @@
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 #include "alsa_types.h"
 
-#define DEBUG_STEP(x) g_debug_step = x
-extern int g_debug_step;
+#if defined(__DEBUG_FILE_ID__)
+#define DEBUG_POS_ACTIVE
+extern int g_debug_file;
+extern int g_debug_lineno;
+extern char g_debug_message[80];
+#define DEBUG_POS_AUTO g_debug_file = __DEBUG_FILE_ID__; g_debug_lineno = __LINE__
+#else
+#define DEBUG_POS_AUTO
+#define __DEBUG_FILE_ID__ -2
+#endif
 
 #else
 
 #include <alsa/asoundlib.h>
 
-#define DEBUG_STEP
+#define DEBUG_POS_AUTO
+#define __DEBUG_FILE_ID__ -3
 
 #endif
 
@@ -58,6 +67,7 @@ bool equals_3(double val1, double val2);
 uint64_t EventTimeToMicros(snd_seq_event_t & ev);
 uint64_t AlsaTimeStampToMicros(snd_seq_timestamp & t);
 
+uint32_t FreeMem();
 
 
 #endif // MAUTILITY_H_INCLUDED

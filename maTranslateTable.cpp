@@ -20,6 +20,7 @@
 #include "maTranslateTable.h"
 
 #include <algorithm>
+#include <cstring>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -31,6 +32,8 @@
 
 #include "maNotes.h"
 #include "maPatternStore.h"
+
+#define __DEBUG_FILE_ID__ 100
 #include "maUtility.h"
 
 // These tables aren't needed at the moment, but
@@ -1135,8 +1138,13 @@ string TranslateDiags::UpdateLog()
     char buff[200];
     string result;
 
+    DEBUG_POS_AUTO;
+#if defined(DEBUG_POS_ACTIVE)
+    snprintf(g_debug_message, 80, "In/Out pairs %i, memory %i", m_InOutPairs.size(), FreeMem());
+#endif
     m_InOutPairs.emplace_back(m_NoteIn, m_NoteOut);
 
+    DEBUG_POS_AUTO;
     //                          In   Octave   Premap Degree/Actual Chro Final
     snprintf(buff, 200, " %3s %-10.10s %3s  %2i+%-2i %4s->%-4s %2i / %-2i = %-4s %3i    %-4s %-12s",
         Note::NoteString(m_Root).c_str(),
@@ -1153,21 +1161,35 @@ string TranslateDiags::UpdateLog()
         Note::NoteString(m_NoteOut).c_str(),
         m_InScale ? "" : "Accidental");
 
+    DEBUG_POS_AUTO;
+#if defined(DEBUG_POS_ACTIVE)
+    snprintf(g_debug_message, 80, "Log %i, entries %i, buff %i, memory %i", m_Log.length(), m_Entries, strlen(buff), FreeMem());
+#endif
+
     m_Log += buff;
+    DEBUG_POS_AUTO;
     m_Log += '\n';
+    DEBUG_POS_AUTO;
     m_Entries += 1;
 
+    int pairs = m_InOutPairs.size();
+    int length = m_Log.length();
+    DEBUG_POS_AUTO;
     return buff;
 }
 
-#if 0
+#if 1
 
 // With diagnositics.
 
 int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 {
+    DEBUG_POS_AUTO;
+
     if ( !m_ScaleValid )
         SetupScaleMaps();
+
+    DEBUG_POS_AUTO;
 
     m_Diags.Reset();
     m_Diags.m_Root = m_Root;
@@ -1187,12 +1209,14 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
     // (Only one of these loops will apply.)
 
+    DEBUG_POS_AUTO;
     while ( note >= 12 )
     {
         note -= 12;
         octave += 12;
     }
 
+    DEBUG_POS_AUTO;
     while ( note < 0 )
     {
         note += 12;
@@ -1202,6 +1226,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     m_Diags.m_Octave = octave/12;
     m_Diags.m_Degree = note;
 
+    DEBUG_POS_AUTO;
     if ( m_PremapMode > premap_off )
     {
         note = PreMapScale(note);
@@ -1220,12 +1245,14 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     int octaveShift = 0;
     int degreeShift = m_DegreeShift + degreeShiftOverride;
 
+    DEBUG_POS_AUTO;
     while ( degreeShift >= m_ScaleDegrees )
     {
         degreeShift -= m_ScaleDegrees;
         octaveShift += 12;
     }
 
+    DEBUG_POS_AUTO;
     while ( degreeShift < 0 )
     {
         degreeShift += m_ScaleDegrees;
@@ -1253,6 +1280,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
     if ( note == 0 || m_NoteMap[note] > 0 )
     {
+        DEBUG_POS_AUTO;
         m_Diags.m_InScale = true;
         shift = ShiftSum(m_NoteMap[note], degreeShift);
 #if 0
@@ -1264,6 +1292,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     }
     else
     {
+        DEBUG_POS_AUTO;
         m_Diags.m_InScale = false;
 
         // Accidental (not in the scale).
@@ -1272,6 +1301,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
         int nLower = note;
         int nUpper = note;
 
+        DEBUG_POS_AUTO;
         while ( nLower > 0 )
         {
             if ( m_NoteMap[nLower] != 0 )
@@ -1279,6 +1309,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
             nLower -= 1;
         }
 
+        DEBUG_POS_AUTO;
         while ( nUpper < 12 )
         {
             if ( m_NoteMap[nUpper] != 0 )
@@ -1294,6 +1325,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
         bool mute = false;
 
+        DEBUG_POS_AUTO;
         switch ( m_AccidentalsMode )
         {
             case accmode_upper:
@@ -1333,12 +1365,15 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 #endif
     }
 
+    DEBUG_POS_AUTO;
     m_Diags.m_ModalShift = shift;
     m_Diags.m_DegreeAfterShift = note + shift;
     m_Diags.m_NoteOut = m_Root + octave + note + octaveShift + shift + m_Transpose;
 
+    DEBUG_POS_AUTO;
     m_Diags.UpdateLog();
 
+    DEBUG_POS_AUTO;
     return m_Root + octave + note + octaveShift + shift + m_Transpose;
 }
 
@@ -1346,7 +1381,11 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
 int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 {
-    DEBUG_STEP(9901010);
+    DEBUG_POS_AUTO;
+
+    if ( !m_ScaleValid )
+        SetupScaleMaps();
+
     // Make note a value relative to root.
     note -= m_Root;
 
@@ -1357,23 +1396,27 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
     // (Only one of these loops will apply.)
 
-    DEBUG_STEP(9901020);
+    DEBUG_POS_AUTO;
     while ( note >= 12 )
     {
         note -= 12;
         octave += 12;
     }
 
-    DEBUG_STEP(9901030);
+    DEBUG_POS_AUTO;
     while ( note < 0 )
     {
         note += 12;
         octave -= 12;
     }
 
-    DEBUG_STEP(9901040);
+    DEBUG_POS_AUTO;
+#if defined(DEBUG_POS_ACTIVE)
+    snprintf(g_debug_message, 80, "Note: %i, Octave: %i, PremapMode: %i", note, octave, m_PremapMode);
+#endif
     if ( m_PremapMode > premap_off )
     {
+        DEBUG_POS_AUTO;
         note = PreMapScale(note);
         if ( note < 0 )
             return -1;
@@ -1381,18 +1424,25 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
     // Similarly, normalise degree shift to single octave.
 
-    DEBUG_STEP(9901050);
+    DEBUG_POS_AUTO;
     int octaveShift = 0;
     int degreeShift = degreeShiftOverride == 0 ? m_DegreeShift : degreeShiftOverride;
 
-    DEBUG_STEP(9901060);
+    DEBUG_POS_AUTO;
+#if defined(DEBUG_POS_ACTIVE)
+    snprintf(g_debug_message, 80, "DegreeShift: %i, Scale Degrees: %i", degreeShift, m_ScaleDegrees);
+#endif
     while ( degreeShift >= m_ScaleDegrees )
     {
         degreeShift -= m_ScaleDegrees;
         octaveShift += 12;
     }
 
-    DEBUG_STEP(9901070);
+#if defined(DEBUG_POS_ACTIVE)
+    snprintf(g_debug_message, 80, "Reached line: %i", __LINE__);
+#endif
+
+    DEBUG_POS_AUTO;
     while ( degreeShift < 0 )
     {
         degreeShift += m_ScaleDegrees;
@@ -1417,7 +1467,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 
     if ( note == 0 || m_NoteMap[note] > 0 )
     {
-        DEBUG_STEP(9901075);
+        DEBUG_POS_AUTO;
         shift = ShiftSum(m_NoteMap[note], degreeShift);
 #if 0
         int degreeIndex = degree - 1;
@@ -1428,7 +1478,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
     }
     else
     {
-        DEBUG_STEP(9901076);
+        DEBUG_POS_AUTO;
         // Accidental (not in the scale).
 
         // int d = 0;
@@ -1442,7 +1492,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
             nLower -= 1;
         }
 
-        DEBUG_STEP(99010761);
+        DEBUG_POS_AUTO;
         while ( nUpper < 12 )
         {
             if ( m_NoteMap[nUpper] != 0 )
@@ -1456,7 +1506,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
         int sLower = ShiftSum(dLower, degreeShift);
         int sUpper = ShiftSum(dUpper, degreeShift);
 
-        DEBUG_STEP(99010762);
+        DEBUG_POS_AUTO;
         switch ( m_AccidentalsMode )
         {
             case accmode_upper:
@@ -1479,7 +1529,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
                 break;
         }
 
-        DEBUG_STEP(99010763);
+        DEBUG_POS_AUTO;
 #if 0
         // Find next free accidental slot.
 
@@ -1492,7 +1542,7 @@ int TranslateTable::TranslateUsingNoteMap(int note, int degreeShiftOverride)
 #endif
     }
 
-    DEBUG_STEP(9901080);
+    DEBUG_POS_AUTO;
     return m_Root + octave + note + octaveShift + shift + m_Transpose;
 }
 #endif

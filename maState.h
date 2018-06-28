@@ -23,12 +23,13 @@
 #include<inttypes.h>
 #include<string>
 
-//#if defined(MA_BLUE)
-//#include "alsa_types.h"
-//#endif
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+#include "alsa_types.h"
+#else
+#include <alsa/asoundlib.h>
+#endif
 
 #include "maTranslateTable.h"
-#include "maUtility.h"
 
 class State
 {
@@ -101,7 +102,7 @@ class State
         int m_PatternReset;
         int m_DeferStop = 0;
 
-#if defined(MA_BLUE)
+#if defined(MA_BLUE) /*and !defined(MA_BLUE_PC)*/
     public:
 
         void SetTempo( double val ) { m_Tempo = val; }

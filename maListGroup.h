@@ -29,7 +29,7 @@
 #include "maRealTimeList.h"
 #include "maStepList.h"
 #include "maTrigList.h"
-#include "maUtility.h"
+//#include "maUtility.h"
 
 class Pattern;
 

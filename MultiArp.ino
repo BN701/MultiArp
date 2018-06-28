@@ -72,6 +72,9 @@ volatile int deliberateStall = 0;
 volatile uint8_t dogCount = 0;
 
 DMAMEM int g_debug_step = -1;
+DMAMEM int g_debug_file = -1;
+DMAMEM int g_debug_lineno = -1;
+DMAMEM char g_debug_message[80];
 DMAMEM int reboot_count = 0;
 
 void DogHandler()
@@ -161,11 +164,15 @@ void setup()
 
     g_TextUI.ResetScreen();
     g_TextUI.FWriteXY(0, 0, "Hello, world (%i) ...\n\n", g_debug_step);
-    printResetType();
     delay(2000);
 
     g_TextUI.ResetScreen();
-    g_TextUI.FWriteXY(4, 1, "Last debug step before reboot: %i", g_debug_step);
+    g_TextUI.FWriteXY(0, 8, "Last logged positions: loop stage %i, file %i, line %i\n\r", g_debug_step, g_debug_file, g_debug_lineno);
+    printResetType();
+    Serial.println(g_debug_message);
+    g_debug_message[0] = 0;
+    g_debug_file = -1;
+    g_debug_lineno = -1;
     set_top_line();
     queue_next_step(NULL);
 

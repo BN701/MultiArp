@@ -345,11 +345,11 @@ void ListGroup::ClearStop()
 
 bool ListGroup::Step(int listGroupID)
 {
-    DEBUG_STEP(4011);
+    DEBUG_POS_AUTO;
     auto pos = m_ListGroupsLookup.find(listGroupID);
     if ( pos == m_ListGroupsLookup.end() )
         return false;
-    DEBUG_STEP(4012);
+    DEBUG_POS_AUTO;
     pos->second->Step();
 //    m_ListGroupsLookup[listGroupID]->Step();
     return true;
@@ -359,7 +359,7 @@ bool ListGroup::Step(int listGroupID)
 
 bool ListGroup::Step()
 {
-    DEBUG_STEP(401231);
+    DEBUG_POS_AUTO;
     if ( !m_Running )
         return false; // Break the cycle, enforced.
 
@@ -371,18 +371,18 @@ bool ListGroup::Step()
     // happens now or at the end of this function. It'll be processed when
     // this has all completed.)
 
-    DEBUG_STEP(401232);
+    DEBUG_POS_AUTO;
 #if 1
     snprintf(m_Progress, 20, " - %5.2f", m_Phase + 1);
 #else
     snprintf(m_Progress, 20, " %5.2f - %.2f", m_Phase + 1, m_Beat);
 #endif
-    DEBUG_STEP(401233);
+    DEBUG_POS_AUTO;
     SetRedraw();
 
     // Now incrememt the step/beat and get on with scheduling the next events.
 
-    DEBUG_STEP(401234);
+    DEBUG_POS_AUTO;
     double stepValueMultiplier = 1.0;
     double beatInc = 4.0 * stepValueMultiplier / m_CurrentStepValue;
     m_Beat += beatInc;
@@ -790,11 +790,11 @@ bool StepListGroup::Step()
 
     // Update any 'now playing' info.
 
-    DEBUG_STEP(40121);
+    DEBUG_POS_AUTO;
     for ( auto it = m_StepListSet.begin(); it != m_StepListSet.end(); it++ )
         it->SetNowPlayingPos(-1);
 
-    DEBUG_STEP(40122);
+    DEBUG_POS_AUTO;
     for ( auto it = m_DeferredUpdates.begin(); it != m_DeferredUpdates.end(); it++ )
     {
         update_pair & u = m_DeferredUpdates.front();
@@ -807,11 +807,11 @@ bool StepListGroup::Step()
 
     m_DeferredUpdates.clear();
 
-    DEBUG_STEP(40123);
+    DEBUG_POS_AUTO;
     if ( !ListGroup::Step() )
         return false;
 
-    DEBUG_STEP(40124);
+    DEBUG_POS_AUTO;
     Cluster nextCluster;
     TrigRepeater repeater;
     TranslateTable & translator = m_ParentPattern->m_TranslateTable;
@@ -823,7 +823,7 @@ bool StepListGroup::Step()
         StepTheLists(nextCluster, repeater, stepValueMultiplier, m_Phase, m_CurrentStepValue, m_NextBeatSwung);
     }
 
-    DEBUG_STEP(40125);
+    DEBUG_POS_AUTO;
     if ( nextCluster.Empty() )
        return true;
 
@@ -837,16 +837,16 @@ bool StepListGroup::Step()
          Step length in mSec = 1000*240/TV
     */
 
-    DEBUG_STEP(40126);
+    DEBUG_POS_AUTO;
     double stepLengthMilliSecs = 240000.0/(m_Tempo * m_CurrentStepValue);
     unsigned int duration = lround(stepLengthMilliSecs * (nextCluster.StepsTillNextNote() + m_ParentPattern->m_Gate));
 
-    DEBUG_STEP(40127);
+    DEBUG_POS_AUTO;
     repeater.Init(m_Tempo, stepLengthMilliSecs);
 
     for ( auto note = nextCluster.m_Notes.begin(); note != nextCluster.m_Notes.end(); note++ )
     {
-        DEBUG_STEP(40128);
+        DEBUG_POS_AUTO;
         int noteNumber = note->m_NoteNumber;
 
         if ( noteNumber < 0 )
@@ -859,7 +859,7 @@ bool StepListGroup::Step()
         // too far ahead, obviously, but there's no mechanism
         // yet for dealing with that situation if it happens.)
 
-        DEBUG_STEP(40129);
+        DEBUG_POS_AUTO;
         double phaseAdjust = note->Phase() - m_Phase;
         int64_t timeAdjust = llround(60000000.0 * phaseAdjust/m_Tempo);
 
@@ -877,25 +877,25 @@ bool StepListGroup::Step()
            duration = lround(60000.0 * noteLength / m_Tempo);
         }
 
-        DEBUG_STEP(401291);
+        DEBUG_POS_AUTO;
         int64_t queue_time_delta = 0;
         int interval = 0;
         repeater.Reset(noteVelocity);
 
         do
         {
-            DEBUG_STEP(401292);
+            DEBUG_POS_AUTO;
             int note = translator.TranslateUsingNoteMap(noteNumber, interval);
 //            int note = noteNumber;
-            DEBUG_STEP(401293);
+            DEBUG_POS_AUTO;
             g_Sequencer.SetScheduleTime(queue_time_adjusted + queue_time_delta);
-            DEBUG_STEP(401294);
+            DEBUG_POS_AUTO;
             g_Sequencer.ScheduleNote(note, noteVelocity, duration, m_MidiChannel);
         }
         while ( repeater.Step(queue_time_delta, interval, noteVelocity) );
     }
 
-    DEBUG_STEP(401295);
+    DEBUG_POS_AUTO;
     return true;
 }
 

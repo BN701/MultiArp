@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include "maState.h"
+#include "maUtility.h"
 
 using namespace std;
 

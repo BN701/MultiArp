@@ -26,6 +26,10 @@ extern "C"{
     int _write(){return -1;}
 }
 
+extern "C" char* sbrk(int incr);
+extern char _estack;
+uint32_t g_heap_0 = reinterpret_cast<uint32_t>(sbrk(0));
+
 // Watchdog things
 
 void printResetType() {
@@ -76,6 +80,7 @@ DMAMEM int g_debug_file = -1;
 DMAMEM int g_debug_lineno = -1;
 DMAMEM char g_debug_message[80];
 DMAMEM int reboot_count = 0;
+
 
 void DogHandler()
 {
@@ -167,6 +172,9 @@ void setup()
     delay(2000);
 
     g_TextUI.ResetScreen();
+    uint32_t heap_base = g_heap_0;
+    g_heap_0 = reinterpret_cast<uint32_t>(sbrk(0));
+    g_TextUI.FWriteXY(0, 7, "Stack base: %08X, Heap base: %08X, Heap now: %08X, used already: %i", & _estack, heap_base, g_heap_0, g_heap_0 - heap_base);
     g_TextUI.FWriteXY(0, 8, "Last logged positions: loop stage %i, file %i, line %i\n\r", g_debug_step, g_debug_file, g_debug_lineno);
     printResetType();
     Serial.println(g_debug_message);

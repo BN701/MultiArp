@@ -268,10 +268,34 @@ bool equals_3(double val1, double val2)
     return lround(1000.0 * val1) == lround(1000.0 * val2);
 }
 
+
+
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+extern "C" char* sbrk(int incr);
+extern char _estack;
+extern uint32_t g_heap_0;  // Defined in main module, set when globals initialise.
+
+void MemStats(uint32_t & heap_top, uint32_t & stack_bottom, uint32_t & free_mem)
+{
+    char top;
+    heap_top = reinterpret_cast<uint32_t>(sbrk(0));// - 0x1FFFE000;
+    stack_bottom = reinterpret_cast<uint32_t>(&top);// - 0x1FFFE000;
+
+    free_mem = stack_bottom - heap_top;
+    stack_bottom = reinterpret_cast<uint32_t>(&_estack) - stack_bottom;
+    heap_top -= g_heap_0; // Observed start of heap, Jun 2018 with "13480 bytes of globals".
+
+//    free_mem = &top - reinterpret_cast<char*>(sbrk(0));
+}
+
 uint32_t FreeMem()
 {
-#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#if 0
 // for Teensy 3.0. Does it work anywhere else?
+// And what if memory has become fragmented? The
+// test allocation below could be anywhere.
     uint32_t stackTop = 0;
     uint32_t heapTop = 0;
 
@@ -284,9 +308,41 @@ uint32_t FreeMem()
     free(hTop);
     // The difference is (approximately) the free, available ram.
     return stackTop - heapTop;
+#endif
+}
+
+#ifdef __arm__
+extern "C" char* sbrk(int incr);
+int FreeRam() {
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+}
+#else  // __arm__
+extern char *__brkval;
+extern char __bss_end;
+/** Amount of free RAM
+ * \return The number of free bytes.
+ */
+int FreeRam() {
+  char top;
+  return __brkval ? &top - __brkval : &top - &__bss_end;
+}
+#endif  // __arm
+
 #else
+uint32_t FreeMem()
+{
     // I don't have any code for other platforms.
     return 0;
+}
+
+void MemStats(uint32_t & heap_top, uint32_t & stack_bottom, uint32_t & free_mem)
+{
+    heap_top = 0;
+    stack_bottom = 0;
+    free_mem = 0;
+}
+
 #endif
 
-}
+

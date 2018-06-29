@@ -68,6 +68,7 @@ uint64_t EventTimeToMicros(snd_seq_event_t & ev);
 uint64_t AlsaTimeStampToMicros(snd_seq_timestamp & t);
 
 uint32_t FreeMem();
+void MemStats(uint32_t & heap_top, uint32_t & stack_bottom, uint32_t & free_mem);
 
 
 #endif // MAUTILITY_H_INCLUDED

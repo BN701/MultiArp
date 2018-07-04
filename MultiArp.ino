@@ -295,7 +295,7 @@ void loop()
 
     // Midi send queue ...
 
-    uint8_t midiChannel = g_Sequencer.MidiChannel() + 1; // usbMIDI not zero based, it seems.
+//    uint8_t midiChannel = g_Sequencer.MidiChannel() + 1; // usbMIDI not zero based, it seems.
 //    bool callStep = false;
     bool sendNow = false;
 
@@ -315,12 +315,12 @@ void loop()
                 break;
             case SND_SEQ_EVENT_NOTEON:
 //                digitalWrite(LED_BUILTIN, HIGH);
-                usbMIDI.sendNoteOn(ev->data.note.note, ev->data.note.velocity, midiChannel);
+                usbMIDI.sendNoteOn(ev->data.note.note, ev->data.note.velocity, ev->data.note.channel + 1);
                 sendNow = true;
                 break;
             case SND_SEQ_EVENT_NOTEOFF:
 //                digitalWrite(LED_BUILTIN, LOW);
-                usbMIDI.sendNoteOff(ev->data.note.note, ev->data.note.velocity, midiChannel);
+                usbMIDI.sendNoteOff(ev->data.note.note, ev->data.note.velocity, ev->data.note.channel + 1);
                 sendNow = true;
                 break;
         }

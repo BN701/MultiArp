@@ -1135,6 +1135,8 @@ const char * Interval(int n)
 
 string TranslateDiags::UpdateLog()
 {
+    return "";
+#if 0 // Disable this until we formally bring back TranslateTables. (It is currently eating memory and never cleared.)
     char buff[200];
     string result;
 
@@ -1176,6 +1178,7 @@ string TranslateDiags::UpdateLog()
     int length = m_Log.length();
     DEBUG_POS_AUTO;
     return buff;
+#endif
 }
 
 #if 1

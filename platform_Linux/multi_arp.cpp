@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
 #if defined(MA_BLUE)
 
-#if defined(MA_BLUE_PC)
+#if /*defined(MA_BLUE_PC) &&*/ defined(MAALSATESTSUPPORT_INCLUDED)
     init_alsa_test_support();
 #endif
 
@@ -189,11 +189,17 @@ int main(int argc, char *argv[])
 
     // Poll for keyboard input to start with.
 
+#if defined(MAALSATESTSUPPORT_INCLUDED)
     int npfd = alsa_midi_test_support_GetFileDescriptorCount();
+#else
+    int npfd = 0;
+#endif
     struct pollfd *pfd = (struct pollfd *)alloca((npfd + 1) * sizeof(struct pollfd));
     pfd[0].fd = 0;  // stdin
     pfd[0].events = POLLIN;
+#if defined(MAALSATESTSUPPORT_INCLUDED)
     alsa_midi_test_support_GetFileDescriptors(pfd + 1, npfd);
+#endif
 
     // Queue first events
 
@@ -232,6 +238,7 @@ int main(int argc, char *argv[])
 //                    callStep = true;
                     ticks.push(*ev);
                     break;
+#if defined(MAALSATESTSUPPORT_INCLUDED)
                 case SND_SEQ_EVENT_NOTEON:
 //                    fprintf(stderr, "%12i - Note on.\n", loopCount);
                     alsa_midi_write_event(ev);
@@ -240,6 +247,7 @@ int main(int argc, char *argv[])
 //                    fprintf(stderr, "%12i - Note off.\n", loopCount);
                     alsa_midi_write_event(ev);
                     break;
+#endif
             }
             g_Sequencer.PopEvent();
         }
@@ -295,6 +303,7 @@ int main(int argc, char *argv[])
                 keep_going = handle_key_input(key);
             }
 
+#if defined(MAALSATESTSUPPORT_INCLUDED)
             for ( int i = 1; i < npfd + 1; i++ )
             {
                 if ( pfd[i].revents > 0 )
@@ -311,6 +320,7 @@ int main(int argc, char *argv[])
                     while ( alsa_midi_input_pending() );
                 }
             }
+#endif
         }
 
         update_item_menus();

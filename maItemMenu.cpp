@@ -248,6 +248,8 @@ ItemMenu * MenuList::CurrentItem()
 
 ItemMenu::ItemMenu()
 {
+    int size = sizeof(*this);
+    int x = size;
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
     if ( SP_CURSORKEYS )
         EepromStore(SP_CURSORKEYS);

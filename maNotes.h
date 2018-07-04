@@ -79,6 +79,17 @@ struct Note : public ItemMenu
         m_Length(length),
         m_Phase(phase)
     {
+        int sizeThis = sizeof(*this);
+        int sizeNumber = sizeof(m_NoteNumber);
+        int sizeVelocity = sizeof(m_NoteVelocity);
+        int sizeLength = sizeof(m_Length);
+        int sizePhase = sizeof(m_Phase);
+        int sizeInc = sizeof(m_Inc);
+        int sizeMoved = sizeof(m_Moved);
+        int sizeTarget = sizeof(m_Target);
+        int sizeInterval = sizeof(m_Interval);
+        int sizeEditFocus = sizeof(m_NoteEditFocus);
+
         m_DisplayObjectType = BaseUI::dot_note;
     }
 
@@ -131,6 +142,11 @@ struct Cluster : public ItemMenu
     Cluster():
         m_StepLength(1)
     {
+        int sizeThis = sizeof(*this);
+        int sizeNotes = sizeof(m_Notes);
+        int sizeStepLength = sizeof(m_StepLength);
+        int sizePosEdit = sizeof(m_PosEdit);
+
         m_DisplayObjectType = BaseUI::dot_cluster;
         m_PopUpMenuID = C_MENU_ID_CLUSTER;
         m_Help = "S-Left/Right: insert note, C-Left/Right: copy note, S-Del: delete";

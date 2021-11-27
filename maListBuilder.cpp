@@ -32,6 +32,18 @@
 #include <alsa/asoundlib.h>
 #endif // MA_BLUE
 
+#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
+
+#include "alsa_types.h"
+
+#else
+#define LINK_PLATFORM_LINUX
+#include <ableton/Link.hpp>
+
+#include <alsa/asoundlib.h>
+
+#endif // MA_BLUE
+
 
 using namespace std;
 

@@ -20,9 +20,10 @@
 #ifndef MANOTES_H_INCLUDED
 #define MANOTES_H_INCLUDED
 
-#include <vector>
-#include <string>
+//#include <cereal/archives/binary.hpp>
 #include <map>
+#include <string>
+#include <vector>
 
 #include "maItemMenu.h"
 

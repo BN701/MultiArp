@@ -24,7 +24,7 @@
 #include <cstring>
 
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
-#include "maBaseUI.h"
+//#include "maBaseUI.h"
 #endif
 
 using namespace std;
@@ -98,9 +98,6 @@ void dump_stuff(PangoLayout* layout) {
 
 vector<string> split(const char *str, char c, bool wantEmptyTokens)
 {
-#if defined(MA_BLUE) && !defined(MA_BLUE_PC)
-    EepromStore(SP_UTILS_SPLIT);
-#endif
     vector<string> result;
 
     do

@@ -22,13 +22,13 @@
 
 #if defined(MA_BLUE) && !defined(MA_BLUE_PC)
 
-#include "alsa_types.h"
+//#include "alsa_types.h"
 
 #else
-#define LINK_PLATFORM_LINUX
-#include <ableton/Link.hpp>
-
-#include <alsa/asoundlib.h>
+//#define LINK_PLATFORM_LINUX
+//#include <ableton/Link.hpp>
+//
+//#include <alsa/asoundlib.h>
 
 #endif // MA_BLUE
 
@@ -44,6 +44,9 @@ enum midi_input_modes_t
     MIDI_INPUT_REAL_TIME,
     MIDI_INPUT_FILE
 };
+
+struct snd_seq_event;
+typedef snd_seq_event snd_seq_event_t;
 
 class ListBuilder
 {

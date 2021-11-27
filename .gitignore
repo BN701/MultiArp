@@ -3,6 +3,7 @@
 Ignore/
 Screen Capture/
 bin/
+vg-logs/
 *.depend
 *.layout
 *.log

@@ -75,6 +75,7 @@
 			<Add directory="/usr/include/pango-1.0" />
 			<Add directory="/usr/include/glib-2.0" />
 			<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include" />
+			<Add directory="../cereal/include" />
 		</Compiler>
 		<Linker>
 			<Add option="-pthread" />
@@ -137,6 +138,8 @@
 			<Option target="Release (Blue)" />
 		</Unit>
 		<Unit filename="maSequencer.h" />
+		<Unit filename="maSerializer.cpp" />
+		<Unit filename="maSerializer.h" />
 		<Unit filename="maState.cpp" />
 		<Unit filename="maState.h" />
 		<Unit filename="maStep.cpp" />
@@ -174,10 +177,6 @@
 		<Unit filename="platform_Linux/maCursesUI.h" />
 		<Unit filename="platform_Linux/multi_arp.cpp" />
 		<Unit filename="vg-logs/vg.log" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
